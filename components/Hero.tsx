@@ -1,13 +1,16 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { HERO } from '@/data/hero';
+import { NUMBER_SEQUENCE, HERO } from '@/data/hero';
 
 const ParticleField = dynamic(() => import('@/components/ParticleField'), {
   ssr: false,
 });
+
+const FRAME_DURATION = 2800;
 
 const FADE_UP = {
   hidden: { opacity: 0, y: 24 },
@@ -19,6 +22,41 @@ const FADE_UP = {
 };
 
 export default function Hero() {
+  const [frame, setFrame] = useState(0);
+  const [sequenceDone, setSequenceDone] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
+
+  const advance = useCallback(() => {
+    setFrame((prev) => {
+      const next = prev + 1;
+      if (next >= NUMBER_SEQUENCE.length) {
+        setSequenceDone(true);
+        return prev;
+      }
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) {
+      setSequenceDone(true);
+      return;
+    }
+    // Start number cycling after identity has landed
+    const startDelay = setTimeout(() => {
+      const timer = setInterval(advance, FRAME_DURATION);
+      return () => clearInterval(timer);
+    }, 2000);
+    return () => clearTimeout(startDelay);
+  }, [advance, prefersReducedMotion]);
+
+  useEffect(() => {
+    if (frame > 0 && !sequenceDone) {
+      const timer = setInterval(advance, FRAME_DURATION);
+      return () => clearInterval(timer);
+    }
+  }, [frame, advance, sequenceDone]);
+
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 md:px-16">
       <ParticleField />
@@ -26,6 +64,7 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
+      {/* Main identity — centered, left-aligned text */}
       <div className="relative z-10 max-w-content">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -37,9 +76,19 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-4 font-mono text-sm tracking-widest text-accent"
+            className="mb-2 font-mono text-sm tracking-widest text-accent"
           >
-            {HERO.title}
+            {HERO.titles[0]}
+          </motion.p>
+
+          <motion.p
+            custom={0.5}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="mb-4 font-mono text-xs tracking-widest text-text-secondary"
+          >
+            {HERO.titles[1]}
           </motion.p>
 
           <motion.h1
@@ -91,23 +140,82 @@ export default function Hero() {
             </span>
           </motion.div>
         </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.8 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-            className="flex flex-col items-center gap-2"
-          >
-            <span className="text-xs text-text-tertiary">Scroll</span>
-            <div className="h-8 w-px bg-gradient-to-b from-text-tertiary to-transparent" />
-          </motion.div>
-        </motion.div>
       </div>
+
+      {/* Number sequence — ambient strip at bottom of viewport */}
+      <div className="absolute bottom-10 left-0 right-0 z-10">
+        <div className="mx-auto max-w-content px-6 md:px-16">
+          <AnimatePresence mode="wait">
+            {!sequenceDone && (
+              <motion.div
+                key={frame}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                className="flex items-baseline gap-3"
+              >
+                <span className="font-mono text-2xl font-bold text-text-primary sm:text-3xl">
+                  {NUMBER_SEQUENCE[frame].value}
+                </span>
+                <span className="font-mono text-xs tracking-wider text-text-tertiary">
+                  {NUMBER_SEQUENCE[frame].context}
+                </span>
+              </motion.div>
+            )}
+
+            {sequenceDone && (
+              <motion.div
+                key="summary"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6 }}
+                className="flex items-center gap-6 font-mono text-xs tracking-wider text-text-tertiary"
+              >
+                <span>5 awards</span>
+                <span className="h-3 w-px bg-border-subtle" />
+                <span>4 production systems</span>
+                <span className="h-3 w-px bg-border-subtle" />
+                <span>8+ years</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Progress dots */}
+          {!sequenceDone && (
+            <div className="mt-3 flex gap-1.5">
+              {NUMBER_SEQUENCE.map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="h-0.5 rounded-full"
+                  animate={{
+                    width: i === frame ? 24 : 6,
+                    backgroundColor: i === frame ? 'var(--color-accent)' : 'var(--color-border)',
+                  }}
+                  transition={{ duration: 0.3 }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Scroll prompt */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: sequenceDone ? 1 : 0 }}
+        transition={{ delay: 0.5, duration: 0.8 }}
+        className="absolute bottom-28 left-1/2 z-10 -translate-x-1/2"
+      >
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+          className="flex flex-col items-center gap-2"
+        >
+          <span className="text-xs text-text-tertiary">Scroll</span>
+          <div className="h-8 w-px bg-gradient-to-b from-text-tertiary to-transparent" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
