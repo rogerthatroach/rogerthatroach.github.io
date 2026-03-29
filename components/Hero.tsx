@@ -2,90 +2,122 @@
 
 import { motion } from 'framer-motion';
 import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { HERO } from '@/data/hero';
 
+const ParticleField = dynamic(() => import('@/components/ParticleField'), {
+  ssr: false,
+});
+
 const FADE_UP = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.15, duration: 0.6, ease: [0.4, 0, 0.2, 1] },
+    transition: { delay: 0.3 + i * 0.15, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
   }),
 };
 
 export default function Hero() {
   return (
-    <section className="relative flex min-h-screen items-center justify-center px-6 md:px-16">
-      {/* Subtle gradient background */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-transparent" />
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 md:px-16">
+      {/* 3D particle background */}
+      <ParticleField />
+
+      {/* Gradient overlays */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
       <div className="relative z-10 max-w-content">
-        <motion.p
-          custom={0}
-          variants={FADE_UP}
-          initial="hidden"
-          animate="visible"
-          className="mb-4 font-mono text-sm tracking-widest text-accent"
-        >
-          {HERO.title}
-        </motion.p>
-
-        <motion.h1
-          custom={1}
-          variants={FADE_UP}
-          initial="hidden"
-          animate="visible"
-          className="mb-6 text-4xl font-bold tracking-tight text-zinc-50 sm:text-5xl md:text-6xl lg:text-7xl"
-        >
-          {HERO.name}
-        </motion.h1>
-
-        <motion.p
-          custom={2}
-          variants={FADE_UP}
-          initial="hidden"
-          animate="visible"
-          className="mb-8 max-w-2xl text-lg text-zinc-400 sm:text-xl md:text-2xl"
-        >
-          {HERO.tagline}
-        </motion.p>
-
         <motion.div
-          custom={3}
-          variants={FADE_UP}
-          initial="hidden"
-          animate="visible"
-          className="flex items-center gap-6"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
         >
-          <a
-            href={HERO.links.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            className="text-zinc-400 transition-colors hover:text-accent"
+          <motion.p
+            custom={0}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="mb-4 font-mono text-sm tracking-widest text-accent"
           >
-            <Linkedin size={22} />
-          </a>
-          <a
-            href={HERO.links.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub"
-            className="text-zinc-400 transition-colors hover:text-accent"
+            {HERO.title}
+          </motion.p>
+
+          <motion.h1
+            custom={1}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="mb-6 text-4xl font-bold tracking-tight text-zinc-50 sm:text-5xl md:text-6xl lg:text-7xl"
           >
-            <Github size={22} />
-          </a>
-          <a
-            href={`mailto:${HERO.links.email}`}
-            aria-label="Email"
-            className="text-zinc-400 transition-colors hover:text-accent"
+            {HERO.name}
+          </motion.h1>
+
+          <motion.p
+            custom={2}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="mb-10 max-w-2xl text-lg text-zinc-400 sm:text-xl md:text-2xl"
           >
-            <Mail size={22} />
-          </a>
-          <span className="flex items-center gap-1.5 text-sm text-zinc-500">
-            <MapPin size={14} />
-            {HERO.location}
-          </span>
+            {HERO.tagline}
+          </motion.p>
+
+          <motion.div
+            custom={3}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="flex items-center gap-6"
+          >
+            <a
+              href={HERO.links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-zinc-400 backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
+            >
+              <Linkedin size={20} />
+            </a>
+            <a
+              href={HERO.links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-zinc-400 backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
+            >
+              <Github size={20} />
+            </a>
+            <a
+              href={`mailto:${HERO.links.email}`}
+              aria-label="Email"
+              className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-zinc-400 backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
+            >
+              <Mail size={20} />
+            </a>
+            <span className="flex items-center gap-1.5 text-sm text-zinc-500">
+              <MapPin size={14} />
+              {HERO.location}
+            </span>
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.8 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+            className="flex flex-col items-center gap-2"
+          >
+            <span className="text-xs text-zinc-600">Scroll</span>
+            <div className="h-8 w-px bg-gradient-to-b from-zinc-600 to-transparent" />
+          </motion.div>
         </motion.div>
       </div>
     </section>
