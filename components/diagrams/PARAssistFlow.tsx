@@ -14,6 +14,7 @@ import '@xyflow/react/dist/style.css';
 import AgentNode from './AgentNode';
 import AnimatedEdge from './AnimatedEdge';
 import type { AgentNodeData } from './AgentNode';
+import { useThemeColor } from '@/lib/useThemeColor';
 
 const nodeTypes = { agent: AgentNode };
 const edgeTypes = { animated: AnimatedEdge };
@@ -161,6 +162,7 @@ const initialEdges: Edge[] = [
 export default function PARAssistFlow() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
     <div className="h-[700px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface">
@@ -178,7 +180,7 @@ export default function PARAssistFlow() {
         proOptions={{ hideAttribution: true }}
         className="[&_.react-flow__background]:!bg-transparent"
       >
-        <Background color="#262626" gap={20} size={1} />
+        <Background color={gridColor} gap={20} size={1} />
         <Controls
           showInteractive={false}
           className="!bg-surface !border-border-subtle !shadow-lg [&_button]:!bg-surface [&_button]:!border-border-subtle [&_button]:!text-zinc-400 [&_button:hover]:!bg-surface-hover"

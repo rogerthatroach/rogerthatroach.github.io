@@ -12,6 +12,7 @@ import '@xyflow/react/dist/style.css';
 import AgentNode from './AgentNode';
 import AnimatedEdge from './AnimatedEdge';
 import type { AgentNodeData } from './AgentNode';
+import { useThemeColor } from '@/lib/useThemeColor';
 
 const nodeTypes = { agent: AgentNode };
 const edgeTypes = { animated: AnimatedEdge };
@@ -119,6 +120,7 @@ const initialEdges: Edge[] = [
 export default function CombustionDiagram() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
     <div className="h-[500px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-sm sm:h-[600px]">
@@ -136,7 +138,7 @@ export default function CombustionDiagram() {
         proOptions={{ hideAttribution: true }}
         className="[&_.react-flow__background]:!bg-transparent"
       >
-        <Background color="#262626" gap={24} size={1} />
+        <Background color={gridColor} gap={24} size={1} />
       </ReactFlow>
     </div>
   );

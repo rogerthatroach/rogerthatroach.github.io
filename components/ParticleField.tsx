@@ -15,14 +15,14 @@ import * as THREE from 'three';
 
 const PARTICLE_COUNT = 500;
 
-// Warm/cool color palette — wabi-sabi: muted, natural
+// Warm/cool color palette — wabi-sabi: muted, works on both light and dark
 const COLORS = [
-  new THREE.Color('#e8b4b8'), // dusty rose
-  new THREE.Color('#d4a0a7'), // faded sakura
-  new THREE.Color('#b8c4d0'), // blue-grey mist
-  new THREE.Color('#a0aec0'), // cool slate
-  new THREE.Color('#c4b5a0'), // warm sand
-  new THREE.Color('#8b7e74'), // earth
+  new THREE.Color('#c4848c'), // dusty rose (deeper)
+  new THREE.Color('#b07a82'), // sakura (accent-matched)
+  new THREE.Color('#8a9bb0'), // blue-grey
+  new THREE.Color('#7a8a9c'), // cool slate
+  new THREE.Color('#a89880'), // warm sand
+  new THREE.Color('#6b5e54'), // earth
 ];
 
 function ScrollCamera() {
@@ -124,12 +124,11 @@ function Particles() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.03}
+        size={0.035}
         vertexColors
         transparent
-        opacity={0.35}
+        opacity={0.3}
         sizeAttenuation
-        blending={THREE.AdditiveBlending}
         depthWrite={false}
       />
     </points>
