@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
 
 const NAV_LINKS = [
+  { label: 'Work', href: '#work' },
   { label: 'Journey', href: '#journey' },
-  { label: 'Projects', href: '#projects' },
   { label: 'About', href: '#about' },
 ];
 

@@ -1,6 +1,19 @@
+export interface NumberFrame {
+  value: string;
+  context: string;
+}
+
+export const NUMBER_SEQUENCE: NumberFrame[] = [
+  { value: '$3M', context: 'annual savings · 900MW plant' },
+  { value: '90 min', context: 'was: months' },
+  { value: '40,000', context: 'transits · millisecond response' },
+  { value: '2 weeks', context: 'concept to production' },
+  { value: 'Bank-wide', context: 'agentic AI platform' },
+] as const;
+
 export const HERO = {
   name: 'Harmilap Singh Dhaliwal',
-  title: 'AI & Data Science Lead',
+  titles: ['Intelligent Systems Architect', 'AI & Data Science Lead'] as const,
   tagline: 'I architect AI platforms. I lead teams that ship them.',
   location: 'Toronto, Canada',
   links: {
