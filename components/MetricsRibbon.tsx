@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
-import Section from '@/components/ui/Section';
 import { METRICS } from '@/data/metrics';
 
 function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffix?: string; duration?: number }) {
@@ -39,7 +38,7 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
   }, [isInView, value, duration]);
 
   return (
-    <span ref={ref} className="font-mono text-3xl font-bold text-text-primary sm:text-4xl md:text-metric">
+    <span ref={ref} className="font-mono text-2xl font-bold text-text-primary sm:text-3xl md:text-4xl">
       {isInView ? (
         <>
           {value === 3 && '$'}
@@ -53,31 +52,31 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
   );
 }
 
-export default function Metrics() {
+export default function MetricsRibbon() {
   return (
-    <Section id="metrics" title="By the Numbers">
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
+    <div className="border-y border-border-subtle bg-surface/30 py-12 sm:py-16">
+      <div className="mx-auto grid max-w-content grid-cols-2 gap-8 px-6 sm:grid-cols-3 md:px-16 lg:grid-cols-6">
         {METRICS.map((metric, i) => (
           <motion.div
             key={metric.label}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-50px' }}
-            transition={{ delay: i * 0.08, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ delay: i * 0.07, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="flex flex-col"
           >
             {metric.numericValue !== undefined ? (
               <AnimatedCounter value={metric.numericValue} suffix={metric.suffix} />
             ) : (
-              <span className="font-mono text-3xl font-bold text-text-primary sm:text-4xl md:text-metric">
+              <span className="font-mono text-2xl font-bold text-text-primary sm:text-3xl md:text-4xl">
                 {metric.value}
               </span>
             )}
-            <span className="mt-2 text-sm font-medium text-text-primary">{metric.label}</span>
-            <span className="mt-0.5 text-xs text-text-tertiary">{metric.context}</span>
+            <span className="mt-2 text-xs font-medium text-text-primary">{metric.label}</span>
+            <span className="mt-0.5 text-[10px] text-text-tertiary">{metric.context}</span>
           </motion.div>
         ))}
       </div>
-    </Section>
+    </div>
   );
 }

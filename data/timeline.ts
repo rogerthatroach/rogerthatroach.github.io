@@ -47,17 +47,6 @@ export const TIMELINE: TimelineNode[] = [
     accent: 'cyan',
   },
   {
-    id: 'georgian',
-    era: 'Big Data',
-    period: '2021',
-    org: 'Georgian College',
-    role: 'Post-Graduate Certificate — Big Data Analytics',
-    description:
-      'Transitioned to Canada. Formalized big data skills — Hadoop, Spark ecosystem. Built an NLP pattern detector using BERT for IBM DataJam.',
-    skills: ['Hadoop', 'Spark', 'PySpark', 'BERT', 'NLP'],
-    accent: 'blue',
-  },
-  {
     id: 'tcs',
     era: 'Foundation',
     period: '2016 – 2019',
