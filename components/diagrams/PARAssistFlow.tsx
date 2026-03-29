@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -163,6 +163,19 @@ export default function PARAssistFlow() {
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
   const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex h-[700px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface">
+        <span className="text-sm text-text-tertiary">Loading architecture diagram...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[700px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface">
