@@ -7,14 +7,17 @@ import PageTransition from '@/components/ui/PageTransition';
 import BackLink from '@/components/ui/BackLink';
 import Nav from '@/components/Nav';
 
-const PARAssistFlow = dynamic(() => import('@/components/diagrams/PARAssistFlow'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-[700px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface">
-      <span className="text-sm text-text-tertiary">Loading architecture diagram...</span>
-    </div>
-  ),
-});
+const PARAssistFlow = dynamic(
+  () => import('@/components/diagrams/PARAssistFlow'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[700px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface">
+        <span className="text-sm text-text-tertiary">Loading architecture diagram...</span>
+      </div>
+    ),
+  },
+);
 
 const FADE_UP = {
   hidden: { opacity: 0, y: 20 },
