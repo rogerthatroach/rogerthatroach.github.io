@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
 
 const NAV_LINKS = [
-  { label: 'Work', href: '#work' },
-  { label: 'Journey', href: '#journey' },
-  { label: 'About', href: '#about' },
+  { label: 'Work', href: '/#work' },
+  { label: 'Journey', href: '/#journey' },
+  { label: 'About', href: '/#about' },
+  { label: 'Writing', href: '/blog' },
 ];
 
 export default function Nav() {
@@ -42,15 +43,25 @@ export default function Nav() {
         </Link>
 
         <div className="flex items-center gap-6">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="hidden text-sm text-text-secondary transition-colors hover:text-text-primary sm:block"
-            >
-              {link.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) =>
+            link.href.startsWith('/') && !link.href.startsWith('/#') ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="hidden text-sm text-text-secondary transition-colors hover:text-text-primary sm:block"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                className="hidden text-sm text-text-secondary transition-colors hover:text-text-primary sm:block"
+              >
+                {link.label}
+              </a>
+            )
+          )}
           <ThemeToggle />
         </div>
       </div>
