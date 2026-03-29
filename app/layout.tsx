@@ -30,8 +30,8 @@ export const metadata: Metadata = {
 const themeScript = `
   (function() {
     var t = localStorage.getItem('theme');
-    if (t === 'light' || (!t && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-      document.documentElement.classList.add('light');
+    if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
     }
   })();
 `;
