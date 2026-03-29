@@ -6,13 +6,14 @@ import { METRICS } from '@/data/metrics';
 
 function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffix?: string; duration?: number }) {
   const [count, setCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!isInView || hasAnimated) return;
+    setHasAnimated(true);
 
-    let start = 0;
     const end = value;
     const startTime = performance.now();
 
@@ -22,10 +23,7 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = Math.floor(eased * end);
 
-      if (current !== start) {
-        start = current;
-        setCount(current);
-      }
+      setCount(current);
 
       if (progress < 1) {
         requestAnimationFrame(animate);
@@ -35,19 +33,13 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
     }
 
     requestAnimationFrame(animate);
-  }, [isInView, value, duration]);
+  }, [isInView, hasAnimated, value, duration]);
 
   return (
     <span ref={ref} className="font-mono text-2xl font-bold text-text-primary sm:text-3xl md:text-4xl">
-      {isInView ? (
-        <>
-          {value === 3 && '$'}
-          {count}
-          {suffix}
-        </>
-      ) : (
-        <span className="opacity-0">0</span>
-      )}
+      {value === 3 && '$'}
+      {hasAnimated ? count : 0}
+      {suffix}
     </span>
   );
 }
@@ -61,7 +53,7 @@ export default function MetricsRibbon() {
             key={metric.label}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ delay: i * 0.07, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
             className="flex flex-col"
           >

@@ -23,22 +23,7 @@ function TimelineItem({ node, index }: { node: typeof TIMELINE[number]; index: n
 
   return (
     <div ref={ref} className="relative flex w-full items-start gap-4 md:gap-0">
-      <div className={cn('hidden md:flex md:w-1/2', isLeft ? 'justify-end pr-12' : 'order-2 pl-12')}>
-        <motion.div
-          initial={{ opacity: 0, x: isLeft ? 40 : -40 }}
-          animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-          className={cn(
-            'max-w-md rounded-xl border p-6 transition-shadow duration-500',
-            colors.border,
-            colors.bg,
-            isInView && `shadow-lg ${colors.glow}`
-          )}
-        >
-          <CardContent node={node} colors={colors} />
-        </motion.div>
-      </div>
-
+      {/* Center line + dot */}
       <div className="absolute left-4 top-0 flex h-full flex-col items-center md:left-1/2 md:-translate-x-1/2">
         <motion.div
           initial={{ scale: 0 }}
@@ -49,62 +34,58 @@ function TimelineItem({ node, index }: { node: typeof TIMELINE[number]; index: n
         <div className="w-px flex-1 bg-gradient-to-b from-border-subtle to-transparent" />
       </div>
 
-      <div className={cn('hidden md:block md:w-1/2', isLeft ? 'order-2' : '')} />
-
-      <div className="ml-8 flex-1 pb-12 md:hidden">
+      {/* Single card — positioned via CSS for left/right alternation on desktop */}
+      <div
+        className={cn(
+          'ml-8 flex-1 pb-12',
+          'md:ml-0 md:w-1/2',
+          isLeft ? 'md:pr-12' : 'md:ml-auto md:pl-12'
+        )}
+      >
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
           animate={isInView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className={cn('rounded-xl border p-5', colors.border, colors.bg)}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          className={cn(
+            'rounded-xl border p-5 transition-shadow duration-500 md:p-6',
+            colors.border,
+            colors.bg,
+            isInView && `shadow-lg ${colors.glow}`
+          )}
         >
-          <CardContent node={node} colors={colors} />
+          <div className="flex items-center justify-between gap-3">
+            <span className={cn('font-mono text-xs font-semibold tracking-wider uppercase', colors.text)}>
+              {node.era}
+            </span>
+            <span className="font-mono text-xs text-text-tertiary">{node.period}</span>
+          </div>
+
+          <h3 className="mt-3 text-base font-bold text-text-primary">{node.org}</h3>
+          <p className="text-sm text-text-secondary">{node.role}</p>
+
+          <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+            {node.description}
+          </p>
+
+          {node.milestone && (
+            <div className={cn('mt-3 inline-block rounded-full border px-3 py-1 font-mono text-xs font-semibold', colors.border, colors.text)}>
+              {node.milestone}
+            </div>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {node.skills.map((skill) => (
+              <span
+                key={skill}
+                className="rounded-full bg-surface px-2.5 py-0.5 text-xs text-text-secondary"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
         </motion.div>
       </div>
     </div>
-  );
-}
-
-function CardContent({
-  node,
-  colors,
-}: {
-  node: typeof TIMELINE[number];
-  colors: typeof ACCENT_COLORS[keyof typeof ACCENT_COLORS];
-}) {
-  return (
-    <>
-      <div className="flex items-center justify-between gap-3">
-        <span className={cn('font-mono text-xs font-semibold tracking-wider uppercase', colors.text)}>
-          {node.era}
-        </span>
-        <span className="font-mono text-xs text-text-tertiary">{node.period}</span>
-      </div>
-
-      <h3 className="mt-3 text-base font-bold text-text-primary">{node.org}</h3>
-      <p className="text-sm text-text-secondary">{node.role}</p>
-
-      <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-        {node.description}
-      </p>
-
-      {node.milestone && (
-        <div className={cn('mt-3 inline-block rounded-full border px-3 py-1 font-mono text-xs font-semibold', colors.border, colors.text)}>
-          {node.milestone}
-        </div>
-      )}
-
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        {node.skills.map((skill) => (
-          <span
-            key={skill}
-            className="rounded-full bg-surface px-2.5 py-0.5 text-xs text-text-secondary"
-          >
-            {skill}
-          </span>
-        ))}
-      </div>
-    </>
   );
 }
 
