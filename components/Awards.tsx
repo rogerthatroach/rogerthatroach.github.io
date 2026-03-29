@@ -25,14 +25,14 @@ export default function Awards() {
             <div className="flex items-start gap-3">
               <Trophy size={18} className="mt-0.5 flex-shrink-0 text-accent" />
               <div>
-                <h3 className="text-sm font-semibold text-zinc-100">
+                <h3 className="text-sm font-semibold text-text-primary">
                   {award.title}
                 </h3>
-                <p className="mt-1 font-mono text-xs text-zinc-500">
+                <p className="mt-1 font-mono text-xs text-text-tertiary">
                   {award.org} · {award.year}
                 </p>
                 {award.detail && (
-                  <p className="mt-2 text-xs text-zinc-400">{award.detail}</p>
+                  <p className="mt-2 text-xs text-text-secondary">{award.detail}</p>
                 )}
               </div>
             </div>

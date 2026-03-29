@@ -19,7 +19,7 @@ export default function Section({ id, title, children, className }: SectionProps
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
-          className="mb-12 text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl"
+          className="mb-12 text-2xl font-bold tracking-tight text-text-primary sm:text-3xl"
         >
           {title}
         </motion.h2>
