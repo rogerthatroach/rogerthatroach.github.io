@@ -163,7 +163,7 @@ export default function PARAssistFlow() {
   const [edges, , onEdgesChange] = useEdgesState(initialEdges);
 
   return (
-    <div className="h-[700px] w-full overflow-hidden rounded-xl border border-border-subtle bg-background/50">
+    <div className="h-[700px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface">
       <ReactFlow
         nodes={nodes}
         edges={edges}

@@ -21,10 +21,8 @@ const FADE_UP = {
 export default function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 md:px-16">
-      {/* 3D particle background */}
       <ParticleField />
 
-      {/* Gradient overlays */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
@@ -49,7 +47,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-6 text-4xl font-bold tracking-tight text-zinc-50 sm:text-5xl md:text-6xl lg:text-7xl"
+            className="mb-6 text-4xl font-bold tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl"
           >
             {HERO.name}
           </motion.h1>
@@ -59,7 +57,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-10 max-w-2xl text-lg text-zinc-400 sm:text-xl md:text-2xl"
+            className="mb-10 max-w-2xl text-lg text-text-secondary sm:text-xl md:text-2xl"
           >
             {HERO.tagline}
           </motion.p>
@@ -71,39 +69,29 @@ export default function Hero() {
             animate="visible"
             className="flex items-center gap-6"
           >
-            <a
-              href={HERO.links.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-zinc-400 backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
-            >
-              <Linkedin size={20} />
-            </a>
-            <a
-              href={HERO.links.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="GitHub"
-              className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-zinc-400 backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
-            >
-              <Github size={20} />
-            </a>
-            <a
-              href={`mailto:${HERO.links.email}`}
-              aria-label="Email"
-              className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-zinc-400 backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
-            >
-              <Mail size={20} />
-            </a>
-            <span className="flex items-center gap-1.5 text-sm text-zinc-500">
+            {[
+              { href: HERO.links.linkedin, icon: Linkedin, label: 'LinkedIn' },
+              { href: HERO.links.github, icon: Github, label: 'GitHub' },
+              { href: `mailto:${HERO.links.email}`, icon: Mail, label: 'Email' },
+            ].map(({ href, icon: Icon, label }) => (
+              <a
+                key={label}
+                href={href}
+                target={label !== 'Email' ? '_blank' : undefined}
+                rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
+                aria-label={label}
+                className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-text-secondary backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
+              >
+                <Icon size={20} />
+              </a>
+            ))}
+            <span className="flex items-center gap-1.5 text-sm text-text-tertiary">
               <MapPin size={14} />
               {HERO.location}
             </span>
           </motion.div>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -115,8 +103,8 @@ export default function Hero() {
             transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
             className="flex flex-col items-center gap-2"
           >
-            <span className="text-xs text-zinc-600">Scroll</span>
-            <div className="h-8 w-px bg-gradient-to-b from-zinc-600 to-transparent" />
+            <span className="text-xs text-text-tertiary">Scroll</span>
+            <div className="h-8 w-px bg-gradient-to-b from-text-tertiary to-transparent" />
           </motion.div>
         </motion.div>
       </div>

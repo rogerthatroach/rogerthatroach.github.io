@@ -31,8 +31,8 @@ function AgentNode({ data }: NodeProps) {
       onMouseLeave={() => setHovered(false)}
       className="relative"
     >
-      <Handle type="target" position={Position.Top} className="!bg-zinc-600 !border-zinc-500 !w-2 !h-2" />
-      <Handle type="source" position={Position.Bottom} className="!bg-zinc-600 !border-zinc-500 !w-2 !h-2" />
+      <Handle type="target" position={Position.Top} className="!bg-border-subtle !border-text-tertiary !w-2 !h-2" />
+      <Handle type="source" position={Position.Bottom} className="!bg-border-subtle !border-text-tertiary !w-2 !h-2" />
 
       <motion.div
         whileHover={{ scale: 1.05 }}
@@ -46,7 +46,7 @@ function AgentNode({ data }: NodeProps) {
       >
         <div className="flex items-center gap-2.5">
           <span className="text-xl">{nodeData.icon}</span>
-          <span className="text-sm font-semibold text-zinc-100">{nodeData.label}</span>
+          <span className="text-sm font-semibold text-text-primary">{nodeData.label}</span>
         </div>
 
         <AnimatePresence>
@@ -56,7 +56,7 @@ function AgentNode({ data }: NodeProps) {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="mt-2 text-xs leading-relaxed text-zinc-400"
+              className="mt-2 text-xs leading-relaxed text-text-secondary"
             >
               {nodeData.description}
             </motion.p>

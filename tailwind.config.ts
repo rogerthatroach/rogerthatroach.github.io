@@ -5,15 +5,19 @@ const config: Config = {
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#0a0a0a',
-        surface: '#141414',
-        'surface-hover': '#1a1a1a',
-        'border-subtle': '#262626',
-        accent: '#3b82f6',
-        'accent-muted': '#1e3a5f',
+        background: 'var(--color-bg)',
+        surface: 'var(--color-surface)',
+        'surface-hover': 'var(--color-surface-hover)',
+        'border-subtle': 'var(--color-border)',
+        accent: 'var(--color-accent)',
+        'accent-muted': 'var(--color-accent-muted)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-tertiary': 'var(--color-text-tertiary)',
       },
       fontFamily: {
         body: ['var(--font-inter)', 'system-ui', 'sans-serif'],

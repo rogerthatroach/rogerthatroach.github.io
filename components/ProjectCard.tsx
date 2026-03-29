@@ -39,30 +39,29 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           if (!hasDeepDive) setIsExpanded(!isExpanded);
         }}
       >
-        {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-zinc-50 sm:text-xl">
+            <h3 className="text-lg font-bold text-text-primary sm:text-xl">
               {project.title}
             </h3>
-            <p className="mt-1 text-sm text-zinc-400">{project.subtitle}</p>
+            <p className="mt-1 text-sm text-text-secondary">{project.subtitle}</p>
           </div>
           <div className="flex flex-col items-end gap-2">
             <div className="text-right">
               <span className="font-mono text-xl font-bold text-accent sm:text-2xl">
                 {project.heroMetric.value}
               </span>
-              <p className="text-xs text-zinc-500">{project.heroMetric.label}</p>
+              <p className="text-xs text-text-tertiary">{project.heroMetric.label}</p>
             </div>
             {hasDeepDive ? (
-              <span className="flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent transition-all duration-300 group-hover:bg-accent/20 group-hover:shadow-md group-hover:shadow-accent/10">
+              <span className="flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent-muted px-3 py-1 text-xs font-medium text-accent transition-all duration-300 group-hover:bg-accent/20 group-hover:shadow-md group-hover:shadow-accent/10">
                 See in action <ArrowRight size={12} />
               </span>
             ) : (
               <ChevronDown
                 size={18}
                 className={cn(
-                  'text-zinc-500 transition-transform duration-300',
+                  'text-text-tertiary transition-transform duration-300',
                   isExpanded && 'rotate-180'
                 )}
               />
@@ -70,26 +69,23 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           </div>
         </div>
 
-        {/* Tech tags */}
         <div className="mt-4 flex flex-wrap gap-2">
           {project.stack.map((tech) => (
             <span
               key={tech}
-              className="rounded-full bg-accent-muted/50 px-3 py-1 font-mono text-xs text-accent"
+              className="rounded-full bg-accent-muted px-3 py-1 font-mono text-xs text-accent"
             >
               {tech}
             </span>
           ))}
         </div>
 
-        {/* Brief description always visible for deep dive cards */}
         {hasDeepDive && (
-          <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+          <p className="mt-4 text-sm leading-relaxed text-text-secondary">
             {project.description}
           </p>
         )}
 
-        {/* Expandable content for non-deep-dive cards */}
         {!hasDeepDive && (
           <AnimatePresence>
             {isExpanded && (
@@ -101,24 +97,24 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
                 className="overflow-hidden"
               >
                 <div className="mt-6 border-t border-border-subtle pt-6">
-                  <p className="text-sm font-medium text-zinc-300">
+                  <p className="text-sm font-medium text-text-primary">
                     {project.role}
                   </p>
 
-                  <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                  <p className="mt-4 text-sm leading-relaxed text-text-secondary">
                     {project.description}
                   </p>
 
                   <ul className="mt-4 space-y-2">
                     {project.highlights.map((item, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-zinc-400">
+                      <li key={i} className="flex gap-2 text-sm text-text-secondary">
                         <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-accent" />
                         <span>{item}</span>
                       </li>
                     ))}
                   </ul>
 
-                  <p className="mt-6 border-l-2 border-accent/30 pl-4 text-sm italic text-zinc-500">
+                  <p className="mt-6 border-l-2 border-accent/30 pl-4 text-sm italic text-text-tertiary">
                     {project.narrative}
                   </p>
                 </div>
