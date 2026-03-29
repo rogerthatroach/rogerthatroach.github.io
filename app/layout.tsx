@@ -26,6 +26,16 @@ export const metadata: Metadata = {
   },
 };
 
+// Inline script to prevent flash of wrong theme
+const themeScript = `
+  (function() {
+    var t = localStorage.getItem('theme');
+    if (t === 'light' || (!t && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      document.documentElement.classList.add('light');
+    }
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: {
@@ -33,6 +43,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="font-body">{children}</body>
     </html>
   );

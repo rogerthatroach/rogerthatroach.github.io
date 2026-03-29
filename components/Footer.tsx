@@ -11,7 +11,7 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="text-zinc-500 transition-colors hover:text-accent"
+            className="text-text-tertiary transition-colors hover:text-accent"
           >
             <Linkedin size={20} />
           </a>
@@ -20,20 +20,20 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
-            className="text-zinc-500 transition-colors hover:text-accent"
+            className="text-text-tertiary transition-colors hover:text-accent"
           >
             <Github size={20} />
           </a>
           <a
             href={`mailto:${HERO.links.email}`}
             aria-label="Email"
-            className="text-zinc-500 transition-colors hover:text-accent"
+            className="text-text-tertiary transition-colors hover:text-accent"
           >
             <Mail size={20} />
           </a>
         </div>
 
-        <div className="flex items-center gap-1.5 text-sm text-zinc-600">
+        <div className="flex items-center gap-1.5 text-sm text-text-tertiary">
           <MapPin size={14} />
           <span>{HERO.location}</span>
         </div>

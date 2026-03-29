@@ -20,7 +20,6 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
     function animate(now: number) {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / (duration * 1000), 1);
-      // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = Math.floor(eased * end);
 
@@ -40,7 +39,7 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
   }, [isInView, value, duration]);
 
   return (
-    <span ref={ref} className="font-mono text-3xl font-bold text-zinc-50 sm:text-4xl md:text-metric">
+    <span ref={ref} className="font-mono text-3xl font-bold text-text-primary sm:text-4xl md:text-metric">
       {isInView ? (
         <>
           {value === 3 && '$'}
@@ -68,17 +67,14 @@ export default function Metrics() {
             className="flex flex-col"
           >
             {metric.numericValue !== undefined ? (
-              <AnimatedCounter
-                value={metric.numericValue}
-                suffix={metric.suffix}
-              />
+              <AnimatedCounter value={metric.numericValue} suffix={metric.suffix} />
             ) : (
-              <span className="font-mono text-3xl font-bold text-zinc-50 sm:text-4xl md:text-metric">
+              <span className="font-mono text-3xl font-bold text-text-primary sm:text-4xl md:text-metric">
                 {metric.value}
               </span>
             )}
-            <span className="mt-2 text-sm font-medium text-zinc-300">{metric.label}</span>
-            <span className="mt-0.5 text-xs text-zinc-500">{metric.context}</span>
+            <span className="mt-2 text-sm font-medium text-text-primary">{metric.label}</span>
+            <span className="mt-0.5 text-xs text-text-tertiary">{metric.context}</span>
           </motion.div>
         ))}
       </div>

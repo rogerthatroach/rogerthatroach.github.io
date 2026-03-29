@@ -19,7 +19,7 @@ export default function About() {
               delay: i * 0.15,
               ease: [0.4, 0, 0.2, 1],
             }}
-            className="text-base leading-relaxed text-zinc-400"
+            className="text-base leading-relaxed text-text-secondary"
           >
             {paragraph}
           </motion.p>
