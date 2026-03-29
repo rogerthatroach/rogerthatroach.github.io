@@ -1,0 +1,136 @@
+'use client';
+
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import Section from '@/components/ui/Section';
+import { TIMELINE } from '@/data/timeline';
+import { cn } from '@/lib/utils';
+
+const ACCENT_COLORS = {
+  blue: { dot: 'bg-blue-500', border: 'border-blue-500/40', bg: 'bg-blue-500/10', text: 'text-blue-400', glow: 'shadow-blue-500/20' },
+  emerald: { dot: 'bg-emerald-500', border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-400', glow: 'shadow-emerald-500/20' },
+  amber: { dot: 'bg-amber-500', border: 'border-amber-500/40', bg: 'bg-amber-500/10', text: 'text-amber-400', glow: 'shadow-amber-500/20' },
+  purple: { dot: 'bg-purple-500', border: 'border-purple-500/40', bg: 'bg-purple-500/10', text: 'text-purple-400', glow: 'shadow-purple-500/20' },
+  cyan: { dot: 'bg-cyan-500', border: 'border-cyan-500/40', bg: 'bg-cyan-500/10', text: 'text-cyan-400', glow: 'shadow-cyan-500/20' },
+  rose: { dot: 'bg-rose-500', border: 'border-rose-500/40', bg: 'bg-rose-500/10', text: 'text-rose-400', glow: 'shadow-rose-500/20' },
+};
+
+function TimelineItem({ node, index }: { node: typeof TIMELINE[number]; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-80px' });
+  const colors = ACCENT_COLORS[node.accent];
+  const isLeft = index % 2 === 0;
+
+  return (
+    <div ref={ref} className="relative flex w-full items-start gap-4 md:gap-0">
+      {/* Desktop: alternating sides */}
+      <div className={cn('hidden md:flex md:w-1/2', isLeft ? 'justify-end pr-12' : 'order-2 pl-12')}>
+        <motion.div
+          initial={{ opacity: 0, x: isLeft ? 40 : -40 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          className={cn(
+            'max-w-md rounded-xl border p-6 transition-shadow duration-500',
+            colors.border,
+            colors.bg,
+            isInView && `shadow-lg ${colors.glow}`
+          )}
+        >
+          <CardContent node={node} colors={colors} />
+        </motion.div>
+      </div>
+
+      {/* Center line + dot */}
+      <div className="absolute left-4 top-0 flex h-full flex-col items-center md:left-1/2 md:-translate-x-1/2">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={isInView ? { scale: 1 } : {}}
+          transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.05 }}
+          className={cn('z-10 h-4 w-4 rounded-full border-2 border-background', colors.dot)}
+        />
+        <div className="w-px flex-1 bg-gradient-to-b from-border-subtle to-transparent" />
+      </div>
+
+      {/* Desktop: spacer for other side */}
+      <div className={cn('hidden md:block md:w-1/2', isLeft ? 'order-2' : '')} />
+
+      {/* Mobile: always right of the line */}
+      <div className="ml-8 flex-1 pb-12 md:hidden">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={isInView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className={cn('rounded-xl border p-5', colors.border, colors.bg)}
+        >
+          <CardContent node={node} colors={colors} />
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function CardContent({
+  node,
+  colors,
+}: {
+  node: typeof TIMELINE[number];
+  colors: typeof ACCENT_COLORS[keyof typeof ACCENT_COLORS];
+}) {
+  return (
+    <>
+      <div className="flex items-center justify-between gap-3">
+        <span className={cn('font-mono text-xs font-semibold tracking-wider uppercase', colors.text)}>
+          {node.era}
+        </span>
+        <span className="font-mono text-xs text-zinc-500">{node.period}</span>
+      </div>
+
+      <h3 className="mt-3 text-base font-bold text-zinc-100">{node.org}</h3>
+      <p className="text-sm text-zinc-400">{node.role}</p>
+
+      <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+        {node.description}
+      </p>
+
+      {node.milestone && (
+        <div className={cn('mt-3 inline-block rounded-full border px-3 py-1 font-mono text-xs font-semibold', colors.border, colors.text)}>
+          {node.milestone}
+        </div>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {node.skills.map((skill) => (
+          <span
+            key={skill}
+            className="rounded-full bg-zinc-800/80 px-2.5 py-0.5 text-xs text-zinc-400"
+          >
+            {skill}
+          </span>
+        ))}
+      </div>
+    </>
+  );
+}
+
+export default function SkillTimeline() {
+  return (
+    <Section id="journey" title="The Journey">
+      <div className="relative">
+        {TIMELINE.map((node, i) => (
+          <TimelineItem key={node.id} node={node} index={i} />
+        ))}
+
+        {/* Terminal dot */}
+        <div className="absolute bottom-0 left-4 md:left-1/2 md:-translate-x-1/2">
+          <motion.div
+            initial={{ scale: 0 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            className="h-3 w-3 rounded-full bg-accent shadow-lg shadow-accent/30"
+          />
+        </div>
+      </div>
+    </Section>
+  );
+}
