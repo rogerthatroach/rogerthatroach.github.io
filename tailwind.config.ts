@@ -18,6 +18,7 @@ const config: Config = {
         'text-primary': 'var(--color-text-primary)',
         'text-secondary': 'var(--color-text-secondary)',
         'text-tertiary': 'var(--color-text-tertiary)',
+        'diagram-grid': 'var(--color-diagram-grid)',
       },
       fontFamily: {
         body: ['var(--font-inter)', 'system-ui', 'sans-serif'],

@@ -3,21 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  /* Dark mode (default) — wabi-sabi: warm depth, sakura accent */
+  /* Light mode (default) — wabi-sabi: warm paper, sakura accent */
   :root {
-    --color-bg: #0c0a0a;
-    --color-surface: #151212;
-    --color-surface-hover: #1c1818;
-    --color-border: #2a2424;
-    --color-accent: #d4a0a7;
-    --color-accent-muted: #3d2a2e;
-    --color-text-primary: #f0ebe8;
-    --color-text-secondary: #a89e9b;
-    --color-text-tertiary: #5c5452;
-  }
-
-  /* Light mode */
-  .light {
     --color-bg: #f8f5f2;
     --color-surface: #ffffff;
     --color-surface-hover: #f2edea;
@@ -27,6 +14,21 @@
     --color-text-primary: #1a1412;
     --color-text-secondary: #5c5452;
     --color-text-tertiary: #a89e9b;
+    --color-diagram-grid: #d4ccc8;
+  }
+
+  /* Dark mode */
+  .dark {
+    --color-bg: #0c0a0a;
+    --color-surface: #151212;
+    --color-surface-hover: #1c1818;
+    --color-border: #2a2424;
+    --color-accent: #d4a0a7;
+    --color-accent-muted: #3d2a2e;
+    --color-text-primary: #f0ebe8;
+    --color-text-secondary: #a89e9b;
+    --color-text-tertiary: #5c5452;
+    --color-diagram-grid: #262626;
   }
 
   html {
@@ -43,8 +45,7 @@
 
   ::selection {
     background-color: var(--color-accent);
-    color: white;
-    opacity: 0.3;
+    color: var(--color-bg);
   }
 
   /* Smooth theme transitions on all themed elements */
