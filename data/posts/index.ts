@@ -73,7 +73,7 @@ export const POSTS: BlogPost[] = [
       readingTime: '18 min read',
       abstract:
         'We present a five-stage decomposed pipeline — intent parsing, KPI detection via embedding similarity, LLM-assisted disambiguation, guardrailed SQL generation, and deterministic formatting — for converting natural-language financial queries into validated SQL. The architecture provides formal safety guarantees: injection impossibility by construction, schema compliance, and disambiguation correctness.',
-      status: 'draft',
+      status: 'published',
     },
     references: [
       { id: 1, authors: 'Li, J. et al.', title: 'Text-to-SQL Empowered by Large Language Models: A Benchmark Evaluation', venue: 'VLDB', year: 2024 },
@@ -102,7 +102,7 @@ export const POSTS: BlogPost[] = [
       readingTime: '25 min read',
       abstract:
         'We examine the closed-loop optimization pattern — sense, model, optimize, act — as it manifests across four domains: industrial PSO for combustion tuning at a 900MW coal plant, cloud document processing, financial process automation, and enterprise agentic AI. We demonstrate structural isomorphism across levels and argue that pattern recognition across abstraction levels constitutes a design methodology.',
-      status: 'draft',
+      status: 'published',
     },
     references: [
       { id: 1, authors: 'Kennedy, J. & Eberhart, R.', title: 'Particle Swarm Optimization', venue: 'IEEE International Conference on Neural Networks', year: 1995 },
