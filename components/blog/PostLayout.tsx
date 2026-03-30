@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import type { BlogPostMeta, Reference, FurtherReadingItem } from '@/data/posts';
 import ReferenceList from './ReferenceList';
 import FurtherReading from './FurtherReading';
+import TableOfContents from './TableOfContents';
 
 interface PostLayoutProps {
   meta: BlogPostMeta;
@@ -85,22 +86,28 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
         </div>
       </header>
 
-      {/* Content */}
-      <div className="prose-blog mx-auto max-w-3xl">
-        {children}
-      </div>
+      {/* Content + TOC side-by-side */}
+      <div className="relative flex gap-10">
+        {/* Main content */}
+        <div className="prose-blog min-w-0 max-w-3xl flex-1">
+          {children}
 
-      {/* References & Further Reading */}
-      <div className="mx-auto max-w-3xl">
-        <ReferenceList references={references} />
-        <FurtherReading items={furtherReading} />
+          {/* References & Further Reading */}
+          <ReferenceList references={references} />
+          <FurtherReading items={furtherReading} />
 
-        {/* Confidentiality disclaimer */}
-        <p className="mt-12 border-t border-border-subtle pt-6 text-xs italic text-text-tertiary">
-          This article describes architectural patterns and methodologies in general terms.
-          All system names, metrics, and implementation details have been anonymized or
-          generalized. No proprietary data, model outputs, or internal configurations are disclosed.
-        </p>
+          {/* Confidentiality disclaimer */}
+          <p className="mt-12 border-t border-border-subtle pt-6 text-xs italic text-text-tertiary">
+            This article describes architectural patterns and methodologies in general terms.
+            All system names, metrics, and implementation details have been anonymized or
+            generalized. No proprietary data, model outputs, or internal configurations are disclosed.
+          </p>
+        </div>
+
+        {/* Table of Contents — sticky sidebar, visible on xl+ screens */}
+        <aside className="hidden w-56 shrink-0 xl:block">
+          <TableOfContents />
+        </aside>
       </div>
     </motion.article>
   );
