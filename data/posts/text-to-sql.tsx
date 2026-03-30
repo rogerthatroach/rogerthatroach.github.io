@@ -60,10 +60,10 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 1. Introduction                                                     */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         1. Introduction
       </h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Text-to-SQL — the task of translating natural language questions into executable
         SQL queries — has seen significant progress through large language models. DIN-SQL
         [1], DAIL-SQL [2], and C3 [3] achieve execution accuracies above 85% on the Spider
@@ -89,7 +89,7 @@ export default function TextToSQLPost() {
           answer
         </li>
       </ol>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         We address these failures through decomposition: rather than treating text-to-SQL
         as a single function{' '}
         <InlineEquation tex="f: \\text{NL} \\rightarrow \\text{SQL}" />, we factor it into
@@ -100,14 +100,14 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 2. Problem Formulation                                              */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         2. Problem Formulation
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         2.1 The Benchmarking Domain
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The system operates on a financial benchmarking database containing Key Performance
         Indicators (KPIs) derived from regulatory filings of major financial institutions.
         Let:
@@ -127,14 +127,14 @@ export default function TextToSQLPost() {
           <InlineEquation tex="\\mathcal{Q}" /> be the space of natural language queries
         </li>
       </ul>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The system must implement{' '}
         <InlineEquation tex="f: \\mathcal{Q} \\rightarrow \\mathcal{R}" /> where{' '}
         <InlineEquation tex="\\mathcal{R}" /> is the space of formatted benchmark
         comparisons.
       </p>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         2.2 Formal Requirements
       </h3>
 
@@ -180,16 +180,16 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 3. Five-Stage Pipeline Architecture                                 */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         3. Five-Stage Pipeline Architecture
       </h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The pipeline decomposes <InlineEquation tex="f" /> into five sequential stages:
       </p>
 
       <MathBlock tex="f = s_5 \\circ s_4 \\circ s_3 \\circ s_2 \\circ s_1" />
 
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">where:</p>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">where:</p>
 
       <div className="my-6 overflow-x-auto">
         <table className="w-full text-sm">
@@ -282,18 +282,18 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 4. Stage 1: Intent Parsing                                          */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         4. Stage 1: Intent Parsing
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         4.1 Structured Extraction
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The intent parser maps a natural language query to a structured intent tuple:
       </p>
       <MathBlock tex="s_1: \\mathcal{Q} \\rightarrow \\mathcal{I} = (\\mu, \\tau, \\delta, \\omega)" />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">where:</p>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">where:</p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
           <InlineEquation tex="\\mu \\in \\mathcal{M}" /> is the{' '}
@@ -314,23 +314,23 @@ export default function TextToSQLPost() {
         </li>
       </ul>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         4.2 Constrained Generation
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The LLM is prompted with a schema definition of{' '}
         <InlineEquation tex="\\mathcal{I}" /> and instructed to output a JSON object
         conforming to the schema. This is constrained generation — the model&apos;s output
         space is restricted to valid intent tuples.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Validation.</strong> The JSON output is validated against the schema before
         proceeding. If validation fails (missing fields, invalid enum values), the system
         retries with the validation error appended to the prompt. After{' '}
         <InlineEquation tex="k_{\\max}" /> retries, it requests clarification from the
         user.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Ambiguity Detection.</strong> If the metric reference{' '}
         <InlineEquation tex="\\mu" /> is empty or too vague (e.g.,{' '}
         &ldquo;efficiency&rdquo; with no qualifying context), the system returns a
@@ -341,43 +341,43 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 5. Stage 2: KPI Detection via Embedding Similarity                  */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         5. Stage 2: KPI Detection via Embedding Similarity
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         5.1 Embedding Space
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Each KPI <InlineEquation tex="k_i \\in \\mathcal{K}" /> is represented by an
         embedding vector computed from its name, definition, and metadata:
       </p>
       <MathBlock tex="\\mathbf{e}_i = \\text{embed}(n_i \\oplus d_i \\oplus m_i) \\in \\mathbb{R}^d" />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         where <InlineEquation tex="\\oplus" /> denotes string concatenation with separator
         tokens and{' '}
         <InlineEquation tex="\\text{embed}: \\text{String} \\rightarrow \\mathbb{R}^d" />{' '}
         is a pre-trained sentence embedding model.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The user&apos;s metric reference <InlineEquation tex="\\mu" /> is similarly
         embedded:
       </p>
       <MathBlock tex="\\mathbf{e}_\\mu = \\text{embed}(\\mu)" />
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         5.2 Similarity Search
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The candidate set is retrieved by cosine similarity:
       </p>
       <MathBlock tex="\\text{sim}(k_i, \\mu) = \\frac{\\mathbf{e}_i \\cdot \\mathbf{e}_\\mu}{\\|\\mathbf{e}_i\\| \\|\\mathbf{e}_\\mu\\|}" />
       <MathBlock tex="\\mathcal{K}_c = \\{k_i \\in \\mathcal{K} \\mid \\text{sim}(k_i, \\mu) \\geq \\tau_{\\min}\\}" />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         where <InlineEquation tex="\\tau_{\\min}" /> is the minimum similarity threshold.
       </p>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         5.3 Why Embeddings Over Keyword Matching
       </h3>
 
@@ -396,17 +396,17 @@ export default function TextToSQLPost() {
         </p>
       </TheoremBlock>
 
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Keyword matching fails here because &ldquo;NIM&rdquo; shares zero tokens with
         &ldquo;Net Interest Margin.&rdquo; Edit distance fails because the strings are not
         typos of each other. Embeddings succeed because they encode semantic meaning, not
         surface form.
       </p>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         5.4 The Scaling Problem
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         As the KPI catalog <InlineEquation tex="|\\mathcal{K}|" /> grows, the probability
         of near-duplicate entries increases. Consider:
       </p>
@@ -416,7 +416,7 @@ export default function TextToSQLPost() {
         <li>&ldquo;Net Interest Margin (Domestic Only)&rdquo;</li>
         <li>&ldquo;NIM — Regulatory Basis&rdquo;</li>
       </ul>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         These are distinct KPIs with different definitions and values, but their embeddings
         cluster tightly in <InlineEquation tex="\\mathbb{R}^d" />. When{' '}
         <InlineEquation tex="|\\mathcal{K}_c| > 1" /> and the top candidates are close in
@@ -433,30 +433,30 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 6. Stage 3: LLM-Assisted Disambiguation                            */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         6. Stage 3: LLM-Assisted Disambiguation
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         6.1 Triggering Condition
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Disambiguation is invoked when the candidate set is ambiguous:
       </p>
       <MathBlock
         tex={`\\text{disambiguate?} = \\begin{cases} \\text{no} & \\text{if } |\\mathcal{K}_c| = 1 \\\\ \\text{no} & \\text{if } |\\mathcal{K}_c| > 1 \\wedge \\text{sim}(k_1, \\mu) - \\text{sim}(k_2, \\mu) > \\gamma \\\\ \\text{yes} & \\text{otherwise} \\end{cases}`}
       />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         where <InlineEquation tex="k_1, k_2" /> are the top-2 candidates sorted by
         similarity, and <InlineEquation tex="\\gamma" /> is the{' '}
         <strong>confidence gap threshold</strong>. If the top candidate is sufficiently
         dominant, we accept it without LLM disambiguation.
       </p>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         6.2 The Disambiguation Protocol
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         When triggered, the LLM receives:
       </p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
@@ -472,18 +472,18 @@ export default function TextToSQLPost() {
           <InlineEquation tex="\\{d_i : k_i \\in \\mathcal{K}_c\\}" />
         </li>
       </ul>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Critically, the LLM does <strong>not</strong> receive KPI values or any data from{' '}
         <InlineEquation tex="\\mathcal{V}" />. This preserves the data confidentiality
         property (cf. companion paper on LLM-as-Router architectures).
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The LLM outputs a selection{' '}
         <InlineEquation tex="\\hat{k} \\in \\mathcal{K}_c" /> and a confidence score{' '}
         <InlineEquation tex="p \\in [0, 1]" />.
       </p>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         6.3 Confidence Thresholding
       </h3>
 
@@ -517,7 +517,7 @@ export default function TextToSQLPost() {
         </p>
       </TheoremBlock>
 
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         In practice, LLM confidence scores are not perfectly calibrated [6], so we set{' '}
         <InlineEquation tex="\\epsilon" /> conservatively (we use{' '}
         <InlineEquation tex="\\epsilon = 0.05" />) and validate calibration empirically on
@@ -527,14 +527,14 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 7. Stage 4: Guardrailed SQL Generation                              */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         7. Stage 4: Guardrailed SQL Generation
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         7.1 Template-Based Generation
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Once the KPI is resolved, SQL generation uses a hybrid approach: a template library
         provides the structural skeleton, and parameterization fills in the specific values.
       </p>
@@ -550,7 +550,7 @@ export default function TextToSQLPost() {
         </p>
       </TheoremBlock>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         7.2 Formal Safety Properties
       </h3>
 
@@ -595,10 +595,10 @@ export default function TextToSQLPost() {
         </p>
       </TheoremBlock>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         7.3 Validation Layer
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Even with template-based generation, a validation layer provides defense-in-depth:
       </p>
       <ol className="mb-4 list-inside list-decimal space-y-1 text-sm text-text-secondary">
@@ -620,7 +620,7 @@ export default function TextToSQLPost() {
           expected type from the template definition
         </li>
       </ol>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         If any check fails, the query is rejected and logged for review — it never reaches
         the database.
       </p>
@@ -635,16 +635,16 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 8. Stage 5: Deterministic Result Formatting                         */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         8. Stage 5: Deterministic Result Formatting
       </h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The final stage transforms raw query results into the output format{' '}
         <InlineEquation tex="\\omega" /> specified in the intent. This stage is entirely
         deterministic — no LLM involvement:
       </p>
       <MathBlock tex="s_5: (\\text{QueryResult}, \\omega) \\rightarrow \\mathcal{R}" />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Output types include comparison tables, trend charts, summary statistics, and
         narrative descriptions (generated from templates, not LLMs).
       </p>
@@ -652,35 +652,35 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 9. On the Two-Week Delivery                                         */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         9. On the Two-Week Delivery
       </h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The second version of this system was designed and deployed in two weeks. This
         timeline merits explanation because it appears to contradict the depth of
         engineering described above.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Three factors made this possible:
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Factor 1: Domain maturity.</strong> Version 1 had been in production for
         months. The KPI catalog, data layer, entitlement model, and deployment
         infrastructure were stable. The rewrite replaced the query interface, not the
         foundation.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Factor 2: Pre-crystallized architecture.</strong> The five-stage
         decomposition, the embedding approach, the confidence thresholding protocol, and the
         guardrail layers had been explored and decided during months of research preceding
         the build. The architecture was ready; it needed to be written, not discovered.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Factor 3: Framework standardization.</strong> The codebase was built within
         an internal platform that handled authentication, entitlements, and deployment.
         Infrastructure was not in scope.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The lesson: speed in delivery comes from depth in preparation. The two weeks of
         building was enabled by months of thinking.
       </p>
@@ -688,27 +688,27 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 10. Related Work                                                    */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         10. Related Work
       </h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Text-to-SQL benchmarks.</strong> Spider [4] and WikiSQL [8] evaluate
         end-to-end accuracy but do not measure safety properties (injection resistance,
         schema compliance) or disambiguation quality. Our pipeline is designed for these
         properties first, accuracy second.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Decomposed approaches.</strong> DIN-SQL [1] decomposes text-to-SQL into
         sub-problems but uses LLM generation at each stage. Our approach restricts LLM use
         to intent parsing and disambiguation, using deterministic templates for SQL
         generation.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Embedding-based retrieval.</strong> Dense retrieval methods [9] using
         sentence transformers have shown strong performance for semantic matching tasks. We
         apply this specifically to KPI catalog matching with a disambiguation overlay.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>SQL safety.</strong> OWASP SQL injection prevention [7] establishes
         parameterization as the primary defense. Our contribution is integrating this with
         LLM-generated queries where the attack surface is the natural language input, not a
@@ -718,10 +718,10 @@ export default function TextToSQLPost() {
       {/* ------------------------------------------------------------------ */}
       {/* 11. Conclusion                                                      */}
       {/* ------------------------------------------------------------------ */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         11. Conclusion
       </h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The five-stage decomposition transforms text-to-SQL from a monolithic generation
         task into a pipeline with formal safety properties. By factoring the problem into
         intent parsing, embedding-based detection, confidence-thresholded disambiguation,
@@ -729,7 +729,7 @@ export default function TextToSQLPost() {
         achieve injection impossibility, schema compliance, and disambiguation correctness —
         properties that are provable, not aspirational.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The key insight: <strong>decomposition is itself the primary guardrail.</strong>{' '}
         Each stage has a narrow contract, a testable interface, and clear failure modes.
         When something goes wrong, you know which stage failed. When the catalog grows, you

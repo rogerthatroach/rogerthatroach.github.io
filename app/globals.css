@@ -63,4 +63,45 @@
   svg circle[r="3"] {
     transition: none !important;
   }
+
+  /* Protect KaTeX from Tailwind preflight resets */
+  .katex,
+  .katex * {
+    transition: none !important;
+    border-style: initial;
+    border-width: initial;
+  }
+
+  .katex .base {
+    display: inline-block !important;
+  }
+
+  .katex .strut {
+    display: inline-block !important;
+  }
+
+  .katex .mord,
+  .katex .mbin,
+  .katex .mrel,
+  .katex .mopen,
+  .katex .mclose,
+  .katex .mpunct,
+  .katex .minner,
+  .katex .mop {
+    display: inline !important;
+  }
+
+  .katex .frac-line {
+    border-bottom-style: solid !important;
+    border-bottom-width: 1px !important;
+  }
+
+  .katex .sqrt > .sqrt-line {
+    border-bottom-style: solid !important;
+  }
+
+  .katex .overline .overline-line,
+  .katex .underline .underline-line {
+    border-bottom-style: solid !important;
+  }
 }

@@ -12,7 +12,7 @@ export default function ReferenceList({ references }: ReferenceListProps) {
       <h2 className="mb-6 text-lg font-semibold text-text-primary">References</h2>
       <ol className="space-y-3">
         {references.map((ref) => (
-          <li key={ref.id} className="text-sm leading-relaxed text-text-secondary">
+          <li key={ref.id} className="text-base leading-relaxed text-text-secondary">
             <span className="mr-1 font-mono text-text-tertiary">[{ref.id}]</span>
             {ref.authors} &ldquo;{ref.title}.&rdquo;{' '}
             <em>{ref.venue}</em>, {ref.year}.
