@@ -1,7 +1,9 @@
 'use client';
 
 import { useRef } from 'react';
+import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import type { Project } from '@/data/projects';
 
 interface ProjectShowcaseProps {
@@ -94,6 +96,25 @@ export default function ProjectShowcase({ project, diagram, index }: ProjectShow
             className="mt-6 h-px w-16 origin-left"
             style={{ backgroundColor: project.palette.primary }}
           />
+
+          {/* Case Study CTA */}
+          {project.deepDivePath && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="mt-5"
+            >
+              <Link
+                href={project.deepDivePath}
+                className="inline-flex items-center gap-2 text-sm font-medium transition-colors hover:text-text-primary"
+                style={{ color: project.palette.primary }}
+              >
+                View case study
+                <ArrowRight size={14} />
+              </Link>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Diagram side */}
