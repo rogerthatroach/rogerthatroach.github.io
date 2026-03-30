@@ -121,7 +121,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
   return (
     <PageTransition>
       <Nav />
-      <div className="px-6 pt-24 pb-12 md:px-16">
+      <div id="main-content" className="px-6 pt-24 pb-12 md:px-16">
         <div className="mx-auto max-w-content">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-4">
