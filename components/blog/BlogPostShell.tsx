@@ -3,6 +3,8 @@
 import dynamic from 'next/dynamic';
 import type { BlogPostMeta } from '@/data/posts';
 import { POSTS } from '@/data/posts';
+import { CASE_STUDIES } from '@/data/projectCaseStudies';
+import { PROJECTS } from '@/data/projects';
 import PostLayout from './PostLayout';
 
 // Post content components — SSR enabled so equations render into static HTML.
@@ -42,6 +44,13 @@ export default function BlogPostShell({ slug, meta }: BlogPostShellProps) {
   const Content = POST_COMPONENTS[slug];
   const post = POSTS.find((p) => p.meta.slug === slug);
 
+  // Find the case study that links to this blog post
+  const caseStudy = CASE_STUDIES.find((cs) => cs.blogPostSlug === slug);
+  const project = caseStudy ? PROJECTS.find((p) => p.id === caseStudy.projectId) : undefined;
+  const relatedProject = project && caseStudy
+    ? { title: project.title, path: `/projects/${project.id}` }
+    : undefined;
+
   if (!Content) return null;
 
   return (
@@ -49,6 +58,7 @@ export default function BlogPostShell({ slug, meta }: BlogPostShellProps) {
       meta={meta}
       references={post?.references}
       furtherReading={post?.furtherReading}
+      relatedProject={relatedProject}
     >
       <Content />
     </PostLayout>

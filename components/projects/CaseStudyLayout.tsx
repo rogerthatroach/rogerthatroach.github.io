@@ -1,8 +1,10 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Calendar, Briefcase, CheckCircle2, XCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Calendar, Briefcase, CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { Project } from '@/data/projects';
 import type { CaseStudy } from '@/data/projectCaseStudies';
 import PageTransition from '@/components/ui/PageTransition';
@@ -24,20 +26,92 @@ const FADE_UP = {
   }),
 };
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+const TOC_SECTIONS = [
+  { id: 'context', label: 'Context' },
+  { id: 'my-role', label: 'My Role' },
+  { id: 'stakeholders', label: 'Stakeholders' },
+  { id: 'challenge', label: 'The Challenge' },
+  { id: 'options', label: 'Options Considered' },
+  { id: 'decision', label: 'The Decision' },
+  { id: 'architecture', label: 'Architecture' },
+  { id: 'implementation', label: 'Implementation' },
+  { id: 'impact', label: 'Impact' },
+  { id: 'in-production', label: 'In Production' },
+  { id: 'lessons', label: 'Lessons Learned' },
+] as const;
+
+function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-10%' }}
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-      className="mt-16"
+      className="mt-16 scroll-mt-24"
     >
       <h2 className="text-xl font-bold text-text-primary">{title}</h2>
       <div className="mt-4 space-y-3 text-sm leading-relaxed text-text-secondary">
         {children}
       </div>
     </motion.div>
+  );
+}
+
+function CaseStudyTOC() {
+  const [activeId, setActiveId] = useState('');
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) setActiveId(visible[0].target.id);
+      },
+      { rootMargin: '-100px 0px -65% 0px', threshold: 0 }
+    );
+
+    TOC_SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <nav
+      className="fixed top-28 hidden w-48 xl:block"
+      style={{ left: 'max(1rem, calc((100vw - 64rem) / 2 - 13rem))' }}
+    >
+      <div className="max-h-[calc(100vh-8rem)] overflow-y-auto border-l border-border-subtle pl-4">
+        <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
+          Contents
+        </p>
+        <ul className="space-y-1.5">
+          {TOC_SECTIONS.map((s) => (
+            <li key={s.id}>
+              <a
+                href={`#${s.id}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
+                className={cn(
+                  'block text-[11px] leading-snug transition-colors duration-150',
+                  activeId === s.id
+                    ? 'font-medium text-accent'
+                    : 'text-text-tertiary hover:text-text-secondary'
+                )}
+              >
+                {s.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
   );
 }
 
@@ -136,32 +210,39 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
             ))}
           </motion.div>
 
+          {/* TOC sidebar — xl screens only */}
+          <CaseStudyTOC />
+
           {/* Context */}
-          <Section title="Context">
+          <Section id="context" title="Context">
             <p>{sections.context}</p>
           </Section>
 
           {/* My Role */}
-          <Section title="My Role">
+          <Section id="my-role" title="My Role">
             <p>{sections.myRole}</p>
           </Section>
 
           {/* Stakeholders */}
-          <Section title="Stakeholders">
+          <Section id="stakeholders" title="Stakeholders">
             <p>{sections.stakeholders}</p>
           </Section>
 
           {/* The Challenge */}
-          <Section title="The Challenge">
+          <Section id="challenge" title="The Challenge">
             <p>{sections.challenge}</p>
           </Section>
 
           {/* Options Considered */}
-          <Section title="Options Considered">
+          <Section id="options" title="Options Considered">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {sections.optionsConsidered.map((opt) => (
-                <div
+              {sections.optionsConsidered.map((opt, i) => (
+                <motion.div
                   key={opt.option}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.4 }}
                   className={`rounded-lg border p-4 transition-colors ${
                     opt.chosen
                       ? 'border-accent/40 bg-accent-muted'
@@ -188,18 +269,18 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
                       </p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </Section>
 
           {/* The Decision */}
-          <Section title="The Decision">
+          <Section id="decision" title="The Decision">
             <p>{sections.decision}</p>
           </Section>
 
           {/* Architecture Diagram */}
-          <Section title="Architecture">
+          <Section id="architecture" title="Architecture">
             <p className="mb-4 text-xs text-text-tertiary">
               Interactive diagram — hover nodes for details, pan and zoom to explore
             </p>
@@ -207,22 +288,43 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
           </Section>
 
           {/* Implementation */}
-          <Section title="Implementation">
+          <Section id="implementation" title="Implementation">
             <p>{sections.implementation}</p>
           </Section>
 
           {/* Impact */}
-          <Section title="Impact">
+          <Section id="impact" title="Impact">
             <p>{sections.impact}</p>
           </Section>
 
           {/* In Production */}
-          <Section title="In Production">
+          <Section id="in-production" title="In Production">
             <p>{sections.inProduction}</p>
           </Section>
 
+          {/* Leadership Moment — only if present */}
+          {caseStudy.leadershipCallout && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mt-16 rounded-lg border border-amber-500/20 bg-amber-500/5 p-6"
+            >
+              <div className="flex items-start gap-3">
+                <Lightbulb size={18} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                <div>
+                  <p className="text-sm font-medium text-text-primary">Leadership Moment</p>
+                  <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+                    {caseStudy.leadershipCallout}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Lessons Learned */}
-          <Section title="Lessons Learned">
+          <Section id="lessons" title="Lessons Learned">
             <p>{sections.lessonsLearned}</p>
           </Section>
 
