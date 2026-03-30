@@ -28,10 +28,10 @@ export default function PostCard({ post, index }: PostCardProps) {
         href={`/blog/${post.slug}`}
         className="group flex min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
       >
-        <h2 className="text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
+        <h2 className="line-clamp-2 text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
           {post.title}
         </h2>
-        <p className="mt-1 text-sm text-text-secondary">{post.subtitle}</p>
+        <p className="mt-1 line-clamp-2 text-sm text-text-secondary">{post.subtitle}</p>
 
         <div className="mt-4 flex flex-wrap gap-2">
           {post.tags.slice(0, 3).map((tag) => (
