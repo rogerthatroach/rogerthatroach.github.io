@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TocItem {
@@ -14,49 +14,62 @@ export default function TableOfContents() {
   const [activeId, setActiveId] = useState('');
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Extract headings from the DOM after content renders
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const contentEl = document.querySelector('.prose-blog');
-      if (!contentEl) return;
+  const scanHeadings = useCallback(() => {
+    const contentEl = document.querySelector('.prose-blog');
+    if (!contentEl) return;
 
-      const els = contentEl.querySelectorAll('h2, h3');
-      const items: TocItem[] = [];
+    const els = contentEl.querySelectorAll('h2[id], h3[id]');
+    if (els.length === 0) return;
 
-      els.forEach((el, i) => {
-        // Generate ID if missing
-        if (!el.id) {
-          el.id = `heading-${i}`;
-        }
-        items.push({
-          id: el.id,
-          text: el.textContent || '',
-          level: el.tagName === 'H2' ? 2 : 3,
-        });
+    const items: TocItem[] = [];
+    els.forEach((el) => {
+      // Skip References and Further Reading headings
+      const text = el.textContent || '';
+      if (text === 'References' || text === 'Further Reading') return;
+      items.push({
+        id: el.id,
+        text,
+        level: el.tagName === 'H2' ? 2 : 3,
       });
+    });
 
-      setHeadings(items);
-    }, 500); // Wait for MDX content to render
-
-    return () => clearTimeout(timer);
+    if (items.length > 0) setHeadings(items);
   }, []);
 
-  // Intersection observer for active heading
+  // Use MutationObserver to detect when MDX content is rendered
+  useEffect(() => {
+    scanHeadings();
+
+    const observer = new MutationObserver(() => scanHeadings());
+    const target = document.querySelector('.prose-blog');
+    if (target) {
+      observer.observe(target, { childList: true, subtree: true });
+    }
+
+    // Also retry on a delay for SSR-hydrated content
+    const timer = setTimeout(scanHeadings, 1000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+  }, [scanHeadings]);
+
+  // Intersection observer for active heading tracking
   useEffect(() => {
     if (headings.length === 0) return;
 
+    observerRef.current?.disconnect();
     observerRef.current = new IntersectionObserver(
       (entries) => {
-        // Find the first heading that is intersecting
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
         if (visible.length > 0) {
           setActiveId(visible[0].target.id);
         }
       },
-      { rootMargin: '-80px 0px -70% 0px', threshold: 0 }
+      { rootMargin: '-100px 0px -65% 0px', threshold: 0 }
     );
 
     headings.forEach((h) => {
@@ -67,36 +80,39 @@ export default function TableOfContents() {
     return () => observerRef.current?.disconnect();
   }, [headings]);
 
-  const handleClick = (id: string) => {
+  const handleClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
     const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   if (headings.length === 0) return null;
 
   return (
-    <nav className="hidden xl:block">
-      <div className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto pr-4">
-        <p className="mb-3 font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
+    <nav
+      className="fixed top-28 hidden w-52 xl:block"
+      style={{ left: 'max(1rem, calc((100vw - 64rem) / 2 - 14rem))' }}
+    >
+      <div className="max-h-[calc(100vh-8rem)] overflow-y-auto border-l border-border-subtle pl-4">
+        <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
           Contents
         </p>
-        <ul className="space-y-1">
+        <ul className="space-y-1.5">
           {headings.map((h) => (
             <li key={h.id}>
-              <button
-                onClick={() => handleClick(h.id)}
+              <a
+                href={`#${h.id}`}
+                onClick={(e) => handleClick(e, h.id)}
                 className={cn(
-                  'block w-full text-left text-xs leading-relaxed transition-colors',
+                  'block text-[11px] leading-snug transition-colors duration-150',
                   h.level === 3 ? 'pl-3' : '',
                   activeId === h.id
-                    ? 'text-accent font-medium'
+                    ? 'font-medium text-accent'
                     : 'text-text-tertiary hover:text-text-secondary'
                 )}
               >
                 {h.text}
-              </button>
+              </a>
             </li>
           ))}
         </ul>

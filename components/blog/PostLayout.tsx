@@ -86,28 +86,25 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
         </div>
       </header>
 
-      {/* Content + TOC side-by-side */}
-      <div className="relative flex gap-10">
-        {/* Main content */}
-        <div className="prose-blog min-w-0 max-w-3xl flex-1">
-          {children}
+      {/* TOC — fixed to left viewport edge, outside content frame */}
+      <TableOfContents />
 
-          {/* References & Further Reading */}
-          <ReferenceList references={references} />
-          <FurtherReading items={furtherReading} />
+      {/* Content */}
+      <div className="prose-blog mx-auto max-w-3xl">
+        {children}
+      </div>
 
-          {/* Confidentiality disclaimer */}
-          <p className="mt-12 border-t border-border-subtle pt-6 text-xs italic text-text-tertiary">
-            This article describes architectural patterns and methodologies in general terms.
-            All system names, metrics, and implementation details have been anonymized or
-            generalized. No proprietary data, model outputs, or internal configurations are disclosed.
-          </p>
-        </div>
+      {/* References & Further Reading */}
+      <div className="mx-auto max-w-3xl">
+        <ReferenceList references={references} />
+        <FurtherReading items={furtherReading} />
 
-        {/* Table of Contents — sticky sidebar, visible on xl+ screens */}
-        <aside className="hidden w-56 shrink-0 xl:block">
-          <TableOfContents />
-        </aside>
+        {/* Confidentiality disclaimer */}
+        <p className="mt-12 border-t border-border-subtle pt-6 text-xs italic text-text-tertiary">
+          This article describes architectural patterns and methodologies in general terms.
+          All system names, metrics, and implementation details have been anonymized or
+          generalized. No proprietary data, model outputs, or internal configurations are disclosed.
+        </p>
       </div>
     </motion.article>
   );
