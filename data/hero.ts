@@ -11,7 +11,7 @@ export const NUMBER_SEQUENCE: NumberFrame[] = [
 
 export const HERO = {
   name: 'Harmilap Singh Dhaliwal',
-  title: 'AI & Data Science Lead',
+  title: 'AI & Data Science Lead — RBC',
   tagline: 'I architect AI platforms. I lead teams that ship them.',
   location: 'Toronto, Canada',
   links: {
