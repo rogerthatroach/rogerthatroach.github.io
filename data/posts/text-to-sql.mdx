@@ -1,0 +1,456 @@
+import { FiveStagePipeline, EmbeddingSpace, GuardrailValidator, FullPipelineFlow } from "@/components/blog/BlogDiagrams"
+import MathBlock from '@/components/blog/MathBlock';
+import { tex } from '@/lib/katex';
+import InlineEquation from '@/components/blog/InlineEquation';
+import TheoremBlock from '@/components/blog/TheoremBlock';
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import CitationRef from '@/components/blog/CitationRef';
+
+## 1. Introduction
+
+Text-to-SQL — the task of translating natural language questions into executable
+SQL queries — has seen significant progress through large language models. DIN-SQL
+<CitationRef id={1} />, DAIL-SQL <CitationRef id={2} />, and C3 <CitationRef id={3} /> achieve execution accuracies above 85% on the Spider
+benchmark <CitationRef id={4} />. However, production deployment in regulated financial environments
+exposes failure modes that benchmark evaluations do not capture:
+
+1. **Ambiguous KPI references** that map to multiple valid metrics
+1. **Evolving taxonomies** where new KPIs are continuously added to the catalog
+1. **Injection vulnerabilities** from unguarded SQL generation
+1. **Non-deterministic outputs** that cannot be regression-tested
+1. **Displacive errors** — a confidently wrong answer is worse than no answer
+
+We address these failures through decomposition: rather than treating text-to-SQL
+as a single function <InlineEquation html={tex("f: \\text{NL} \\rightarrow \\text{SQL}")} />, we factor it into
+five stages, each with explicit contracts, testable invariants, and formal safety
+properties.
+
+## 2. Problem Formulation
+
+### 2.1 The Benchmarking Domain
+
+The system operates on a financial benchmarking database containing Key Performance
+Indicators (KPIs) derived from regulatory filings of major financial institutions.
+Let:
+
+- <InlineEquation html={tex("\\mathcal{K} = \\{k_1, k_2, \\ldots, k_n\\}")} /> be the **KPI catalog**, where each <InlineEquation html={tex("k_i")} /> has a name <InlineEquation html={tex("n_i")} />, definition <InlineEquation html={tex("d_i")} />, and metadata <InlineEquation html={tex("m_i")} /> (reporting period, entity, unit)
+- <InlineEquation html={tex("\\mathcal{V}")} /> be the **value store**, containing time-indexed KPI values for each institution
+- <InlineEquation html={tex("\\mathcal{Q}")} /> be the space of natural language queries
+
+The system must implement <InlineEquation html={tex("f: \\mathcal{Q} \\rightarrow \\mathcal{R}")} /> where <InlineEquation html={tex("\\mathcal{R}")} /> is the space of formatted benchmark
+comparisons.
+
+### 2.2 Formal Requirements
+
+<TheoremBlock variant="definition" number={1} title="Injection Safety">
+  <p>
+    No user input string <InlineEquation html={tex("q \\in \\mathcal{Q}")} /> can cause
+    execution of SQL operations outside the predefined operation set <InlineEquation html={tex("\\mathcal{O} = \\{\\text{SELECT}\\}")} />:
+  </p>
+  <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\text{op}(\\text{SQL}(q)) \\in \\mathcal{O}", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="definition" number={2} title="Schema Compliance">
+  <p>
+    Generated SQL may reference only tables <InlineEquation html={tex("T_{\\text{allowed}}")} /> and columns <InlineEquation html={tex("C_{\\text{allowed}}")} /> in the registered schema:
+  </p>
+  <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(\\text{SQL}(q)) \\subseteq C_{\\text{allowed}}", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="definition" number={3} title="Disambiguation Correctness">
+  <p>
+    If the system resolves an ambiguous KPI reference, the resolved KPI must be the
+    one the user intended with probability at least <InlineEquation html={tex("1 - \\epsilon")} /> for a configurable confidence threshold <InlineEquation html={tex("\\epsilon")} />:
+  </p>
+  <MathBlock html={tex("P(\\hat{k} = k^*) \\geq 1 - \\epsilon", true)} />
+  <p>
+    Otherwise, the system must request clarification rather than guess.
+  </p>
+</TheoremBlock>
+
+<TheoremBlock variant="definition" number={4} title="Testability">
+  <p>
+    Every pipeline stage must be independently testable with deterministic inputs and
+    outputs:
+  </p>
+  <MathBlock html={tex("\\forall \\text{ stage } s_i: \\exists \\text{ test suite } T_i \\text{ s.t. } s_i \\text{ is deterministic on } T_i", true)} />
+</TheoremBlock>
+
+## 3. Five-Stage Pipeline Architecture
+
+The pipeline decomposes <InlineEquation html={tex("f")} /> into five sequential stages:
+
+<MathBlock html={tex("f = s_5 \\circ s_4 \\circ s_3 \\circ s_2 \\circ s_1", true)} />
+
+where:
+
+<div className="my-6 overflow-x-auto">
+  <table className="w-full text-sm">
+    <thead>
+      <tr className="border-b border-border-subtle">
+        <th className="pb-2 pr-4 font-medium text-text-tertiary text-left">Stage</th>
+        <th className="pb-2 pr-4 font-medium text-text-tertiary text-left">Function</th>
+        <th className="pb-2 pr-4 font-medium text-text-tertiary text-left">Input</th>
+        <th className="pb-2 pr-4 font-medium text-text-tertiary text-left">Output</th>
+        <th className="pb-2 font-medium text-text-tertiary text-left">Uses LLM?</th>
+      </tr>
+    </thead>
+    <tbody className="text-text-secondary">
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4"><InlineEquation html={tex("s_1")} /></td>
+        <td className="py-2 pr-4">Intent Parsing</td>
+        <td className="py-2 pr-4">Natural language query <InlineEquation html={tex("q")} /></td>
+        <td className="py-2 pr-4">Structured intent <InlineEquation html={tex("I")} /></td>
+        <td className="py-2">Yes (constrained)</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4"><InlineEquation html={tex("s_2")} /></td>
+        <td className="py-2 pr-4">KPI Detection</td>
+        <td className="py-2 pr-4">Metric reference from <InlineEquation html={tex("I")} /></td>
+        <td className="py-2 pr-4">Candidate set <InlineEquation html={tex("\\mathcal{K}_c \\subseteq \\mathcal{K}")} /></td>
+        <td className="py-2">No (embeddings)</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4"><InlineEquation html={tex("s_3")} /></td>
+        <td className="py-2 pr-4">Disambiguation</td>
+        <td className="py-2 pr-4">Candidates <InlineEquation html={tex("\\mathcal{K}_c")} /> + query <InlineEquation html={tex("q")} /></td>
+        <td className="py-2 pr-4">Resolved KPI <InlineEquation html={tex("\\hat{k}")} /> or clarification request</td>
+        <td className="py-2">Conditional</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4"><InlineEquation html={tex("s_4")} /></td>
+        <td className="py-2 pr-4">SQL Generation</td>
+        <td className="py-2 pr-4">Resolved KPI <InlineEquation html={tex("\\hat{k}")} /> + parameters</td>
+        <td className="py-2 pr-4">Validated SQL string</td>
+        <td className="py-2">Template + validation</td>
+      </tr>
+      <tr>
+        <td className="py-2 pr-4"><InlineEquation html={tex("s_5")} /></td>
+        <td className="py-2 pr-4">Result Formatting</td>
+        <td className="py-2 pr-4">Query results</td>
+        <td className="py-2 pr-4">Formatted response <InlineEquation html={tex("r")} /></td>
+        <td className="py-2">No</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<VisualizationContainer
+  minHeight={350}
+  caption="Figure 1: Five-stage decomposed pipeline — blue stages use LLM, green stages are fully deterministic"
+>
+  {() => <FiveStagePipeline />}
+</VisualizationContainer>
+
+## 4. Stage 1: Intent Parsing
+
+### 4.1 Structured Extraction
+
+The intent parser maps a natural language query to a structured intent tuple:
+
+<MathBlock html={tex("s_1: \\mathcal{Q} \\rightarrow \\mathcal{I} = (\\mu, \\tau, \\delta, \\omega)", true)} />
+
+where:
+
+- <InlineEquation html={tex("\\mu \\in \\mathcal{M}")} /> is the **metric reference** (the KPI the user is asking about, in their words)
+- <InlineEquation html={tex("\\tau \\in \\mathcal{T}")} /> is the **temporal scope** (quarter, year, range, trend)
+- <InlineEquation html={tex("\\delta \\in \\Delta")} /> is the **comparison dimension** (peer vs. self, absolute vs. relative)
+- <InlineEquation html={tex("\\omega \\in \\Omega")} /> is the **output type** (table, chart, single value, narrative)
+
+### 4.2 Constrained Generation
+
+The LLM is prompted with a schema definition of <InlineEquation html={tex("\\mathcal{I}")} /> and instructed to output a JSON object
+conforming to the schema. This is constrained generation — the model's output
+space is restricted to valid intent tuples.
+
+**Validation.** The JSON output is validated against the schema before
+proceeding. If validation fails (missing fields, invalid enum values), the system
+retries with the validation error appended to the prompt. After <InlineEquation html={tex("k_{\\max}")} /> retries, it requests clarification from the
+user.
+
+**Ambiguity Detection.** If the metric reference <InlineEquation html={tex("\\mu")} /> is empty or too vague (e.g.,
+"efficiency" with no qualifying context), the system returns a
+clarification request rather than proceeding with a guess. This is Stage 1's
+contribution to Requirement 3.
+
+## 5. Stage 2: KPI Detection via Embedding Similarity
+
+### 5.1 Embedding Space
+
+Each KPI <InlineEquation html={tex("k_i \\in \\mathcal{K}")} /> is represented by an
+embedding vector computed from its name, definition, and metadata:
+
+<MathBlock html={tex("\\mathbf{e}_i = \\text{embed}(n_i \\oplus d_i \\oplus m_i) \\in \\mathbb{R}^d", true)} />
+
+where <InlineEquation html={tex("\\oplus")} /> denotes string concatenation with separator
+tokens and <InlineEquation html={tex("\\text{embed}: \\text{String} \\rightarrow \\mathbb{R}^d")} /> is a pre-trained sentence embedding model.
+
+The user's metric reference <InlineEquation html={tex("\\mu")} /> is similarly
+embedded:
+
+<MathBlock html={tex("\\mathbf{e}_\\mu = \\text{embed}(\\mu)", true)} />
+
+### 5.2 Similarity Search
+
+The candidate set is retrieved by cosine similarity:
+
+<MathBlock html={tex("\\text{sim}(k_i, \\mu) = \\frac{\\mathbf{e}_i \\cdot \\mathbf{e}_\\mu}{\\|\\mathbf{e}_i\\| \\|\\mathbf{e}_\\mu\\|}", true)} />
+
+<MathBlock html={tex("\\mathcal{K}_c = \\{k_i \\in \\mathcal{K} \\mid \\text{sim}(k_i, \\mu) \\geq \\tau_{\\min}\\}", true)} />
+
+where <InlineEquation html={tex("\\tau_{\\min}")} /> is the minimum similarity threshold.
+
+### 5.3 Why Embeddings Over Keyword Matching
+
+<TheoremBlock variant="proposition" number={3} title="Embedding Robustness to Synonymy">
+  <p>
+    For semantically equivalent metric references <InlineEquation html={tex("\\mu_1 \\equiv_{\\text{sem}} \\mu_2")} /> (e.g.,
+    "NIM" and "Net Interest Margin"), embedding similarity
+    preserves retrieval:
+  </p>
+  <MathBlock html={tex("\\mu_1 \\equiv_{\\text{sem}} \\mu_2 \\implies |\\text{sim}(k, \\mu_1) - \\text{sim}(k, \\mu_2)| < \\delta", true)} />
+  <p>
+    for small <InlineEquation html={tex("\\delta")} />, assuming the embedding model captures
+    semantic similarity (a property validated empirically for modern sentence
+    transformers <CitationRef id={5} />).
+  </p>
+</TheoremBlock>
+
+Keyword matching fails here because "NIM" shares zero tokens with
+"Net Interest Margin." Edit distance fails because the strings are not
+typos of each other. Embeddings succeed because they encode semantic meaning, not
+surface form.
+
+### 5.4 The Scaling Problem
+
+As the KPI catalog <InlineEquation html={tex("|\\mathcal{K}|")} /> grows, the probability
+of near-duplicate entries increases. Consider:
+
+- "Net Interest Margin"
+- "Net Interest Margin (Adjusted)"
+- "Net Interest Margin (Domestic Only)"
+- "NIM — Regulatory Basis"
+
+These are distinct KPIs with different definitions and values, but their embeddings
+cluster tightly in <InlineEquation html={tex("\\mathbb{R}^d")} />. When <InlineEquation html={tex("|\\mathcal{K}_c| > 1")} /> and the top candidates are close in
+similarity score, we enter the disambiguation stage.
+
+<VisualizationContainer
+  minHeight={400}
+  caption="Figure 2: KPI embedding space — clusters of related metrics with the disambiguation danger zone highlighted"
+>
+  {() => <EmbeddingSpace />}
+</VisualizationContainer>
+
+## 6. Stage 3: LLM-Assisted Disambiguation
+
+### 6.1 Triggering Condition
+
+Disambiguation is invoked when the candidate set is ambiguous:
+
+<MathBlock
+  html={tex("\\text{disambiguate?} = \\begin{cases} \\text{no} & \\text{if } |\\mathcal{K}_c| = 1 \\\\ \\text{no} & \\text{if } |\\mathcal{K}_c| > 1 \\wedge \\text{sim}(k_1, \\mu) - \\text{sim}(k_2, \\mu) > \\gamma \\\\ \\text{yes} & \\text{otherwise} \\end{cases}", true)}
+/>
+
+where <InlineEquation html={tex("k_1, k_2")} /> are the top-2 candidates sorted by
+similarity, and <InlineEquation html={tex("\\gamma")} /> is the **confidence gap threshold**. If the top candidate is sufficiently
+dominant, we accept it without LLM disambiguation.
+
+### 6.2 The Disambiguation Protocol
+
+When triggered, the LLM receives:
+
+- The user's original query <InlineEquation html={tex("q")} />
+- The candidate KPI names <InlineEquation html={tex("\\{n_i : k_i \\in \\mathcal{K}_c\\}")} />
+- The candidate KPI definitions <InlineEquation html={tex("\\{d_i : k_i \\in \\mathcal{K}_c\\}")} />
+
+Critically, the LLM does **not** receive KPI values or any data from <InlineEquation html={tex("\\mathcal{V}")} />. This preserves the data confidentiality
+property (cf. companion paper on LLM-as-Router architectures).
+
+The LLM outputs a selection <InlineEquation html={tex("\\hat{k} \\in \\mathcal{K}_c")} /> and a confidence score <InlineEquation html={tex("p \\in [0, 1]")} />.
+
+### 6.3 Confidence Thresholding
+
+<TheoremBlock variant="definition" number={6} title="Disambiguation Decision Function">
+  <p>The disambiguation outcome is:</p>
+  <MathBlock
+    html={tex("\\text{outcome}(\\hat{k}, p) = \\begin{cases} \\text{accept}(\\hat{k}) & \\text{if } p \\geq 1 - \\epsilon \\\\ \\text{clarify}(\\mathcal{K}_c) & \\text{if } p < 1 - \\epsilon \\end{cases}", true)}
+  />
+  <p>
+    where <InlineEquation html={tex("\\epsilon")} /> is the maximum acceptable error
+    probability from Requirement 3.
+  </p>
+</TheoremBlock>
+
+<TheoremBlock variant="proposition" number={4} title="Disambiguation Safety">
+  <p>
+    If the LLM's confidence score is calibrated (i.e., <InlineEquation html={tex("P(\\hat{k} = k^* \\mid p) \\geq p")} /> for all confidence
+    levels <InlineEquation html={tex("p")} />), then the disambiguation decision function satisfies Requirement 3:
+  </p>
+  <MathBlock html={tex("P(\\hat{k} = k^*) \\geq 1 - \\epsilon \\text{ whenever outcome} = \\text{accept}", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="proof">
+  <p>
+    The accept condition requires <InlineEquation html={tex("p \\geq 1 - \\epsilon")} />. By
+    calibration, <InlineEquation html={tex("P(\\hat{k} = k^* \\mid p) \\geq p \\geq 1 - \\epsilon")} />. <InlineEquation html={tex("\\square")} />
+  </p>
+</TheoremBlock>
+
+In practice, LLM confidence scores are not perfectly calibrated <CitationRef id={6} />, so we set <InlineEquation html={tex("\\epsilon")} /> conservatively (we use <InlineEquation html={tex("\\epsilon = 0.05")} />) and validate calibration empirically on
+a held-out query set.
+
+## 7. Stage 4: Guardrailed SQL Generation
+
+### 7.1 Template-Based Generation
+
+Once the KPI is resolved, SQL generation uses a hybrid approach: a template library
+provides the structural skeleton, and parameterization fills in the specific values.
+
+<TheoremBlock variant="definition" number={7} title="SQL Template">
+  <p>
+    A template <InlineEquation html={tex("T")} /> is a SQL string with typed placeholders:
+  </p>
+  <MathBlock html={tex("T(\\text{kpi\\_id}: \\text{int},\\; \\text{period}: \\text{date},\\; \\text{entity}: \\text{string}) = \\text{SELECT } \\ldots \\text{ WHERE kpi\\_id = :kpi\\_id AND } \\ldots", true)} />
+  <p>
+    Templates are pre-authored and reviewed for each query pattern (peer comparison,
+    time series trend, single-point lookup, cross-entity ranking).
+  </p>
+</TheoremBlock>
+
+### 7.2 Formal Safety Properties
+
+<TheoremBlock variant="theorem" number={3} title="Injection Impossibility">
+  <p>
+    If all user-supplied values are passed as parameterized bindings (not
+    string-interpolated into the SQL), then SQL injection is impossible:
+  </p>
+  <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\nexists \\text{ substring } s \\text{ of } q \\text{ that executes as SQL}", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="proof">
+  <p>
+    Parameterized queries separate code (the SQL template) from data (the parameter
+    values) at the database driver level <CitationRef id={7} />. The driver processes the SQL template as
+    a prepared statement, compiling it into an execution plan before binding parameter
+    values. Parameter values are treated as data literals, not as SQL syntax.
+    Therefore, no content of <InlineEquation html={tex("q")} /> — regardless of its structure
+    or embedded SQL keywords — can alter the query's syntactic structure or
+    execution plan.
+  </p>
+</TheoremBlock>
+
+<TheoremBlock variant="theorem" number={4} title="Schema Compliance">
+  <p>
+    If the template library <InlineEquation html={tex("\\mathcal{T}")} /> references only
+    tables in <InlineEquation html={tex("T_{\\text{allowed}}")} /> and columns in <InlineEquation html={tex("C_{\\text{allowed}}")} />, and templates are selected (not
+    generated), then Requirement 2 is satisfied:
+  </p>
+  <MathBlock html={tex("\\forall T \\in \\mathcal{T}: \\text{tables}(T) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(T) \\subseteq C_{\\text{allowed}}", true)} />
+  <MathBlock html={tex("\\text{template\\_select}: \\mathcal{I} \\rightarrow \\mathcal{T} \\implies \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}}", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="proof">
+  <p>
+    The SQL execution uses only templates from <InlineEquation html={tex("\\mathcal{T}")} />. Each template is authored and reviewed to
+    reference only allowed tables and columns. Since no dynamic table or column names
+    enter through parameters (which are values, not identifiers), the schema boundary
+    is preserved.
+  </p>
+</TheoremBlock>
+
+### 7.3 Validation Layer
+
+Even with template-based generation, a validation layer provides defense-in-depth:
+
+1. **Whitelist check:** Parse the generated SQL AST and verify all table and column references against <InlineEquation html={tex("T_{\\text{allowed}}")} /> and <InlineEquation html={tex("C_{\\text{allowed}}")} />
+1. **Operation check:** Verify the top-level operation is SELECT (no INSERT, UPDATE, DELETE, DROP)
+1. **Structure check:** Compare the generated SQL structure against the expected template structure using tree edit distance on the AST
+1. **Parameter type check:** Verify each bound parameter matches the expected type from the template definition
+
+If any check fails, the query is rejected and logged for review — it never reaches
+the database.
+
+<VisualizationContainer
+  minHeight={400}
+  caption="Figure 3: Four-gate guardrail validation — SQL injection attempts are caught at parameterization, schema violations at whitelist check"
+>
+  {() => <GuardrailValidator />}
+</VisualizationContainer>
+
+## 8. Stage 5: Deterministic Result Formatting
+
+The final stage transforms raw query results into the output format <InlineEquation html={tex("\\omega")} /> specified in the intent. This stage is entirely
+deterministic — no LLM involvement:
+
+<MathBlock html={tex("s_5: (\\text{QueryResult}, \\omega) \\rightarrow \\mathcal{R}", true)} />
+
+Output types include comparison tables, trend charts, summary statistics, and
+narrative descriptions (generated from templates, not LLMs).
+
+## 9. On the Two-Week Delivery
+
+The second version of this system was designed and deployed in two weeks. This
+timeline merits explanation because it appears to contradict the depth of
+engineering described above.
+
+Three factors made this possible:
+
+**Factor 1: Domain maturity.** Version 1 had been in production for
+months. The KPI catalog, data layer, entitlement model, and deployment
+infrastructure were stable. The rewrite replaced the query interface, not the
+foundation.
+
+**Factor 2: Pre-crystallized architecture.** The five-stage
+decomposition, the embedding approach, the confidence thresholding protocol, and the
+guardrail layers had been explored and decided during months of research preceding
+the build. The architecture was ready; it needed to be written, not discovered.
+
+**Factor 3: Framework standardization.** The codebase was built within
+an internal platform that handled authentication, entitlements, and deployment.
+Infrastructure was not in scope.
+
+The lesson: speed in delivery comes from depth in preparation. The two weeks of
+building was enabled by months of thinking.
+
+## 10. Related Work
+
+**Text-to-SQL benchmarks.** Spider <CitationRef id={4} /> and WikiSQL <CitationRef id={8} /> evaluate
+end-to-end accuracy but do not measure safety properties (injection resistance,
+schema compliance) or disambiguation quality. Our pipeline is designed for these
+properties first, accuracy second.
+
+**Decomposed approaches.** DIN-SQL <CitationRef id={1} /> decomposes text-to-SQL into
+sub-problems but uses LLM generation at each stage. Our approach restricts LLM use
+to intent parsing and disambiguation, using deterministic templates for SQL
+generation.
+
+**Embedding-based retrieval.** Dense retrieval methods <CitationRef id={9} /> using
+sentence transformers have shown strong performance for semantic matching tasks. We
+apply this specifically to KPI catalog matching with a disambiguation overlay.
+
+**SQL safety.** OWASP SQL injection prevention <CitationRef id={7} /> establishes
+parameterization as the primary defense. Our contribution is integrating this with
+LLM-generated queries where the attack surface is the natural language input, not a
+traditional form field.
+
+## 11. Conclusion
+
+The five-stage decomposition transforms text-to-SQL from a monolithic generation
+task into a pipeline with formal safety properties. By factoring the problem into
+intent parsing, embedding-based detection, confidence-thresholded disambiguation,
+template-based generation with parameterization, and deterministic formatting, we
+achieve injection impossibility, schema compliance, and disambiguation correctness —
+properties that are provable, not aspirational.
+
+The key insight: **decomposition is itself the primary guardrail.** Each stage has a narrow contract, a testable interface, and clear failure modes.
+When something goes wrong, you know which stage failed. When the catalog grows, you
+know which stage to extend. When requirements change, you know which stage to modify
+without risking the others.
+
+<VisualizationContainer
+  minHeight={450}
+  caption="Figure 4: Complete pipeline architecture — query flows through all five stages with typed connections and safety property annotations"
+>
+  {() => <FullPipelineFlow />}
+</VisualizationContainer>

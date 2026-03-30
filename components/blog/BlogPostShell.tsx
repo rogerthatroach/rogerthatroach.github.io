@@ -8,16 +8,16 @@ import PostLayout from './PostLayout';
 // Post content components — SSR enabled so equations render into static HTML.
 // Interactive diagrams inside each post use their own ssr:false via next/dynamic.
 const POST_COMPONENTS: Record<string, React.ComponentType> = {
-  'agentic-ai': dynamic(() => import('@/data/posts/agentic-ai'), {
+  'agentic-ai': dynamic(() => import('@/data/posts/agentic-ai.mdx'), {
     loading: () => <PostSkeleton />,
   }),
-  'text-to-sql': dynamic(() => import('@/data/posts/text-to-sql'), {
+  'text-to-sql': dynamic(() => import('@/data/posts/text-to-sql.mdx'), {
     loading: () => <PostSkeleton />,
   }),
-  'closed-loop': dynamic(() => import('@/data/posts/closed-loop'), {
+  'closed-loop': dynamic(() => import('@/data/posts/closed-loop.mdx'), {
     loading: () => <PostSkeleton />,
   }),
-  'enterprise-agentic-ai-architecture': dynamic(() => import('@/data/posts/enterprise-agentic-ai'), {
+  'enterprise-agentic-ai-architecture': dynamic(() => import('@/data/posts/enterprise-agentic-ai.mdx'), {
     loading: () => <PostSkeleton />,
   }),
 };
