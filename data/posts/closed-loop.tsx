@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import MathBlock from '@/components/blog/MathBlock';
+import { tex } from '@/lib/katex';
 import InlineEquation from '@/components/blog/InlineEquation';
 import TheoremBlock from '@/components/blog/TheoremBlock';
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
@@ -142,29 +143,29 @@ export default function ClosedLoopPost() {
 
       <TheoremBlock variant="definition" number={1} title="Closed-Loop Optimization System">
         <p className="mb-2">
-          A closed-loop optimization system <InlineEquation tex="\\mathcal{S}" /> is a 4-tuple:
+          A closed-loop optimization system <InlineEquation html={tex("\\mathcal{S}")} /> is a 4-tuple:
         </p>
-        <MathBlock tex="\\mathcal{S} = (\\mathcal{Z},\\; \\mathcal{M},\\; \\mathcal{O},\\; \\mathcal{A})" />
+        <MathBlock html={tex("\\mathcal{S} = (\\mathcal{Z},\\; \\mathcal{M},\\; \\mathcal{O},\\; \\mathcal{A})", true)} />
         <p className="mb-2">where:</p>
         <ul className="list-inside list-disc space-y-1">
           <li>
-            <InlineEquation tex="\\mathcal{Z}: \\text{Environment} \\rightarrow \\mathcal{X}" /> is
+            <InlineEquation html={tex("\\mathcal{Z}: \\text{Environment} \\rightarrow \\mathcal{X}")} /> is
             the <strong>sensing function</strong>, mapping environmental state to an observation
-            space <InlineEquation tex="\\mathcal{X} \\subseteq \\mathbb{R}^n" />
+            space <InlineEquation html={tex("\\mathcal{X} \\subseteq \\mathbb{R}^n")} />
           </li>
           <li>
-            <InlineEquation tex="\\mathcal{M}: \\mathcal{X} \\rightarrow \\hat{\\mathcal{Y}}" /> is
+            <InlineEquation html={tex("\\mathcal{M}: \\mathcal{X} \\rightarrow \\hat{\\mathcal{Y}}")} /> is
             the <strong>modeling function</strong>, mapping observations to predicted outputs{' '}
-            <InlineEquation tex="\\hat{\\mathcal{Y}} \\subseteq \\mathbb{R}^m" />
+            <InlineEquation html={tex("\\hat{\\mathcal{Y}} \\subseteq \\mathbb{R}^m")} />
           </li>
           <li>
-            <InlineEquation tex="\\mathcal{O}: \\hat{\\mathcal{Y}} \\times \\mathcal{C} \\rightarrow \\mathcal{X}^*" />{' '}
+            <InlineEquation html={tex("\\mathcal{O}: \\hat{\\mathcal{Y}} \\times \\mathcal{C} \\rightarrow \\mathcal{X}^*")} />{' '}
             is the <strong>optimization function</strong>, finding optimal inputs{' '}
-            <InlineEquation tex="\\mathcal{X}^* \\subseteq \\mathcal{X}" /> subject to constraints{' '}
-            <InlineEquation tex="\\mathcal{C}" />
+            <InlineEquation html={tex("\\mathcal{X}^* \\subseteq \\mathcal{X}")} /> subject to constraints{' '}
+            <InlineEquation html={tex("\\mathcal{C}")} />
           </li>
           <li>
-            <InlineEquation tex="\\mathcal{A}: \\mathcal{X}^* \\rightarrow \\text{Environment}" />{' '}
+            <InlineEquation html={tex("\\mathcal{A}: \\mathcal{X}^* \\rightarrow \\text{Environment}")} />{' '}
             is the <strong>actuation function</strong>, applying optimized inputs to the environment
           </li>
         </ul>
@@ -176,7 +177,7 @@ export default function ClosedLoopPost() {
       </p>
 
       <MathBlock
-        tex="\\text{Environment} \\xrightarrow{\\mathcal{Z}} \\mathcal{X} \\xrightarrow{\\mathcal{M}} \\hat{\\mathcal{Y}} \\xrightarrow{\\mathcal{O}} \\mathcal{X}^* \\xrightarrow{\\mathcal{A}} \\text{Environment} \\xrightarrow{\\mathcal{Z}} \\cdots"
+        html={tex("\\text{Environment} \\xrightarrow{\\mathcal{Z}} \\mathcal{X} \\xrightarrow{\\mathcal{M}} \\hat{\\mathcal{Y}} \\xrightarrow{\\mathcal{O}} \\mathcal{X}^* \\xrightarrow{\\mathcal{A}} \\text{Environment} \\xrightarrow{\\mathcal{Z}} \\cdots", true)}
       />
 
       <VisualizationContainer
@@ -194,7 +195,7 @@ export default function ClosedLoopPost() {
           The system improves over time because actuation changes the environment, producing new
           observations that update the model:
         </p>
-        <MathBlock tex="\\mathcal{M}_{t+1} = \\text{update}(\\mathcal{M}_t,\\; \\mathcal{Z}(\\text{Environment}_{t+1}))" />
+        <MathBlock html={tex("\\mathcal{M}_{t+1} = \\text{update}(\\mathcal{M}_t,\\; \\mathcal{Z}(\\text{Environment}_{t+1}))", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proposition" number={2} title="Constraint Satisfaction">
@@ -202,15 +203,15 @@ export default function ClosedLoopPost() {
           The optimization function operates within a feasible set defined by operational,
           regulatory, or safety constraints:
         </p>
-        <MathBlock tex="\\mathcal{X}^* = \\underset{x \\in \\mathcal{F}}{\\text{argmin}}\\; J(x) \\quad \\text{where} \\quad \\mathcal{F} = \\{x \\in \\mathcal{X} \\mid c_j(x) \\leq 0,\\; j = 1, \\ldots, p\\}" />
+        <MathBlock html={tex("\\mathcal{X}^* = \\underset{x \\in \\mathcal{F}}{\\text{argmin}}\\; J(x) \\quad \\text{where} \\quad \\mathcal{F} = \\{x \\in \\mathcal{X} \\mid c_j(x) \\leq 0,\\; j = 1, \\ldots, p\\}", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proposition" number={3} title="Human-in-the-Loop">
         <p>
           In high-stakes domains,{' '}
-          <InlineEquation tex="\\mathcal{A}" /> includes a human judgment gate:
+          <InlineEquation html={tex("\\mathcal{A}")} /> includes a human judgment gate:
         </p>
-        <MathBlock tex="\\mathcal{A}(x^*) = \\begin{cases} \\text{apply}(x^*) & \\text{if human approves} \\\\ \\text{hold}(x^*) & \\text{otherwise} \\end{cases}" />
+        <MathBlock html={tex("\\mathcal{A}(x^*) = \\begin{cases} \\text{apply}(x^*) & \\text{if human approves} \\\\ \\text{hold}(x^*) & \\text{otherwise} \\end{cases}", true)} />
       </TheoremBlock>
 
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
@@ -242,10 +243,10 @@ export default function ClosedLoopPost() {
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
           Temperature at multiple boiler zones (
-          <InlineEquation tex="T_1, T_2, \\ldots, T_k" />)
+          <InlineEquation html={tex("T_1, T_2, \\ldots, T_k")} />)
         </li>
         <li>
-          Pressure readings (<InlineEquation tex="P_1, P_2, \\ldots" />)
+          Pressure readings (<InlineEquation html={tex("P_1, P_2, \\ldots")} />)
         </li>
         <li>Flow rates (fuel, air, steam)</li>
         <li>Emissions concentrations at stack outlets</li>
@@ -256,7 +257,7 @@ export default function ClosedLoopPost() {
         interaction terms developed in consultation with a mechanical engineer on the team), the
         input space is:
       </p>
-      <MathBlock tex="\\mathbf{x} \\in \\mathbb{R}^n, \\quad n \\approx 90+" />
+      <MathBlock html={tex("\\mathbf{x} \\in \\mathbb{R}^n, \\quad n \\approx 90+", true)} />
 
       {/* ── 3.3 Modeling ── */}
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
@@ -265,12 +266,12 @@ export default function ClosedLoopPost() {
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Each output variable of interest (emissions at different measurement points, temperature
         readings, efficiency indicators) receives its own regression model. Let{' '}
-        <InlineEquation tex="y_i" /> denote the <InlineEquation tex="i" />-th output variable:
+        <InlineEquation html={tex("y_i")} /> denote the <InlineEquation html={tex("i")} />-th output variable:
       </p>
-      <MathBlock tex="\\hat{y}_i = f_i(\\mathbf{x};\\; \\boldsymbol{\\beta}_i), \\quad i = 1, 2, \\ldots, 84" />
+      <MathBlock html={tex("\\hat{y}_i = f_i(\\mathbf{x};\\; \\boldsymbol{\\beta}_i), \\quad i = 1, 2, \\ldots, 84", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The modeling task is to learn 84 parameter vectors{' '}
-        <InlineEquation tex="\\{\\boldsymbol{\\beta}_1, \\boldsymbol{\\beta}_2, \\ldots, \\boldsymbol{\\beta}_{84}\\}" />{' '}
+        <InlineEquation html={tex("\\{\\boldsymbol{\\beta}_1, \\boldsymbol{\\beta}_2, \\ldots, \\boldsymbol{\\beta}_{84}\\}")} />{' '}
         from historical sensor data.
       </p>
 
@@ -279,30 +280,30 @@ export default function ClosedLoopPost() {
         3.3.1 Feature Selection
       </h4>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        With <InlineEquation tex="n \\approx 90+" /> candidate features and potential interaction
+        With <InlineEquation html={tex("n \\approx 90+")} /> candidate features and potential interaction
         terms, dimensionality reduction is necessary. We used correlation-based feature selection:
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Step 1: Feature-target correlation.</strong> For each model{' '}
-        <InlineEquation tex="i" />, compute Pearson correlation between each feature{' '}
-        <InlineEquation tex="x_j" /> and target <InlineEquation tex="y_i" />:
+        <InlineEquation html={tex("i")} />, compute Pearson correlation between each feature{' '}
+        <InlineEquation html={tex("x_j")} /> and target <InlineEquation html={tex("y_i")} />:
       </p>
       <MathBlock
-        tex="r_{j,i} = \\frac{\\sum_{t=1}^{T}(x_j^{(t)} - \\bar{x}_j)(y_i^{(t)} - \\bar{y}_i)}{\\sqrt{\\sum_{t=1}^{T}(x_j^{(t)} - \\bar{x}_j)^2 \\cdot \\sum_{t=1}^{T}(y_i^{(t)} - \\bar{y}_i)^2}}"
+        html={tex("r_{j,i} = \\frac{\\sum_{t=1}^{T}(x_j^{(t)} - \\bar{x}_j)(y_i^{(t)} - \\bar{y}_i)}{\\sqrt{\\sum_{t=1}^{T}(x_j^{(t)} - \\bar{x}_j)^2 \\cdot \\sum_{t=1}^{T}(y_i^{(t)} - \\bar{y}_i)^2}}", true)}
         label="(1)"
       />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        Retain features where <InlineEquation tex="|r_{j,i}| > r_{\\min}" /> for a configurable
-        threshold <InlineEquation tex="r_{\\min}" />.
+        Retain features where <InlineEquation html={tex("|r_{j,i}| > r_{\\min}")} /> for a configurable
+        threshold <InlineEquation html={tex("r_{\\min}")} />.
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Step 2: Feature-feature correlation.</strong> Among retained features, identify pairs
-        with <InlineEquation tex="|r_{j,k}| > r_{\\text{collinear}}" />. For collinear pairs,
+        with <InlineEquation html={tex("|r_{j,k}| > r_{\\text{collinear}}")} />. For collinear pairs,
         retain the feature with higher target correlation.
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         This yields a model-specific feature set{' '}
-        <InlineEquation tex="\\mathbf{x}_i \\subseteq \\mathbf{x}" /> for each of the 84 models
+        <InlineEquation html={tex("\\mathbf{x}_i \\subseteq \\mathbf{x}")} /> for each of the 84 models
         &mdash; not all models use the same features.
       </p>
 
@@ -311,17 +312,17 @@ export default function ClosedLoopPost() {
         3.3.2 Model Selection: Multi-Indicator Evaluation
       </h4>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        For each model <InlineEquation tex="f_i" />, we evaluated multiple candidate algorithms
+        For each model <InlineEquation html={tex("f_i")} />, we evaluated multiple candidate algorithms
         (linear regression, polynomial regression, ridge, lasso, random forest, gradient boosting,
-        SVR) using k-fold cross-validation with <InlineEquation tex="K = 5" /> folds. The
+        SVR) using k-fold cross-validation with <InlineEquation html={tex("K = 5")} /> folds. The
         selection criteria were:
       </p>
 
       <p className="mb-2 text-sm font-medium text-text-primary">
-        Coefficient of Determination (<InlineEquation tex="R^2" />):
+        Coefficient of Determination (<InlineEquation html={tex("R^2")} />):
       </p>
       <MathBlock
-        tex="R^2_i = 1 - \\frac{\\sum_{t=1}^{T}(y_i^{(t)} - \\hat{y}_i^{(t)})^2}{\\sum_{t=1}^{T}(y_i^{(t)} - \\bar{y}_i)^2}"
+        html={tex("R^2_i = 1 - \\frac{\\sum_{t=1}^{T}(y_i^{(t)} - \\hat{y}_i^{(t)})^2}{\\sum_{t=1}^{T}(y_i^{(t)} - \\bar{y}_i)^2}", true)}
         label="(2)"
       />
 
@@ -329,7 +330,7 @@ export default function ClosedLoopPost() {
         Root Mean Squared Error (RMSE):
       </p>
       <MathBlock
-        tex="\\text{RMSE}_i = \\sqrt{\\frac{1}{T}\\sum_{t=1}^{T}(y_i^{(t)} - \\hat{y}_i^{(t)})^2}"
+        html={tex("\\text{RMSE}_i = \\sqrt{\\frac{1}{T}\\sum_{t=1}^{T}(y_i^{(t)} - \\hat{y}_i^{(t)})^2}", true)}
         label="(3)"
       />
 
@@ -337,39 +338,39 @@ export default function ClosedLoopPost() {
         Mean Absolute Percentage Error (MAPE):
       </p>
       <MathBlock
-        tex="\\text{MAPE}_i = \\frac{100}{T}\\sum_{t=1}^{T}\\left|\\frac{y_i^{(t)} - \\hat{y}_i^{(t)}}{y_i^{(t)}}\\right|"
+        html={tex("\\text{MAPE}_i = \\frac{100}{T}\\sum_{t=1}^{T}\\left|\\frac{y_i^{(t)} - \\hat{y}_i^{(t)}}{y_i^{(t)}}\\right|", true)}
         label="(4)"
       />
 
       <p className="mb-2 text-sm font-medium text-text-primary">Mean Absolute Error (MAE):</p>
       <MathBlock
-        tex="\\text{MAE}_i = \\frac{1}{T}\\sum_{t=1}^{T}|y_i^{(t)} - \\hat{y}_i^{(t)}|"
+        html={tex("\\text{MAE}_i = \\frac{1}{T}\\sum_{t=1}^{T}|y_i^{(t)} - \\hat{y}_i^{(t)}|", true)}
         label="(5)"
       />
 
       <p className="mb-2 text-sm font-medium text-text-primary">
-        Inter-Fold Variance (<InlineEquation tex="\\sigma^2_{\\text{fold}}" />):
+        Inter-Fold Variance (<InlineEquation html={tex("\\sigma^2_{\\text{fold}}")} />):
       </p>
       <MathBlock
-        tex="\\sigma^2_{\\text{fold},i} = \\text{Var}(\\{R^2_{i,1},\\; R^2_{i,2},\\; \\ldots,\\; R^2_{i,K}\\})"
+        html={tex("\\sigma^2_{\\text{fold},i} = \\text{Var}(\\{R^2_{i,1},\\; R^2_{i,2},\\; \\ldots,\\; R^2_{i,K}\\})", true)}
         label="(6)"
       />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        where <InlineEquation tex="R^2_{i,k}" /> is the <InlineEquation tex="R^2" /> score of
-        model <InlineEquation tex="i" /> on fold <InlineEquation tex="k" />.
+        where <InlineEquation html={tex("R^2_{i,k}")} /> is the <InlineEquation html={tex("R^2")} /> score of
+        model <InlineEquation html={tex("i")} /> on fold <InlineEquation html={tex("k")} />.
       </p>
 
       <TheoremBlock variant="definition" number={2} title="Model Selection Criterion">
         <p>
-          The selected model for output <InlineEquation tex="i" /> is:
+          The selected model for output <InlineEquation html={tex("i")} /> is:
         </p>
-        <MathBlock tex="f_i^* = \\underset{f \\in \\mathcal{F}}{\\text{argmax}}\\; R^2_i(f) \\quad \\text{subject to} \\quad \\sigma^2_{\\text{fold},i}(f) < \\sigma_{\\max}" />
+        <MathBlock html={tex("f_i^* = \\underset{f \\in \\mathcal{F}}{\\text{argmax}}\\; R^2_i(f) \\quad \\text{subject to} \\quad \\sigma^2_{\\text{fold},i}(f) < \\sigma_{\\max}", true)} />
       </TheoremBlock>
 
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        The stability constraint (<InlineEquation tex="\\sigma^2_{\\text{fold}} < \\sigma_{\\max}" />)
+        The stability constraint (<InlineEquation html={tex("\\sigma^2_{\\text{fold}} < \\sigma_{\\max}")} />)
         is critical and frequently omitted in practice. A model with high{' '}
-        <InlineEquation tex="R^2" /> but high inter-fold variance has memorized training-set
+        <InlineEquation html={tex("R^2")} /> but high inter-fold variance has memorized training-set
         patterns rather than learning generalizable relationships. For a system where model
         predictions directly drive physical control recommendations, a stable model with slightly
         lower accuracy is preferable to an unstable model with higher peak accuracy.
@@ -391,31 +392,31 @@ export default function ClosedLoopPost() {
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart [1], is a
         population-based metaheuristic inspired by collective behavior in biological swarms. A
-        population of <InlineEquation tex="N" /> particles navigates an{' '}
-        <InlineEquation tex="n" />-dimensional search space, each evaluating a candidate solution
+        population of <InlineEquation html={tex("N")} /> particles navigates an{' '}
+        <InlineEquation html={tex("n")} />-dimensional search space, each evaluating a candidate solution
         at its position.
       </p>
 
       <TheoremBlock variant="definition" number={3} title="Particle State">
         <p className="mb-2">
-          Each particle <InlineEquation tex="i" /> at iteration <InlineEquation tex="t" /> has:
+          Each particle <InlineEquation html={tex("i")} /> at iteration <InlineEquation html={tex("t")} /> has:
         </p>
         <ul className="list-inside list-disc space-y-1">
           <li>
-            Position: <InlineEquation tex="\\mathbf{x}_i^{(t)} \\in \\mathbb{R}^n" /> (a candidate
+            Position: <InlineEquation html={tex("\\mathbf{x}_i^{(t)} \\in \\mathbb{R}^n")} /> (a candidate
             set of boiler input settings)
           </li>
           <li>
-            Velocity: <InlineEquation tex="\\mathbf{v}_i^{(t)} \\in \\mathbb{R}^n" /> (the
+            Velocity: <InlineEquation html={tex("\\mathbf{v}_i^{(t)} \\in \\mathbb{R}^n")} /> (the
             direction and magnitude of movement)
           </li>
           <li>
             Personal best:{' '}
-            <InlineEquation tex="\\mathbf{p}_i^{(t)} = \\underset{s \\leq t}{\\text{argmin}}\\; J(\\mathbf{x}_i^{(s)})" />
+            <InlineEquation html={tex("\\mathbf{p}_i^{(t)} = \\underset{s \\leq t}{\\text{argmin}}\\; J(\\mathbf{x}_i^{(s)})")} />
           </li>
           <li>
             Global best:{' '}
-            <InlineEquation tex="\\mathbf{g}^{(t)} = \\underset{i,\\, s \\leq t}{\\text{argmin}}\\; J(\\mathbf{x}_i^{(s)})" />
+            <InlineEquation html={tex("\\mathbf{g}^{(t)} = \\underset{i,\\, s \\leq t}{\\text{argmin}}\\; J(\\mathbf{x}_i^{(s)})")} />
           </li>
         </ul>
       </TheoremBlock>
@@ -426,41 +427,41 @@ export default function ClosedLoopPost() {
         The velocity and position update rules are:
       </p>
       <MathBlock
-        tex="\\mathbf{v}_i^{(t+1)} = w \\cdot \\mathbf{v}_i^{(t)} + c_1 r_1 \\cdot (\\mathbf{p}_i^{(t)} - \\mathbf{x}_i^{(t)}) + c_2 r_2 \\cdot (\\mathbf{g}^{(t)} - \\mathbf{x}_i^{(t)})"
+        html={tex("\\mathbf{v}_i^{(t+1)} = w \\cdot \\mathbf{v}_i^{(t)} + c_1 r_1 \\cdot (\\mathbf{p}_i^{(t)} - \\mathbf{x}_i^{(t)}) + c_2 r_2 \\cdot (\\mathbf{g}^{(t)} - \\mathbf{x}_i^{(t)})", true)}
         label="(7)"
       />
       <MathBlock
-        tex="\\mathbf{x}_i^{(t+1)} = \\mathbf{x}_i^{(t)} + \\mathbf{v}_i^{(t+1)}"
+        html={tex("\\mathbf{x}_i^{(t+1)} = \\mathbf{x}_i^{(t)} + \\mathbf{v}_i^{(t+1)}", true)}
         label="(8)"
       />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">where:</p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
-          <InlineEquation tex="w" /> is the <strong>inertia weight</strong> (controls exploration
+          <InlineEquation html={tex("w")} /> is the <strong>inertia weight</strong> (controls exploration
           vs. exploitation)
         </li>
         <li>
-          <InlineEquation tex="c_1" /> is the <strong>cognitive coefficient</strong> (attraction to
+          <InlineEquation html={tex("c_1")} /> is the <strong>cognitive coefficient</strong> (attraction to
           personal best)
         </li>
         <li>
-          <InlineEquation tex="c_2" /> is the <strong>social coefficient</strong> (attraction to
+          <InlineEquation html={tex("c_2")} /> is the <strong>social coefficient</strong> (attraction to
           global best)
         </li>
         <li>
-          <InlineEquation tex="r_1, r_2 \\sim \\text{Uniform}(0, 1)" /> are stochastic scaling
+          <InlineEquation html={tex("r_1, r_2 \\sim \\text{Uniform}(0, 1)")} /> are stochastic scaling
           factors
         </li>
       </ul>
 
       <TheoremBlock variant="proposition" number={5} title="Convergence Behavior">
         <p>
-          Under the condition <InlineEquation tex="w < 1" /> and{' '}
-          <InlineEquation tex="c_1 + c_2 > 0" />, the swarm contracts toward a region containing{' '}
-          <InlineEquation tex="\\mathbf{g}^{(t)}" /> [2]. With linearly decreasing inertia weight{' '}
-          <InlineEquation tex="w(t) = w_{\\max} - (w_{\\max} - w_{\\min}) \\cdot t/t_{\\max}" />,
-          the swarm transitions from exploration (high <InlineEquation tex="w" />, broad search)
-          to exploitation (low <InlineEquation tex="w" />, local refinement).
+          Under the condition <InlineEquation html={tex("w < 1")} /> and{' '}
+          <InlineEquation html={tex("c_1 + c_2 > 0")} />, the swarm contracts toward a region containing{' '}
+          <InlineEquation html={tex("\\mathbf{g}^{(t)}")} /> [2]. With linearly decreasing inertia weight{' '}
+          <InlineEquation html={tex("w(t) = w_{\\max} - (w_{\\max} - w_{\\min}) \\cdot t/t_{\\max}")} />,
+          the swarm transitions from exploration (high <InlineEquation html={tex("w")} />, broad search)
+          to exploitation (low <InlineEquation html={tex("w")} />, local refinement).
         </p>
       </TheoremBlock>
 
@@ -479,19 +480,19 @@ export default function ClosedLoopPost() {
         The combustion tuning objective is to minimize pollutant emissions simultaneously:
       </p>
       <MathBlock
-        tex="\\text{minimize} \\quad J(\\mathbf{x}) = \\alpha_1 \\cdot \\hat{y}_{\\text{NOx}}(\\mathbf{x}) + \\alpha_2 \\cdot \\hat{y}_{\\text{SOx}}(\\mathbf{x}) + \\alpha_3 \\cdot \\hat{y}_{\\text{CO}}(\\mathbf{x})"
+        html={tex("\\text{minimize} \\quad J(\\mathbf{x}) = \\alpha_1 \\cdot \\hat{y}_{\\text{NOx}}(\\mathbf{x}) + \\alpha_2 \\cdot \\hat{y}_{\\text{SOx}}(\\mathbf{x}) + \\alpha_3 \\cdot \\hat{y}_{\\text{CO}}(\\mathbf{x})", true)}
         label="(9)"
       />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">subject to:</p>
       <MathBlock
-        tex="\\begin{aligned} x_j^{\\min} &\\leq x_j \\leq x_j^{\\max} & \\forall j &= 1, \\ldots, n & &\\text{(operational bounds)} \\\\ y_{\\text{load}}(\\mathbf{x}) &\\geq y_{\\text{load}}^{\\min} & & & &\\text{(minimum load constraint)} \\\\ T_{\\text{boiler}}(\\mathbf{x}) &\\leq T_{\\max} & & & &\\text{(safety constraint)} \\end{aligned}"
+        html={tex("\\begin{aligned} x_j^{\\min} &\\leq x_j \\leq x_j^{\\max} & \\forall j &= 1, \\ldots, n & &\\text{(operational bounds)} \\\\ y_{\\text{load}}(\\mathbf{x}) &\\geq y_{\\text{load}}^{\\min} & & & &\\text{(minimum load constraint)} \\\\ T_{\\text{boiler}}(\\mathbf{x}) &\\leq T_{\\max} & & & &\\text{(safety constraint)} \\end{aligned}", true)}
         label="(10)"
       />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        where <InlineEquation tex="\\alpha_1, \\alpha_2, \\alpha_3" /> are weighting coefficients
+        where <InlineEquation html={tex("\\alpha_1, \\alpha_2, \\alpha_3")} /> are weighting coefficients
         reflecting the relative importance of each pollutant (configurable based on regulatory
         priorities), and{' '}
-        <InlineEquation tex="\\hat{y}_{\\text{NOx}}, \\hat{y}_{\\text{SOx}}, \\hat{y}_{\\text{CO}}" />{' '}
+        <InlineEquation html={tex("\\hat{y}_{\\text{NOx}}, \\hat{y}_{\\text{SOx}}, \\hat{y}_{\\text{CO}}")} />{' '}
         are the trained regression models for each pollutant.
       </p>
 
@@ -501,7 +502,7 @@ export default function ClosedLoopPost() {
 
       <TheoremBlock variant="theorem" number={5} title="Non-Convexity Robustness">
         <p>
-          For a non-convex objective <InlineEquation tex="J" /> with multiple local minima,
+          For a non-convex objective <InlineEquation html={tex("J")} /> with multiple local minima,
           gradient-based methods converge to the nearest local minimum from initialization. PSO, as
           a population-based stochastic optimizer, samples from multiple basins of attraction
           simultaneously, providing probabilistic guarantees of finding the global minimum that
@@ -511,21 +512,21 @@ export default function ClosedLoopPost() {
 
       <TheoremBlock variant="proof">
         <p className="mb-2">
-          <em>Sketch of argument.</em> Consider a landscape with <InlineEquation tex="B" /> basins
+          <em>Sketch of argument.</em> Consider a landscape with <InlineEquation html={tex("B")} /> basins
           of attraction. A single gradient descent trajectory explores exactly one basin. A PSO
-          swarm of <InlineEquation tex="N" /> particles, initialized uniformly, places approximately{' '}
-          <InlineEquation tex="N/B" /> particles in each basin (for large{' '}
-          <InlineEquation tex="N" />). The global best{' '}
-          <InlineEquation tex="\\mathbf{g}^{(t)}" /> tracks the best solution across all basins.
+          swarm of <InlineEquation html={tex("N")} /> particles, initialized uniformly, places approximately{' '}
+          <InlineEquation html={tex("N/B")} /> particles in each basin (for large{' '}
+          <InlineEquation html={tex("N")} />). The global best{' '}
+          <InlineEquation html={tex("\\mathbf{g}^{(t)}")} /> tracks the best solution across all basins.
           As long as at least one particle initializes in the basin containing the global minimum,
           the swarm will eventually converge there (under appropriate{' '}
-          <InlineEquation tex="w, c_1, c_2" /> settings). The probability of at least one particle
-          initializing in the global basin approaches 1 as <InlineEquation tex="N" /> grows:
+          <InlineEquation html={tex("w, c_1, c_2")} /> settings). The probability of at least one particle
+          initializing in the global basin approaches 1 as <InlineEquation html={tex("N")} /> grows:
         </p>
-        <MathBlock tex="P(\\text{global basin covered}) = 1 - \\left(1 - \\frac{V_{\\text{global}}}{V_{\\text{total}}}\\right)^N" />
+        <MathBlock html={tex("P(\\text{global basin covered}) = 1 - \\left(1 - \\frac{V_{\\text{global}}}{V_{\\text{total}}}\\right)^N", true)} />
         <p>
-          where <InlineEquation tex="V_{\\text{global}}" /> is the volume of the global basin
-          relative to the total search space <InlineEquation tex="V_{\\text{total}}" />.
+          where <InlineEquation html={tex("V_{\\text{global}}")} /> is the volume of the global basin
+          relative to the total search space <InlineEquation html={tex("V_{\\text{total}}")} />.
         </p>
       </TheoremBlock>
 
@@ -578,14 +579,14 @@ export default function ClosedLoopPost() {
       <TheoremBlock variant="definition" number={4} title="Structural Isomorphism">
         <p className="mb-2">
           Two closed-loop optimization systems{' '}
-          <InlineEquation tex="\\mathcal{S}_1 = (\\mathcal{Z}_1, \\mathcal{M}_1, \\mathcal{O}_1, \\mathcal{A}_1)" />{' '}
+          <InlineEquation html={tex("\\mathcal{S}_1 = (\\mathcal{Z}_1, \\mathcal{M}_1, \\mathcal{O}_1, \\mathcal{A}_1)")} />{' '}
           and{' '}
-          <InlineEquation tex="\\mathcal{S}_2 = (\\mathcal{Z}_2, \\mathcal{M}_2, \\mathcal{O}_2, \\mathcal{A}_2)" />{' '}
+          <InlineEquation html={tex("\\mathcal{S}_2 = (\\mathcal{Z}_2, \\mathcal{M}_2, \\mathcal{O}_2, \\mathcal{A}_2)")} />{' '}
           are structurally isomorphic if there exist bijective mappings{' '}
-          <InlineEquation tex="\\phi_Z, \\phi_M, \\phi_O, \\phi_A" /> such that the compositional
+          <InlineEquation html={tex("\\phi_Z, \\phi_M, \\phi_O, \\phi_A")} /> such that the compositional
           structure is preserved:
         </p>
-        <MathBlock tex="\\phi_A \\circ \\phi_O \\circ \\phi_M \\circ \\phi_Z(\\mathcal{S}_1) \\cong \\mathcal{S}_2" />
+        <MathBlock html={tex("\\phi_A \\circ \\phi_O \\circ \\phi_M \\circ \\phi_Z(\\mathcal{S}_1) \\cong \\mathcal{S}_2", true)} />
         <p>
           That is, the four-phase flow (sense &rarr; model &rarr; optimize &rarr; act) is the same
           in both systems, even if the concrete implementations differ entirely.
@@ -607,7 +608,7 @@ export default function ClosedLoopPost() {
           <tbody className="text-text-secondary">
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{Z}" /> (Sense)
+                <InlineEquation html={tex("\\mathcal{Z}")} /> (Sense)
               </td>
               <td className="py-2">
                 Document ingestion &mdash; structured and unstructured files from
@@ -616,7 +617,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{M}" /> (Model)
+                <InlineEquation html={tex("\\mathcal{M}")} /> (Model)
               </td>
               <td className="py-2">
                 Entity extraction models (Vertex AI, AutoML) &mdash; mapping document content to
@@ -625,7 +626,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{O}" /> (Optimize)
+                <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
               </td>
               <td className="py-2">
                 Reduce manual review cycles &mdash; maximize extraction accuracy to minimize human
@@ -634,7 +635,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr>
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{A}" /> (Act)
+                <InlineEquation html={tex("\\mathcal{A}")} /> (Act)
               </td>
               <td className="py-2">
                 Verified, structured outputs delivered to downstream systems
@@ -659,7 +660,7 @@ export default function ClosedLoopPost() {
           <tbody className="text-text-secondary">
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{Z}" /> (Sense)
+                <InlineEquation html={tex("\\mathcal{Z}")} /> (Sense)
               </td>
               <td className="py-2">
                 General Ledger data extraction via PySpark across enterprise financial systems
@@ -667,7 +668,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{M}" /> (Model)
+                <InlineEquation html={tex("\\mathcal{M}")} /> (Model)
               </td>
               <td className="py-2">
                 PySpark transformation pipelines &mdash; mapping raw GL data to tax-ready formats
@@ -675,7 +676,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{O}" /> (Optimize)
+                <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
               </td>
               <td className="py-2">
                 Process time reduction: months &rarr; 90 minutes
@@ -683,7 +684,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr>
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{A}" /> (Act)
+                <InlineEquation html={tex("\\mathcal{A}")} /> (Act)
               </td>
               <td className="py-2">
                 Automated tax returns + Tableau dashboards for CFO Group decision-making
@@ -708,7 +709,7 @@ export default function ClosedLoopPost() {
           <tbody className="text-text-secondary">
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{Z}" /> (Sense)
+                <InlineEquation html={tex("\\mathcal{Z}")} /> (Sense)
               </td>
               <td className="py-2">
                 Policy documents, historical data, user queries &mdash; ingested via chunking +
@@ -717,7 +718,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{M}" /> (Model)
+                <InlineEquation html={tex("\\mathcal{M}")} /> (Model)
               </td>
               <td className="py-2">
                 LangGraph agentic orchestration &mdash; intent detection, sub-agent routing, RAG
@@ -726,7 +727,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{O}" /> (Optimize)
+                <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
               </td>
               <td className="py-2">
                 RAG relevance optimization, MCP tool selection, disambiguation &mdash; maximizing
@@ -735,7 +736,7 @@ export default function ClosedLoopPost() {
             </tr>
             <tr>
               <td className="py-2 pr-4">
-                <InlineEquation tex="\\mathcal{A}" /> (Act)
+                <InlineEquation html={tex("\\mathcal{A}")} /> (Act)
               </td>
               <td className="py-2">
                 Guided enterprise decisions &mdash; structured drafts, financial insights,
@@ -756,8 +757,8 @@ export default function ClosedLoopPost() {
       <ol className="mb-4 list-inside list-decimal space-y-3 text-sm text-text-secondary">
         <li>
           <strong>The sensing function becomes more semantic.</strong> Physical sensors (
-          <InlineEquation tex="\\mathbb{R}^n" />) &rarr; document parsers &rarr; data pipelines
-          &rarr; embedding models (<InlineEquation tex="\\mathbb{R}^d" />). The inputs evolve from
+          <InlineEquation html={tex("\\mathbb{R}^n")} />) &rarr; document parsers &rarr; data pipelines
+          &rarr; embedding models (<InlineEquation html={tex("\\mathbb{R}^d")} />). The inputs evolve from
           physical measurements to semantic representations.
         </li>
         <li>
