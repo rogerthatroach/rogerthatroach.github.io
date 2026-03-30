@@ -26,7 +26,7 @@ export default function PostCard({ post, index }: PostCardProps) {
     >
       <Link
         href={`/blog/${post.slug}`}
-        className="group block rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
+        className="group flex h-full flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
       >
         <h2 className="text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
           {post.title}
@@ -44,7 +44,7 @@ export default function PostCard({ post, index }: PostCardProps) {
           ))}
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-xs text-text-tertiary">
+        <div className="mt-auto flex items-center justify-between pt-4 text-xs text-text-tertiary">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <Calendar size={12} />
