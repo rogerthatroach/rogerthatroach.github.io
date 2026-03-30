@@ -36,7 +36,7 @@ export const POSTS: BlogPost[] = [
       slug: 'agentic-ai',
       title: 'Deterministic Agentic Architectures for Enterprise Financial Analytics',
       subtitle: 'A Separation-of-Concerns Approach to LLM-Powered Decision Systems',
-      date: '2026-03-29',
+      date: '2026-03-01',
       tags: ['Agentic AI', 'LLM Routing', 'Enterprise Security', 'Entitlement Modeling'],
       readingTime: '20 min read',
       abstract:
@@ -68,7 +68,7 @@ export const POSTS: BlogPost[] = [
       slug: 'text-to-sql',
       title: 'Guardrailed Text-to-SQL for Financial Benchmarking',
       subtitle: 'A Multi-Stage Pipeline with Formal Safety Properties',
-      date: '2026-03-29',
+      date: '2026-02-08',
       tags: ['Text-to-SQL', 'Semantic Similarity', 'SQL Injection Prevention', 'Enterprise NLP'],
       readingTime: '18 min read',
       abstract:
@@ -97,7 +97,7 @@ export const POSTS: BlogPost[] = [
       slug: 'closed-loop',
       title: 'Closed-Loop Optimization as a Unifying Pattern',
       subtitle: 'From Particle Swarm Optimization in Industrial Systems to Agentic AI in Enterprise Finance',
-      date: '2026-03-29',
+      date: '2026-01-15',
       tags: ['PSO', 'Closed-Loop Control', 'Digital Twins', 'Systems Thinking', 'Agentic AI'],
       readingTime: '25 min read',
       abstract:
@@ -128,7 +128,7 @@ export const POSTS: BlogPost[] = [
       slug: 'enterprise-agentic-ai-architecture',
       title: 'Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Multi-Layer RAG',
       subtitle: 'A separation-of-concerns approach to LLM-powered enterprise workflow orchestration with formal guarantees on context isolation, action auditability, and retrieval scoping.',
-      date: '2026-03-29',
+      date: '2026-03-22',
       tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'PostgreSQL', 'Formal Methods'],
       readingTime: '12 min read',
       abstract:

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import { Github, Linkedin, Mail } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY } from '@/data/hero';
 
@@ -76,19 +76,9 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-2 font-mono text-sm tracking-widest text-accent"
+            className="mb-4 font-mono text-sm tracking-widest text-accent"
           >
-            {HERO.titles[0]}
-          </motion.p>
-
-          <motion.p
-            custom={0.5}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="mb-4 font-mono text-xs tracking-widest text-text-secondary"
-          >
-            {HERO.titles[1]}
+            {HERO.title}
           </motion.p>
 
           <motion.h1
@@ -134,10 +124,6 @@ export default function Hero() {
                 <Icon size={20} />
               </a>
             ))}
-            <span className="flex items-center gap-1.5 text-sm text-text-tertiary">
-              <MapPin size={14} />
-              {HERO.location}
-            </span>
           </motion.div>
         </motion.div>
       </div>
