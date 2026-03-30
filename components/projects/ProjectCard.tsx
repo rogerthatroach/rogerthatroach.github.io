@@ -28,7 +28,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
     >
       <Link
         href={`/projects/${project.id}`}
-        className="group flex h-full flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
+        className="group flex min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
       >
         <div className="flex items-center gap-3">
           <span
