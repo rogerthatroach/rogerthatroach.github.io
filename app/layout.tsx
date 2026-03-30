@@ -41,12 +41,21 @@ export const metadata: Metadata = {
     siteName: 'Harmilap Singh Dhaliwal',
     locale: 'en_US',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.svg',
+        width: 1200,
+        height: 630,
+        alt: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
     description:
       'From Digital Twins to deterministic agents — shipping AI at bank scale.',
+    images: ['/og-image.svg'],
   },
   robots: {
     index: true,

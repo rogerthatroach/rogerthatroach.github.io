@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Project } from '@/data/projects';
 import type { CaseStudy } from '@/data/projectCaseStudies';
+import { useTilt } from '@/lib/useTilt';
 
 interface ProjectCardProps {
   project: Project;
@@ -13,11 +14,17 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, caseStudy, index }: ProjectCardProps) {
+  const { ref, handleMouseMove, handleMouseLeave } = useTilt<HTMLDivElement>();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1, ease: [0.4, 0, 0.2, 1] }}
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transition: 'transform 0.15s ease-out' }}
     >
       <Link
         href={`/projects/${project.id}`}
