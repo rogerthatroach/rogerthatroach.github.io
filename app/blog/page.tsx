@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import { POSTS } from '@/data/posts';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
@@ -16,8 +18,15 @@ export default function BlogIndexPage() {
     <>
       <Nav />
       <main className="mx-auto min-h-screen max-w-content px-6 pb-16 pt-28 md:px-16">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
+        >
+          <ArrowLeft size={16} />
+          Home
+        </Link>
         <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Writing</h1>
-        <p className="mt-2 text-sm text-text-secondary">
+        <p className="mt-2 text-base text-text-secondary">
           Technical explorations — architecture patterns, formal guarantees, and the systems thinking behind the work.
         </p>
 
