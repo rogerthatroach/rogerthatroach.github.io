@@ -1,0 +1,351 @@
+import { AgenticArchitecture, SubAgentExecution, EPMTranslation, FullSystemArchitecture, EventModelAnimation } from "@/components/blog/BlogDiagrams"
+import MathBlock from '@/components/blog/MathBlock';
+import { tex } from '@/lib/katex';
+import InlineEquation from '@/components/blog/InlineEquation';
+import TheoremBlock from '@/components/blog/TheoremBlock';
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import CitationRef from '@/components/blog/CitationRef';
+
+## Abstract
+
+Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern — **LLM-as-Router** — that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent detection layer and a deterministic computation layer, prove that this architecture preserves data confidentiality under defined threat models, and describe a production implementation processing ~40,000 employee transits across ~9,000 organizational rollups with millisecond-level query response for a major bank's CFO Group.
+
+<VisualizationContainer minHeight={500} caption="Full System Architecture: Two-layer LLM-as-Router pattern with parallel sub-agents and entitlement enforcement">
+  {(isVisible) => <FullSystemArchitecture />}
+</VisualizationContainer>
+
+## 1. Introduction
+
+Enterprise AI systems operating on sensitive financial data face a trilemma: they must be *intelligent* (understand natural language queries), *correct* (produce deterministic, auditable results), and *secure* (enforce fine-grained access controls). Existing LLM-powered analytics tools typically sacrifice correctness and security for intelligence, passing sensitive data through model context windows and relying on probabilistic inference for computation <CitationRef id={1} /><CitationRef id={2} />.
+
+We argue that this tradeoff is architectural, not fundamental. By decomposing the system into two layers with distinct computational properties — a stateless, data-free intent detection layer powered by an LLM, and a stateful, data-rich deterministic computation layer powered by conventional software — we achieve all three properties simultaneously.
+
+The contributions of this paper are:
+
+1. A formal definition of the **LLM-as-Router** architecture pattern for enterprise AI
+2. A proof that the architecture preserves data confidentiality under a defined threat model
+3. A formalization of EPM-to-SQL entitlement translation as a lattice-preserving mapping
+4. A production validation at enterprise scale
+
+## 2. Problem Formulation
+
+### 2.1 System Requirements
+
+Let <InlineEquation html={tex("\\mathcal{Q}")} /> denote the space of natural language queries, <InlineEquation html={tex("\\mathcal{D}")} /> the space of sensitive enterprise data, and <InlineEquation html={tex("\\mathcal{R}")} /> the space of formatted responses. We seek a function <InlineEquation html={tex("f: \\mathcal{Q} \\rightarrow \\mathcal{R}")} /> such that:
+
+<TheoremBlock variant="definition" number={1} title="System Requirements">
+  <p className="mb-3">
+    <strong>Requirement 1 (Semantic Understanding).</strong> <InlineEquation html={tex("f")} /> must map semantically equivalent queries to equivalent responses:
+  </p>
+  <MathBlock html={tex("q_1 \\equiv_{\\text{sem}} q_2 \\implies f(q_1) = f(q_2)", true)} />
+  <p className="mb-3">
+    <strong>Requirement 2 (Deterministic Correctness).</strong> For any query <InlineEquation html={tex("q")} /> with a well-defined answer <InlineEquation html={tex("r^*")} /> derivable from <InlineEquation html={tex("\\mathcal{D}")} />, the system must return exactly <InlineEquation html={tex("r^*")} />:
+  </p>
+  <MathBlock html={tex("f(q) = r^* = g(\\mathcal{D}, \\phi(q))", true)} />
+  <p className="mb-1 text-xs text-text-tertiary">
+    where <InlineEquation html={tex("\\phi(q)")} /> is the structured representation of <InlineEquation html={tex("q")} /> and <InlineEquation html={tex("g")} /> is a deterministic computation function.
+  </p>
+  <p className="mb-3 mt-3">
+    <strong>Requirement 3 (Data Confidentiality).</strong> The LLM component <InlineEquation html={tex("\\mathcal{L}")} /> must never observe any element of <InlineEquation html={tex("\\mathcal{D}")} />:
+  </p>
+  <MathBlock html={tex("\\mathcal{L}.\\text{context} \\cap \\mathcal{D} = \\emptyset", true)} />
+  <p className="mb-3">
+    <strong>Requirement 4 (Entitlement Enforcement).</strong> For a user <InlineEquation html={tex("u")} /> with permission set <InlineEquation html={tex("P(u)")} />, the visible data must be restricted:
+  </p>
+  <MathBlock html={tex("f_u(q) = g(\\mathcal{D}|_{P(u)}, \\phi(q))", true)} />
+  <p className="text-xs text-text-tertiary">
+    where <InlineEquation html={tex("\\mathcal{D}|_{P(u)}")} /> denotes <InlineEquation html={tex("\\mathcal{D}")} /> filtered to the subset authorized for <InlineEquation html={tex("u")} />.
+  </p>
+</TheoremBlock>
+
+### 2.2 Why Monolithic LLM Architectures Fail
+
+A monolithic architecture passes both the query and relevant data into a single LLM call:
+
+<MathBlock html={tex("f_{\\text{mono}}(q) = \\mathcal{L}(q, \\mathcal{D}_{\\text{relevant}})", true)} />
+
+This violates Requirement 3 by construction. It also violates Requirement 2 because LLM outputs are stochastic — the same prompt produces different outputs across invocations <CitationRef id={3} />. Temperature zero does not guarantee determinism across model versions or API updates.
+
+<VisualizationContainer minHeight={400} caption="Figure 1: Monolithic vs. LLM-as-Router architecture comparison. The monolithic approach passes data through the LLM context, violating confidentiality and determinism guarantees.">
+  {(isVisible) => <AgenticArchitecture />}
+</VisualizationContainer>
+
+## 3. Architecture: LLM-as-Router
+
+### 3.1 Formal Definition
+
+<TheoremBlock variant="definition" number={2} title="LLM-as-Router Architecture">
+  <p className="mb-2">
+    A system <InlineEquation html={tex("\\mathcal{S}")} /> implements the LLM-as-Router pattern if it decomposes into two components:
+  </p>
+  <MathBlock html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}", true)} />
+  <p className="mb-1">where:</p>
+  <ul className="list-inside list-disc space-y-1">
+    <li>
+      <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} /> is a <strong>routing function</strong> implemented by an LLM, mapping natural language queries to a structured intent space <InlineEquation html={tex("\\mathcal{I}")} />
+    </li>
+    <li>
+      <InlineEquation html={tex("\\mathcal{A}_{\\text{compute}}: \\mathcal{I} \\times \\mathcal{D} \\rightarrow \\mathcal{R}")} /> is a <strong>computation function</strong> implemented by deterministic agents, mapping intents and data to responses
+    </li>
+    <li>
+      <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> receives no element of <InlineEquation html={tex("\\mathcal{D}")} /> as input
+    </li>
+  </ul>
+</TheoremBlock>
+
+### 3.2 Intent Space
+
+The intent space <InlineEquation html={tex("\\mathcal{I}")} /> is a structured schema:
+
+<MathBlock html={tex("\\mathcal{I} = \\{(c, \\theta, \\tau, \\omega) \\mid c \\in \\mathcal{C},\\; \\theta \\in \\Theta,\\; \\tau \\in \\mathcal{T},\\; \\omega \\in \\Omega\\}", true)} />
+
+where:
+
+- <InlineEquation html={tex("c \\in \\mathcal{C} = \\{\\text{headcount}, \\text{cost}, \\text{positions}\\}")} /> is the **domain class**
+- <InlineEquation html={tex("\\theta \\in \\Theta")} /> is the **query parameter set** (time range, organizational scope, comparison type)
+- <InlineEquation html={tex("\\tau \\in \\mathcal{T}")} /> is the **temporal specification** (point-in-time, range, trend)
+- <InlineEquation html={tex("\\omega \\in \\Omega")} /> is the **output format** (table, chart, summary, report)
+
+The intent space is finite and enumerable, which is what makes the downstream agents deterministic — they handle a known set of structured inputs, not open-ended natural language.
+
+### 3.3 Sub-Agent Orchestration
+
+The computation layer consists of <InlineEquation html={tex("k")} /> specialized sub-agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
+
+<MathBlock html={tex("\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})", true)} />
+
+In the production system, <InlineEquation html={tex("k = 3")} />: an EPM/cost agent, a headcount agent, and an open positions agent. These execute in parallel:
+
+<MathBlock html={tex("\\mathcal{A}_{\\text{compute}} = A_1 \\| A_2 \\| A_3", true)} />
+
+<TheoremBlock variant="proposition" number={1} title="Parallel Correctness">
+  <p>
+    If each sub-agent <InlineEquation html={tex("A_j")} /> is deterministic and operates on disjoint data partitions, then parallel execution preserves correctness:
+  </p>
+  <MathBlock html={tex("\\forall j \\neq j': \\mathcal{D}_j \\cap \\mathcal{D}_{j'} = \\emptyset \\implies (A_1 \\| A_2 \\| A_3)(i, \\mathcal{D}) = A_{c(i)}(i, \\mathcal{D}_{c(i)})", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="proof">
+  <p>
+    Since each agent reads only from its own data partition and writes only to its own output buffer, there are no read-write conflicts. The routing function <InlineEquation html={tex("c(i)")} /> selects exactly one agent per query. The other agents either idle (no matching intent) or handle independent concurrent queries. By the absence of shared mutable state, parallel execution is equivalent to serial execution of the selected agent. <InlineEquation html={tex("\\square")} />
+  </p>
+</TheoremBlock>
+
+<VisualizationContainer minHeight={400} caption="Figure 2: Sub-agent parallel execution. Select a query type to see how the router dispatches to the corresponding agent track while others remain idle.">
+  {(isVisible) => <SubAgentExecution />}
+</VisualizationContainer>
+
+## 4. Data Confidentiality Guarantee
+
+### 4.1 Threat Model
+
+We consider a threat model where the LLM provider is an honest-but-curious adversary: it faithfully processes inputs but may retain or leak context window contents. This is the standard concern for enterprise LLM deployment <CitationRef id={4} />.
+
+<TheoremBlock variant="definition" number={3} title="Context Exposure Set">
+  <p>
+    The context exposure set <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L})")} /> of an LLM component <InlineEquation html={tex("\\mathcal{L}")} /> is the union of all inputs provided to <InlineEquation html={tex("\\mathcal{L}")} /> across all invocations:
+  </p>
+  <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}) = \\bigcup_{t} \\text{input}_t(\\mathcal{L})", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="theorem" number={1} title="Data Confidentiality">
+  <p>
+    In an LLM-as-Router architecture <InlineEquation html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}")} />, if <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> receives only elements of <InlineEquation html={tex("\\mathcal{Q}")} /> (natural language queries) and system prompts <InlineEquation html={tex("\\mathcal{P}")} /> (containing schema metadata but no data values), then:
+  </p>
+  <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}_{\\text{route}}) \\cap \\mathcal{D} = \\emptyset", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="proof">
+  <p className="mb-2">
+    By construction, <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} />. The input to <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> at each invocation is <InlineEquation html={tex("(q_t, p)")} /> where <InlineEquation html={tex("q_t \\in \\mathcal{Q}")} /> and <InlineEquation html={tex("p \\in \\mathcal{P}")} />. Since <InlineEquation html={tex("\\mathcal{Q}")} /> contains only user-generated natural language and <InlineEquation html={tex("\\mathcal{P}")} /> contains only structural metadata (table names, column types, domain labels — not data values), and <InlineEquation html={tex("\\mathcal{D}")} /> contains only data values (employee records, financial figures, organizational assignments):
+  </p>
+  <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}_{\\text{route}}) = \\bigcup_t \\{q_t\\} \\cup \\{p\\} \\subseteq \\mathcal{Q} \\cup \\mathcal{P}", true)} />
+  <p>
+    Since <InlineEquation html={tex("(\\mathcal{Q} \\cup \\mathcal{P}) \\cap \\mathcal{D} = \\emptyset")} /> by the domain separation assumption, the result follows. <InlineEquation html={tex("\\square")} />
+  </p>
+</TheoremBlock>
+
+<TheoremBlock variant="corollary" number={1}>
+  <p>
+    Even if the LLM provider retains all context window contents indefinitely, no sensitive enterprise data is exposed.
+  </p>
+</TheoremBlock>
+
+### 4.2 Boundary Enforcement
+
+The confidentiality guarantee holds only if the architectural boundary is enforced — i.e., no code path exists that passes data values to the LLM. In the production system, this is enforced by:
+
+1. **Interface typing:** The routing function's input type signature accepts only <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs">(query: string, system_prompt: string)</code> — no data parameters exist in the function signature
+2. **Network isolation:** The LLM API call originates from a service that has no database credentials and no access to data stores
+3. **Audit logging:** Every LLM invocation is logged with its full input, enabling automated verification that <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D} = \\emptyset")} />
+
+## 5. Entitlement Model: EPM-to-SQL Translation
+
+### 5.1 The Translation Problem
+
+Enterprise Performance Management (EPM) systems enforce access control through multidimensional cube permissions — a user may see certain intersections of dimensions (e.g., "Risk division × North America × FY2025") but not others. SQL databases enforce access through row-level predicates. Translating between these models is non-trivial because cube permissions are *conjunctive* over dimensions while SQL predicates are *disjunctive* over rows.
+
+### 5.2 Formal Model
+
+<TheoremBlock variant="definition" number={4} title="EPM Permission Structure">
+  <p>
+    An EPM permission set for user <InlineEquation html={tex("u")} /> is a set of authorized dimension intersections:
+  </p>
+  <MathBlock html={tex("P(u) = \\{(d_1^{(j)}, d_2^{(j)}, \\ldots, d_n^{(j)})\\}_{j=1}^{m}", true)} />
+  <p>
+    where each <InlineEquation html={tex("d_i^{(j)} \\in D_i")} /> is an element of dimension <InlineEquation html={tex("i")} /> (organizational unit, geography, time period, etc.).
+  </p>
+</TheoremBlock>
+
+<TheoremBlock variant="definition" number={5} title="SQL Entitlement Filter">
+  <p className="mb-2">
+    The corresponding SQL filter is a predicate <InlineEquation html={tex("\\sigma_u")} /> such that for any row <InlineEquation html={tex("r")} /> in the data table:
+  </p>
+  <MathBlock html={tex("\\sigma_u(r) = \\text{true} \\iff \\exists j: \\bigwedge_{i=1}^{n} r.d_i = d_i^{(j)}", true)} />
+  <p>
+    That is, a row is visible if and only if its dimension values match at least one authorized intersection.
+  </p>
+</TheoremBlock>
+
+### 5.3 The Translation Pipeline
+
+The production system implements this translation as a four-stage pipeline:
+
+<MathBlock html={tex("\\text{EPM Cubes} \\xrightarrow{\\alpha} \\text{Security Groups} \\xrightarrow{\\beta} \\text{Employee Sets} \\xrightarrow{\\gamma} \\text{Transit Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
+
+**Stage <InlineEquation html={tex("\\alpha")} />:** Extract permission grants from the EPM system as structured tuples <InlineEquation html={tex("(u, D_1, D_2, \\ldots, D_n)")} />.
+
+**Stage <InlineEquation html={tex("\\beta")} />:** Map permission grants to security group memberships. Security groups represent natural organizational boundaries (e.g., "Division A Managers") and serve as a caching layer — permissions change slowly, so pre-computing group-to-employee mappings avoids runtime EPM queries.
+
+**Stage <InlineEquation html={tex("\\gamma")} />:** Expand security groups to employee-level transit sets. A transit is the fundamental unit of the data model (see Section 6), representing an employee's assignment to an organizational position.
+
+**Stage <InlineEquation html={tex("\\delta")} />:** Compile transit sets into parameterized SQL WHERE clauses:
+
+<div className="mb-4 overflow-x-auto rounded bg-surface p-4">
+  <code className="font-mono text-xs text-text-secondary">
+    WHERE transit_id IN (SELECT transit_id FROM entitlements WHERE user_id = :current_user)
+  </code>
+</div>
+
+<TheoremBlock variant="proposition" number={2} title="Entitlement Preservation">
+  <p>
+    The translation pipeline preserves the lattice structure of EPM permissions: if user <InlineEquation html={tex("u_1")} /> has a subset of <InlineEquation html={tex("u_2")} />'s permissions in EPM, then <InlineEquation html={tex("u_1")} /> sees a subset of <InlineEquation html={tex("u_2")} />'s data in SQL:
+  </p>
+  <MathBlock html={tex("P(u_1) \\subseteq P(u_2) \\implies \\mathcal{D}|_{P(u_1)} \\subseteq \\mathcal{D}|_{P(u_2)}", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="proof">
+  <p>
+    Each stage <InlineEquation html={tex("\\alpha, \\beta, \\gamma, \\delta")} /> is monotone with respect to set inclusion. If <InlineEquation html={tex("P(u_1) \\subseteq P(u_2)")} />, then <InlineEquation html={tex("\\alpha(P(u_1)) \\subseteq \\alpha(P(u_2))")} /> (fewer permission grants leads to fewer security groups), <InlineEquation html={tex("\\beta(\\alpha(P(u_1))) \\subseteq \\beta(\\alpha(P(u_2)))")} /> (fewer security groups leads to fewer employees), and so on. Since each stage preserves subset relationships, the composition preserves them. <InlineEquation html={tex("\\square")} />
+  </p>
+</TheoremBlock>
+
+<VisualizationContainer minHeight={400} caption="Figure 3: EPM-to-SQL translation pipeline. Toggle between two different permission sets to see how the output SQL changes at each stage.">
+  {(isVisible) => <EPMTranslation />}
+</VisualizationContainer>
+
+## 6. Event-Driven Data Model
+
+### 6.1 Events vs. Snapshots
+
+Traditional HR analytics systems use periodic snapshot models: headcount at time <InlineEquation html={tex("t")} /> is a count of active employees in a snapshot table. This approach suffers from reconciliation errors when employees transfer between organizational units within the same reporting period.
+
+We instead model workforce movements as a stream of discrete events at the transactional employee-by-transit level.
+
+<TheoremBlock variant="definition" number={6} title="Workforce Event">
+  <p className="mb-2">
+    A workforce event <InlineEquation html={tex("e")} /> is a tuple:
+  </p>
+  <MathBlock html={tex("e = (\\text{employee}_{\\text{id}},\\; \\text{transit}_{\\text{id}},\\; \\text{event\\_type},\\; \\text{timestamp},\\; \\text{source\\_rollup},\\; \\text{target\\_rollup})", true)} />
+  <p>
+    where <InlineEquation html={tex("\\text{event\\_type} \\in \\{\\text{New Hire},\\; \\text{Departure},\\; \\text{Lateral Move Out},\\; \\text{Lateral Move In},\\; \\text{Promotion}\\}")} />.
+  </p>
+</TheoremBlock>
+
+### 6.2 Automatic Reconciliation
+
+<TheoremBlock variant="theorem" number={2} title="Intra-Rollup Transfer Netting">
+  <p>
+    For any rollup <InlineEquation html={tex("R")} />, if an employee <InlineEquation html={tex("e")} /> transfers from position <InlineEquation html={tex("p_1")} /> to position <InlineEquation html={tex("p_2")} /> where both <InlineEquation html={tex("p_1, p_2 \\in R")} />, then the net headcount change for <InlineEquation html={tex("R")} /> is zero:
+  </p>
+  <MathBlock html={tex("\\Delta H(R) = \\sum_{e \\in \\text{events}(R)} \\text{sign}(e) = (+1)_{\\text{Move In}} + (-1)_{\\text{Move Out}} = 0", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="proof">
+  <p>
+    An intra-rollup transfer generates exactly two events: a Lateral Move Out from <InlineEquation html={tex("p_1")} /> (counted as <InlineEquation html={tex("-1")} />) and a Lateral Move In to <InlineEquation html={tex("p_2")} /> (counted as <InlineEquation html={tex("+1")} />). Since both positions belong to the same rollup <InlineEquation html={tex("R")} />, the contribution to <InlineEquation html={tex("\\Delta H(R)")} /> is <InlineEquation html={tex("-1 + 1 = 0")} />. <InlineEquation html={tex("\\square")} />
+  </p>
+</TheoremBlock>
+
+This is guaranteed by construction, not by post-hoc reconciliation. The event model makes double-counting structurally impossible.
+
+<VisualizationContainer minHeight={400} caption="Figure 4: Event model animation. Drag an employee between positions to see how Lateral Move Out and Lateral Move In events fire, with headcount counters updating in real-time.">
+  {(isVisible) => <EventModelAnimation />}
+</VisualizationContainer>
+
+## 7. Production Validation
+
+The architecture has been deployed in production serving a major bank's CFO Group with the following measured characteristics:
+
+<div className="my-6 overflow-x-auto">
+  <table className="w-full text-sm">
+    <thead>
+      <tr className="border-b border-border-subtle text-left text-text-tertiary">
+        <th className="pb-2 pr-4 font-medium">Metric</th>
+        <th className="pb-2 font-medium">Value</th>
+      </tr>
+    </thead>
+    <tbody className="text-text-secondary">
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Employee transits processed</td>
+        <td className="py-2 font-mono">~40,000</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Organizational rollups</td>
+        <td className="py-2 font-mono">~9,000</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Geographies</td>
+        <td className="py-2 font-mono">~60,000</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Query response latency</td>
+        <td className="py-2 font-mono">Millisecond-level</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Sub-agent count</td>
+        <td className="py-2 font-mono">3 (parallel)</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">LLM data exposure</td>
+        <td className="py-2 font-mono">Zero (by construction, per Theorem 1)</td>
+      </tr>
+      <tr>
+        <td className="py-2 pr-4">Entitlement model</td>
+        <td className="py-2 font-mono">EPM-to-SQL (per Section 5)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+The system delivers financial insights through three channels: a production-grade dynamic dashboard, a conversational chatbot interface, and inbox-ready HTML reports — all enforcing the same entitlement model.
+
+## 8. Related Work
+
+The separation of LLM reasoning from data computation relates to several active research threads:
+
+**Tool-use architectures.** ReAct <CitationRef id={5} /> and Toolformer <CitationRef id={6} /> demonstrate LLMs using external tools, but typically pass data through the LLM context for reasoning. Our architecture is stricter: the LLM never sees data, only intents.
+
+**Guardrailed generation.** NeMo Guardrails <CitationRef id={7} /> and similar frameworks add safety filters around LLM outputs. Our approach is complementary but more fundamental — rather than filtering unsafe outputs, we prevent unsafe inputs.
+
+**Text-to-SQL.** DIN-SQL <CitationRef id={8} /> and DAIL-SQL <CitationRef id={9} /> achieve strong results on benchmarks but assume the LLM can access schema and data. Our architecture restricts the LLM to schema metadata only.
+
+**Agentic frameworks.** LangGraph <CitationRef id={10} />, AutoGen <CitationRef id={11} />, and CrewAI provide orchestration primitives. Our contribution is the formal separation guarantee and the entitlement-preserving data layer, which are architecture-level concerns above the framework level.
+
+## 9. Conclusion
+
+The LLM-as-Router pattern resolves the intelligence-correctness-security trilemma by architectural decomposition rather than compromise. By proving that the data confidentiality guarantee holds under an honest-but-curious threat model, and that the entitlement translation preserves the permission lattice, we provide formal foundations for deploying LLM-powered systems in regulated enterprise environments.
+
+The key insight is simple but consequential: **use LLMs for what they're good at (understanding language), and use deterministic systems for what they're good at (computing answers).** The architectural boundary between these two capabilities is where trust is built.
+
+{/* References and Further Reading rendered by PostLayout from data/posts/index.ts */}
