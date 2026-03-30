@@ -21,6 +21,7 @@ export interface CaseStudy {
   projectId: string;
   timeline: string;
   era: string;
+  status?: 'shipped' | 'in-progress';
   sections: CaseStudySection;
   blogPostSlug?: string;
 }
@@ -75,35 +76,40 @@ export const CASE_STUDIES: CaseStudy[] = [
     era: 'Cloud ML',
     sections: {
       context:
-        'Quantiphi is a Google Cloud partner serving insurance and financial services clients. These clients needed to process high volumes of documents — insurance forms, financial records, identity verification documents — that were still being reviewed manually. The bottleneck was entity extraction: pulling structured data from unstructured documents at scale.',
+        'Insurance claims processing is document-heavy — claim forms, policy documents, supporting evidence, identity verification. Quantiphi\'s insurance clients were drowning in manual review: adjusters and underwriters spending hours per claim extracting fields from scanned PDFs, photos of damaged property, handwritten forms, and multi-page policy documents. The bottleneck wasn\'t decision-making — it was getting structured data out of unstructured documents fast enough to make decisions at scale.',
       myRole:
-        'ML Engineer responsible for building the end-to-end document processing pipeline on Google Cloud. I designed the pipeline architecture, deployed custom and AutoML models via Vertex AI, and integrated Document AI for OCR and structural parsing. Also led inventory analytics workstreams using SQL and Tableau for enterprise clients.',
+        'ML Engineer responsible for designing and building the end-to-end document processing pipeline on Google Cloud. I owned the architecture from ingestion to validated output: choosing which GCP services to compose, building the entity extraction layer, deploying custom and AutoML models via Vertex AI, and tuning the pipeline for cost efficiency at scale. Also led a parallel inventory analytics workstream using SQL and Tableau for enterprise retail clients.',
       stakeholders:
-        'Insurance and financial services clients (document owners), Quantiphi delivery team, Google Cloud partnership team (technical support and platform access).',
+        'Insurance client teams (claims operations managers, underwriting leads), Quantiphi delivery lead and project manager, Google Cloud partner engineering team (platform guidance and co-development support).',
       challenge:
-        'Document formats varied wildly across clients — different layouts, scan qualities, handwritten vs. typed content. The pipeline needed to handle this variability while maintaining extraction accuracy high enough to reduce (not just supplement) manual review. Cloud cost management was also a factor — processing at scale on GCP needed to be cost-efficient.',
+        'Insurance documents are uniquely messy: scanned claim forms with variable layouts, handwritten damage descriptions, photos mixed with text, multi-page policies where the relevant clause is buried on page 47. OCR alone wasn\'t enough — the pipeline needed to understand document structure (which section is this field in?) and handle graceful degradation when scan quality was poor. On top of that, GCP costs scale with volume, so the architecture had to be cost-conscious — over-processing low-confidence documents on expensive custom models would blow the economics.',
       optionsConsidered: [
         {
-          option: 'Custom-trained models only (full control)',
-          prosAndCons: 'Maximum accuracy for specific document types, but required large labeled datasets per client and long training cycles.',
+          option: 'Custom-trained models only',
+          prosAndCons: 'Maximum accuracy for specific document types, but required large labeled datasets per client and weeks of training per document format. Didn\'t scale across client variety.',
           chosen: false,
         },
         {
-          option: 'AutoML + Document AI hybrid pipeline',
-          prosAndCons: 'Document AI handles OCR and structural parsing; AutoML provides quick-start classification; custom models handle edge cases. Faster time-to-value with a clear upgrade path.',
+          option: 'Off-the-shelf vendor solution (e.g., ABBYY, Kofax)',
+          prosAndCons: 'Fastest to deploy, but limited customization for insurance-specific fields. Vendor lock-in and per-page pricing made it expensive at scale. Couldn\'t handle the client\'s non-standard form layouts.',
+          chosen: false,
+        },
+        {
+          option: 'GCP Document AI + Vertex AI hybrid pipeline',
+          prosAndCons: 'Document AI handles OCR and structural parsing out of the box; AutoML provides quick-start classification for standard forms; custom Vertex AI models handle edge cases (handwritten fields, damaged scans). Incremental — start with AutoML, upgrade to custom where accuracy demands it.',
           chosen: true,
         },
       ],
       decision:
-        'The hybrid approach let us deliver fast with AutoML for initial classification, while Document AI handled the heavy lifting of OCR and structural parsing. Custom models were added incrementally for high-value extraction tasks where AutoML accuracy wasn\'t sufficient. This gave clients value in weeks rather than months.',
+        'The hybrid pipeline let us deliver value fast while keeping a clear upgrade path. Document AI handled the OCR and structural parsing — it\'s excellent at decomposing pages into fields and tables. AutoML classified document types (claim form vs. policy vs. ID) with minimal training data. For high-value extraction tasks where AutoML accuracy wasn\'t sufficient (e.g., handwritten damage descriptions, non-standard form layouts), we trained custom models on Vertex AI. The tiered approach also controlled costs: AutoML is cheap per-inference, custom models are reserved for documents that need them.',
       implementation:
-        'Built the pipeline on Google Cloud: Document AI for OCR and structural parsing → entity extraction layer (custom + AutoML via Vertex AI) → validation against business rules → structured output. Also delivered inventory analytics with multi-million-row SQL analysis and Tableau dashboards for operational decision-making.',
+        'Ingestion layer receives scanned documents (PDFs, images). Document AI performs OCR with structural parsing — extracting not just text but document layout (tables, key-value pairs, form fields). A classification stage routes documents to the appropriate extraction pipeline based on type. Vertex AI models (AutoML for standard forms, custom for edge cases) extract entities: claimant names, policy numbers, damage descriptions, dates, amounts. A validation layer cross-references extracted data against business rules (e.g., policy number format, date ranges, required fields). Structured output is delivered for downstream claims processing.',
       impact:
-        'Reduced manual document review cycles for insurance and financial clients. Established a replicable pipeline pattern on GCP that could be adapted across Quantiphi\'s client base. The document processing experience directly informed later work on RAG pipelines at RBC (processing PDFs, PPTX, DOCX for enterprise AI systems).',
+        'Reduced manual document review time for insurance claims processing. Established a replicable GCP pipeline pattern that Quantiphi could adapt across their insurance client base. The document processing architecture — parsing structure from unstructured sources, tiered model selection, cost-conscious inference — directly informed my later work on RAG pipelines at RBC, where I built chunking and embedding pipelines for PDFs, PPTX, and DOCX.',
       inProduction:
-        'Deployed on Google Cloud Platform for active client use. The pipeline processed documents in production for insurance verification and financial record extraction workflows.',
+        'Deployed on Google Cloud Platform for active use in insurance claims workflows. The pipeline processed claim documents in production, feeding structured data into downstream adjudication and underwriting systems.',
       lessonsLearned:
-        'Cloud ML deployment forced me to think about the full production lifecycle — not just model accuracy, but latency, cost, monitoring, and graceful degradation. The document entity extraction skills (parsing structure from unstructured sources) became directly relevant when I later built RAG pipelines for LLM systems at RBC. This role was the bridge from "data scientist who builds models" to "ML engineer who ships systems."',
+        'Two things stayed with me. First, cost-per-inference matters as much as accuracy at scale — we had to architect the pipeline so expensive custom models only ran on documents that needed them, which taught me to think about ML economics, not just ML metrics. Second, document structure is information: knowing which section a field appears in (header vs. body vs. footer) dramatically improves extraction accuracy. This insight resurfaced directly when I built RAG pipelines at RBC — chunking documents by structure rather than fixed token windows was the difference between useful and useless retrieval.',
     },
   },
   {
@@ -228,6 +234,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'par-assist',
     timeline: '2025 – Present',
     era: 'Intelligent Systems',
+    status: 'in-progress',
     sections: {
       context:
         'Project Approval Requests (PARs) are a critical governance process at RBC — every major initiative requires one, and drafting them is a complex, time-consuming process involving metadata, policies, historical examples, and institutional knowledge. The idea originated from the 2025 Amplify internship program, where an intern proposed a tool to help with PAR drafting. I saw the potential to scale it from a prototype to an enterprise-wide platform.',
