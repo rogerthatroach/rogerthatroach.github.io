@@ -1,13 +1,28 @@
 import type { MDXComponents } from 'mdx/types';
+import type { ReactNode } from 'react';
+
+function slugify(children: ReactNode): string {
+  const text = typeof children === 'string'
+    ? children
+    : Array.isArray(children)
+      ? children.map((c) => (typeof c === 'string' ? c : '')).join('')
+      : String(children ?? '');
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    h2: ({ children }) => (
-      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">{children}</h2>
-    ),
-    h3: ({ children }) => (
-      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">{children}</h3>
-    ),
+    h2: ({ children }) => {
+      const id = slugify(children);
+      return <h2 id={id} className="scroll-mt-24 mb-4 mt-12 text-2xl font-semibold text-text-primary">{children}</h2>;
+    },
+    h3: ({ children }) => {
+      const id = slugify(children);
+      return <h3 id={id} className="scroll-mt-24 mb-3 mt-8 text-xl font-medium text-text-primary">{children}</h3>;
+    },
     h4: ({ children }) => (
       <h4 className="mb-2 mt-6 text-lg font-medium text-text-primary">{children}</h4>
     ),
