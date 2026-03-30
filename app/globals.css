@@ -67,21 +67,31 @@
 
 }
 
-/* KaTeX — fully opt out of Tailwind preflight and theme transitions.
-   KaTeX ships its own complete CSS; Tailwind's resets break it. */
+/* KaTeX — neutralize only the Tailwind properties that break rendering.
+   `all: revert` was destroying KaTeX's own CSS (fonts, display, positioning).
+   Instead, surgically undo only Tailwind preflight's border reset and
+   the universal theme transition rule. */
 .katex,
 .katex * {
-  all: revert;
+  /* Undo Tailwind preflight border reset (sets border-width:0 on *) */
+  border-width: revert;
+  border-style: revert;
+  border-color: revert;
+  /* Undo the universal theme transition applied to * */
   transition: none !important;
+  /* Ensure KaTeX's box-sizing is respected */
+  box-sizing: content-box;
 }
 
+/* KaTeX display math blocks */
 .katex-display {
-  all: revert;
   margin: 1em 0 !important;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
+/* Ensure KaTeX's visually-hidden MathML stays hidden */
 .katex-mathml {
-  /* Screen-reader accessible but visually hidden — KaTeX default */
   position: absolute !important;
   clip: rect(1px, 1px, 1px, 1px) !important;
   padding: 0 !important;
