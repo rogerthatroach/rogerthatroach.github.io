@@ -19,7 +19,7 @@ export default function BlogIndexPage() {
   return (
     <>
       <Nav />
-      <main className="mx-auto min-h-screen max-w-content px-6 pb-16 pt-28 md:px-16">
+      <main id="main-content" className="mx-auto min-h-screen max-w-content px-6 pb-16 pt-28 md:px-16">
         <Link
           href="/"
           className="mb-6 inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
