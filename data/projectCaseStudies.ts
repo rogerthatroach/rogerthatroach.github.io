@@ -22,6 +22,7 @@ export interface CaseStudy {
   timeline: string;
   era: string;
   status?: 'shipped' | 'in-progress';
+  leadershipCallout?: string;
   sections: CaseStudySection;
   blogPostSlug?: string;
 }
@@ -116,6 +117,8 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'commodity-tax',
     timeline: '2022 – 2023',
     era: 'Enterprise Analytics',
+    leadershipCallout:
+      'This was my first project at RBC — and I treated it as an audition. By choosing Tableau as the transparency layer (not just an output), I gave skeptical finance stakeholders visibility into every step of the automation. The resulting trust didn\'t just deliver Commodity Tax — it opened the door for Aegis, Astraeus, and every AI initiative that followed. The months-to-90-minutes metric became the team\'s calling card with CFO leadership.',
     sections: {
       context:
         'The Commodity Tax return process within RBC\'s CFO Group was a massive manual effort — finance teams spent months each cycle extracting data from General Ledger journals, reconciling figures, and preparing tax returns. The process was error-prone, time-consuming, and consumed significant analyst bandwidth that could be directed at higher-value work.',
@@ -191,6 +194,8 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'astraeus',
     timeline: '2024 – Present',
     era: 'Intelligent Systems',
+    leadershipCallout:
+      'The defining leadership decision was choosing LLM-as-Router over a monolithic agent. Every instinct said "give the LLM full access and let it figure it out" — it\'s faster to build, easier to demo. But I pushed back because I\'d seen what happens when LLMs touch sensitive financial data in enterprise: non-deterministic outputs, data leakage risk, and no audit trail. The multi-tier architecture took longer to build but delivered what the CFO Group actually needs — trustworthy, auditable, deterministic analytics. I led this cross-functionally with GFT engineering while staying 70% hands-on in the codebase.',
     sections: {
       context:
         'RBC\'s CFO Group needed a single platform for financial insights — headcount analytics, HR costs, open positions — that could serve multiple delivery channels: interactive dashboard, chatbot, and inbox-ready reports. The data spanned ~40,000 employee transits across ~9,000 organizational rollups and ~60,000 geographies, with strict entitlement controls (users should only see data they\'re authorized to access).',
@@ -235,6 +240,8 @@ export const CASE_STUDIES: CaseStudy[] = [
     timeline: '2025 – Present',
     era: 'Intelligent Systems',
     status: 'in-progress',
+    leadershipCallout:
+      'An intern in the 2025 Amplify program proposed a tool to help with PAR drafting. Most managers would have said "nice idea" and moved on. I recognized the potential — not just for a tool, but for an enterprise platform. I conceived the product vision, designed the agentic architecture, and am now leading the productionization from intern POC to bank-wide initiative. This is what leadership looks like in AI: recognizing an idea\'s potential, providing the technical vision to scale it, and creating the environment for it to succeed.',
     sections: {
       context:
         'Project Approval Requests (PARs) are a critical governance process at RBC — every major initiative requires one, and drafting them is a complex, time-consuming process involving metadata, policies, historical examples, and institutional knowledge. The idea originated from the 2025 Amplify internship program, where an intern proposed a tool to help with PAR drafting. I saw the potential to scale it from a prototype to an enterprise-wide platform.',

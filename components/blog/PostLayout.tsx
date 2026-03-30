@@ -3,21 +3,27 @@
 import 'katex/dist/katex.min.css';
 
 import Link from 'next/link';
-import { ArrowLeft, Clock, Calendar } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Clock, Calendar, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { BlogPostMeta, Reference, FurtherReadingItem } from '@/data/posts';
 import ReferenceList from './ReferenceList';
 import FurtherReading from './FurtherReading';
 import TableOfContents from './TableOfContents';
 
+interface RelatedProject {
+  title: string;
+  path: string;
+}
+
 interface PostLayoutProps {
   meta: BlogPostMeta;
   references?: Reference[];
   furtherReading?: FurtherReadingItem[];
+  relatedProject?: RelatedProject;
   children: React.ReactNode;
 }
 
-export default function PostLayout({ meta, references = [], furtherReading = [], children }: PostLayoutProps) {
+export default function PostLayout({ meta, references = [], furtherReading = [], relatedProject, children }: PostLayoutProps) {
   const formattedDate = new Date(meta.date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -78,6 +84,18 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
             </span>
           ))}
         </div>
+
+        {/* Related Project */}
+        {relatedProject && (
+          <Link
+            href={relatedProject.path}
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface/50 px-3.5 py-1.5 text-xs text-text-secondary transition-colors hover:border-accent/30 hover:text-accent"
+          >
+            <FolderOpen size={12} />
+            Related project: {relatedProject.title}
+            <ArrowRight size={10} />
+          </Link>
+        )}
 
         {/* Abstract */}
         <div className="mt-8 rounded-lg border-l-2 border-accent bg-surface/50 px-5 py-4">

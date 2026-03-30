@@ -3,6 +3,7 @@ import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
 import ProjectShowcase from '@/components/ProjectShowcase';
 import EraTransition from '@/components/EraTransition';
+import CareerArcNarrative from '@/components/CareerArcNarrative';
 import MetricsRibbon from '@/components/MetricsRibbon';
 import SkillTimeline from '@/components/SkillTimeline';
 import AboutSection from '@/components/AboutSection';
@@ -57,6 +58,7 @@ export default function Home() {
         })}
       </div>
 
+      <CareerArcNarrative />
       <MetricsRibbon />
       <SkillTimeline />
       <AboutSection />

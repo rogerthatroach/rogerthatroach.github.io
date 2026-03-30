@@ -6,8 +6,6 @@ export interface NumberFrame {
 export const NUMBER_SEQUENCE: NumberFrame[] = [
   { value: '$3M', context: 'annual savings · 900MW plant' },
   { value: '90 min', context: 'was: months' },
-  { value: '40,000', context: 'transits · millisecond response' },
-  { value: '2 weeks', context: 'concept to production' },
   { value: 'Bank-wide', context: 'agentic AI platform' },
 ] as const;
 
