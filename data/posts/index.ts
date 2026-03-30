@@ -123,4 +123,19 @@ export const POSTS: BlogPost[] = [
       { title: 'LLM Powered Autonomous Agents', url: 'https://lilianweng.github.io/posts/2023-06-23-agent/', description: 'Comprehensive overview of LLM-based agent architectures and their applications.' },
     ],
   },
+  {
+    meta: {
+      slug: 'enterprise-agentic-ai-architecture',
+      title: 'Building an Enterprise Agentic AI System: LangGraph, MCP Tools, and Multi-Layer RAG',
+      subtitle: 'How I designed an agentic platform that guides users through complex enterprise workflows — and the architectural decisions that made it work at scale.',
+      date: '2026-03-29',
+      tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'PostgreSQL', 'Enterprise AI'],
+      readingTime: '6 min read',
+      abstract:
+        'An agentic platform built with LangGraph orchestration, MCP tools for auditable actions, multi-layer RAG for heterogeneous document retrieval, and PostgreSQL with pgvector as a unified backbone. The architecture enforces separation of concerns structurally: LLMs reason, tools act, code controls flow, and the database remembers.',
+      status: 'published',
+    },
+    references: [],
+    furtherReading: [],
+  },
 ];

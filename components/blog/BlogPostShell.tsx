@@ -17,6 +17,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'closed-loop': dynamic(() => import('@/data/posts/closed-loop'), {
     loading: () => <PostSkeleton />,
   }),
+  'enterprise-agentic-ai-architecture': dynamic(() => import('@/data/posts/enterprise-agentic-ai'), {
+    loading: () => <PostSkeleton />,
+  }),
 };
 
 function PostSkeleton() {
