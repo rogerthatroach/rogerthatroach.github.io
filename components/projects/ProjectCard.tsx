@@ -28,7 +28,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
     >
       <Link
         href={`/projects/${project.id}`}
-        className="group block rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
+        className="group flex h-full flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
       >
         <div className="flex items-center gap-3">
           <span
@@ -81,7 +81,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
           ))}
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-xs text-text-tertiary">
+        <div className="mt-auto flex items-center justify-between pt-4 text-xs text-text-tertiary">
           <span className="font-mono">{project.role}</span>
           <span className="flex items-center gap-1 text-accent opacity-0 transition-opacity group-hover:opacity-100">
             Case study <ArrowRight size={12} />

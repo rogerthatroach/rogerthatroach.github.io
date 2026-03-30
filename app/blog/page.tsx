@@ -32,7 +32,7 @@ export default function BlogIndexPage() {
           Technical explorations — architecture patterns, formal guarantees, and the systems thinking behind the work.
         </p>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
           {published.map((post, i) => (
             <PostCard key={post.meta.slug} post={post.meta} index={i} />
           ))}

@@ -30,17 +30,23 @@ export default function ProjectsIndexPage() {
           The full story behind each project — context, decisions, trade-offs, and impact.
         </p>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* Mosaic: origin story (wide) → 4 middle projects (2×2) → vision (wide) */}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
           {PROJECTS.map((project, i) => {
             const caseStudy = CASE_STUDIES.find((cs) => cs.projectId === project.id);
             if (!caseStudy) return null;
+            const isBookend = i === 0 || i === PROJECTS.length - 1;
             return (
-              <ProjectCard
+              <div
                 key={project.id}
-                project={project}
-                caseStudy={caseStudy}
-                index={i}
-              />
+                className={isBookend ? 'sm:col-span-2' : ''}
+              >
+                <ProjectCard
+                  project={project}
+                  caseStudy={caseStudy}
+                  index={i}
+                />
+              </div>
             );
           })}
         </div>
