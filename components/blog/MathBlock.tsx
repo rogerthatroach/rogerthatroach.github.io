@@ -1,19 +1,11 @@
 'use client';
 
-import katex from 'katex';
-
 interface MathBlockProps {
-  tex: string;
+  html: string;
   label?: string;
 }
 
-export default function MathBlock({ tex, label }: MathBlockProps) {
-  const html = katex.renderToString(tex, {
-    displayMode: true,
-    throwOnError: false,
-    strict: false,
-  });
-
+export default function MathBlock({ html, label }: MathBlockProps) {
   return (
     <div className="my-6 flex items-center gap-4">
       <div

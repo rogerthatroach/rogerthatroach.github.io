@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import MathBlock from '@/components/blog/MathBlock';
+import { tex } from '@/lib/katex';
 import InlineEquation from '@/components/blog/InlineEquation';
 import TheoremBlock from '@/components/blog/TheoremBlock';
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
@@ -94,47 +95,47 @@ export default function AgenticAIPost() {
 
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">2.1 System Requirements</h3>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        Let <InlineEquation tex="\\mathcal{Q}" /> denote the space of natural language queries,{' '}
-        <InlineEquation tex="\\mathcal{D}" /> the space of sensitive enterprise data, and{' '}
-        <InlineEquation tex="\\mathcal{R}" /> the space of formatted responses. We seek a
-        function <InlineEquation tex="f: \\mathcal{Q} \\rightarrow \\mathcal{R}" /> such that:
+        Let <InlineEquation html={tex("\\mathcal{Q}")} /> denote the space of natural language queries,{' '}
+        <InlineEquation html={tex("\\mathcal{D}")} /> the space of sensitive enterprise data, and{' '}
+        <InlineEquation html={tex("\\mathcal{R}")} /> the space of formatted responses. We seek a
+        function <InlineEquation html={tex("f: \\mathcal{Q} \\rightarrow \\mathcal{R}")} /> such that:
       </p>
 
       <TheoremBlock variant="definition" number={1} title="System Requirements">
         <p className="mb-3">
           <strong>Requirement 1 (Semantic Understanding).</strong>{' '}
-          <InlineEquation tex="f" /> must map semantically equivalent queries to equivalent
+          <InlineEquation html={tex("f")} /> must map semantically equivalent queries to equivalent
           responses:
         </p>
-        <MathBlock tex="q_1 \\equiv_{\\text{sem}} q_2 \\implies f(q_1) = f(q_2)" />
+        <MathBlock html={tex("q_1 \\equiv_{\\text{sem}} q_2 \\implies f(q_1) = f(q_2)", true)} />
         <p className="mb-3">
           <strong>Requirement 2 (Deterministic Correctness).</strong> For any query{' '}
-          <InlineEquation tex="q" /> with a well-defined answer{' '}
-          <InlineEquation tex="r^*" /> derivable from <InlineEquation tex="\\mathcal{D}" />,
-          the system must return exactly <InlineEquation tex="r^*" />:
+          <InlineEquation html={tex("q")} /> with a well-defined answer{' '}
+          <InlineEquation html={tex("r^*")} /> derivable from <InlineEquation html={tex("\\mathcal{D}")} />,
+          the system must return exactly <InlineEquation html={tex("r^*")} />:
         </p>
-        <MathBlock tex="f(q) = r^* = g(\\mathcal{D}, \\phi(q))" />
+        <MathBlock html={tex("f(q) = r^* = g(\\mathcal{D}, \\phi(q))", true)} />
         <p className="mb-1 text-xs text-text-tertiary">
-          where <InlineEquation tex="\\phi(q)" /> is the structured representation
-          of <InlineEquation tex="q" /> and <InlineEquation tex="g" /> is a deterministic
+          where <InlineEquation html={tex("\\phi(q)")} /> is the structured representation
+          of <InlineEquation html={tex("q")} /> and <InlineEquation html={tex("g")} /> is a deterministic
           computation function.
         </p>
         <p className="mb-3 mt-3">
           <strong>Requirement 3 (Data Confidentiality).</strong> The LLM
-          component <InlineEquation tex="\\mathcal{L}" /> must never observe any element
-          of <InlineEquation tex="\\mathcal{D}" />:
+          component <InlineEquation html={tex("\\mathcal{L}")} /> must never observe any element
+          of <InlineEquation html={tex("\\mathcal{D}")} />:
         </p>
-        <MathBlock tex="\\mathcal{L}.\\text{context} \\cap \\mathcal{D} = \\emptyset" />
+        <MathBlock html={tex("\\mathcal{L}.\\text{context} \\cap \\mathcal{D} = \\emptyset", true)} />
         <p className="mb-3">
           <strong>Requirement 4 (Entitlement Enforcement).</strong> For a user{' '}
-          <InlineEquation tex="u" /> with permission set <InlineEquation tex="P(u)" />,
+          <InlineEquation html={tex("u")} /> with permission set <InlineEquation html={tex("P(u)")} />,
           the visible data must be restricted:
         </p>
-        <MathBlock tex="f_u(q) = g(\\mathcal{D}|_{P(u)}, \\phi(q))" />
+        <MathBlock html={tex("f_u(q) = g(\\mathcal{D}|_{P(u)}, \\phi(q))", true)} />
         <p className="text-xs text-text-tertiary">
-          where <InlineEquation tex="\\mathcal{D}|_{P(u)}" /> denotes{' '}
-          <InlineEquation tex="\\mathcal{D}" /> filtered to the subset authorized
-          for <InlineEquation tex="u" />.
+          where <InlineEquation html={tex("\\mathcal{D}|_{P(u)}")} /> denotes{' '}
+          <InlineEquation html={tex("\\mathcal{D}")} /> filtered to the subset authorized
+          for <InlineEquation html={tex("u")} />.
         </p>
       </TheoremBlock>
 
@@ -142,7 +143,7 @@ export default function AgenticAIPost() {
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         A monolithic architecture passes both the query and relevant data into a single LLM call:
       </p>
-      <MathBlock tex="f_{\\text{mono}}(q) = \\mathcal{L}(q, \\mathcal{D}_{\\text{relevant}})" />
+      <MathBlock html={tex("f_{\\text{mono}}(q) = \\mathcal{L}(q, \\mathcal{D}_{\\text{relevant}})", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         This violates Requirement 3 by construction. It also violates Requirement 2 because LLM
         outputs are stochastic &mdash; the same prompt produces different outputs across
@@ -163,50 +164,50 @@ export default function AgenticAIPost() {
 
       <TheoremBlock variant="definition" number={2} title="LLM-as-Router Architecture">
         <p className="mb-2">
-          A system <InlineEquation tex="\\mathcal{S}" /> implements the LLM-as-Router pattern
+          A system <InlineEquation html={tex("\\mathcal{S}")} /> implements the LLM-as-Router pattern
           if it decomposes into two components:
         </p>
-        <MathBlock tex="\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}" />
+        <MathBlock html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}", true)} />
         <p className="mb-1">where:</p>
         <ul className="list-inside list-disc space-y-1">
           <li>
-            <InlineEquation tex="\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}" />{' '}
+            <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} />{' '}
             is a <strong>routing function</strong> implemented by an LLM, mapping natural
-            language queries to a structured intent space <InlineEquation tex="\\mathcal{I}" />
+            language queries to a structured intent space <InlineEquation html={tex("\\mathcal{I}")} />
           </li>
           <li>
-            <InlineEquation tex="\\mathcal{A}_{\\text{compute}}: \\mathcal{I} \\times \\mathcal{D} \\rightarrow \\mathcal{R}" />{' '}
+            <InlineEquation html={tex("\\mathcal{A}_{\\text{compute}}: \\mathcal{I} \\times \\mathcal{D} \\rightarrow \\mathcal{R}")} />{' '}
             is a <strong>computation function</strong> implemented by deterministic agents,
             mapping intents and data to responses
           </li>
           <li>
-            <InlineEquation tex="\\mathcal{L}_{\\text{route}}" /> receives no element
-            of <InlineEquation tex="\\mathcal{D}" /> as input
+            <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> receives no element
+            of <InlineEquation html={tex("\\mathcal{D}")} /> as input
           </li>
         </ul>
       </TheoremBlock>
 
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">3.2 Intent Space</h3>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        The intent space <InlineEquation tex="\\mathcal{I}" /> is a structured schema:
+        The intent space <InlineEquation html={tex("\\mathcal{I}")} /> is a structured schema:
       </p>
-      <MathBlock tex="\\mathcal{I} = \\{(c, \\theta, \\tau, \\omega) \\mid c \\in \\mathcal{C},\\; \\theta \\in \\Theta,\\; \\tau \\in \\mathcal{T},\\; \\omega \\in \\Omega\\}" />
+      <MathBlock html={tex("\\mathcal{I} = \\{(c, \\theta, \\tau, \\omega) \\mid c \\in \\mathcal{C},\\; \\theta \\in \\Theta,\\; \\tau \\in \\mathcal{T},\\; \\omega \\in \\Omega\\}", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">where:</p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
-          <InlineEquation tex="c \\in \\mathcal{C} = \\{\\text{headcount}, \\text{cost}, \\text{positions}\\}" />{' '}
+          <InlineEquation html={tex("c \\in \\mathcal{C} = \\{\\text{headcount}, \\text{cost}, \\text{positions}\\}")} />{' '}
           is the <strong>domain class</strong>
         </li>
         <li>
-          <InlineEquation tex="\\theta \\in \\Theta" /> is the <strong>query parameter set</strong>{' '}
+          <InlineEquation html={tex("\\theta \\in \\Theta")} /> is the <strong>query parameter set</strong>{' '}
           (time range, organizational scope, comparison type)
         </li>
         <li>
-          <InlineEquation tex="\\tau \\in \\mathcal{T}" /> is the <strong>temporal specification</strong>{' '}
+          <InlineEquation html={tex("\\tau \\in \\mathcal{T}")} /> is the <strong>temporal specification</strong>{' '}
           (point-in-time, range, trend)
         </li>
         <li>
-          <InlineEquation tex="\\omega \\in \\Omega" /> is the <strong>output format</strong>{' '}
+          <InlineEquation html={tex("\\omega \\in \\Omega")} /> is the <strong>output format</strong>{' '}
           (table, chart, summary, report)
         </li>
       </ul>
@@ -218,33 +219,33 @@ export default function AgenticAIPost() {
 
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">3.3 Sub-Agent Orchestration</h3>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        The computation layer consists of <InlineEquation tex="k" /> specialized sub-agents{' '}
-        <InlineEquation tex="\\{A_1, A_2, \\ldots, A_k\\}" />, each handling a partition of the
+        The computation layer consists of <InlineEquation html={tex("k")} /> specialized sub-agents{' '}
+        <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the
         domain class space:
       </p>
-      <MathBlock tex="\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})" />
+      <MathBlock html={tex("\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        In the production system, <InlineEquation tex="k = 3" />: an EPM/cost agent, a
+        In the production system, <InlineEquation html={tex("k = 3")} />: an EPM/cost agent, a
         headcount agent, and an open positions agent. These execute in parallel:
       </p>
-      <MathBlock tex="\\mathcal{A}_{\\text{compute}} = A_1 \\| A_2 \\| A_3" />
+      <MathBlock html={tex("\\mathcal{A}_{\\text{compute}} = A_1 \\| A_2 \\| A_3", true)} />
 
       <TheoremBlock variant="proposition" number={1} title="Parallel Correctness">
         <p>
-          If each sub-agent <InlineEquation tex="A_j" /> is deterministic and operates on
+          If each sub-agent <InlineEquation html={tex("A_j")} /> is deterministic and operates on
           disjoint data partitions, then parallel execution preserves correctness:
         </p>
-        <MathBlock tex="\\forall j \\neq j': \\mathcal{D}_j \\cap \\mathcal{D}_{j'} = \\emptyset \\implies (A_1 \\| A_2 \\| A_3)(i, \\mathcal{D}) = A_{c(i)}(i, \\mathcal{D}_{c(i)})" />
+        <MathBlock html={tex("\\forall j \\neq j': \\mathcal{D}_j \\cap \\mathcal{D}_{j'} = \\emptyset \\implies (A_1 \\| A_2 \\| A_3)(i, \\mathcal{D}) = A_{c(i)}(i, \\mathcal{D}_{c(i)})", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proof">
         <p>
           Since each agent reads only from its own data partition and writes only to its own
           output buffer, there are no read-write conflicts. The routing
-          function <InlineEquation tex="c(i)" /> selects exactly one agent per query. The other
+          function <InlineEquation html={tex("c(i)")} /> selects exactly one agent per query. The other
           agents either idle (no matching intent) or handle independent concurrent queries. By
           the absence of shared mutable state, parallel execution is equivalent to serial
-          execution of the selected agent. <InlineEquation tex="\\square" />
+          execution of the selected agent. <InlineEquation html={tex("\\square")} />
         </p>
       </TheoremBlock>
 
@@ -266,40 +267,40 @@ export default function AgenticAIPost() {
 
       <TheoremBlock variant="definition" number={3} title="Context Exposure Set">
         <p>
-          The context exposure set <InlineEquation tex="\\mathcal{E}(\\mathcal{L})" /> of an
-          LLM component <InlineEquation tex="\\mathcal{L}" /> is the union of all inputs
-          provided to <InlineEquation tex="\\mathcal{L}" /> across all invocations:
+          The context exposure set <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L})")} /> of an
+          LLM component <InlineEquation html={tex("\\mathcal{L}")} /> is the union of all inputs
+          provided to <InlineEquation html={tex("\\mathcal{L}")} /> across all invocations:
         </p>
-        <MathBlock tex="\\mathcal{E}(\\mathcal{L}) = \\bigcup_{t} \\text{input}_t(\\mathcal{L})" />
+        <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}) = \\bigcup_{t} \\text{input}_t(\\mathcal{L})", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="theorem" number={1} title="Data Confidentiality">
         <p>
           In an LLM-as-Router architecture{' '}
-          <InlineEquation tex="\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}" />,
-          if <InlineEquation tex="\\mathcal{L}_{\\text{route}}" /> receives only elements
-          of <InlineEquation tex="\\mathcal{Q}" /> (natural language queries) and system
-          prompts <InlineEquation tex="\\mathcal{P}" /> (containing schema metadata but no data
+          <InlineEquation html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}")} />,
+          if <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> receives only elements
+          of <InlineEquation html={tex("\\mathcal{Q}")} /> (natural language queries) and system
+          prompts <InlineEquation html={tex("\\mathcal{P}")} /> (containing schema metadata but no data
           values), then:
         </p>
-        <MathBlock tex="\\mathcal{E}(\\mathcal{L}_{\\text{route}}) \\cap \\mathcal{D} = \\emptyset" />
+        <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}_{\\text{route}}) \\cap \\mathcal{D} = \\emptyset", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proof">
         <p className="mb-2">
-          By construction, <InlineEquation tex="\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}" />.
-          The input to <InlineEquation tex="\\mathcal{L}_{\\text{route}}" /> at each invocation
-          is <InlineEquation tex="(q_t, p)" /> where <InlineEquation tex="q_t \\in \\mathcal{Q}" />{' '}
-          and <InlineEquation tex="p \\in \\mathcal{P}" />. Since <InlineEquation tex="\\mathcal{Q}" />{' '}
-          contains only user-generated natural language and <InlineEquation tex="\\mathcal{P}" />{' '}
+          By construction, <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} />.
+          The input to <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> at each invocation
+          is <InlineEquation html={tex("(q_t, p)")} /> where <InlineEquation html={tex("q_t \\in \\mathcal{Q}")} />{' '}
+          and <InlineEquation html={tex("p \\in \\mathcal{P}")} />. Since <InlineEquation html={tex("\\mathcal{Q}")} />{' '}
+          contains only user-generated natural language and <InlineEquation html={tex("\\mathcal{P}")} />{' '}
           contains only structural metadata (table names, column types, domain labels &mdash; not
-          data values), and <InlineEquation tex="\\mathcal{D}" /> contains only data values
+          data values), and <InlineEquation html={tex("\\mathcal{D}")} /> contains only data values
           (employee records, financial figures, organizational assignments):
         </p>
-        <MathBlock tex="\\mathcal{E}(\\mathcal{L}_{\\text{route}}) = \\bigcup_t \\{q_t\\} \\cup \\{p\\} \\subseteq \\mathcal{Q} \\cup \\mathcal{P}" />
+        <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}_{\\text{route}}) = \\bigcup_t \\{q_t\\} \\cup \\{p\\} \\subseteq \\mathcal{Q} \\cup \\mathcal{P}", true)} />
         <p>
-          Since <InlineEquation tex="(\\mathcal{Q} \\cup \\mathcal{P}) \\cap \\mathcal{D} = \\emptyset" />{' '}
-          by the domain separation assumption, the result follows. <InlineEquation tex="\\square" />
+          Since <InlineEquation html={tex("(\\mathcal{Q} \\cup \\mathcal{P}) \\cap \\mathcal{D} = \\emptyset")} />{' '}
+          by the domain separation assumption, the result follows. <InlineEquation html={tex("\\square")} />
         </p>
       </TheoremBlock>
 
@@ -332,7 +333,7 @@ export default function AgenticAIPost() {
         <li>
           <strong>Audit logging:</strong> Every LLM invocation is logged with its full input,
           enabling automated verification
-          that <InlineEquation tex="\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D} = \\emptyset" />
+          that <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D} = \\emptyset")} />
         </li>
       </ol>
 
@@ -355,23 +356,23 @@ export default function AgenticAIPost() {
 
       <TheoremBlock variant="definition" number={4} title="EPM Permission Structure">
         <p>
-          An EPM permission set for user <InlineEquation tex="u" /> is a set of authorized
+          An EPM permission set for user <InlineEquation html={tex("u")} /> is a set of authorized
           dimension intersections:
         </p>
-        <MathBlock tex="P(u) = \\{(d_1^{(j)}, d_2^{(j)}, \\ldots, d_n^{(j)})\\}_{j=1}^{m}" />
+        <MathBlock html={tex("P(u) = \\{(d_1^{(j)}, d_2^{(j)}, \\ldots, d_n^{(j)})\\}_{j=1}^{m}", true)} />
         <p>
-          where each <InlineEquation tex="d_i^{(j)} \\in D_i" /> is an element of
-          dimension <InlineEquation tex="i" /> (organizational unit, geography, time period, etc.).
+          where each <InlineEquation html={tex("d_i^{(j)} \\in D_i")} /> is an element of
+          dimension <InlineEquation html={tex("i")} /> (organizational unit, geography, time period, etc.).
         </p>
       </TheoremBlock>
 
       <TheoremBlock variant="definition" number={5} title="SQL Entitlement Filter">
         <p className="mb-2">
           The corresponding SQL filter is a
-          predicate <InlineEquation tex="\\sigma_u" /> such that for any
-          row <InlineEquation tex="r" /> in the data table:
+          predicate <InlineEquation html={tex("\\sigma_u")} /> such that for any
+          row <InlineEquation html={tex("r")} /> in the data table:
         </p>
-        <MathBlock tex="\\sigma_u(r) = \\text{true} \\iff \\exists j: \\bigwedge_{i=1}^{n} r.d_i = d_i^{(j)}" />
+        <MathBlock html={tex("\\sigma_u(r) = \\text{true} \\iff \\exists j: \\bigwedge_{i=1}^{n} r.d_i = d_i^{(j)}", true)} />
         <p>
           That is, a row is visible if and only if its dimension values match at least one
           authorized intersection.
@@ -382,26 +383,26 @@ export default function AgenticAIPost() {
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The production system implements this translation as a four-stage pipeline:
       </p>
-      <MathBlock tex="\\text{EPM Cubes} \\xrightarrow{\\alpha} \\text{Security Groups} \\xrightarrow{\\beta} \\text{Employee Sets} \\xrightarrow{\\gamma} \\text{Transit Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}" />
+      <MathBlock html={tex("\\text{EPM Cubes} \\xrightarrow{\\alpha} \\text{Security Groups} \\xrightarrow{\\beta} \\text{Employee Sets} \\xrightarrow{\\gamma} \\text{Transit Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
 
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        <strong>Stage <InlineEquation tex="\\alpha" />:</strong> Extract permission grants from
+        <strong>Stage <InlineEquation html={tex("\\alpha")} />:</strong> Extract permission grants from
         the EPM system as structured
-        tuples <InlineEquation tex="(u, D_1, D_2, \\ldots, D_n)" />.
+        tuples <InlineEquation html={tex("(u, D_1, D_2, \\ldots, D_n)")} />.
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        <strong>Stage <InlineEquation tex="\\beta" />:</strong> Map permission grants to security
+        <strong>Stage <InlineEquation html={tex("\\beta")} />:</strong> Map permission grants to security
         group memberships. Security groups represent natural organizational boundaries (e.g.,
         &ldquo;Division A Managers&rdquo;) and serve as a caching layer &mdash; permissions change
         slowly, so pre-computing group-to-employee mappings avoids runtime EPM queries.
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        <strong>Stage <InlineEquation tex="\\gamma" />:</strong> Expand security groups to
+        <strong>Stage <InlineEquation html={tex("\\gamma")} />:</strong> Expand security groups to
         employee-level transit sets. A transit is the fundamental unit of the data model (see
         Section 6), representing an employee&apos;s assignment to an organizational position.
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        <strong>Stage <InlineEquation tex="\\delta" />:</strong> Compile transit sets into
+        <strong>Stage <InlineEquation html={tex("\\delta")} />:</strong> Compile transit sets into
         parameterized SQL WHERE clauses:
       </p>
       <div className="mb-4 overflow-x-auto rounded bg-surface p-4">
@@ -413,24 +414,24 @@ export default function AgenticAIPost() {
       <TheoremBlock variant="proposition" number={2} title="Entitlement Preservation">
         <p>
           The translation pipeline preserves the lattice structure of EPM permissions: if
-          user <InlineEquation tex="u_1" /> has a subset
-          of <InlineEquation tex="u_2" />&apos;s permissions in EPM,
-          then <InlineEquation tex="u_1" /> sees a subset
-          of <InlineEquation tex="u_2" />&apos;s data in SQL:
+          user <InlineEquation html={tex("u_1")} /> has a subset
+          of <InlineEquation html={tex("u_2")} />&apos;s permissions in EPM,
+          then <InlineEquation html={tex("u_1")} /> sees a subset
+          of <InlineEquation html={tex("u_2")} />&apos;s data in SQL:
         </p>
-        <MathBlock tex="P(u_1) \\subseteq P(u_2) \\implies \\mathcal{D}|_{P(u_1)} \\subseteq \\mathcal{D}|_{P(u_2)}" />
+        <MathBlock html={tex("P(u_1) \\subseteq P(u_2) \\implies \\mathcal{D}|_{P(u_1)} \\subseteq \\mathcal{D}|_{P(u_2)}", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proof">
         <p>
-          Each stage <InlineEquation tex="\\alpha, \\beta, \\gamma, \\delta" /> is monotone with
-          respect to set inclusion. If <InlineEquation tex="P(u_1) \\subseteq P(u_2)" />,
-          then <InlineEquation tex="\\alpha(P(u_1)) \\subseteq \\alpha(P(u_2))" /> (fewer
+          Each stage <InlineEquation html={tex("\\alpha, \\beta, \\gamma, \\delta")} /> is monotone with
+          respect to set inclusion. If <InlineEquation html={tex("P(u_1) \\subseteq P(u_2)")} />,
+          then <InlineEquation html={tex("\\alpha(P(u_1)) \\subseteq \\alpha(P(u_2))")} /> (fewer
           permission grants leads to fewer security
-          groups), <InlineEquation tex="\\beta(\\alpha(P(u_1))) \\subseteq \\beta(\\alpha(P(u_2)))" />{' '}
+          groups), <InlineEquation html={tex("\\beta(\\alpha(P(u_1))) \\subseteq \\beta(\\alpha(P(u_2)))")} />{' '}
           (fewer security groups leads to fewer employees), and so on. Since each stage preserves
           subset relationships, the composition preserves
-          them. <InlineEquation tex="\\square" />
+          them. <InlineEquation html={tex("\\square")} />
         </p>
       </TheoremBlock>
 
@@ -446,7 +447,7 @@ export default function AgenticAIPost() {
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">6.1 Events vs. Snapshots</h3>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Traditional HR analytics systems use periodic snapshot models: headcount at
-        time <InlineEquation tex="t" /> is a count of active employees in a snapshot table. This
+        time <InlineEquation html={tex("t")} /> is a count of active employees in a snapshot table. This
         approach suffers from reconciliation errors when employees transfer between organizational
         units within the same reporting period.
       </p>
@@ -457,11 +458,11 @@ export default function AgenticAIPost() {
 
       <TheoremBlock variant="definition" number={6} title="Workforce Event">
         <p className="mb-2">
-          A workforce event <InlineEquation tex="e" /> is a tuple:
+          A workforce event <InlineEquation html={tex("e")} /> is a tuple:
         </p>
-        <MathBlock tex="e = (\\text{employee}_{\\text{id}},\\; \\text{transit}_{\\text{id}},\\; \\text{event\\_type},\\; \\text{timestamp},\\; \\text{source\\_rollup},\\; \\text{target\\_rollup})" />
+        <MathBlock html={tex("e = (\\text{employee}_{\\text{id}},\\; \\text{transit}_{\\text{id}},\\; \\text{event\\_type},\\; \\text{timestamp},\\; \\text{source\\_rollup},\\; \\text{target\\_rollup})", true)} />
         <p>
-          where <InlineEquation tex="\\text{event\\_type} \\in \\{\\text{New Hire},\\; \\text{Departure},\\; \\text{Lateral Move Out},\\; \\text{Lateral Move In},\\; \\text{Promotion}\\}" />.
+          where <InlineEquation html={tex("\\text{event\\_type} \\in \\{\\text{New Hire},\\; \\text{Departure},\\; \\text{Lateral Move Out},\\; \\text{Lateral Move In},\\; \\text{Promotion}\\}")} />.
         </p>
       </TheoremBlock>
 
@@ -469,26 +470,26 @@ export default function AgenticAIPost() {
 
       <TheoremBlock variant="theorem" number={2} title="Intra-Rollup Transfer Netting">
         <p>
-          For any rollup <InlineEquation tex="R" />, if an
-          employee <InlineEquation tex="e" /> transfers from
-          position <InlineEquation tex="p_1" /> to
-          position <InlineEquation tex="p_2" /> where
-          both <InlineEquation tex="p_1, p_2 \\in R" />, then the net headcount change
-          for <InlineEquation tex="R" /> is zero:
+          For any rollup <InlineEquation html={tex("R")} />, if an
+          employee <InlineEquation html={tex("e")} /> transfers from
+          position <InlineEquation html={tex("p_1")} /> to
+          position <InlineEquation html={tex("p_2")} /> where
+          both <InlineEquation html={tex("p_1, p_2 \\in R")} />, then the net headcount change
+          for <InlineEquation html={tex("R")} /> is zero:
         </p>
-        <MathBlock tex="\\Delta H(R) = \\sum_{e \\in \\text{events}(R)} \\text{sign}(e) = (+1)_{\\text{Move In}} + (-1)_{\\text{Move Out}} = 0" />
+        <MathBlock html={tex("\\Delta H(R) = \\sum_{e \\in \\text{events}(R)} \\text{sign}(e) = (+1)_{\\text{Move In}} + (-1)_{\\text{Move Out}} = 0", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proof">
         <p>
           An intra-rollup transfer generates exactly two events: a Lateral Move Out
-          from <InlineEquation tex="p_1" /> (counted
-          as <InlineEquation tex="-1" />) and a Lateral Move In
-          to <InlineEquation tex="p_2" /> (counted
-          as <InlineEquation tex="+1" />). Since both positions belong to the same
-          rollup <InlineEquation tex="R" />, the contribution
-          to <InlineEquation tex="\\Delta H(R)" />{' '}
-          is <InlineEquation tex="-1 + 1 = 0" />. <InlineEquation tex="\\square" />
+          from <InlineEquation html={tex("p_1")} /> (counted
+          as <InlineEquation html={tex("-1")} />) and a Lateral Move In
+          to <InlineEquation html={tex("p_2")} /> (counted
+          as <InlineEquation html={tex("+1")} />). Since both positions belong to the same
+          rollup <InlineEquation html={tex("R")} />, the contribution
+          to <InlineEquation html={tex("\\Delta H(R)")} />{' '}
+          is <InlineEquation html={tex("-1 + 1 = 0")} />. <InlineEquation html={tex("\\square")} />
         </p>
       </TheoremBlock>
 
