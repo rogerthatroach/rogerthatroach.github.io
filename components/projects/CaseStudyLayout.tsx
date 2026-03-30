@@ -90,6 +90,11 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
                 <Calendar size={12} />
                 {caseStudy.timeline}
               </span>
+              {caseStudy.status === 'in-progress' && (
+                <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                  In Productionization
+                </span>
+              )}
             </div>
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
               {project.title}

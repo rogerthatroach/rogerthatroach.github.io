@@ -98,13 +98,6 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
       <div className="mx-auto max-w-3xl">
         <ReferenceList references={references} />
         <FurtherReading items={furtherReading} />
-
-        {/* Confidentiality disclaimer */}
-        <p className="mt-12 border-t border-border-subtle pt-6 text-xs italic text-text-tertiary">
-          This article describes architectural patterns and methodologies in general terms.
-          All system names, metrics, and implementation details have been anonymized or
-          generalized. No proprietary data, model outputs, or internal configurations are disclosed.
-        </p>
       </div>
     </motion.article>
   );
