@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, ArrowRight } from 'lucide-react';
+import { Clock, Calendar, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { BlogPostMeta } from '@/data/posts';
+import { useTilt } from '@/lib/useTilt';
 
 interface PostCardProps {
   post: BlogPostMeta;
@@ -11,11 +12,17 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, index }: PostCardProps) {
+  const { ref, handleMouseMove, handleMouseLeave } = useTilt<HTMLDivElement>();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1, ease: [0.4, 0, 0.2, 1] }}
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transition: 'transform 0.15s ease-out' }}
     >
       <Link
         href={`/blog/${post.slug}`}
@@ -38,10 +45,16 @@ export default function PostCard({ post, index }: PostCardProps) {
         </div>
 
         <div className="mt-4 flex items-center justify-between text-xs text-text-tertiary">
-          <span className="flex items-center gap-1">
-            <Clock size={12} />
-            {post.readingTime}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <Calendar size={12} />
+              {new Date(post.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            </span>
+            <span className="flex items-center gap-1">
+              <Clock size={12} />
+              {post.readingTime}
+            </span>
+          </div>
           <span className="flex items-center gap-1 text-accent opacity-0 transition-opacity group-hover:opacity-100">
             Read <ArrowRight size={12} />
           </span>
