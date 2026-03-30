@@ -37,6 +37,11 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
           <span className="font-mono text-[10px] text-text-tertiary">
             {caseStudy.timeline}
           </span>
+          {caseStudy.status === 'in-progress' && (
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+              In Progress
+            </span>
+          )}
         </div>
 
         <h2 className="mt-3 text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
