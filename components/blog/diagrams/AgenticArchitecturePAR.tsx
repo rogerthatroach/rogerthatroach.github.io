@@ -1,109 +1,253 @@
 'use client';
 
+import {
+  ReactFlow,
+  Background,
+  type Node,
+  type Edge,
+  useNodesState,
+  useEdgesState,
+} from '@xyflow/react';
+import '@xyflow/react/dist/style.css';
+import AgentNode from '@/components/diagrams/AgentNode';
+import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
+import type { AgentNodeData } from '@/components/diagrams/AgentNode';
+import { useThemeColor } from '@/lib/useThemeColor';
+
+const nodeTypes = { agent: AgentNode };
+const edgeTypes = { animated: AnimatedEdge };
+
+const PURPLE = '#8b5cf6';
+const RED = '#ef4444';
+const BLUE = '#3b82f6';
+const AMBER = '#f59e0b';
+const TEAL = '#14b8a6';
+
+const initialNodes: Node[] = [
+  // === User Input ===
+  {
+    id: 'user',
+    type: 'agent',
+    position: { x: 280, y: 0 },
+    data: {
+      label: 'User Input',
+      description: 'Natural language query + uploaded documents',
+      icon: '👤',
+      category: 'user',
+      accentColor: PURPLE,
+    } satisfies AgentNodeData,
+  },
+  // === LangGraph Orchestration Layer ===
+  {
+    id: 'parse',
+    type: 'agent',
+    position: { x: 60, y: 120 },
+    data: {
+      label: 'Parse Intent',
+      description: 'Extract structured intent from NL input',
+      icon: '🔤',
+      category: 'orchestrator',
+      accentColor: TEAL,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'route',
+    type: 'agent',
+    position: { x: 220, y: 120 },
+    data: {
+      label: 'Route',
+      description: 'LangGraph state machine selects next action',
+      icon: '🧠',
+      category: 'orchestrator',
+      accentColor: TEAL,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'execute',
+    type: 'agent',
+    position: { x: 380, y: 120 },
+    data: {
+      label: 'Execute Tool',
+      description: 'Dispatch to MCP tool based on intent',
+      icon: '⚡',
+      category: 'orchestrator',
+      accentColor: TEAL,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'respond',
+    type: 'agent',
+    position: { x: 540, y: 120 },
+    data: {
+      label: 'Respond',
+      description: 'Format and return guided output',
+      icon: '💬',
+      category: 'orchestrator',
+      accentColor: TEAL,
+    } satisfies AgentNodeData,
+  },
+  // === MCP Tools (Action Layer) ===
+  {
+    id: 'template',
+    type: 'agent',
+    position: { x: 0, y: 270 },
+    data: {
+      label: 'Template Select',
+      description: 'MCP tool — semantic similarity against template catalog',
+      icon: '📋',
+      category: 'tool',
+      accentColor: RED,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'field',
+    type: 'agent',
+    position: { x: 160, y: 270 },
+    data: {
+      label: 'Field Assign',
+      description: 'MCP tool — NL → structured template fields',
+      icon: '✏️',
+      category: 'tool',
+      accentColor: RED,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'conflict',
+    type: 'agent',
+    position: { x: 320, y: 270 },
+    data: {
+      label: 'Conflict Resolve',
+      description: 'MCP tool — surfaces contradictions between sources',
+      icon: '⚖️',
+      category: 'tool',
+      accentColor: RED,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'ambiguity',
+    type: 'agent',
+    position: { x: 480, y: 270 },
+    data: {
+      label: 'Ambiguity Detect',
+      description: 'MCP tool — flags vague inputs, generates clarifying Qs',
+      icon: '🔍',
+      category: 'tool',
+      accentColor: RED,
+    } satisfies AgentNodeData,
+  },
+  // === Multi-Layer RAG ===
+  {
+    id: 'rag-history',
+    type: 'agent',
+    position: { x: 60, y: 420 },
+    data: {
+      label: 'L1: History',
+      description: 'Conversation context via semantic retrieval (pgvector)',
+      icon: '💬',
+      category: 'rag',
+      accentColor: BLUE,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'rag-docs',
+    type: 'agent',
+    position: { x: 260, y: 420 },
+    data: {
+      label: 'L2: Documents',
+      description: 'Format-aware chunked user uploads (PDF, PPTX, DOCX)',
+      icon: '📄',
+      category: 'rag',
+      accentColor: BLUE,
+    } satisfies AgentNodeData,
+  },
+  {
+    id: 'rag-knowledge',
+    type: 'agent',
+    position: { x: 460, y: 420 },
+    data: {
+      label: 'L3: Knowledge',
+      description: 'Institutional policies + prompt template selection',
+      icon: '🏛️',
+      category: 'rag',
+      accentColor: BLUE,
+    } satisfies AgentNodeData,
+  },
+  // === PostgreSQL Backbone ===
+  {
+    id: 'postgres',
+    type: 'agent',
+    position: { x: 220, y: 560 },
+    data: {
+      label: 'PostgreSQL + pgvector',
+      description: 'Unified store: workflow state, embeddings, metadata, sessions',
+      icon: '🗄️',
+      category: 'data',
+      accentColor: AMBER,
+    } satisfies AgentNodeData,
+  },
+  // === Output ===
+  {
+    id: 'output',
+    type: 'agent',
+    position: { x: 280, y: 680 },
+    data: {
+      label: 'Guided PAR Draft',
+      description: 'Validated, step-by-step enterprise document output',
+      icon: '✅',
+      category: 'output',
+      accentColor: PURPLE,
+    } satisfies AgentNodeData,
+  },
+];
+
+const initialEdges: Edge[] = [
+  // User → orchestration
+  { id: 'e-user-parse', source: 'user', target: 'parse', type: 'animated', data: { color: PURPLE } },
+  // Orchestration chain
+  { id: 'e-parse-route', source: 'parse', target: 'route', type: 'animated', data: { color: TEAL } },
+  { id: 'e-route-exec', source: 'route', target: 'execute', type: 'animated', data: { color: TEAL } },
+  { id: 'e-exec-respond', source: 'execute', target: 'respond', type: 'animated', data: { color: TEAL } },
+  // Execute → MCP tools
+  { id: 'e-exec-template', source: 'execute', target: 'template', type: 'animated', data: { color: RED } },
+  { id: 'e-exec-field', source: 'execute', target: 'field', type: 'animated', data: { color: RED } },
+  { id: 'e-exec-conflict', source: 'execute', target: 'conflict', type: 'animated', data: { color: RED } },
+  { id: 'e-exec-ambiguity', source: 'execute', target: 'ambiguity', type: 'animated', data: { color: RED } },
+  // Tools → RAG layers
+  { id: 'e-template-hist', source: 'template', target: 'rag-history', type: 'animated', data: { color: BLUE } },
+  { id: 'e-field-docs', source: 'field', target: 'rag-docs', type: 'animated', data: { color: BLUE } },
+  { id: 'e-conflict-docs', source: 'conflict', target: 'rag-docs', type: 'animated', data: { color: BLUE } },
+  { id: 'e-ambiguity-know', source: 'ambiguity', target: 'rag-knowledge', type: 'animated', data: { color: BLUE } },
+  // RAG → PostgreSQL
+  { id: 'e-hist-pg', source: 'rag-history', target: 'postgres', type: 'animated', data: { color: AMBER } },
+  { id: 'e-docs-pg', source: 'rag-docs', target: 'postgres', type: 'animated', data: { color: AMBER } },
+  { id: 'e-know-pg', source: 'rag-knowledge', target: 'postgres', type: 'animated', data: { color: AMBER } },
+  // PostgreSQL → Output
+  { id: 'e-pg-output', source: 'postgres', target: 'output', type: 'animated', data: { color: PURPLE } },
+];
+
 export default function AgenticArchitecturePAR() {
+  const [nodes, , onNodesChange] = useNodesState(initialNodes);
+  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
+
   return (
-    <svg width="100%" viewBox="0 0 680 720" xmlns="http://www.w3.org/2000/svg" className="my-8">
-      {/* Title */}
-      <text fill="var(--color-text-secondary)" fontFamily="var(--font-inter), sans-serif" fontSize="14" fontWeight="500" x="340" y="30" textAnchor="middle">Enterprise agentic AI architecture</text>
-      <text fill="var(--color-text-tertiary)" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="340" y="48" textAnchor="middle">LangGraph + MCP tools + multi-layer RAG</text>
-
-      {/* ============ USER INPUT ============ */}
-      <rect x="240" y="70" width="200" height="44" rx="8" fill="var(--color-surface)" stroke="var(--color-border)" strokeWidth="0.5" />
-      <text fill="var(--color-text-primary)" fontFamily="var(--font-inter), sans-serif" fontSize="14" fontWeight="500" x="340" y="96" textAnchor="middle">User input</text>
-
-      {/* Arrow down */}
-      <line x1="340" y1="114" x2="340" y2="144" stroke="var(--color-border)" strokeWidth="1.5" />
-      <polygon points="334,140 340,150 346,140" fill="var(--color-border)" />
-
-      {/* ============ LANGGRAPH ORCHESTRATION CONTAINER ============ */}
-      <rect x="60" y="144" width="560" height="120" rx="16" fill="rgba(124,58,237,0.08)" stroke="rgba(124,58,237,0.3)" strokeWidth="0.5" />
-      <text fill="#a78bfa" fontFamily="var(--font-inter), sans-serif" fontSize="14" fontWeight="500" x="340" y="170" textAnchor="middle">LangGraph orchestration</text>
-      <text fill="#7c3aed" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="340" y="188" textAnchor="middle" opacity="0.7">Directed graph with persistent state machine</text>
-
-      {/* Internal nodes */}
-      <rect x="86" y="200" width="110" height="44" rx="6" fill="rgba(20,184,166,0.12)" stroke="rgba(20,184,166,0.3)" strokeWidth="0.5" />
-      <text fill="#5eead4" fontFamily="var(--font-inter), sans-serif" fontSize="13" fontWeight="500" x="141" y="226" textAnchor="middle">Parse intent</text>
-
-      <line x1="196" y1="222" x2="216" y2="222" stroke="var(--color-border)" strokeWidth="1" />
-      <polygon points="212,219 220,222 212,225" fill="var(--color-border)" />
-
-      <rect x="216" y="200" width="110" height="44" rx="6" fill="rgba(20,184,166,0.12)" stroke="rgba(20,184,166,0.3)" strokeWidth="0.5" />
-      <text fill="#5eead4" fontFamily="var(--font-inter), sans-serif" fontSize="13" fontWeight="500" x="271" y="226" textAnchor="middle">Route</text>
-
-      <line x1="326" y1="222" x2="346" y2="222" stroke="var(--color-border)" strokeWidth="1" />
-      <polygon points="342,219 350,222 342,225" fill="var(--color-border)" />
-
-      <rect x="346" y="200" width="128" height="44" rx="6" fill="rgba(20,184,166,0.12)" stroke="rgba(20,184,166,0.3)" strokeWidth="0.5" />
-      <text fill="#5eead4" fontFamily="var(--font-inter), sans-serif" fontSize="13" fontWeight="500" x="410" y="226" textAnchor="middle">Execute tool</text>
-
-      <line x1="474" y1="222" x2="494" y2="222" stroke="var(--color-border)" strokeWidth="1" />
-      <polygon points="490,219 498,222 490,225" fill="var(--color-border)" />
-
-      <rect x="494" y="200" width="110" height="44" rx="6" fill="rgba(20,184,166,0.12)" stroke="rgba(20,184,166,0.3)" strokeWidth="0.5" />
-      <text fill="#5eead4" fontFamily="var(--font-inter), sans-serif" fontSize="13" fontWeight="500" x="549" y="226" textAnchor="middle">Respond</text>
-
-      {/* Arrows down to MCP + RAG */}
-      <line x1="220" y1="264" x2="220" y2="300" stroke="var(--color-border)" strokeWidth="1.5" />
-      <polygon points="214,296 220,306 226,296" fill="var(--color-border)" />
-      <text fill="var(--color-text-tertiary)" fontFamily="var(--font-inter), sans-serif" fontSize="11" x="228" y="286">Tools</text>
-
-      <line x1="460" y1="264" x2="460" y2="300" stroke="var(--color-border)" strokeWidth="1.5" />
-      <polygon points="454,296 460,306 466,296" fill="var(--color-border)" />
-      <text fill="var(--color-text-tertiary)" fontFamily="var(--font-inter), sans-serif" fontSize="11" x="468" y="286">Retrieval</text>
-
-      {/* ============ MCP TOOLS CONTAINER ============ */}
-      <rect x="60" y="300" width="280" height="200" rx="16" fill="rgba(239,68,68,0.06)" stroke="rgba(239,68,68,0.25)" strokeWidth="0.5" />
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="14" fontWeight="500" x="200" y="326" textAnchor="middle">MCP tools (action layer)</text>
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="200" y="344" textAnchor="middle" opacity="0.6">Typed, logged, auditable</text>
-
-      {/* Tool boxes */}
-      <rect x="80" y="360" width="120" height="44" rx="6" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.25)" strokeWidth="0.5" />
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="140" y="378" textAnchor="middle">Template</text>
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="140" y="394" textAnchor="middle">selection</text>
-
-      <rect x="208" y="360" width="120" height="44" rx="6" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.25)" strokeWidth="0.5" />
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="268" y="378" textAnchor="middle">Field</text>
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="268" y="394" textAnchor="middle">assignment</text>
-
-      <rect x="80" y="416" width="120" height="44" rx="6" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.25)" strokeWidth="0.5" />
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="140" y="434" textAnchor="middle">Conflict</text>
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="140" y="450" textAnchor="middle">resolution</text>
-
-      <rect x="208" y="416" width="120" height="44" rx="6" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.25)" strokeWidth="0.5" />
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="268" y="434" textAnchor="middle">Ambiguity</text>
-      <text fill="#fca5a5" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="268" y="450" textAnchor="middle">detection</text>
-
-      {/* ============ MULTI-LAYER RAG CONTAINER ============ */}
-      <rect x="360" y="300" width="260" height="200" rx="16" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.25)" strokeWidth="0.5" />
-      <text fill="#93c5fd" fontFamily="var(--font-inter), sans-serif" fontSize="14" fontWeight="500" x="490" y="326" textAnchor="middle">Multi-layer RAG</text>
-      <text fill="#93c5fd" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="490" y="344" textAnchor="middle" opacity="0.6">Three retrieval scopes</text>
-
-      {/* RAG layer rows */}
-      <rect x="380" y="360" width="220" height="36" rx="6" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.25)" strokeWidth="0.5" />
-      <text fill="#93c5fd" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="490" y="382" textAnchor="middle">Layer 1: Conversation history</text>
-
-      <rect x="380" y="404" width="220" height="36" rx="6" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.25)" strokeWidth="0.5" />
-      <text fill="#93c5fd" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="490" y="426" textAnchor="middle">Layer 2: Uploaded documents</text>
-
-      <rect x="380" y="448" width="220" height="36" rx="6" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.25)" strokeWidth="0.5" />
-      <text fill="#93c5fd" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="490" y="470" textAnchor="middle">Layer 3: Institutional knowledge</text>
-
-      {/* Arrows down to PostgreSQL */}
-      <line x1="200" y1="500" x2="200" y2="540" stroke="var(--color-border)" strokeWidth="1.5" />
-      <polygon points="194,536 200,546 206,536" fill="var(--color-border)" />
-
-      <line x1="490" y1="500" x2="490" y2="540" stroke="var(--color-border)" strokeWidth="1.5" />
-      <polygon points="484,536 490,546 496,536" fill="var(--color-border)" />
-
-      {/* ============ POSTGRESQL BACKBONE ============ */}
-      <rect x="100" y="540" width="480" height="70" rx="12" fill="rgba(245,158,11,0.08)" stroke="rgba(245,158,11,0.3)" strokeWidth="0.5" />
-      <text fill="#fbbf24" fontFamily="var(--font-inter), sans-serif" fontSize="14" fontWeight="500" x="340" y="570" textAnchor="middle">PostgreSQL + pgvector</text>
-      <text fill="#fbbf24" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="340" y="590" textAnchor="middle" opacity="0.7">Unified store: workflow state, embeddings, metadata, sessions</text>
-
-      {/* ============ SEPARATION OF CONCERNS CALLOUT ============ */}
-      <rect x="120" y="640" width="440" height="52" rx="8" fill="none" stroke="var(--color-border)" strokeWidth="0.5" strokeDasharray="4 3" />
-      <text fill="var(--color-text-primary)" fontFamily="var(--font-inter), sans-serif" fontSize="14" fontWeight="500" x="340" y="662" textAnchor="middle">Separation of concerns</text>
-      <text fill="var(--color-text-tertiary)" fontFamily="var(--font-inter), sans-serif" fontSize="12" x="340" y="680" textAnchor="middle">LLMs reason — tools act — code controls flow — database remembers</text>
-    </svg>
+    <div className="h-[600px] w-full sm:h-[700px]">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        fitView
+        fitViewOptions={{ padding: 0.12 }}
+        minZoom={0.3}
+        maxZoom={1.5}
+        proOptions={{ hideAttribution: true }}
+        className="[&_.react-flow__background]:!bg-transparent"
+      >
+        <Background color={gridColor} gap={24} size={1} />
+      </ReactFlow>
+    </div>
   );
 }

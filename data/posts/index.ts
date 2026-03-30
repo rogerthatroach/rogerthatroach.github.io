@@ -126,13 +126,13 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'enterprise-agentic-ai-architecture',
-      title: 'Building an Enterprise Agentic AI System: LangGraph, MCP Tools, and Multi-Layer RAG',
-      subtitle: 'How I designed an agentic platform that guides users through complex enterprise workflows — and the architectural decisions that made it work at scale.',
+      title: 'Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Multi-Layer RAG',
+      subtitle: 'A separation-of-concerns approach to LLM-powered enterprise workflow orchestration with formal guarantees on context isolation, action auditability, and retrieval scoping.',
       date: '2026-03-29',
-      tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'PostgreSQL', 'Enterprise AI'],
-      readingTime: '6 min read',
+      tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'PostgreSQL', 'Formal Methods'],
+      readingTime: '12 min read',
       abstract:
-        'An agentic platform built with LangGraph orchestration, MCP tools for auditable actions, multi-layer RAG for heterogeneous document retrieval, and PostgreSQL with pgvector as a unified backbone. The architecture enforces separation of concerns structurally: LLMs reason, tools act, code controls flow, and the database remembers.',
+        'We formalize an agentic workflow system as a directed graph with persistent state, typed MCP tool contracts, and layered retrieval functions. The architecture provides formal guarantees: context isolation (the LLM never observes sensitive data), action boundary enforcement (all agent actions are typed, logged tool invocations), and retrieval scoping (user document indices are session-partitioned with zero cross-contamination). We prove these properties hold by construction and describe a production implementation for enterprise document workflows.',
       status: 'published',
     },
     references: [],
