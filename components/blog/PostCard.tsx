@@ -26,7 +26,7 @@ export default function PostCard({ post, index }: PostCardProps) {
     >
       <Link
         href={`/blog/${post.slug}`}
-        className="group flex h-full flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
+        className="group flex min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
       >
         <h2 className="text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
           {post.title}
