@@ -5,13 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
-
-const NAV_LINKS = [
-  { label: 'Work', href: '/#work' },
-  { label: 'Journey', href: '/#journey' },
-  { label: 'About', href: '/#about' },
-  { label: 'Writing', href: '/blog' },
-];
+import { NAV_LINKS } from '@/data/nav';
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
