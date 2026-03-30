@@ -19,25 +19,88 @@ export interface Project {
 }
 
 export const PROJECTS: Project[] = [
+  // Arc 1: Foundation (2016-2019)
   {
-    id: 'par-assist',
-    title: 'PAR Assist',
-    subtitle: 'Enterprise Agentic AI Platform',
-    role: 'Conceived vision, led strategic + technical requirements',
-    stack: ['LangGraph', 'MCP', 'PostgreSQL', 'Embeddings', 'Custom RAG'],
-    heroMetric: { value: 'Bank-wide', label: 'Target Scale' },
+    id: 'combustion-tuning',
+    title: 'Combustion Tuning',
+    subtitle: 'Digital Twin — 900MW Coal Plant',
+    role: 'ML Engineer — 3-person R&D team (MHPS / TCS)',
+    stack: ['R', 'Python', 'PSO', 'Multi-Output Regression', 'K-Fold CV'],
+    heroMetric: { value: '$3M', label: 'Annual Savings' },
     caption:
-      'Enterprise-wide agentic drafting platform for Project Approval Requests. LangGraph orchestration with MCP tools, multi-layer RAG, and semantic search — from intern POC to bank-wide initiative.',
+      'Led ML engineering for combustion tuning at a 900MW coal plant. 84 models across 90+ sensors, optimized via Particle Swarm Optimization to reduce NOx, SOx, CO emissions. $3M annually.',
     description:
-      'Enterprise-wide drafting tool for Project Approval Requests — a critical governance process. Acts as a personal assistant guiding users through each step, utilizing metadata, rules, policies, historical examples, and best practices.',
+      'ML-powered Digital Twin for Maizuru 900MW coal power plant. Built predictive models to optimize combustion, reduce emissions, and improve efficiency.',
     highlights: [
-      'LangGraph agentic orchestration with MCP tools for template selection, field assignment, conflict resolution, and ambiguity checks',
-      'Multi-layer custom/dynamic RAG: conversation history, uploaded documents (PDF, PPTX, DOCX, TXT), and field assignment prompts',
-      'Chunking and embedding pipeline for enterprise documents with semantic search',
-      'Originated from the Amplify internship program — scaled from intern POC to bank-wide initiative',
+      '90+ plant sensors → feature engineering → 84 simultaneous ML regression models',
+      'Rigorous model selection: k-fold cross-validation, R², RMSE, MAPE, fold variance stability',
+      'Particle Swarm Optimization: models as objective functions, exploring input space to minimize emissions',
+      'Closed-loop: optimal settings → plant operators adjust → $3M/yr saved + reduced NOx/SOx/CO',
     ],
-    palette: { primary: '#8b5cf6', glow: 'shadow-purple-500/20', bg: 'from-purple-500/5' },
-    deepDivePath: '/projects/par-assist',
+    palette: { primary: '#f59e0b', glow: 'shadow-amber-500/20', bg: 'from-amber-500/5' },
+    deepDivePath: '/projects/combustion-tuning',
+  },
+  // Arc 2: Cloud ML (2021-2022)
+  {
+    id: 'document-intelligence',
+    title: 'Document Intelligence',
+    subtitle: 'Cloud ML Pipeline — Insurance & Financial Services',
+    role: 'ML Engineer — Quantiphi / Google Cloud partnership',
+    stack: ['GCP', 'Vertex AI', 'Document AI', 'AutoML', 'Entity Extraction'],
+    heroMetric: { value: 'Cloud-Scale', label: 'Document Processing' },
+    caption:
+      'End-to-end document verification and entity extraction pipeline on Google Cloud. Vertex AI model deployment for insurance and financial clients — the bridge from industrial ML to enterprise AI.',
+    description:
+      'Streamlined document verification for insurance and financial clients using Google Cloud end-to-end. Custom and AutoML models via Vertex AI for classification, entity extraction, and validation at scale.',
+    highlights: [
+      'Document AI pipeline: OCR, structural parsing, and entity extraction from insurance and financial documents',
+      'Vertex AI model deployment: custom and AutoML models for document classification and validation',
+      'Multi-million-row inventory analytics with SQL and Tableau for enterprise clients',
+      'Google Cloud partner ecosystem — production ML on GCP from ingestion to inference',
+    ],
+    palette: { primary: '#06b6d4', glow: 'shadow-cyan-500/20', bg: 'from-cyan-500/5' },
+    deepDivePath: '/projects/document-intelligence',
+  },
+  // Arc 3: Enterprise Analytics (2022-2023)
+  {
+    id: 'commodity-tax',
+    title: 'Commodity Tax',
+    subtitle: 'Process Automation',
+    role: 'Lead developer + stakeholder engagement',
+    stack: ['PySpark', 'Tableau', 'General Ledger Extraction'],
+    heroMetric: { value: 'Months → 90min', label: 'Processing Time' },
+    caption:
+      'Overhauled the Commodity Tax return process from a multi-month manual workflow to a 90-minute automated pipeline. The win that built CFO stakeholder trust and opened the door to AI.',
+    description:
+      'Transformed the Commodity Tax return process with PySpark pipelines and Tableau dashboards for financial KPI monitoring.',
+    highlights: [
+      'PySpark pipeline for General Ledger Journal data extraction at scale',
+      'Advanced Tableau dashboards for financial KPI monitoring',
+      'Recognized with CFO Group RBC Quarterly Team Award (Q4 2023)',
+    ],
+    palette: { primary: '#ef4444', glow: 'shadow-red-500/20', bg: 'from-red-500/5' },
+    deepDivePath: '/projects/commodity-tax',
+  },
+  // Arc 4: Intelligent Systems (2024-present)
+  {
+    id: 'aegis',
+    title: 'Aegis v2',
+    subtitle: 'Text-to-SQL Benchmarking Engine',
+    role: 'Designed + shipped in two weeks',
+    stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
+    heroMetric: { value: '2 weeks', label: 'Concept → Production' },
+    caption:
+      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 shipped in two weeks while running Astraeus + Amplify.',
+    description:
+      'Strategic benchmarking engine for the CFO Group. v1 derives KPIs from Big 6 Canadian banks\' Supplementary Financial Packages. v2 adds intent parsing, text-to-SQL, and embeddings-based KPI disambiguation.',
+    highlights: [
+      'Intent parsing and query decomposition into logical sub-parts',
+      'KPI detection with rich metadata mapping and embeddings-based similarity search for disambiguation',
+      'Guarded, LLM-assisted disambiguation — pinpoints intended KPI without exposing sensitive data',
+      'Guardrails: whitelisting, parameterization, testability',
+    ],
+    palette: { primary: '#22c55e', glow: 'shadow-green-500/20', bg: 'from-green-500/5' },
+    deepDivePath: '/projects/aegis',
   },
   {
     id: 'astraeus',
@@ -57,61 +120,26 @@ export const PROJECTS: Project[] = [
       '~9,000 rollups, ~60,000 geographies, millisecond slicing across weekly and month-end granularity',
     ],
     palette: { primary: '#3b82f6', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
+    deepDivePath: '/projects/astraeus',
   },
   {
-    id: 'aegis',
-    title: 'Aegis v2',
-    subtitle: 'Text-to-SQL Benchmarking Engine',
-    role: 'Designed + shipped in two weeks',
-    stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
-    heroMetric: { value: '2 weeks', label: 'Concept → Production' },
+    id: 'par-assist',
+    title: 'PAR Assist',
+    subtitle: 'Enterprise Agentic AI Platform',
+    role: 'Conceived vision, led strategic + technical requirements',
+    stack: ['LangGraph', 'MCP', 'PostgreSQL', 'Embeddings', 'Custom RAG'],
+    heroMetric: { value: 'Bank-wide', label: 'Target Scale' },
     caption:
-      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 shipped in two weeks while running Astraeus + Amplify.',
+      'Enterprise-wide agentic drafting platform for Project Approval Requests. LangGraph orchestration with MCP tools, multi-layer RAG, and semantic search — from intern POC to bank-wide initiative.',
     description:
-      'Strategic benchmarking engine for the CFO Group. v1 derives KPIs from Big 6 Canadian banks\' Supplementary Financial Packages. v2 adds intent parsing, text-to-SQL, and embeddings-based KPI disambiguation.',
+      'Enterprise-wide drafting tool for Project Approval Requests — a critical governance process. Acts as a personal assistant guiding users through each step, utilizing metadata, rules, policies, historical examples, and best practices.',
     highlights: [
-      'Intent parsing and query decomposition into logical sub-parts',
-      'KPI detection with rich metadata mapping and embeddings-based similarity search for disambiguation',
-      'Guarded, LLM-assisted disambiguation — pinpoints intended KPI without exposing sensitive data',
-      'Guardrails: whitelisting, parameterization, testability',
+      'LangGraph agentic orchestration with MCP tools for template selection, field assignment, conflict resolution, and ambiguity checks',
+      'Multi-layer custom/dynamic RAG: conversation history, uploaded documents (PDF, PPTX, DOCX, TXT), and field assignment prompts',
+      'Chunking and embedding pipeline for enterprise documents with semantic search',
+      'Originated from the Amplify internship program — scaled from intern POC to bank-wide initiative',
     ],
-    palette: { primary: '#22c55e', glow: 'shadow-green-500/20', bg: 'from-green-500/5' },
-  },
-  {
-    id: 'combustion-tuning',
-    title: 'Combustion Tuning',
-    subtitle: 'Digital Twin — 900MW Coal Plant',
-    role: 'ML Engineer — 3-person R&D team (MHPS / TCS)',
-    stack: ['R', 'Python', 'PSO', 'Multi-Output Regression', 'K-Fold CV'],
-    heroMetric: { value: '$3M', label: 'Annual Savings' },
-    caption:
-      'Led ML engineering for combustion tuning at a 900MW coal plant. 84 models across 90+ sensors, optimized via Particle Swarm Optimization to reduce NOx, SOx, CO emissions. $3M annually.',
-    description:
-      'ML-powered Digital Twin for Maizuru 900MW coal power plant. Built predictive models to optimize combustion, reduce emissions, and improve efficiency.',
-    highlights: [
-      '90+ plant sensors → feature engineering → 84 simultaneous ML regression models',
-      'Rigorous model selection: k-fold cross-validation, R², RMSE, MAPE, fold variance stability',
-      'Particle Swarm Optimization: models as objective functions, exploring input space to minimize emissions',
-      'Closed-loop: optimal settings → plant operators adjust → $3M/yr saved + reduced NOx/SOx/CO',
-    ],
-    palette: { primary: '#f59e0b', glow: 'shadow-amber-500/20', bg: 'from-amber-500/5' },
-  },
-  {
-    id: 'commodity-tax',
-    title: 'Commodity Tax',
-    subtitle: 'Process Automation',
-    role: 'Lead developer + stakeholder engagement',
-    stack: ['PySpark', 'Tableau', 'General Ledger Extraction'],
-    heroMetric: { value: 'Months → 90min', label: 'Processing Time' },
-    caption:
-      'Overhauled the Commodity Tax return process from a multi-month manual workflow to a 90-minute automated pipeline. The win that built CFO stakeholder trust and opened the door to AI.',
-    description:
-      'Transformed the Commodity Tax return process with PySpark pipelines and Tableau dashboards for financial KPI monitoring.',
-    highlights: [
-      'PySpark pipeline for General Ledger Journal data extraction at scale',
-      'Advanced Tableau dashboards for financial KPI monitoring',
-      'Recognized with CFO Group RBC Quarterly Team Award (Q4 2023)',
-    ],
-    palette: { primary: '#ef4444', glow: 'shadow-red-500/20', bg: 'from-red-500/5' },
+    palette: { primary: '#8b5cf6', glow: 'shadow-purple-500/20', bg: 'from-purple-500/5' },
+    deepDivePath: '/projects/par-assist',
   },
 ];
