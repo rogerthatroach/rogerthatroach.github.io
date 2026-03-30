@@ -58,8 +58,8 @@ export default function ClosedLoopPost() {
   return (
     <>
       {/* ── Abstract ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">Abstract</h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">Abstract</h2>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         This paper examines a structural pattern &mdash; <strong>closed-loop optimization</strong>{' '}
         (sense &rarr; model &rarr; optimize &rarr; act) &mdash; as it manifests across four distinct
         application domains at ascending levels of abstraction: industrial emissions control via
@@ -75,15 +75,15 @@ export default function ClosedLoopPost() {
       </p>
 
       {/* ── 1. Introduction ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">1. Introduction</h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">1. Introduction</h2>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Applied AI practitioners often describe their careers as a sequence of projects, each with
         its own technologies, clients, and challenges. This framing obscures a deeper structural
         truth: the most impactful AI systems share common architectural patterns regardless of
         domain. Recognizing these patterns is not merely an academic exercise &mdash; it is a
         practical design methodology that reduces architecture risk in novel applications.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         This paper traces one such pattern &mdash; <strong>closed-loop optimization</strong> &mdash;
         through four instantiations spanning a decade of applied work:
       </p>
@@ -127,18 +127,18 @@ export default function ClosedLoopPost() {
         </table>
       </div>
 
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The formal treatment focuses on Level 1 (PSO for combustion tuning), where the mathematics
         is most explicit, and then demonstrates how the structural pattern abstracts to each
         subsequent level.
       </p>
 
       {/* ── 2. The Closed-Loop Optimization Pattern ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         2. The Closed-Loop Optimization Pattern
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">2.1 Formal Definition</h3>
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">2.1 Formal Definition</h3>
 
       <TheoremBlock variant="definition" number={1} title="Closed-Loop Optimization System">
         <p className="mb-2">
@@ -170,7 +170,7 @@ export default function ClosedLoopPost() {
         </ul>
       </TheoremBlock>
 
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The system forms a closed loop because actuation modifies the environment, which is then
         re-sensed:
       </p>
@@ -187,7 +187,7 @@ export default function ClosedLoopPost() {
       </VisualizationContainer>
 
       {/* ── 2.2 Properties ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">2.2 Properties</h3>
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">2.2 Properties</h3>
 
       <TheoremBlock variant="proposition" number={1} title="Feedback">
         <p>
@@ -213,18 +213,18 @@ export default function ClosedLoopPost() {
         <MathBlock tex="\\mathcal{A}(x^*) = \\begin{cases} \\text{apply}(x^*) & \\text{if human approves} \\\\ \\text{hold}(x^*) & \\text{otherwise} \\end{cases}" />
       </TheoremBlock>
 
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         This is not a limitation but a design feature. The system recommends; the human validates
         against context the model doesn&apos;t capture.
       </p>
 
       {/* ── 3. Level 1: PSO for Combustion Tuning ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         3. Level 1: Particle Swarm Optimization for Combustion Tuning
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">3.1 Physical System</h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">3.1 Physical System</h3>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The Maizuru 900MW coal-fired power plant (operated by Mitsubishi Hitachi Power Systems)
         combusts pulverized coal in a boiler to generate steam. The combustion process produces
         three primary pollutants &mdash; nitrogen oxides (NOx), sulfur oxides (SOx), and carbon
@@ -233,10 +233,10 @@ export default function ClosedLoopPost() {
       </p>
 
       {/* ── 3.2 Sensing ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         3.2 Sensing: The Input Space
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The plant instruments 90+ sensors measuring:
       </p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
@@ -251,7 +251,7 @@ export default function ClosedLoopPost() {
         <li>Emissions concentrations at stack outlets</li>
         <li>Operational parameters (load, efficiency)</li>
       </ul>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         After feature engineering (domain-specific transformations, temporal aggregations,
         interaction terms developed in consultation with a mechanical engineer on the team), the
         input space is:
@@ -259,30 +259,30 @@ export default function ClosedLoopPost() {
       <MathBlock tex="\\mathbf{x} \\in \\mathbb{R}^n, \\quad n \\approx 90+" />
 
       {/* ── 3.3 Modeling ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         3.3 Modeling: 84 Simultaneous Regression Models
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Each output variable of interest (emissions at different measurement points, temperature
         readings, efficiency indicators) receives its own regression model. Let{' '}
         <InlineEquation tex="y_i" /> denote the <InlineEquation tex="i" />-th output variable:
       </p>
       <MathBlock tex="\\hat{y}_i = f_i(\\mathbf{x};\\; \\boldsymbol{\\beta}_i), \\quad i = 1, 2, \\ldots, 84" />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The modeling task is to learn 84 parameter vectors{' '}
         <InlineEquation tex="\\{\\boldsymbol{\\beta}_1, \\boldsymbol{\\beta}_2, \\ldots, \\boldsymbol{\\beta}_{84}\\}" />{' '}
         from historical sensor data.
       </p>
 
       {/* ── 3.3.1 Feature Selection ── */}
-      <h4 className="mb-2 mt-6 text-base font-medium text-text-primary">
+      <h4 className="mb-2 mt-6 text-lg font-medium text-text-primary">
         3.3.1 Feature Selection
       </h4>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         With <InlineEquation tex="n \\approx 90+" /> candidate features and potential interaction
         terms, dimensionality reduction is necessary. We used correlation-based feature selection:
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Step 1: Feature-target correlation.</strong> For each model{' '}
         <InlineEquation tex="i" />, compute Pearson correlation between each feature{' '}
         <InlineEquation tex="x_j" /> and target <InlineEquation tex="y_i" />:
@@ -291,26 +291,26 @@ export default function ClosedLoopPost() {
         tex="r_{j,i} = \\frac{\\sum_{t=1}^{T}(x_j^{(t)} - \\bar{x}_j)(y_i^{(t)} - \\bar{y}_i)}{\\sqrt{\\sum_{t=1}^{T}(x_j^{(t)} - \\bar{x}_j)^2 \\cdot \\sum_{t=1}^{T}(y_i^{(t)} - \\bar{y}_i)^2}}"
         label="(1)"
       />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Retain features where <InlineEquation tex="|r_{j,i}| > r_{\\min}" /> for a configurable
         threshold <InlineEquation tex="r_{\\min}" />.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Step 2: Feature-feature correlation.</strong> Among retained features, identify pairs
         with <InlineEquation tex="|r_{j,k}| > r_{\\text{collinear}}" />. For collinear pairs,
         retain the feature with higher target correlation.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         This yields a model-specific feature set{' '}
         <InlineEquation tex="\\mathbf{x}_i \\subseteq \\mathbf{x}" /> for each of the 84 models
         &mdash; not all models use the same features.
       </p>
 
       {/* ── 3.3.2 Model Selection ── */}
-      <h4 className="mb-2 mt-6 text-base font-medium text-text-primary">
+      <h4 className="mb-2 mt-6 text-lg font-medium text-text-primary">
         3.3.2 Model Selection: Multi-Indicator Evaluation
       </h4>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         For each model <InlineEquation tex="f_i" />, we evaluated multiple candidate algorithms
         (linear regression, polynomial regression, ridge, lasso, random forest, gradient boosting,
         SVR) using k-fold cross-validation with <InlineEquation tex="K = 5" /> folds. The
@@ -354,7 +354,7 @@ export default function ClosedLoopPost() {
         tex="\\sigma^2_{\\text{fold},i} = \\text{Var}(\\{R^2_{i,1},\\; R^2_{i,2},\\; \\ldots,\\; R^2_{i,K}\\})"
         label="(6)"
       />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         where <InlineEquation tex="R^2_{i,k}" /> is the <InlineEquation tex="R^2" /> score of
         model <InlineEquation tex="i" /> on fold <InlineEquation tex="k" />.
       </p>
@@ -366,7 +366,7 @@ export default function ClosedLoopPost() {
         <MathBlock tex="f_i^* = \\underset{f \\in \\mathcal{F}}{\\text{argmax}}\\; R^2_i(f) \\quad \\text{subject to} \\quad \\sigma^2_{\\text{fold},i}(f) < \\sigma_{\\max}" />
       </TheoremBlock>
 
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The stability constraint (<InlineEquation tex="\\sigma^2_{\\text{fold}} < \\sigma_{\\max}" />)
         is critical and frequently omitted in practice. A model with high{' '}
         <InlineEquation tex="R^2" /> but high inter-fold variance has memorized training-set
@@ -383,12 +383,12 @@ export default function ClosedLoopPost() {
       </VisualizationContainer>
 
       {/* ── 3.4 Optimization: PSO ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         3.4 Optimization: Particle Swarm Optimization
       </h3>
 
-      <h4 className="mb-2 mt-6 text-base font-medium text-text-primary">3.4.1 PSO Fundamentals</h4>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h4 className="mb-2 mt-6 text-lg font-medium text-text-primary">3.4.1 PSO Fundamentals</h4>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart [1], is a
         population-based metaheuristic inspired by collective behavior in biological swarms. A
         population of <InlineEquation tex="N" /> particles navigates an{' '}
@@ -421,8 +421,8 @@ export default function ClosedLoopPost() {
       </TheoremBlock>
 
       {/* ── 3.4.2 Update Equations ── */}
-      <h4 className="mb-2 mt-6 text-base font-medium text-text-primary">3.4.2 Update Equations</h4>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h4 className="mb-2 mt-6 text-lg font-medium text-text-primary">3.4.2 Update Equations</h4>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The velocity and position update rules are:
       </p>
       <MathBlock
@@ -433,7 +433,7 @@ export default function ClosedLoopPost() {
         tex="\\mathbf{x}_i^{(t+1)} = \\mathbf{x}_i^{(t)} + \\mathbf{v}_i^{(t+1)}"
         label="(8)"
       />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">where:</p>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">where:</p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
           <InlineEquation tex="w" /> is the <strong>inertia weight</strong> (controls exploration
@@ -472,22 +472,22 @@ export default function ClosedLoopPost() {
       </VisualizationContainer>
 
       {/* ── 3.4.3 Multi-Objective Formulation ── */}
-      <h4 className="mb-2 mt-6 text-base font-medium text-text-primary">
+      <h4 className="mb-2 mt-6 text-lg font-medium text-text-primary">
         3.4.3 Multi-Objective Formulation
       </h4>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The combustion tuning objective is to minimize pollutant emissions simultaneously:
       </p>
       <MathBlock
         tex="\\text{minimize} \\quad J(\\mathbf{x}) = \\alpha_1 \\cdot \\hat{y}_{\\text{NOx}}(\\mathbf{x}) + \\alpha_2 \\cdot \\hat{y}_{\\text{SOx}}(\\mathbf{x}) + \\alpha_3 \\cdot \\hat{y}_{\\text{CO}}(\\mathbf{x})"
         label="(9)"
       />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">subject to:</p>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">subject to:</p>
       <MathBlock
         tex="\\begin{aligned} x_j^{\\min} &\\leq x_j \\leq x_j^{\\max} & \\forall j &= 1, \\ldots, n & &\\text{(operational bounds)} \\\\ y_{\\text{load}}(\\mathbf{x}) &\\geq y_{\\text{load}}^{\\min} & & & &\\text{(minimum load constraint)} \\\\ T_{\\text{boiler}}(\\mathbf{x}) &\\leq T_{\\max} & & & &\\text{(safety constraint)} \\end{aligned}"
         label="(10)"
       />
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         where <InlineEquation tex="\\alpha_1, \\alpha_2, \\alpha_3" /> are weighting coefficients
         reflecting the relative importance of each pollutant (configurable based on regulatory
         priorities), and{' '}
@@ -530,15 +530,15 @@ export default function ClosedLoopPost() {
       </TheoremBlock>
 
       {/* ── 3.5 Actuation ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         3.5 Actuation: Human-in-the-Loop
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The PSO output is a set of optimal boiler input settings: specific fuel ratios, air flow
         rates, and damper positions. These recommendations were delivered to plant operators who
         made the physical adjustments.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The human-in-the-loop design was deliberate. In a 900MW power plant, automated control
         changes carry catastrophic risk &mdash; incorrect settings could damage equipment worth
         hundreds of millions of dollars or cause safety incidents. The operators provided a
@@ -547,8 +547,8 @@ export default function ClosedLoopPost() {
       </p>
 
       {/* ── 3.6 Results ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">3.6 Results</h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">3.6 Results</h3>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The system achieved:
       </p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
@@ -567,11 +567,11 @@ export default function ClosedLoopPost() {
       </ul>
 
       {/* ── 4. The Pattern at Higher Abstraction Levels ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         4. The Pattern at Higher Abstraction Levels
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         4.1 Structural Isomorphism
       </h3>
 
@@ -593,7 +593,7 @@ export default function ClosedLoopPost() {
       </TheoremBlock>
 
       {/* ── 4.2 Level 2 ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         4.2 Level 2: Cloud Document Processing (2021&ndash;2022)
       </h3>
       <div className="my-6 overflow-x-auto">
@@ -645,7 +645,7 @@ export default function ClosedLoopPost() {
       </div>
 
       {/* ── 4.3 Level 3 ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         4.3 Level 3: Financial Process Automation (2022&ndash;2024)
       </h3>
       <div className="my-6 overflow-x-auto">
@@ -694,7 +694,7 @@ export default function ClosedLoopPost() {
       </div>
 
       {/* ── 4.4 Level 4 ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         4.4 Level 4: Agentic AI Platforms (2024&ndash;present)
       </h3>
       <div className="my-6 overflow-x-auto">
@@ -747,10 +747,10 @@ export default function ClosedLoopPost() {
       </div>
 
       {/* ── 4.5 The Abstraction Gradient ── */}
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         4.5 The Abstraction Gradient
       </h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Observation.</strong> As the abstraction level increases:
       </p>
       <ol className="mb-4 list-inside list-decimal space-y-3 text-sm text-text-secondary">
@@ -786,35 +786,35 @@ export default function ClosedLoopPost() {
       </VisualizationContainer>
 
       {/* ── 5. Pattern Recognition as Design Methodology ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">
         5. Pattern Recognition as Design Methodology
       </h2>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">5.1 Practical Benefits</h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">5.1 Practical Benefits</h3>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Recognizing the closed-loop pattern in a new domain provides immediate architectural
         scaffolding:
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Accelerated design.</strong> When approaching a new enterprise AI problem, asking
         &ldquo;What is the sensing function? What is the model? What is the optimization objective?
         What is the actuation mechanism?&rdquo; immediately structures the solution space and
         reveals design choices.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Risk reduction.</strong> Patterns that have been validated at one level of
         abstraction carry structural guarantees to the next. The insight that &ldquo;human-in-the-loop
         improves system trust&rdquo; transfers from physical plant operators to enterprise knowledge
         workers.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Communication.</strong> Explaining a complex agentic AI system as &ldquo;the same
         closed-loop architecture as industrial optimization, but operating on policies instead of
         sensors&rdquo; makes the design accessible to non-technical stakeholders.
       </p>
 
-      <h3 className="mb-3 mt-8 text-lg font-medium text-text-primary">5.2 Limitations</h3>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">5.2 Limitations</h3>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The pattern is structural, not implementational. Knowing that an agentic AI platform follows
         sense &rarr; model &rarr; optimize &rarr; act does not tell you which embedding model to
         use, how to design the agent orchestration, or how to enforce entitlements. The pattern
@@ -822,32 +822,32 @@ export default function ClosedLoopPost() {
       </p>
 
       {/* ── 6. Related Work ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">6. Related Work</h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">6. Related Work</h2>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Particle Swarm Optimization.</strong> Kennedy and Eberhart [1] introduced PSO; Shi
         and Eberhart [2] added inertia weight for improved convergence. Clerc and Kennedy [4]
         provided convergence analysis. PSO remains widely used in engineering optimization due to
         its simplicity and effectiveness on non-convex landscapes.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Digital Twins.</strong> Grieves [5] introduced the Digital Twin concept; Tao et al.
         [6] formalized it for manufacturing. Our combustion tuning system predates the widespread
         adoption of the term but implements the core idea: a data-driven model of a physical system
         used for optimization and control.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Multi-Objective Optimization.</strong> Coello Coello et al. [7] survey evolutionary
         approaches to multi-objective optimization, including Pareto-based methods. Our weighted-sum
         approach is a simplification; Pareto-optimal methods (NSGA-II [8]) would allow exploring the
         full tradeoff frontier between pollutant types.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Agentic AI Architectures.</strong> LangGraph [9], AutoGen [10], and CrewAI provide
         orchestration frameworks. Our contribution is the recognition that these systems implement
         the same closed-loop pattern as classical control systems, which provides formal grounding
         for architectural decisions.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Architectural Patterns in Software.</strong> Gamma et al. [11] established design
         patterns as a communication and design tool. We extend this idea to AI system architecture,
         arguing that cross-domain structural patterns (like closed-loop optimization) serve the same
@@ -855,8 +855,8 @@ export default function ClosedLoopPost() {
       </p>
 
       {/* ── 7. Conclusion ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">7. Conclusion</h2>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">7. Conclusion</h2>
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The closed-loop optimization pattern &mdash; sense, model, optimize, act &mdash; is not
         merely a useful abstraction. It is a structural invariant that appears in systems as
         different as industrial combustion control and enterprise agentic AI. Recognizing this
@@ -864,7 +864,7 @@ export default function ClosedLoopPost() {
         identify what each phase looks like in the new domain, and apply the structural lessons
         learned from prior instantiations.
       </p>
-      <p className="mb-4 text-sm leading-relaxed text-text-secondary">
+      <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The most important structural lesson is this:{' '}
         <strong>the &ldquo;act&rdquo; step defines the system&apos;s value.</strong> A model that
         predicts emissions without recommending settings is a dashboard. A system that recommends
@@ -875,7 +875,7 @@ export default function ClosedLoopPost() {
       </p>
 
       {/* ── References ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">References</h2>
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">References</h2>
       <ol className="mb-4 list-inside list-decimal space-y-2 text-sm text-text-secondary">
         <li>
           Kennedy, J. and Eberhart, R. &ldquo;Particle Swarm Optimization.&rdquo;{' '}
@@ -937,7 +937,7 @@ export default function ClosedLoopPost() {
       </ol>
 
       {/* ── Further Reading ── */}
-      <h2 className="mb-4 mt-12 text-xl font-semibold text-text-primary">Further Reading</h2>
+      <h2 className="mb-4 mt-12 text-2xl font-semibold text-text-primary">Further Reading</h2>
       <ul className="mb-4 list-inside list-disc space-y-2 text-sm text-text-secondary">
         <li>
           Bansal, J.C., et al. &ldquo;Particle Swarm Optimization.&rdquo; In{' '}

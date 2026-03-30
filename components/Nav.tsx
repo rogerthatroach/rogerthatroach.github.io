@@ -48,7 +48,7 @@ export default function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="hidden text-sm text-text-secondary transition-colors hover:text-text-primary sm:block"
+                className="text-sm text-text-secondary transition-colors hover:text-text-primary"
               >
                 {link.label}
               </Link>

@@ -41,7 +41,7 @@ export default function TheoremBlock({ variant, number, title, children }: Theor
           <span className="text-text-secondary">.</span>
         </p>
       )}
-      <div className="text-sm leading-relaxed text-text-secondary">{children}</div>
+      <div className="text-base leading-relaxed text-text-secondary">{children}</div>
       {isProof && (
         <p className="mt-2 text-right text-text-tertiary">&#x25A0;</p>
       )}

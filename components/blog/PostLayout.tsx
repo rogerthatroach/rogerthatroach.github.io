@@ -30,21 +30,30 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
       className="mx-auto max-w-content px-6 pb-16 pt-28 md:px-16"
     >
-      {/* Back link */}
-      <Link
-        href="/blog"
-        className="mb-8 inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
-      >
-        <ArrowLeft size={16} />
-        Back to writing
-      </Link>
+      {/* Back links */}
+      <div className="mb-8 flex items-center gap-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
+        >
+          <ArrowLeft size={16} />
+          Home
+        </Link>
+        <span className="text-text-tertiary/40">/</span>
+        <Link
+          href="/blog"
+          className="text-sm text-text-tertiary transition-colors hover:text-accent"
+        >
+          Writing
+        </Link>
+      </div>
 
       {/* Header */}
       <header className="mb-12">
         <h1 className="text-2xl font-bold leading-tight text-text-primary sm:text-3xl md:text-4xl">
           {meta.title}
         </h1>
-        <p className="mt-2 text-lg text-text-secondary">{meta.subtitle}</p>
+        <p className="mt-3 text-lg text-text-secondary">{meta.subtitle}</p>
 
         <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-text-tertiary">
           <span className="flex items-center gap-1.5">
@@ -71,8 +80,8 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
 
         {/* Abstract */}
         <div className="mt-8 rounded-lg border-l-2 border-accent bg-surface/50 px-5 py-4">
-          <p className="text-sm font-medium text-text-secondary">Abstract</p>
-          <p className="mt-2 text-sm leading-relaxed text-text-secondary">{meta.abstract}</p>
+          <p className="text-sm font-semibold text-text-secondary">Abstract</p>
+          <p className="mt-2 text-base leading-relaxed text-text-secondary">{meta.abstract}</p>
         </div>
       </header>
 
