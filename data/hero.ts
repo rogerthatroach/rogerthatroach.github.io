@@ -22,3 +22,10 @@ export const HERO = {
     email: 'harmilapsingh@gmail.com',
   },
 } as const;
+
+export const HERO_SUMMARY = [
+  '5 awards',
+  '4 production systems',
+  '8+ years',
+] as const;
+

@@ -47,20 +47,20 @@ export default function AboutSection() {
           <div className="flex h-3 w-full overflow-hidden rounded-full bg-surface">
             <motion.div
               initial={{ width: 0 }}
-              animate={isInView ? { width: '70%' } : {}}
+              animate={isInView ? { width: `${ABOUT.split.handsOn.percent}%` } : {}}
               transition={{ delay: 0.6, duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
               className="rounded-l-full bg-accent"
             />
             <motion.div
               initial={{ width: 0 }}
-              animate={isInView ? { width: '30%' } : {}}
+              animate={isInView ? { width: `${ABOUT.split.leadership.percent}%` } : {}}
               transition={{ delay: 0.8, duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
               className="rounded-r-full bg-text-tertiary/40"
             />
           </div>
           <div className="mt-2 flex justify-between text-[10px] text-text-tertiary">
-            <span>70% Hands-on: architecture, code, systems</span>
-            <span>30% Leadership: team, strategy</span>
+            <span>{ABOUT.split.handsOn.percent}% {ABOUT.split.handsOn.label}</span>
+            <span>{ABOUT.split.leadership.percent}% {ABOUT.split.leadership.label}</span>
           </div>
         </motion.div>
 

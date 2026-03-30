@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { NUMBER_SEQUENCE, HERO } from '@/data/hero';
+import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY } from '@/data/hero';
 
 const ParticleField = dynamic(() => import('@/components/ParticleField'), {
   ssr: false,
@@ -172,11 +172,12 @@ export default function Hero() {
                 transition={{ duration: 0.6 }}
                 className="flex items-center gap-6 font-mono text-xs tracking-wider text-text-tertiary"
               >
-                <span>5 awards</span>
-                <span className="h-3 w-px bg-border-subtle" />
-                <span>4 production systems</span>
-                <span className="h-3 w-px bg-border-subtle" />
-                <span>8+ years</span>
+                {HERO_SUMMARY.map((item, i) => (
+                  <span key={item}>
+                    {i > 0 && <span className="mr-6 inline-block h-3 w-px bg-border-subtle" />}
+                    {item}
+                  </span>
+                ))}
               </motion.div>
             )}
           </AnimatePresence>
