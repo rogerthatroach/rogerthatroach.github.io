@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import MathBlock from '@/components/blog/MathBlock';
+import { tex } from '@/lib/katex';
 import InlineEquation from '@/components/blog/InlineEquation';
 import TheoremBlock from '@/components/blog/TheoremBlock';
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
@@ -92,7 +93,7 @@ export default function TextToSQLPost() {
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         We address these failures through decomposition: rather than treating text-to-SQL
         as a single function{' '}
-        <InlineEquation tex="f: \\text{NL} \\rightarrow \\text{SQL}" />, we factor it into
+        <InlineEquation html={tex("f: \\text{NL} \\rightarrow \\text{SQL}")} />, we factor it into
         five stages, each with explicit contracts, testable invariants, and formal safety
         properties.
       </p>
@@ -114,23 +115,23 @@ export default function TextToSQLPost() {
       </p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
-          <InlineEquation tex="\\mathcal{K} = \\{k_1, k_2, \\ldots, k_n\\}" /> be the{' '}
-          <strong>KPI catalog</strong>, where each <InlineEquation tex="k_i" /> has a name{' '}
-          <InlineEquation tex="n_i" />, definition <InlineEquation tex="d_i" />, and
-          metadata <InlineEquation tex="m_i" /> (reporting period, entity, unit)
+          <InlineEquation html={tex("\\mathcal{K} = \\{k_1, k_2, \\ldots, k_n\\}")} /> be the{' '}
+          <strong>KPI catalog</strong>, where each <InlineEquation html={tex("k_i")} /> has a name{' '}
+          <InlineEquation html={tex("n_i")} />, definition <InlineEquation html={tex("d_i")} />, and
+          metadata <InlineEquation html={tex("m_i")} /> (reporting period, entity, unit)
         </li>
         <li>
-          <InlineEquation tex="\\mathcal{V}" /> be the <strong>value store</strong>,
+          <InlineEquation html={tex("\\mathcal{V}")} /> be the <strong>value store</strong>,
           containing time-indexed KPI values for each institution
         </li>
         <li>
-          <InlineEquation tex="\\mathcal{Q}" /> be the space of natural language queries
+          <InlineEquation html={tex("\\mathcal{Q}")} /> be the space of natural language queries
         </li>
       </ul>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The system must implement{' '}
-        <InlineEquation tex="f: \\mathcal{Q} \\rightarrow \\mathcal{R}" /> where{' '}
-        <InlineEquation tex="\\mathcal{R}" /> is the space of formatted benchmark
+        <InlineEquation html={tex("f: \\mathcal{Q} \\rightarrow \\mathcal{R}")} /> where{' '}
+        <InlineEquation html={tex("\\mathcal{R}")} /> is the space of formatted benchmark
         comparisons.
       </p>
 
@@ -140,30 +141,30 @@ export default function TextToSQLPost() {
 
       <TheoremBlock variant="definition" number={1} title="Injection Safety">
         <p>
-          No user input string <InlineEquation tex="q \\in \\mathcal{Q}" /> can cause
+          No user input string <InlineEquation html={tex("q \\in \\mathcal{Q}")} /> can cause
           execution of SQL operations outside the predefined operation set{' '}
-          <InlineEquation tex="\\mathcal{O} = \\{\\text{SELECT}\\}" />:
+          <InlineEquation html={tex("\\mathcal{O} = \\{\\text{SELECT}\\}")} />:
         </p>
-        <MathBlock tex="\\forall q \\in \\mathcal{Q}: \\text{op}(\\text{SQL}(q)) \\in \\mathcal{O}" />
+        <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\text{op}(\\text{SQL}(q)) \\in \\mathcal{O}", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="definition" number={2} title="Schema Compliance">
         <p>
           Generated SQL may reference only tables{' '}
-          <InlineEquation tex="T_{\\text{allowed}}" /> and columns{' '}
-          <InlineEquation tex="C_{\\text{allowed}}" /> in the registered schema:
+          <InlineEquation html={tex("T_{\\text{allowed}}")} /> and columns{' '}
+          <InlineEquation html={tex("C_{\\text{allowed}}")} /> in the registered schema:
         </p>
-        <MathBlock tex="\\forall q \\in \\mathcal{Q}: \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(\\text{SQL}(q)) \\subseteq C_{\\text{allowed}}" />
+        <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(\\text{SQL}(q)) \\subseteq C_{\\text{allowed}}", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="definition" number={3} title="Disambiguation Correctness">
         <p>
           If the system resolves an ambiguous KPI reference, the resolved KPI must be the
           one the user intended with probability at least{' '}
-          <InlineEquation tex="1 - \\epsilon" /> for a configurable confidence threshold{' '}
-          <InlineEquation tex="\\epsilon" />:
+          <InlineEquation html={tex("1 - \\epsilon")} /> for a configurable confidence threshold{' '}
+          <InlineEquation html={tex("\\epsilon")} />:
         </p>
-        <MathBlock tex="P(\\hat{k} = k^*) \\geq 1 - \\epsilon" />
+        <MathBlock html={tex("P(\\hat{k} = k^*) \\geq 1 - \\epsilon", true)} />
         <p>
           Otherwise, the system must request clarification rather than guess.
         </p>
@@ -174,7 +175,7 @@ export default function TextToSQLPost() {
           Every pipeline stage must be independently testable with deterministic inputs and
           outputs:
         </p>
-        <MathBlock tex="\\forall \\text{ stage } s_i: \\exists \\text{ test suite } T_i \\text{ s.t. } s_i \\text{ is deterministic on } T_i" />
+        <MathBlock html={tex("\\forall \\text{ stage } s_i: \\exists \\text{ test suite } T_i \\text{ s.t. } s_i \\text{ is deterministic on } T_i", true)} />
       </TheoremBlock>
 
       {/* ------------------------------------------------------------------ */}
@@ -184,10 +185,10 @@ export default function TextToSQLPost() {
         3. Five-Stage Pipeline Architecture
       </h2>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        The pipeline decomposes <InlineEquation tex="f" /> into five sequential stages:
+        The pipeline decomposes <InlineEquation html={tex("f")} /> into five sequential stages:
       </p>
 
-      <MathBlock tex="f = s_5 \\circ s_4 \\circ s_3 \\circ s_2 \\circ s_1" />
+      <MathBlock html={tex("f = s_5 \\circ s_4 \\circ s_3 \\circ s_2 \\circ s_1", true)} />
 
       <p className="mb-4 text-base leading-relaxed text-text-secondary">where:</p>
 
@@ -207,64 +208,64 @@ export default function TextToSQLPost() {
           <tbody className="text-text-secondary">
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="s_1" />
+                <InlineEquation html={tex("s_1")} />
               </td>
               <td className="py-2 pr-4">Intent Parsing</td>
               <td className="py-2 pr-4">
-                Natural language query <InlineEquation tex="q" />
+                Natural language query <InlineEquation html={tex("q")} />
               </td>
               <td className="py-2 pr-4">
-                Structured intent <InlineEquation tex="I" />
+                Structured intent <InlineEquation html={tex("I")} />
               </td>
               <td className="py-2">Yes (constrained)</td>
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="s_2" />
+                <InlineEquation html={tex("s_2")} />
               </td>
               <td className="py-2 pr-4">KPI Detection</td>
               <td className="py-2 pr-4">
-                Metric reference from <InlineEquation tex="I" />
+                Metric reference from <InlineEquation html={tex("I")} />
               </td>
               <td className="py-2 pr-4">
                 Candidate set{' '}
-                <InlineEquation tex="\\mathcal{K}_c \\subseteq \\mathcal{K}" />
+                <InlineEquation html={tex("\\mathcal{K}_c \\subseteq \\mathcal{K}")} />
               </td>
               <td className="py-2">No (embeddings)</td>
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="s_3" />
+                <InlineEquation html={tex("s_3")} />
               </td>
               <td className="py-2 pr-4">Disambiguation</td>
               <td className="py-2 pr-4">
-                Candidates <InlineEquation tex="\\mathcal{K}_c" /> + query{' '}
-                <InlineEquation tex="q" />
+                Candidates <InlineEquation html={tex("\\mathcal{K}_c")} /> + query{' '}
+                <InlineEquation html={tex("q")} />
               </td>
               <td className="py-2 pr-4">
-                Resolved KPI <InlineEquation tex="\\hat{k}" /> or clarification request
+                Resolved KPI <InlineEquation html={tex("\\hat{k}")} /> or clarification request
               </td>
               <td className="py-2">Conditional</td>
             </tr>
             <tr className="border-b border-border-subtle/50">
               <td className="py-2 pr-4">
-                <InlineEquation tex="s_4" />
+                <InlineEquation html={tex("s_4")} />
               </td>
               <td className="py-2 pr-4">SQL Generation</td>
               <td className="py-2 pr-4">
-                Resolved KPI <InlineEquation tex="\\hat{k}" /> + parameters
+                Resolved KPI <InlineEquation html={tex("\\hat{k}")} /> + parameters
               </td>
               <td className="py-2 pr-4">Validated SQL string</td>
               <td className="py-2">Template + validation</td>
             </tr>
             <tr>
               <td className="py-2 pr-4">
-                <InlineEquation tex="s_5" />
+                <InlineEquation html={tex("s_5")} />
               </td>
               <td className="py-2 pr-4">Result Formatting</td>
               <td className="py-2 pr-4">Query results</td>
               <td className="py-2 pr-4">
-                Formatted response <InlineEquation tex="r" />
+                Formatted response <InlineEquation html={tex("r")} />
               </td>
               <td className="py-2">No</td>
             </tr>
@@ -292,24 +293,24 @@ export default function TextToSQLPost() {
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The intent parser maps a natural language query to a structured intent tuple:
       </p>
-      <MathBlock tex="s_1: \\mathcal{Q} \\rightarrow \\mathcal{I} = (\\mu, \\tau, \\delta, \\omega)" />
+      <MathBlock html={tex("s_1: \\mathcal{Q} \\rightarrow \\mathcal{I} = (\\mu, \\tau, \\delta, \\omega)", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">where:</p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
-          <InlineEquation tex="\\mu \\in \\mathcal{M}" /> is the{' '}
+          <InlineEquation html={tex("\\mu \\in \\mathcal{M}")} /> is the{' '}
           <strong>metric reference</strong> (the KPI the user is asking about, in their
           words)
         </li>
         <li>
-          <InlineEquation tex="\\tau \\in \\mathcal{T}" /> is the{' '}
+          <InlineEquation html={tex("\\tau \\in \\mathcal{T}")} /> is the{' '}
           <strong>temporal scope</strong> (quarter, year, range, trend)
         </li>
         <li>
-          <InlineEquation tex="\\delta \\in \\Delta" /> is the{' '}
+          <InlineEquation html={tex("\\delta \\in \\Delta")} /> is the{' '}
           <strong>comparison dimension</strong> (peer vs. self, absolute vs. relative)
         </li>
         <li>
-          <InlineEquation tex="\\omega \\in \\Omega" /> is the{' '}
+          <InlineEquation html={tex("\\omega \\in \\Omega")} /> is the{' '}
           <strong>output type</strong> (table, chart, single value, narrative)
         </li>
       </ul>
@@ -319,7 +320,7 @@ export default function TextToSQLPost() {
       </h3>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The LLM is prompted with a schema definition of{' '}
-        <InlineEquation tex="\\mathcal{I}" /> and instructed to output a JSON object
+        <InlineEquation html={tex("\\mathcal{I}")} /> and instructed to output a JSON object
         conforming to the schema. This is constrained generation — the model&apos;s output
         space is restricted to valid intent tuples.
       </p>
@@ -327,12 +328,12 @@ export default function TextToSQLPost() {
         <strong>Validation.</strong> The JSON output is validated against the schema before
         proceeding. If validation fails (missing fields, invalid enum values), the system
         retries with the validation error appended to the prompt. After{' '}
-        <InlineEquation tex="k_{\\max}" /> retries, it requests clarification from the
+        <InlineEquation html={tex("k_{\\max}")} /> retries, it requests clarification from the
         user.
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         <strong>Ambiguity Detection.</strong> If the metric reference{' '}
-        <InlineEquation tex="\\mu" /> is empty or too vague (e.g.,{' '}
+        <InlineEquation html={tex("\\mu")} /> is empty or too vague (e.g.,{' '}
         &ldquo;efficiency&rdquo; with no qualifying context), the system returns a
         clarification request rather than proceeding with a guess. This is Stage 1&apos;s
         contribution to Requirement 3.
@@ -349,21 +350,21 @@ export default function TextToSQLPost() {
         5.1 Embedding Space
       </h3>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        Each KPI <InlineEquation tex="k_i \\in \\mathcal{K}" /> is represented by an
+        Each KPI <InlineEquation html={tex("k_i \\in \\mathcal{K}")} /> is represented by an
         embedding vector computed from its name, definition, and metadata:
       </p>
-      <MathBlock tex="\\mathbf{e}_i = \\text{embed}(n_i \\oplus d_i \\oplus m_i) \\in \\mathbb{R}^d" />
+      <MathBlock html={tex("\\mathbf{e}_i = \\text{embed}(n_i \\oplus d_i \\oplus m_i) \\in \\mathbb{R}^d", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        where <InlineEquation tex="\\oplus" /> denotes string concatenation with separator
+        where <InlineEquation html={tex("\\oplus")} /> denotes string concatenation with separator
         tokens and{' '}
-        <InlineEquation tex="\\text{embed}: \\text{String} \\rightarrow \\mathbb{R}^d" />{' '}
+        <InlineEquation html={tex("\\text{embed}: \\text{String} \\rightarrow \\mathbb{R}^d")} />{' '}
         is a pre-trained sentence embedding model.
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        The user&apos;s metric reference <InlineEquation tex="\\mu" /> is similarly
+        The user&apos;s metric reference <InlineEquation html={tex("\\mu")} /> is similarly
         embedded:
       </p>
-      <MathBlock tex="\\mathbf{e}_\\mu = \\text{embed}(\\mu)" />
+      <MathBlock html={tex("\\mathbf{e}_\\mu = \\text{embed}(\\mu)", true)} />
 
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
         5.2 Similarity Search
@@ -371,10 +372,10 @@ export default function TextToSQLPost() {
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The candidate set is retrieved by cosine similarity:
       </p>
-      <MathBlock tex="\\text{sim}(k_i, \\mu) = \\frac{\\mathbf{e}_i \\cdot \\mathbf{e}_\\mu}{\\|\\mathbf{e}_i\\| \\|\\mathbf{e}_\\mu\\|}" />
-      <MathBlock tex="\\mathcal{K}_c = \\{k_i \\in \\mathcal{K} \\mid \\text{sim}(k_i, \\mu) \\geq \\tau_{\\min}\\}" />
+      <MathBlock html={tex("\\text{sim}(k_i, \\mu) = \\frac{\\mathbf{e}_i \\cdot \\mathbf{e}_\\mu}{\\|\\mathbf{e}_i\\| \\|\\mathbf{e}_\\mu\\|}", true)} />
+      <MathBlock html={tex("\\mathcal{K}_c = \\{k_i \\in \\mathcal{K} \\mid \\text{sim}(k_i, \\mu) \\geq \\tau_{\\min}\\}", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        where <InlineEquation tex="\\tau_{\\min}" /> is the minimum similarity threshold.
+        where <InlineEquation html={tex("\\tau_{\\min}")} /> is the minimum similarity threshold.
       </p>
 
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
@@ -384,13 +385,13 @@ export default function TextToSQLPost() {
       <TheoremBlock variant="proposition" number={3} title="Embedding Robustness to Synonymy">
         <p>
           For semantically equivalent metric references{' '}
-          <InlineEquation tex="\\mu_1 \\equiv_{\\text{sem}} \\mu_2" /> (e.g.,{' '}
+          <InlineEquation html={tex("\\mu_1 \\equiv_{\\text{sem}} \\mu_2")} /> (e.g.,{' '}
           &ldquo;NIM&rdquo; and &ldquo;Net Interest Margin&rdquo;), embedding similarity
           preserves retrieval:
         </p>
-        <MathBlock tex="\\mu_1 \\equiv_{\\text{sem}} \\mu_2 \\implies |\\text{sim}(k, \\mu_1) - \\text{sim}(k, \\mu_2)| < \\delta" />
+        <MathBlock html={tex("\\mu_1 \\equiv_{\\text{sem}} \\mu_2 \\implies |\\text{sim}(k, \\mu_1) - \\text{sim}(k, \\mu_2)| < \\delta", true)} />
         <p>
-          for small <InlineEquation tex="\\delta" />, assuming the embedding model captures
+          for small <InlineEquation html={tex("\\delta")} />, assuming the embedding model captures
           semantic similarity (a property validated empirically for modern sentence
           transformers [5]).
         </p>
@@ -407,7 +408,7 @@ export default function TextToSQLPost() {
         5.4 The Scaling Problem
       </h3>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        As the KPI catalog <InlineEquation tex="|\\mathcal{K}|" /> grows, the probability
+        As the KPI catalog <InlineEquation html={tex("|\\mathcal{K}|")} /> grows, the probability
         of near-duplicate entries increases. Consider:
       </p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
@@ -418,8 +419,8 @@ export default function TextToSQLPost() {
       </ul>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         These are distinct KPIs with different definitions and values, but their embeddings
-        cluster tightly in <InlineEquation tex="\\mathbb{R}^d" />. When{' '}
-        <InlineEquation tex="|\\mathcal{K}_c| > 1" /> and the top candidates are close in
+        cluster tightly in <InlineEquation html={tex("\\mathbb{R}^d")} />. When{' '}
+        <InlineEquation html={tex("|\\mathcal{K}_c| > 1")} /> and the top candidates are close in
         similarity score, we enter the disambiguation stage.
       </p>
 
@@ -444,11 +445,11 @@ export default function TextToSQLPost() {
         Disambiguation is invoked when the candidate set is ambiguous:
       </p>
       <MathBlock
-        tex={`\\text{disambiguate?} = \\begin{cases} \\text{no} & \\text{if } |\\mathcal{K}_c| = 1 \\\\ \\text{no} & \\text{if } |\\mathcal{K}_c| > 1 \\wedge \\text{sim}(k_1, \\mu) - \\text{sim}(k_2, \\mu) > \\gamma \\\\ \\text{yes} & \\text{otherwise} \\end{cases}`}
+        html={tex("\\text{disambiguate?} = \\begin{cases} \\text{no} & \\text{if } |\\mathcal{K}_c| = 1 \\\\ \\text{no} & \\text{if } |\\mathcal{K}_c| > 1 \\wedge \\text{sim}(k_1, \\mu) - \\text{sim}(k_2, \\mu) > \\gamma \\\\ \\text{yes} & \\text{otherwise} \\end{cases}", true)}
       />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
-        where <InlineEquation tex="k_1, k_2" /> are the top-2 candidates sorted by
-        similarity, and <InlineEquation tex="\\gamma" /> is the{' '}
+        where <InlineEquation html={tex("k_1, k_2")} /> are the top-2 candidates sorted by
+        similarity, and <InlineEquation html={tex("\\gamma")} /> is the{' '}
         <strong>confidence gap threshold</strong>. If the top candidate is sufficiently
         dominant, we accept it without LLM disambiguation.
       </p>
@@ -461,26 +462,26 @@ export default function TextToSQLPost() {
       </p>
       <ul className="mb-4 list-inside list-disc space-y-1 text-sm text-text-secondary">
         <li>
-          The user&apos;s original query <InlineEquation tex="q" />
+          The user&apos;s original query <InlineEquation html={tex("q")} />
         </li>
         <li>
           The candidate KPI names{' '}
-          <InlineEquation tex="\\{n_i : k_i \\in \\mathcal{K}_c\\}" />
+          <InlineEquation html={tex("\\{n_i : k_i \\in \\mathcal{K}_c\\}")} />
         </li>
         <li>
           The candidate KPI definitions{' '}
-          <InlineEquation tex="\\{d_i : k_i \\in \\mathcal{K}_c\\}" />
+          <InlineEquation html={tex("\\{d_i : k_i \\in \\mathcal{K}_c\\}")} />
         </li>
       </ul>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Critically, the LLM does <strong>not</strong> receive KPI values or any data from{' '}
-        <InlineEquation tex="\\mathcal{V}" />. This preserves the data confidentiality
+        <InlineEquation html={tex("\\mathcal{V}")} />. This preserves the data confidentiality
         property (cf. companion paper on LLM-as-Router architectures).
       </p>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The LLM outputs a selection{' '}
-        <InlineEquation tex="\\hat{k} \\in \\mathcal{K}_c" /> and a confidence score{' '}
-        <InlineEquation tex="p \\in [0, 1]" />.
+        <InlineEquation html={tex("\\hat{k} \\in \\mathcal{K}_c")} /> and a confidence score{' '}
+        <InlineEquation html={tex("p \\in [0, 1]")} />.
       </p>
 
       <h3 className="mb-3 mt-8 text-xl font-medium text-text-primary">
@@ -490,10 +491,10 @@ export default function TextToSQLPost() {
       <TheoremBlock variant="definition" number={6} title="Disambiguation Decision Function">
         <p>The disambiguation outcome is:</p>
         <MathBlock
-          tex={`\\text{outcome}(\\hat{k}, p) = \\begin{cases} \\text{accept}(\\hat{k}) & \\text{if } p \\geq 1 - \\epsilon \\\\ \\text{clarify}(\\mathcal{K}_c) & \\text{if } p < 1 - \\epsilon \\end{cases}`}
+          html={tex("\\text{outcome}(\\hat{k}, p) = \\begin{cases} \\text{accept}(\\hat{k}) & \\text{if } p \\geq 1 - \\epsilon \\\\ \\text{clarify}(\\mathcal{K}_c) & \\text{if } p < 1 - \\epsilon \\end{cases}", true)}
         />
         <p>
-          where <InlineEquation tex="\\epsilon" /> is the maximum acceptable error
+          where <InlineEquation html={tex("\\epsilon")} /> is the maximum acceptable error
           probability from Requirement 3.
         </p>
       </TheoremBlock>
@@ -501,26 +502,26 @@ export default function TextToSQLPost() {
       <TheoremBlock variant="proposition" number={4} title="Disambiguation Safety">
         <p>
           If the LLM&apos;s confidence score is calibrated (i.e.,{' '}
-          <InlineEquation tex="P(\\hat{k} = k^* \\mid p) \\geq p" /> for all confidence
-          levels <InlineEquation tex="p" />
+          <InlineEquation html={tex("P(\\hat{k} = k^* \\mid p) \\geq p")} /> for all confidence
+          levels <InlineEquation html={tex("p")} />
           ), then the disambiguation decision function satisfies Requirement 3:
         </p>
-        <MathBlock tex="P(\\hat{k} = k^*) \\geq 1 - \\epsilon \\text{ whenever outcome} = \\text{accept}" />
+        <MathBlock html={tex("P(\\hat{k} = k^*) \\geq 1 - \\epsilon \\text{ whenever outcome} = \\text{accept}", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proof">
         <p>
-          The accept condition requires <InlineEquation tex="p \\geq 1 - \\epsilon" />. By
+          The accept condition requires <InlineEquation html={tex("p \\geq 1 - \\epsilon")} />. By
           calibration,{' '}
-          <InlineEquation tex="P(\\hat{k} = k^* \\mid p) \\geq p \\geq 1 - \\epsilon" />.{' '}
-          <InlineEquation tex="\\square" />
+          <InlineEquation html={tex("P(\\hat{k} = k^* \\mid p) \\geq p \\geq 1 - \\epsilon")} />.{' '}
+          <InlineEquation html={tex("\\square")} />
         </p>
       </TheoremBlock>
 
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         In practice, LLM confidence scores are not perfectly calibrated [6], so we set{' '}
-        <InlineEquation tex="\\epsilon" /> conservatively (we use{' '}
-        <InlineEquation tex="\\epsilon = 0.05" />) and validate calibration empirically on
+        <InlineEquation html={tex("\\epsilon")} /> conservatively (we use{' '}
+        <InlineEquation html={tex("\\epsilon = 0.05")} />) and validate calibration empirically on
         a held-out query set.
       </p>
 
@@ -541,9 +542,9 @@ export default function TextToSQLPost() {
 
       <TheoremBlock variant="definition" number={7} title="SQL Template">
         <p>
-          A template <InlineEquation tex="T" /> is a SQL string with typed placeholders:
+          A template <InlineEquation html={tex("T")} /> is a SQL string with typed placeholders:
         </p>
-        <MathBlock tex="T(\\text{kpi\\_id}: \\text{int},\\; \\text{period}: \\text{date},\\; \\text{entity}: \\text{string}) = \\text{SELECT } \\ldots \\text{ WHERE kpi\\_id = :kpi\\_id AND } \\ldots" />
+        <MathBlock html={tex("T(\\text{kpi\\_id}: \\text{int},\\; \\text{period}: \\text{date},\\; \\text{entity}: \\text{string}) = \\text{SELECT } \\ldots \\text{ WHERE kpi\\_id = :kpi\\_id AND } \\ldots", true)} />
         <p>
           Templates are pre-authored and reviewed for each query pattern (peer comparison,
           time series trend, single-point lookup, cross-entity ranking).
@@ -559,7 +560,7 @@ export default function TextToSQLPost() {
           If all user-supplied values are passed as parameterized bindings (not
           string-interpolated into the SQL), then SQL injection is impossible:
         </p>
-        <MathBlock tex="\\forall q \\in \\mathcal{Q}: \\nexists \\text{ substring } s \\text{ of } q \\text{ that executes as SQL}" />
+        <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\nexists \\text{ substring } s \\text{ of } q \\text{ that executes as SQL}", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proof">
@@ -568,7 +569,7 @@ export default function TextToSQLPost() {
           values) at the database driver level [7]. The driver processes the SQL template as
           a prepared statement, compiling it into an execution plan before binding parameter
           values. Parameter values are treated as data literals, not as SQL syntax.
-          Therefore, no content of <InlineEquation tex="q" /> — regardless of its structure
+          Therefore, no content of <InlineEquation html={tex("q")} /> — regardless of its structure
           or embedded SQL keywords — can alter the query&apos;s syntactic structure or
           execution plan.
         </p>
@@ -576,19 +577,19 @@ export default function TextToSQLPost() {
 
       <TheoremBlock variant="theorem" number={4} title="Schema Compliance">
         <p>
-          If the template library <InlineEquation tex="\\mathcal{T}" /> references only
-          tables in <InlineEquation tex="T_{\\text{allowed}}" /> and columns in{' '}
-          <InlineEquation tex="C_{\\text{allowed}}" />, and templates are selected (not
+          If the template library <InlineEquation html={tex("\\mathcal{T}")} /> references only
+          tables in <InlineEquation html={tex("T_{\\text{allowed}}")} /> and columns in{' '}
+          <InlineEquation html={tex("C_{\\text{allowed}}")} />, and templates are selected (not
           generated), then Requirement 2 is satisfied:
         </p>
-        <MathBlock tex="\\forall T \\in \\mathcal{T}: \\text{tables}(T) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(T) \\subseteq C_{\\text{allowed}}" />
-        <MathBlock tex="\\text{template\\_select}: \\mathcal{I} \\rightarrow \\mathcal{T} \\implies \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}}" />
+        <MathBlock html={tex("\\forall T \\in \\mathcal{T}: \\text{tables}(T) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(T) \\subseteq C_{\\text{allowed}}", true)} />
+        <MathBlock html={tex("\\text{template\\_select}: \\mathcal{I} \\rightarrow \\mathcal{T} \\implies \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}}", true)} />
       </TheoremBlock>
 
       <TheoremBlock variant="proof">
         <p>
           The SQL execution uses only templates from{' '}
-          <InlineEquation tex="\\mathcal{T}" />. Each template is authored and reviewed to
+          <InlineEquation html={tex("\\mathcal{T}")} />. Each template is authored and reviewed to
           reference only allowed tables and columns. Since no dynamic table or column names
           enter through parameters (which are values, not identifiers), the schema boundary
           is preserved.
@@ -604,8 +605,8 @@ export default function TextToSQLPost() {
       <ol className="mb-4 list-inside list-decimal space-y-1 text-sm text-text-secondary">
         <li>
           <strong>Whitelist check:</strong> Parse the generated SQL AST and verify all table
-          and column references against <InlineEquation tex="T_{\\text{allowed}}" /> and{' '}
-          <InlineEquation tex="C_{\\text{allowed}}" />
+          and column references against <InlineEquation html={tex("T_{\\text{allowed}}")} /> and{' '}
+          <InlineEquation html={tex("C_{\\text{allowed}}")} />
         </li>
         <li>
           <strong>Operation check:</strong> Verify the top-level operation is SELECT (no
@@ -640,10 +641,10 @@ export default function TextToSQLPost() {
       </h2>
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         The final stage transforms raw query results into the output format{' '}
-        <InlineEquation tex="\\omega" /> specified in the intent. This stage is entirely
+        <InlineEquation html={tex("\\omega")} /> specified in the intent. This stage is entirely
         deterministic — no LLM involvement:
       </p>
-      <MathBlock tex="s_5: (\\text{QueryResult}, \\omega) \\rightarrow \\mathcal{R}" />
+      <MathBlock html={tex("s_5: (\\text{QueryResult}, \\omega) \\rightarrow \\mathcal{R}", true)} />
       <p className="mb-4 text-base leading-relaxed text-text-secondary">
         Output types include comparison tables, trend charts, summary statistics, and
         narrative descriptions (generated from templates, not LLMs).

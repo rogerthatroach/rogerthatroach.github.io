@@ -1,18 +1,10 @@
 'use client';
 
-import katex from 'katex';
-
 interface InlineEquationProps {
-  tex: string;
+  html: string;
 }
 
-export default function InlineEquation({ tex }: InlineEquationProps) {
-  const html = katex.renderToString(tex, {
-    displayMode: false,
-    throwOnError: false,
-    strict: false,
-  });
-
+export default function InlineEquation({ html }: InlineEquationProps) {
   return (
     <span
       className="inline-block align-middle"
