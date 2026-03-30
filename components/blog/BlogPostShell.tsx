@@ -5,17 +5,16 @@ import type { BlogPostMeta } from '@/data/posts';
 import { POSTS } from '@/data/posts';
 import PostLayout from './PostLayout';
 
+// Post content components — SSR enabled so equations render into static HTML.
+// Interactive diagrams inside each post use their own ssr:false via next/dynamic.
 const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'agentic-ai': dynamic(() => import('@/data/posts/agentic-ai'), {
-    ssr: false,
     loading: () => <PostSkeleton />,
   }),
   'text-to-sql': dynamic(() => import('@/data/posts/text-to-sql'), {
-    ssr: false,
     loading: () => <PostSkeleton />,
   }),
   'closed-loop': dynamic(() => import('@/data/posts/closed-loop'), {
-    ssr: false,
     loading: () => <PostSkeleton />,
   }),
 };
