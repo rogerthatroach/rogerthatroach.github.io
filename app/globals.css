@@ -32,6 +32,7 @@
   }
 
   html {
+    font-size: 110%;
     scroll-behavior: smooth;
   }
 
@@ -64,44 +65,28 @@
     transition: none !important;
   }
 
-  /* Protect KaTeX from Tailwind preflight resets */
-  .katex,
-  .katex * {
-    transition: none !important;
-    border-style: initial;
-    border-width: initial;
-  }
+}
 
-  .katex .base {
-    display: inline-block !important;
-  }
+/* KaTeX — fully opt out of Tailwind preflight and theme transitions.
+   KaTeX ships its own complete CSS; Tailwind's resets break it. */
+.katex,
+.katex * {
+  all: revert;
+  transition: none !important;
+}
 
-  .katex .strut {
-    display: inline-block !important;
-  }
+.katex-display {
+  all: revert;
+  margin: 1em 0 !important;
+}
 
-  .katex .mord,
-  .katex .mbin,
-  .katex .mrel,
-  .katex .mopen,
-  .katex .mclose,
-  .katex .mpunct,
-  .katex .minner,
-  .katex .mop {
-    display: inline !important;
-  }
-
-  .katex .frac-line {
-    border-bottom-style: solid !important;
-    border-bottom-width: 1px !important;
-  }
-
-  .katex .sqrt > .sqrt-line {
-    border-bottom-style: solid !important;
-  }
-
-  .katex .overline .overline-line,
-  .katex .underline .underline-line {
-    border-bottom-style: solid !important;
-  }
+.katex-mathml {
+  /* Screen-reader accessible but visually hidden — KaTeX default */
+  position: absolute !important;
+  clip: rect(1px, 1px, 1px, 1px) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  height: 1px !important;
+  width: 1px !important;
+  overflow: hidden !important;
 }
