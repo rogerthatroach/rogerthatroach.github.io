@@ -10,12 +10,20 @@ import AboutSection from '@/components/AboutSection';
 import Footer from '@/components/Footer';
 import { PROJECTS } from '@/data/projects';
 
-const CombustionDiagram = dynamic(() => import('@/components/diagrams/CombustionDiagram'), { ssr: false });
-const DocumentIntelligenceDiagram = dynamic(() => import('@/components/diagrams/DocumentIntelligenceDiagram'), { ssr: false });
-const CommodityTaxDiagram = dynamic(() => import('@/components/diagrams/CommodityTaxDiagram'), { ssr: false });
-const FinancialBenchmarkingDiagram = dynamic(() => import('@/components/diagrams/FinancialBenchmarkingDiagram'), { ssr: false });
-const WorkforceAnalyticsDiagram = dynamic(() => import('@/components/diagrams/WorkforceAnalyticsDiagram'), { ssr: false });
-const FundingRequestDiagram = dynamic(() => import('@/components/diagrams/FundingRequestDiagram'), { ssr: false });
+function DiagramSkeleton() {
+  return (
+    <div className="flex h-[400px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface/50 sm:h-[500px]">
+      <span className="text-xs text-text-tertiary">Loading diagram...</span>
+    </div>
+  );
+}
+
+const CombustionDiagram = dynamic(() => import('@/components/diagrams/CombustionDiagram'), { ssr: false, loading: DiagramSkeleton });
+const DocumentIntelligenceDiagram = dynamic(() => import('@/components/diagrams/DocumentIntelligenceDiagram'), { ssr: false, loading: DiagramSkeleton });
+const CommodityTaxDiagram = dynamic(() => import('@/components/diagrams/CommodityTaxDiagram'), { ssr: false, loading: DiagramSkeleton });
+const FinancialBenchmarkingDiagram = dynamic(() => import('@/components/diagrams/FinancialBenchmarkingDiagram'), { ssr: false, loading: DiagramSkeleton });
+const WorkforceAnalyticsDiagram = dynamic(() => import('@/components/diagrams/WorkforceAnalyticsDiagram'), { ssr: false, loading: DiagramSkeleton });
+const FundingRequestDiagram = dynamic(() => import('@/components/diagrams/FundingRequestDiagram'), { ssr: false, loading: DiagramSkeleton });
 
 const DIAGRAMS: Record<string, React.ComponentType> = {
   'combustion-tuning': CombustionDiagram,
@@ -34,7 +42,7 @@ const ERA_TRANSITIONS: Record<number, { label: string; years: string }> = {
 
 export default function Home() {
   return (
-    <main>
+    <main id="main-content">
       <Nav />
       <Hero />
 

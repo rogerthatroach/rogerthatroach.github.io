@@ -5,13 +5,21 @@ import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
 import CaseStudyLayout from '@/components/projects/CaseStudyLayout';
 
+function DiagramSkeleton() {
+  return (
+    <div className="flex h-[400px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface/50 sm:h-[500px]">
+      <span className="text-xs text-text-tertiary">Loading diagram...</span>
+    </div>
+  );
+}
+
 const DIAGRAMS: Record<string, React.ComponentType> = {
-  'combustion-tuning': dynamic(() => import('@/components/diagrams/CombustionDiagram'), { ssr: false }),
-  'document-intelligence': dynamic(() => import('@/components/diagrams/DocumentIntelligenceDiagram'), { ssr: false }),
-  'commodity-tax': dynamic(() => import('@/components/diagrams/CommodityTaxDiagram'), { ssr: false }),
-  'financialBenchmarking': dynamic(() => import('@/components/diagrams/FinancialBenchmarkingDiagram'), { ssr: false }),
-  'workforceAnalytics': dynamic(() => import('@/components/diagrams/WorkforceAnalyticsDiagram'), { ssr: false }),
-  'funding-request-drafting': dynamic(() => import('@/components/diagrams/FundingRequestDiagram'), { ssr: false }),
+  'combustion-tuning': dynamic(() => import('@/components/diagrams/CombustionDiagram'), { ssr: false, loading: DiagramSkeleton }),
+  'document-intelligence': dynamic(() => import('@/components/diagrams/DocumentIntelligenceDiagram'), { ssr: false, loading: DiagramSkeleton }),
+  'commodity-tax': dynamic(() => import('@/components/diagrams/CommodityTaxDiagram'), { ssr: false, loading: DiagramSkeleton }),
+  'financialBenchmarking': dynamic(() => import('@/components/diagrams/FinancialBenchmarkingDiagram'), { ssr: false, loading: DiagramSkeleton }),
+  'workforceAnalytics': dynamic(() => import('@/components/diagrams/WorkforceAnalyticsDiagram'), { ssr: false, loading: DiagramSkeleton }),
+  'funding-request-drafting': dynamic(() => import('@/components/diagrams/FundingRequestDiagram'), { ssr: false, loading: DiagramSkeleton }),
 };
 
 export function generateStaticParams() {
@@ -27,8 +35,13 @@ export function generateMetadata({
   if (!project) return {};
 
   return {
-    title: `${project.title} — ${project.subtitle} | Harmilap Singh Dhaliwal`,
+    title: `${project.title} — ${project.subtitle}`,
     description: project.caption,
+    openGraph: {
+      title: `${project.title} — ${project.subtitle}`,
+      description: project.caption,
+      type: 'article',
+    },
   };
 }
 

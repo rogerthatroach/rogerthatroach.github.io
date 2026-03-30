@@ -18,6 +18,7 @@ export default function Nav() {
 
   return (
     <motion.nav
+      aria-label="Main navigation"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.5, duration: 0.5 }}
