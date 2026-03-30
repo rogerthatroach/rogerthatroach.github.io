@@ -38,8 +38,8 @@ function TimelineItem({ node, index }: { node: typeof TIMELINE[number]; index: n
       <div
         className={cn(
           'ml-8 flex-1 pb-12',
-          'md:ml-0 md:w-1/2',
-          isLeft ? 'md:pr-12' : 'md:ml-auto md:pl-12'
+          'md:ml-0 md:w-[calc(50%-1rem)] md:flex-none',
+          isLeft ? 'md:pr-8' : 'md:ml-auto md:pl-8'
         )}
       >
         <motion.div
