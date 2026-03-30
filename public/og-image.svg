@@ -1,0 +1,59 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0c0a0a"/>
+
+  <!-- Subtle gradient overlay -->
+  <rect width="1200" height="630" fill="url(#grad)" opacity="0.3"/>
+  <defs>
+    <linearGradient id="grad" x1="0" y1="0" x2="1200" y2="630">
+      <stop offset="0%" stop-color="#b07a82" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0c0a0a" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="accent-line" x1="0" y1="0" x2="200" y2="0">
+      <stop offset="0%" stop-color="#b07a82"/>
+      <stop offset="100%" stop-color="#b07a82" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Content -->
+  <g transform="translate(80, 160)">
+    <!-- Title badge -->
+    <text font-family="monospace" font-size="14" letter-spacing="4" fill="#b07a82" opacity="0.9">
+      AI &amp; DATA SCIENCE LEAD
+    </text>
+
+    <!-- Name -->
+    <text y="65" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="700" fill="#f0ece8">
+      Harmilap Singh Dhaliwal
+    </text>
+
+    <!-- Tagline -->
+    <text y="115" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#8a8078">
+      I architect AI platforms. I lead teams that ship them.
+    </text>
+
+    <!-- Accent line -->
+    <rect y="150" width="200" height="1" fill="url(#accent-line)"/>
+
+    <!-- Metrics -->
+    <g transform="translate(0, 190)">
+      <text font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">$3M</text>
+      <text x="85" font-family="monospace" font-size="12" fill="#8a8078" dy="4">annual savings</text>
+
+      <text x="280" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">90 min</text>
+      <text x="400" font-family="monospace" font-size="12" fill="#8a8078" dy="4">was: months</text>
+
+      <text x="560" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Bank-wide</text>
+      <text x="740" font-family="monospace" font-size="12" fill="#8a8078" dy="4">agentic AI</text>
+    </g>
+  </g>
+
+  <!-- Decorative dots (subtle) -->
+  <circle cx="1050" cy="200" r="2" fill="#b07a82" opacity="0.2"/>
+  <circle cx="1080" cy="220" r="1.5" fill="#b07a82" opacity="0.15"/>
+  <circle cx="1100" cy="190" r="1" fill="#b07a82" opacity="0.1"/>
+  <circle cx="1060" cy="250" r="2.5" fill="#b07a82" opacity="0.1"/>
+
+  <!-- Bottom bar -->
+  <rect y="610" width="1200" height="20" fill="#b07a82" opacity="0.1"/>
+</svg>

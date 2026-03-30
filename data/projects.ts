@@ -65,7 +65,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'commodity-tax',
     title: 'Commodity Tax',
-    subtitle: 'Process Automation',
+    subtitle: 'Process Automation — RBC CFO Group',
     role: 'Lead developer + stakeholder engagement',
     stack: ['PySpark', 'Tableau', 'General Ledger Extraction'],
     heroMetric: { value: 'Months → 90min', label: 'Processing Time' },
@@ -85,7 +85,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'aegis',
     title: 'Aegis v2',
-    subtitle: 'Text-to-SQL Benchmarking Engine',
+    subtitle: 'Text-to-SQL Benchmarking Engine — RBC CFO Group',
     role: 'Designed + shipped in two weeks',
     stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
     heroMetric: { value: '2 weeks', label: 'Concept → Production' },
@@ -105,7 +105,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'astraeus',
     title: 'ASTRAEUS',
-    subtitle: 'Financial Insights & Analysis Suite',
+    subtitle: 'Financial Insights & Analysis Suite — RBC CFO Group',
     role: 'Architect, lead developer, product visionary',
     stack: ['Multi-Agent Framework', 'Text-to-SQL', 'GPT Routing', 'EPM Security'],
     heroMetric: { value: '~40,000', label: 'Transits Processed' },
@@ -125,7 +125,7 @@ export const PROJECTS: Project[] = [
   {
     id: 'par-assist',
     title: 'PAR Assist',
-    subtitle: 'Enterprise Agentic AI Platform',
+    subtitle: 'Enterprise Agentic AI Platform — RBC Bank-wide',
     role: 'Conceived vision, led strategic + technical requirements',
     stack: ['LangGraph', 'MCP', 'PostgreSQL', 'Embeddings', 'Custom RAG'],
     heroMetric: { value: 'Bank-wide', label: 'Target Scale' },
