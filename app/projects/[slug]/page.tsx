@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
+import { isPostSlugPublic } from '@/data/posts';
 import CaseStudyLayout from '@/components/projects/CaseStudyLayout';
 
 function DiagramSkeleton() {
@@ -62,6 +63,8 @@ export default function ProjectCaseStudyPage({
       project={project}
       caseStudy={caseStudy}
       diagram={Diagram ? <Diagram /> : null}
+      showFormalBlogCta={isPostSlugPublic(caseStudy.blogPostSlug)}
+      showCompanionBlogCta={isPostSlugPublic(caseStudy.companionBlogPostSlug)}
     />
   );
 }

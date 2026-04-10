@@ -30,6 +30,16 @@ export interface BlogPost {
   furtherReading: FurtherReadingItem[];
 }
 
+export function isPostPublic(post: BlogPost, now: number = Date.now()): boolean {
+  return post.meta.status === 'published' && new Date(post.meta.date).getTime() <= now;
+}
+
+export function isPostSlugPublic(slug: string | undefined, now: number = Date.now()): boolean {
+  if (!slug) return false;
+  const post = POSTS.find((p) => p.meta.slug === slug);
+  return post ? isPostPublic(post, now) : false;
+}
+
 export const POSTS: BlogPost[] = [
   {
     meta: {
