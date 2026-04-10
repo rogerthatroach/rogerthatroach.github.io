@@ -1,45 +1,15 @@
-import dynamic from 'next/dynamic';
 import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
-import ProjectShowcase from '@/components/ProjectShowcase';
-import EraTransition from '@/components/EraTransition';
 import CareerArcNarrative from '@/components/CareerArcNarrative';
 import MetricsRibbon from '@/components/MetricsRibbon';
+import NowBuilding from '@/components/NowBuilding';
+import ProjectCard from '@/components/projects/ProjectCard';
 import SkillTimeline from '@/components/SkillTimeline';
 import AboutSection from '@/components/AboutSection';
 import RecognitionSection from '@/components/RecognitionSection';
 import Footer from '@/components/Footer';
 import { PROJECTS } from '@/data/projects';
-
-function DiagramSkeleton() {
-  return (
-    <div className="flex h-[400px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface/50 sm:h-[500px]">
-      <span className="text-xs text-text-tertiary">Loading diagram...</span>
-    </div>
-  );
-}
-
-const CombustionDiagram = dynamic(() => import('@/components/diagrams/CombustionDiagram'), { ssr: false, loading: DiagramSkeleton });
-const DocumentIntelligenceDiagram = dynamic(() => import('@/components/diagrams/DocumentIntelligenceDiagram'), { ssr: false, loading: DiagramSkeleton });
-const CommodityTaxDiagram = dynamic(() => import('@/components/diagrams/CommodityTaxDiagram'), { ssr: false, loading: DiagramSkeleton });
-const AegisDiagram = dynamic(() => import('@/components/diagrams/AegisDiagram'), { ssr: false, loading: DiagramSkeleton });
-const AstraeusDiagram = dynamic(() => import('@/components/diagrams/AstraeusDiagram'), { ssr: false, loading: DiagramSkeleton });
-const PARAssistDiagram = dynamic(() => import('@/components/diagrams/PARAssistDiagram'), { ssr: false, loading: DiagramSkeleton });
-
-const DIAGRAMS: Record<string, React.ComponentType> = {
-  'combustion-tuning': CombustionDiagram,
-  'document-intelligence': DocumentIntelligenceDiagram,
-  'commodity-tax': CommodityTaxDiagram,
-  'aegis': AegisDiagram,
-  'astraeus': AstraeusDiagram,
-  'par-assist': PARAssistDiagram,
-};
-
-const ERA_TRANSITIONS: Record<number, { label: string; years: string }> = {
-  1: { label: 'From plant floors to cloud pipelines', years: '2019 → 2021' },
-  2: { label: 'From cloud to enterprise finance', years: '2022' },
-  3: { label: 'From analytics to intelligent systems', years: '2024' },
-};
+import { CASE_STUDIES } from '@/data/projectCaseStudies';
 
 export default function Home() {
   return (
@@ -47,31 +17,49 @@ export default function Home() {
       <Nav />
       <Hero />
 
-      {/* Projects — full viewport showcases with architecture diagrams */}
-      <div id="work">
-        {PROJECTS.map((project, i) => {
-          const Diagram = DIAGRAMS[project.id];
-          const transition = ERA_TRANSITIONS[i];
-          return (
-            <div key={project.id}>
-              {transition && (
-                <EraTransition label={transition.label} years={transition.years} />
-              )}
-              <ProjectShowcase
-                project={project}
-                diagram={Diagram ? <Diagram /> : null}
-                index={i}
-              />
-            </div>
-          );
-        })}
-      </div>
-
+      {/* Through-line: the thesis that ties every system together */}
       <CareerArcNarrative />
+
+      {/* Stats: the proof behind the thesis */}
       <MetricsRibbon />
+
+      {/* Present-tense momentum */}
+      <NowBuilding />
+
+      {/* Projects: six entry points into the three-layer funnel.
+          Simplified cards (no ReactFlow on homepage) — era badges carry the career arc.
+          Full cards with diagrams live on /projects and case study pages. */}
+      <section id="work" className="px-6 py-20 md:px-16">
+        <div className="mx-auto max-w-content">
+          <h2 className="mb-2 text-2xl font-bold text-text-primary sm:text-3xl">Projects</h2>
+          <p className="mb-10 max-w-2xl text-sm text-text-secondary">
+            Six systems across eight years. From power plant combustion tuning to bank-wide agentic
+            AI. Click any card for the full case study.
+          </p>
+          <div className="grid gap-6 sm:grid-cols-2">
+            {PROJECTS.map((project, i) => {
+              const caseStudy = CASE_STUDIES.find((cs) => cs.projectId === project.id);
+              if (!caseStudy) return null;
+              const isBookend = i === 0 || i === PROJECTS.length - 1;
+              return (
+                <div key={project.id} className={isBookend ? 'sm:col-span-2' : ''}>
+                  <ProjectCard project={project} caseStudy={caseStudy} index={i} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Journey zoom-out */}
       <SkillTimeline />
+
+      {/* Leadership philosophy */}
       <AboutSection />
+
+      {/* Recognition: the close */}
       <RecognitionSection />
+
       <Footer />
     </main>
   );
