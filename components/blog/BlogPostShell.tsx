@@ -22,6 +22,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'enterprise-agentic-ai-architecture': dynamic(() => import('@/data/posts/enterprise-agentic-ai.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'par-assist-building': dynamic(() => import('@/data/posts/par-assist-building.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
 };
 
 function PostSkeleton() {
@@ -44,8 +47,12 @@ export default function BlogPostShell({ slug, meta }: BlogPostShellProps) {
   const Content = POST_COMPONENTS[slug];
   const post = POSTS.find((p) => p.meta.slug === slug);
 
-  // Find the case study that links to this blog post
-  const caseStudy = CASE_STUDIES.find((cs) => cs.blogPostSlug === slug);
+  // Find the case study that links to this blog post via either the
+  // canonical formal post (blogPostSlug) or the practitioner companion
+  // (companionBlogPostSlug). Both registers link back to the same case study.
+  const caseStudy = CASE_STUDIES.find(
+    (cs) => cs.blogPostSlug === slug || cs.companionBlogPostSlug === slug,
+  );
   const project = caseStudy ? PROJECTS.find((p) => p.id === caseStudy.projectId) : undefined;
   const relatedProject = project && caseStudy
     ? { title: project.title, path: `/projects/${project.id}` }

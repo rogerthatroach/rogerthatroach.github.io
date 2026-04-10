@@ -1,0 +1,75 @@
+import { AgenticArchitecturePAR } from '@/components/blog/BlogDiagrams'
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
+
+> **A conversational companion to the formal post [Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Multi-Layer RAG](/blog/enterprise-agentic-ai-architecture).** That post formalizes the system as a directed graph with typed MCP tool contracts and proves context isolation by construction. This one tells the story: how an intern&rsquo;s prototype became a bank-wide product, what architecture decisions we made and why, and the leadership lessons that had nothing to do with the code.
+
+---
+
+In November 2025, I wrote a one-page plan for an AI system that would transform how RBC drafts Project Approval Requests. Five months later, it&rsquo;s shipping bank-wide.
+
+This is the story of how it happened, what I learned about scaling an intern&rsquo;s proof-of-concept into an enterprise product, and why the hardest part had nothing to do with technology.
+
+## The problem
+
+Project Approval Requests (PARs) are how major banks govern significant initiatives. They&rsquo;re high-stakes documents that require institutional knowledge, policy compliance, and cross-referencing dozens of templates, rules, and historical examples. The drafting process took weeks. Most of that time was spent hunting for the right template, resolving contradictions between policy documents, and guessing which fields applied to which project type.
+
+This wasn&rsquo;t a search problem. It was an orchestration problem.
+
+## The spark
+
+During the 2025 Amplify internship program, one of the four interns I was managing prototyped a concept: what if an AI assistant could guide you through a PAR step by step? The prototype was rough, a basic chatbot with a single RAG layer, but the insight was sharp. The user didn&rsquo;t need answers. They needed guidance through a process.
+
+I saw the shape of something bigger. Not a chatbot. An agentic platform that could understand where you were in the workflow, pull the right context at the right moment, resolve conflicts between policies automatically, and adapt to any PAR type across any business line.
+
+## The architecture decisions
+
+<VisualizationContainer minHeight={600} caption="PAR Assist architecture: LangGraph orchestration, MCP tools, multi-layer RAG, PostgreSQL backbone.">
+{() => <AgenticArchitecturePAR />}
+</VisualizationContainer>
+
+**Why LangGraph over vanilla chains.** A PAR workflow isn&rsquo;t linear. At any point, the system might need to clarify an ambiguity, resolve a conflict between two policy documents, or switch templates because the user&rsquo;s project type changed mid-draft. LangGraph models this as a directed graph with persistent state. Conditional routing based on workflow state is the core capability. Sequential chains couldn&rsquo;t express it.
+
+**Why MCP tools as the action boundary.** Every action the agent takes is a typed, logged tool invocation: template selection, field assignment, conflict resolution, ambiguity detection. No invisible prompt engineering. Every decision is auditable. In a regulated environment, that&rsquo;s not optional.
+
+**Why three RAG layers, not one.** A single RAG layer couldn&rsquo;t handle the retrieval complexity of an enterprise workflow:
+
+- **Conversation history** (session-scoped): so the agent never loses context across a 30-minute drafting session.
+- **Uploaded documents** (user-scoped): PDFs, decks, Word docs the user brings to the table, chunked and embedded on the fly, invisible to every other user.
+- **Institutional knowledge** (global scope): policies, templates, historical examples, best practices, used to select the right prompts for each field.
+
+Each layer has its own retrieval function, relevance threshold, and scope rules. The results are combined before being passed to the agent.
+
+**Why PostgreSQL + pgvector.** Structured metadata and vector embeddings in one transactional store. No sync problems between vector store and application database, no two-system consistency headaches.
+
+**Context isolation.** The LLM parses intent and routes. It never sees sensitive operational data. All data access happens through MCP tools and deterministic Python code. The code paths that touch sensitive data and the code paths that touch the LLM are physically separate. This isn&rsquo;t a prompt engineering trick. It&rsquo;s an architectural guarantee. The formal post proves this property by construction. The informal version: you can&rsquo;t leak what you can&rsquo;t reach.
+
+## The leadership lessons
+
+The hardest part wasn&rsquo;t the architecture. It was three things.
+
+**Scoping.** The intern prototype tried to do everything. The production version does one thing exceptionally well: guide a user through a PAR draft, step by step, with the right context at the right moment. Saying no to features is harder than building them. Every &ldquo;what if we also&hellip;&rdquo; is a seductive detour. I learned to ask: does this serve the guided-drafting promise, or dilute it? The answers were usually no.
+
+**Parallel execution.** I was running PAR Assist alongside Astraeus (the production analytics platform) and the tail end of Aegis v2. The only way it worked was because the architecture was clean enough that the work could be parallelized. Clean separation of concerns isn&rsquo;t just good engineering. It&rsquo;s a management strategy. When your components have narrow interfaces, multiple workstreams can progress independently without stepping on each other. I didn&rsquo;t appreciate this until I was trying to run three products with one direct report and a rotating cast of interns.
+
+**Trusting the origin.** An intern had the initial idea. Some leaders would have absorbed it, renamed it, and made it &ldquo;theirs.&rdquo; I think that&rsquo;s how you kill innovation. The best thing I did was resource the idea, scale the vision, and make sure everyone, including senior leadership, knew where it started. That&rsquo;s not generosity. It&rsquo;s how you build a team where people bring their best ideas to work. If the intern who sparks your next enterprise product gets a promotion, a reference, and visible credit, the next intern does too. And the one after that.
+
+## The result
+
+PAR Assist ships bank-wide on April 16, 2026. Less than three months from when real development started. What was weeks of manual drafting becomes a guided interactive session. It targets key PAR authors: project sponsors, senior leaders, PMO teams, across all RBC business lines.
+
+## What I&rsquo;d do differently
+
+Start the formal architecture document earlier. We had the vision in November 2025 but didn&rsquo;t start real development until February 2026 because of holidays and team restructuring. Having a detailed technical design ready to go the moment capacity freed up would have shaved two to three weeks off the timeline.
+
+Involve end users (PAR authors) earlier in the design process. We built based on our understanding of the pain points, which was accurate. But earlier user feedback would have caught edge cases we found later.
+
+## The pattern
+
+PAR Assist follows the same closed-loop pattern as every system I&rsquo;ve built.
+
+- **Sense.** Ingest policies, documents, user input.
+- **Model.** LangGraph agents reason about intent and context.
+- **Optimize.** RAG retrieval, MCP tool selection, disambiguation.
+- **Act.** Guided enterprise decisions, auditable end to end.
+
+The technology is different from Particle Swarm Optimization on a 900MW coal plant. The architecture is the same. The formal post [makes that isomorphism rigorous](/blog/closed-loop). This post is the version I&rsquo;d tell you at lunch.

@@ -25,7 +25,11 @@ export interface CaseStudy {
   statusLabel?: string;
   leadershipCallout?: string;
   sections: CaseStudySection;
+  // Canonical formal deep-dive post (Track 1: Technical Explorations).
   blogPostSlug?: string;
+  // Builder-register companion post (Track 2: Building in Practice).
+  // Semantically distinct: same system, different register.
+  companionBlogPostSlug?: string;
 }
 
 export const CASE_STUDIES: CaseStudy[] = [
@@ -277,5 +281,6 @@ export const CASE_STUDIES: CaseStudy[] = [
         'The Amplify program taught me that great ideas can come from anywhere — the key is recognizing potential and creating the environment for it to scale. The intern who proposed the PAR concept didn\'t envision an enterprise platform; that vision came from understanding the bank\'s needs and seeing how the idea could generalize. I also learned that the transition from POC to enterprise product is where most AI initiatives fail — it requires not just technical architecture but stakeholder alignment, governance design, and a clear productionization roadmap.',
     },
     blogPostSlug: 'enterprise-agentic-ai-architecture',
+    companionBlogPostSlug: 'par-assist-building',
   },
 ];
