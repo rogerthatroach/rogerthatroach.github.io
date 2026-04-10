@@ -349,26 +349,45 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
             </div>
           </motion.div>
 
-          {/* Blog Post CTA */}
-          {caseStudy.blogPostSlug && (
+          {/* Blog Post CTAs — formal deep-dive + optional builder-register companion */}
+          {(caseStudy.blogPostSlug || caseStudy.companionBlogPostSlug) && (
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="mt-16 mb-12 rounded-lg border border-accent/20 bg-accent-muted p-6"
+              className="mt-16 mb-12 grid gap-4 sm:grid-cols-2"
             >
-              <p className="text-sm font-medium text-text-primary">Technical Deep Dive</p>
-              <p className="mt-2 text-sm text-text-secondary">
-                For the formal architecture, proofs, and implementation details — read the full technical write-up.
-              </p>
-              <Link
-                href={`/blog/${caseStudy.blogPostSlug}`}
-                className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-text-primary"
-              >
-                Read the technical paper
-                <ArrowRight size={14} />
-              </Link>
+              {caseStudy.blogPostSlug && (
+                <div className="rounded-lg border border-accent/20 bg-accent-muted p-6">
+                  <p className="text-sm font-medium text-text-primary">Technical Deep Dive</p>
+                  <p className="mt-2 text-sm text-text-secondary">
+                    The formal architecture, proofs, and implementation details.
+                  </p>
+                  <Link
+                    href={`/blog/${caseStudy.blogPostSlug}`}
+                    className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-text-primary"
+                  >
+                    Read the technical paper
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              )}
+              {caseStudy.companionBlogPostSlug && (
+                <div className="rounded-lg border border-border-subtle bg-surface/50 p-6">
+                  <p className="text-sm font-medium text-text-primary">The Builder&rsquo;s Story</p>
+                  <p className="mt-2 text-sm text-text-secondary">
+                    The conversational version: decisions, trade-offs, and the leadership lessons behind the code.
+                  </p>
+                  <Link
+                    href={`/blog/${caseStudy.companionBlogPostSlug}`}
+                    className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-text-primary"
+                  >
+                    Read the companion post
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              )}
             </motion.div>
           )}
         </div>
