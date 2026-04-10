@@ -22,6 +22,7 @@ export interface CaseStudy {
   timeline: string;
   era: string;
   status?: 'shipped' | 'in-progress';
+  statusLabel?: string;
   leadershipCallout?: string;
   sections: CaseStudySection;
   blogPostSlug?: string;
@@ -240,6 +241,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     timeline: '2025 – Present',
     era: 'Intelligent Systems',
     status: 'in-progress',
+    statusLabel: 'Shipping April 2026',
     leadershipCallout:
       'An intern in the 2025 Amplify program proposed a tool to help with PAR drafting. Most managers would have said "nice idea" and moved on. I recognized the potential — not just for a tool, but for an enterprise platform. I conceived the product vision, designed the agentic architecture, and am now leading the productionization from intern POC to bank-wide initiative. This is what leadership looks like in AI: recognizing an idea\'s potential, providing the technical vision to scale it, and creating the environment for it to succeed.',
     sections: {
