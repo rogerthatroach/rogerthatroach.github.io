@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { POSTS } from '@/data/posts';
+import { POSTS, isPostPublic } from '@/data/posts';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import BlogPostShell from '@/components/blog/BlogPostShell';
 
 export function generateStaticParams() {
-  return POSTS.filter((p) => p.meta.status === 'published').map((p) => ({
+  return POSTS.filter((p) => isPostPublic(p)).map((p) => ({
     slug: p.meta.slug,
   }));
 }
