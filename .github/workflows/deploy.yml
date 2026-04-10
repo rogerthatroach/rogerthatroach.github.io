@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily rebuild at 12:00 UTC so future-dated blog posts auto-publish
+  # on their frontmatter date without a manual redeploy. See
+  # isPostPublic() in data/posts/index.ts.
+  schedule:
+    - cron: '0 12 * * *'
 
 permissions:
   contents: read

@@ -15,6 +15,8 @@ interface CaseStudyLayoutProps {
   project: Project;
   caseStudy: CaseStudy;
   diagram: React.ReactNode;
+  showFormalBlogCta: boolean;
+  showCompanionBlogCta: boolean;
 }
 
 const FADE_UP = {
@@ -115,7 +117,7 @@ function CaseStudyTOC() {
   );
 }
 
-export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStudyLayoutProps) {
+export default function CaseStudyLayout({ project, caseStudy, diagram, showFormalBlogCta, showCompanionBlogCta }: CaseStudyLayoutProps) {
   const { sections } = caseStudy;
 
   return (
@@ -350,7 +352,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
           </motion.div>
 
           {/* Blog Post CTAs — formal deep-dive + optional builder-register companion */}
-          {(caseStudy.blogPostSlug || caseStudy.companionBlogPostSlug) && (
+          {(showFormalBlogCta || showCompanionBlogCta) && (
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -358,7 +360,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
               transition={{ duration: 0.6 }}
               className="mt-16 mb-12 grid gap-4 sm:grid-cols-2"
             >
-              {caseStudy.blogPostSlug && (
+              {showFormalBlogCta && caseStudy.blogPostSlug && (
                 <div className="rounded-lg border border-accent/20 bg-accent-muted p-6">
                   <p className="text-sm font-medium text-text-primary">Technical Deep Dive</p>
                   <p className="mt-2 text-sm text-text-secondary">
@@ -373,7 +375,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram }: CaseStu
                   </Link>
                 </div>
               )}
-              {caseStudy.companionBlogPostSlug && (
+              {showCompanionBlogCta && caseStudy.companionBlogPostSlug && (
                 <div className="rounded-lg border border-border-subtle bg-surface/50 p-6">
                   <p className="text-sm font-medium text-text-primary">The Builder&rsquo;s Story</p>
                   <p className="mt-2 text-sm text-text-secondary">

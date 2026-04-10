@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { POSTS } from '@/data/posts';
+import { POSTS, isPostPublic } from '@/data/posts';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import PostCard from '@/components/blog/PostCard';
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function BlogIndexPage() {
   const published = POSTS
-    .filter((p) => p.meta.status === 'published')
+    .filter((p) => isPostPublic(p))
     .sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime());
 
   return (
