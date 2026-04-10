@@ -7,6 +7,7 @@ import CareerArcNarrative from '@/components/CareerArcNarrative';
 import MetricsRibbon from '@/components/MetricsRibbon';
 import SkillTimeline from '@/components/SkillTimeline';
 import AboutSection from '@/components/AboutSection';
+import RecognitionSection from '@/components/RecognitionSection';
 import Footer from '@/components/Footer';
 import { PROJECTS } from '@/data/projects';
 
@@ -70,6 +71,7 @@ export default function Home() {
       <MetricsRibbon />
       <SkillTimeline />
       <AboutSection />
+      <RecognitionSection />
       <Footer />
     </main>
   );
