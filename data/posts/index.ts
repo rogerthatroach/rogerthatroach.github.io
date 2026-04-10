@@ -159,4 +159,25 @@ export const POSTS: BlogPost[] = [
       { title: 'Microsoft Responsible AI Standard', url: 'https://www.microsoft.com/en-us/ai/responsible-ai', description: 'Framework for responsible AI development — relevant to the auditability and context isolation guarantees.' },
     ],
   },
+  {
+    meta: {
+      slug: 'par-assist-building',
+      title: 'How We Built PAR Assist: From Intern POC to Bank-Wide Product',
+      subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind a bank-wide agentic AI platform.',
+      date: '2026-04-17',
+      tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
+      readingTime: '9 min read',
+      abstract:
+        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 Amplify program became PAR Assist, a bank-wide agentic AI platform shipping in April 2026. Architecture decisions as trade-offs, not theorems: why LangGraph over chains, why MCP tools as the action boundary, why three RAG layers, why PostgreSQL + pgvector. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea. A conversational companion to the formal post that proves context isolation by construction.',
+      status: 'published',
+    },
+    references: [],
+    furtherReading: [
+      { title: 'Enterprise Agentic AI Architecture (the formal companion)', url: '/blog/enterprise-agentic-ai-architecture', description: 'The formal post that proves context isolation, action boundary enforcement, and retrieval scoping by construction. Same system, different register.' },
+      { title: 'Closed-Loop Optimization as a Unifying Pattern', url: '/blog/closed-loop', description: 'The broader pattern this system follows, traced from PSO on a coal plant to LangGraph agents in enterprise finance.' },
+      { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Official docs for directed-graph workflow orchestration with persistent state.' },
+      { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for typed tool contracts between AI assistants and external systems.' },
+      { title: 'pgvector', url: 'https://github.com/pgvector/pgvector', description: 'Vector similarity search for PostgreSQL — the backbone that unifies structured metadata and embeddings in one transactional store.' },
+    ],
+  },
 ];
