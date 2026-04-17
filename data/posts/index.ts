@@ -192,6 +192,102 @@ export const POSTS: BlogPost[] = [
   },
   {
     meta: {
+      slug: 'workforce-analytics-llm-as-router',
+      title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
+      subtitle:
+        'A builder-register companion to the formal WorkforceAnalytics architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
+      date: '2026-05-22',
+      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'WorkforceAnalytics'],
+      readingTime: '7 min read',
+      abstract:
+        'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building WorkforceAnalytics \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
+      status: 'draft',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Deterministic Agentic Architectures (the formal companion)',
+        url: '/blog/agentic-ai',
+        description: 'The formal paper proving data-confidentiality and entitlement-safety of the LLM-as-Router architecture under defined threat models.',
+      },
+      {
+        title: 'How We Built AI/LLM Drafting Platform',
+        url: '/blog/funding-request-drafting-platform-building',
+        description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
+      },
+      {
+        title: 'WorkforceAnalytics \u2014 Case Study',
+        url: '/projects/workforceAnalytics',
+        description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: 
+    references: [],
+    furtherReading: [
+      {
+        title: 'Closed-Loop Optimization as a Unifying Pattern (the formal companion)',
+        url: '/blog/closed-loop',
+        description: 'The formal post that traces the sense-model-optimize-act pattern from PSO on a coal plant to agentic AI in enterprise finance. Same pattern, four domains.',
+      },
+      {
+        title: 'Combustion Tuning \u2014 Case Study',
+        url: '/projects/combustion-tuning',
+        description: 'The case study page: context, technical approach, impact, and the lessons that shaped later work.',
+      },
+    ],
+  },
+  {
+    meta: 
+    references: [],
+    furtherReading: [
+      {
+        title: 'Document Intelligence \u2014 Case Study',
+        url: '/projects/document-intelligence',
+        description: 'The case study page: insurance-specific context, OCR challenges, the hybrid pipeline, and how the lessons carried over to RAG design at RBC.',
+      },
+      {
+        title: 'How We Built AI/LLM Drafting Platform',
+        url: '/blog/funding-request-drafting-platform-building',
+        description: 'Where the document-structure insight resurfaced: chunking by structure (not fixed token windows) was the difference between useful and useless retrieval.',
+      },
+    ],
+  },
+  {
+    meta: {
+      slug: 'financial-benchmarking-refactor-velocity',
+      title: 'Two Weeks, One Product: What Velocity Looks Like When Architecture Is Right',
+      subtitle:
+        'FinancialBenchmarking v2 shipped in 2 weeks while WorkforceAnalytics was mid-flight and the Amplify program was running. A post about what makes that possible.',
+      date: '2026-07-03',
+      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'FinancialBenchmarking'],
+      readingTime: '6 min read',
+      abstract:
+        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover the five-stage FinancialBenchmarking v2 pipeline (intent parsing, KPI detection, disambiguation, guardrailed SQL, deterministic formatting), and the differentiating insight: 2-week delivery isn\u2019t working harder \u2014 it\u2019s architectural clarity plus months of mental rehearsal plus ruthless scoping. Ties back to the WorkforceAnalytics LLM-as-Router pattern \u2014 same family, tighter intent classification.',
+      status: 'draft',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Guardrailed Text-to-SQL (the formal companion)',
+        url: '/blog/text-to-sql',
+        description: 'The formal paper on the five-stage pipeline with safety guarantees: injection impossibility by construction, bounded disambiguation, schema compliance.',
+      },
+      {
+        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
+        url: '/blog/workforce-analytics-llm-as-router',
+        description: 'The sister architectural call. FinancialBenchmarking v2 is the same pattern with a tighter intent classification.',
+      },
+      {
+        title: 'FinancialBenchmarking v2 \u2014 Case Study',
+        url: '/projects/financialBenchmarking',
+        description: 'The case study page: context, the five-stage architecture, and the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: {
       slug: 'commodity-tax-cfo-trust',
       title: 'How Commodity Tax Built CFO Trust',
       subtitle:
