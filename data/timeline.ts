@@ -14,6 +14,22 @@ export interface TimelineNode {
   skills: string[];
   milestone?: string;
   accent: 'blue' | 'emerald' | 'amber' | 'purple' | 'cyan' | 'rose';
+  /**
+   * Optional path to the company's logo SVG, relative to /public.
+   * When set, SkillTimeline renders the logo next to the org name.
+   * When unset, the org text renders alone.
+   *
+   * To add a logo:
+   *   1. Source the logo from the company's official brand asset page
+   *      (e.g., RBC: https://www.rbc.com/about-us/brand-guidelines,
+   *       TCS: https://www.tcs.com/brand-guidelines), or from an
+   *      open-source icon package like simpleicons.org when available.
+   *   2. Drop the SVG at public/images/logos/{slug}.svg
+   *   3. Set logoPath: '/images/logos/{slug}.svg' below
+   * Keep SVGs under ~5KB; prefer single-color monochrome when the
+   * original is muted enough for the card background.
+   */
+  logoPath?: string;
 }
 
 export const TIMELINE: TimelineNode[] = [

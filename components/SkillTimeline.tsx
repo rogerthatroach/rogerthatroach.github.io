@@ -60,7 +60,19 @@ function TimelineItem({ node, index }: { node: typeof TIMELINE[number]; index: n
             <span className="font-mono text-xs text-text-tertiary">{node.period}</span>
           </div>
 
-          <h3 className="mt-3 text-base font-bold text-text-primary">{node.org}</h3>
+          <div className="mt-3 flex items-center gap-3">
+            {node.logoPath && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={node.logoPath}
+                alt=""
+                aria-hidden="true"
+                className="h-7 w-auto max-w-[120px] shrink-0 object-contain"
+                loading="lazy"
+              />
+            )}
+            <h3 className="text-base font-bold text-text-primary">{node.org}</h3>
+          </div>
           <p className="text-sm text-text-secondary">{node.role}</p>
 
           <p className="mt-3 text-sm leading-relaxed text-text-secondary">
