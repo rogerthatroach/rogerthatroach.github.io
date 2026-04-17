@@ -10,11 +10,10 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
+    // Light is the default. Only read dark from explicit storage —
+    // OS prefers-color-scheme is intentionally ignored.
     const stored = localStorage.getItem('theme');
-    if (stored === 'light' || stored === 'dark') {
-      setTheme(stored);
-      document.documentElement.classList.toggle('dark', stored === 'dark');
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if (stored === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
     }
