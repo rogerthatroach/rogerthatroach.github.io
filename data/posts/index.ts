@@ -178,7 +178,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '9 min read',
       abstract:
-        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 Amplify program became PAR Assist, a bank-wide agentic AI platform shipping in April 2026. Architecture decisions as trade-offs, not theorems: why LangGraph over chains, why MCP tools as the action boundary, why three RAG layers, why PostgreSQL + pgvector. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea. A conversational companion to the formal post that proves context isolation by construction.',
+        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 Amplify program became PAR Assist, a bank-wide agentic AI platform that shipped April 2026. Architecture decisions as trade-offs, not theorems: why LangGraph over chains, why MCP tools as the action boundary, why three RAG layers, why PostgreSQL + pgvector. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea. A conversational companion to the formal post that proves context isolation by construction.',
       status: 'published',
     },
     references: [],

@@ -108,9 +108,9 @@ export const PROJECTS: Project[] = [
     subtitle: 'Financial Insights & Analysis Suite — RBC CFO Group',
     role: 'Architect, lead developer, product visionary',
     stack: ['Multi-Agent Framework', 'Text-to-SQL', 'GPT Routing', 'EPM Security'],
-    heroMetric: { value: '~40,000', label: 'Transits Processed' },
+    heroMetric: { value: '~40,000', label: 'Factorial Combinations' },
     caption:
-      'Deterministic agentic platform for CFO-grade financial analytics. Three parallel sub-agents, millisecond slicing across 40K transits and 60K geographies. GPT routes intent — deterministic agents handle truth.',
+      'Deterministic agentic platform for CFO-grade financial analytics. Three parallel sub-agents, millisecond slicing across ~40K factorial combinations and ~60K geographies. GPT routes intent — deterministic agents handle truth.',
     description:
       'Production-grade platform for CFO-level financial insights — headcount analytics, HR costs, open positions — delivered via dashboard, chatbot, and inbox-ready reports.',
     highlights: [

@@ -244,17 +244,16 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'par-assist',
     timeline: '2025 – Present',
     era: 'Intelligent Systems',
-    status: 'in-progress',
-    statusLabel: 'Shipping April 2026',
+    status: 'shipped',
     leadershipCallout:
-      'An intern in the 2025 Amplify program proposed a tool to help with PAR drafting. Most managers would have said "nice idea" and moved on. I recognized the potential — not just for a tool, but for an enterprise platform. I conceived the product vision, designed the agentic architecture, and am now leading the productionization from intern POC to bank-wide initiative. This is what leadership looks like in AI: recognizing an idea\'s potential, providing the technical vision to scale it, and creating the environment for it to succeed.',
+      'An intern in the 2025 Amplify program proposed a tool to help with PAR drafting. Most managers would have said "nice idea" and moved on. I recognized the potential — not just for a tool, but for an enterprise platform. I conceived the product vision, designed the agentic architecture, and led the productionization from intern POC to bank-wide platform. This is what leadership looks like in AI: recognizing an idea\'s potential, providing the technical vision to scale it, and creating the environment for it to succeed.',
     sections: {
       context:
         'Project Approval Requests (PARs) are a critical governance process at RBC — every major initiative requires one, and drafting them is a complex, time-consuming process involving metadata, policies, historical examples, and institutional knowledge. The idea originated from the 2025 Amplify internship program, where an intern proposed a tool to help with PAR drafting. I saw the potential to scale it from a prototype to an enterprise-wide platform.',
       myRole:
-        'Conceived the product vision, led strategic and technical requirements, designed the agentic architecture. I\'m leading the productionization from intern POC to bank-wide enterprise platform. This project represents the full arc: identifying an idea, defining the vision, architecting the system, and driving it toward enterprise deployment.',
+        'Conceived the product vision, led strategic and technical requirements, designed the agentic architecture, and led the productionization from intern POC to bank-wide enterprise platform. This project represents the full arc: identifying an idea, defining the vision, architecting the system, and driving it to enterprise deployment.',
       stakeholders:
-        'CFO Group leadership (sponsoring the initiative), enterprise stakeholders across the bank (future users — PAR authors in every department), Director AI (governance and priority), Amplify interns (original POC developers), GFT engineering (co-delivery on productionization).',
+        'CFO Group leadership (sponsor), enterprise stakeholders across the bank (PAR authors in every department), Director AI (governance and priority), Amplify interns (original POC developers), GFT engineering (co-delivery on productionization).',
       challenge:
         'PARs are not standardized — different templates for different initiative types, conflicting policies, ambiguous field requirements, and institutional knowledge that lives in people\'s heads rather than documentation. The system needs to guide users through this complexity while ensuring every field assignment is traceable to a source (policy, historical example, or user input). No hallucination allowed — this is governance documentation.',
       optionsConsidered: [
@@ -274,9 +273,9 @@ export const CASE_STUDIES: CaseStudy[] = [
       implementation:
         'LangGraph for agentic orchestration managing the PAR workflow. Four MCP tools: template selection (matching initiative type to PAR template), field assignment (populating fields from metadata and policies), conflict resolution (detecting and resolving contradictory requirements), and ambiguity checks (flagging unclear fields for user clarification). Multi-layer RAG: conversation history (no context loss across turns), uploaded documents (PDF, PPTX, DOCX, TXT with chunking and embedding pipeline), and field assignment prompts (institutional knowledge). PostgreSQL with embeddings for persistent semantic search.',
       impact:
-        'Transforming a manual, weeks-long governance process into an AI-guided drafting experience. Scaling from intern POC to bank-wide initiative — targeting enterprise deployment across all departments that author PARs. This represents the largest-scope agentic AI initiative in the CFO Group.',
+        'Transformed a manual, weeks-long governance process into an AI-guided drafting experience. Scaled from intern POC to bank-wide platform — serving PAR authors across departments. The largest-scope agentic AI initiative in the CFO Group.',
       inProduction:
-        'Currently in productionization phase. POC demonstrated feasibility; now building the enterprise-grade system with full audit trails, multi-layer RAG, and MCP tool contracts. Targeting bank-wide deployment.',
+        'Shipped April 2026 as a bank-wide agentic AI platform. Full audit trails, multi-layer RAG, and typed MCP tool contracts in the production architecture. Ongoing: rollout, adoption, and iteration on enterprise feedback.',
       lessonsLearned:
         'The Amplify program taught me that great ideas can come from anywhere — the key is recognizing potential and creating the environment for it to scale. The intern who proposed the PAR concept didn\'t envision an enterprise platform; that vision came from understanding the bank\'s needs and seeing how the idea could generalize. I also learned that the transition from POC to enterprise product is where most AI initiatives fail — it requires not just technical architecture but stakeholder alignment, governance design, and a clear productionization roadmap.',
     },
