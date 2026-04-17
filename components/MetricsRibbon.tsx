@@ -51,20 +51,11 @@ export default function MetricsRibbon() {
         {/* Through-line: the thesis that ties every system together */}
         <div className="mx-auto max-w-2xl pt-12 text-center sm:pt-14">
           <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.6 }}
-            className="font-mono text-xs uppercase tracking-widest text-text-tertiary"
-          >
-            The through-line
-          </motion.p>
-          <motion.p
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="mt-5 text-base leading-relaxed text-text-secondary"
+            transition={{ duration: 0.7 }}
+            className="text-base leading-relaxed text-text-secondary"
           >
             Every system I&apos;ve built follows the same pattern: sense the environment, model it,
             optimize against constraints, and close the loop. At a power plant, that meant sensors

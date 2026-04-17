@@ -26,7 +26,7 @@ export default function NowBuilding() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="mt-3 max-w-2xl text-2xl font-bold text-text-primary sm:text-3xl"
         >
-          In motion, not cataloging the past.
+          Current work.
         </motion.h2>
 
         <ul className="mt-10 grid gap-6 sm:grid-cols-3">

@@ -14,8 +14,8 @@ export const ABOUT = {
       body: "PAR Assist started as an intern's proof-of-concept during the Amplify program. I saw the shape of something bigger, resourced it, and scaled the vision. Today it's shipping as a bank-wide agentic AI platform. My job as a leader isn't to have the best ideas. It's to recognize them, clear the path to production, and make sure everyone knows where they started.",
     },
     {
-      lead: 'Third, every system I\u2019ve built follows the same pattern.',
-      body: "Sense the environment, model it, optimize against constraints, close the loop. At a power plant, that meant 90 sensors and Particle Swarm Optimization. In enterprise finance, it means LangGraph agents reasoning about policies while deterministic code enforces entitlements. The technology changes. The pattern doesn't.",
+      lead: 'Third, trust beats accuracy in regulated AI.',
+      body: "The hardest thing in production AI at a regulated institution isn\u2019t getting the answer right \u2014 it\u2019s getting the humans who own the decision to trust the system that produced it. Commodity Tax\u2019s Tableau transparency layer, Astraeus\u2019s EPM entitlement modeling, PAR Assist\u2019s MCP-tool audit trail: at every stage the architecture has to survive stakeholder audit. That\u2019s the job.",
     },
   ],
   closer:
