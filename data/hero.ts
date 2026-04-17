@@ -1,12 +1,21 @@
+import {
+  DIGITAL_TWIN_SAVINGS,
+  COMMODITY_TAX_EFFICIENCY_COMPACT,
+  PAR_ASSIST_SCALE,
+  AWARDS_COUNT,
+  PRODUCTION_SYSTEMS_COUNT,
+  YEARS_EXPERIENCE,
+} from './canonical';
+
 export interface NumberFrame {
   value: string;
   context: string;
 }
 
 export const NUMBER_SEQUENCE: NumberFrame[] = [
-  { value: '$3M', context: 'annual savings · 900MW plant' },
-  { value: '90 min', context: 'was: months' },
-  { value: 'Bank-wide', context: 'agentic AI platform' },
+  { value: DIGITAL_TWIN_SAVINGS, context: 'annual savings · 900MW plant' },
+  { value: COMMODITY_TAX_EFFICIENCY_COMPACT, context: 'was: months' },
+  { value: PAR_ASSIST_SCALE, context: 'agentic AI platform' },
 ] as const;
 
 export const HERO = {
@@ -22,8 +31,7 @@ export const HERO = {
 } as const;
 
 export const HERO_SUMMARY = [
-  '5 awards',
-  '4 production systems',
-  '8+ years',
+  `${AWARDS_COUNT} awards`,
+  `${PRODUCTION_SYSTEMS_COUNT} production systems`,
+  `${YEARS_EXPERIENCE} years`,
 ] as const;
-

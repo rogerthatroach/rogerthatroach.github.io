@@ -1,3 +1,9 @@
+import {
+  DIGITAL_TWIN_SAVINGS,
+  COMMODITY_TAX_EFFICIENCY,
+  PAR_ASSIST_SCALE,
+} from './canonical';
+
 export interface TimelineNode {
   id: string;
   era: string;
@@ -20,7 +26,7 @@ export const TIMELINE: TimelineNode[] = [
     description:
       'Architecting enterprise agentic AI systems. Conceived PAR Assist, shipped Astraeus, built Aegis v2 in two weeks, leading the Amplify intern program. 70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
-    milestone: 'Bank-wide AI platform',
+    milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
   },
   {
@@ -32,7 +38,7 @@ export const TIMELINE: TimelineNode[] = [
     description:
       'Overhauled the Commodity Tax process (months → 90 min). Productionized Aegis v1. Built the data foundations for Astraeus. Earned trust with CFO stakeholders.',
     skills: ['PySpark', 'SQL', 'Tableau', 'Financial Modeling', 'Aegis v1'],
-    milestone: 'Months → 90 min',
+    milestone: COMMODITY_TAX_EFFICIENCY,
     accent: 'amber',
   },
   {
@@ -55,7 +61,7 @@ export const TIMELINE: TimelineNode[] = [
     description:
       'Built a Digital Twin for a 900MW coal power plant in Japan — $3M annual savings. Won 2nd/600 in a computer vision hackathon. Where the ML journey began.',
     skills: ['R', 'Python', 'ggplot2', 'Regression', 'Classification', 'Clustering', 'CNNs', 'TensorFlow'],
-    milestone: '$3M/year savings',
+    milestone: `${DIGITAL_TWIN_SAVINGS}/year savings`,
     accent: 'emerald',
   },
 ];
