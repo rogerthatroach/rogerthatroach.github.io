@@ -22,6 +22,7 @@ export const HERO = {
   name: 'Harmilap Singh Dhaliwal',
   title: 'AI & Data Science Lead — RBC',
   tagline: 'I architect AI systems across four domains — industrial, cloud, enterprise, agentic. I lead the teams that ship them.',
+  bio: 'Eight years shipping production AI — from 900MW combustion tuning in Japan to bank-wide agentic platforms in Toronto. Hands-on ~70% of the time; leading growing teams the rest.',
   location: 'Toronto, Canada',
   links: {
     linkedin: 'https://www.linkedin.com/in/harmilapsingh',
