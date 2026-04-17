@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Github, Linkedin, Mail } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY } from '@/data/hero';
+import { COMPANIES } from '@/data/companies';
 
 const ParticleField = dynamic(() => import('@/components/ParticleField'), {
   ssr: false,
@@ -96,13 +97,52 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-10 max-w-2xl text-lg text-text-secondary sm:text-xl md:text-2xl"
+            className="mb-5 max-w-2xl text-lg text-text-secondary sm:text-xl md:text-2xl"
           >
             {HERO.tagline}
           </motion.p>
 
-          <motion.div
+          <motion.p
             custom={3}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="mb-8 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-base"
+          >
+            {HERO.bio}
+          </motion.p>
+
+          {/* Companies strip — text treatments, not raw logos (see data/companies.ts) */}
+          <motion.div
+            custom={4}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-3"
+          >
+            <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+              Experience
+            </span>
+            {COMPANIES.map((c) => (
+              <a
+                key={c.id}
+                href={c.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`${c.name} — ${c.role} (${c.period})`}
+                className="group inline-flex items-center gap-2 rounded-md border border-border-subtle bg-surface/40 px-3 py-1.5 text-xs font-semibold tracking-wide backdrop-blur-sm transition-all hover:bg-surface-hover"
+                style={{ color: c.accent }}
+              >
+                {c.shortName}
+                <span className="font-mono text-[10px] font-normal text-text-tertiary transition-colors group-hover:text-text-secondary">
+                  {c.period}
+                </span>
+              </a>
+            ))}
+          </motion.div>
+
+          <motion.div
+            custom={5}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
