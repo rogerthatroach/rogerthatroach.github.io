@@ -37,7 +37,7 @@ export const PROJECTS: Project[] = [
     stack: ['R', 'Python', 'PSO', 'Multi-Output Regression', 'K-Fold CV'],
     heroMetric: { value: DIGITAL_TWIN_SAVINGS, label: 'Annual Savings' },
     caption:
-      'Led ML engineering for combustion tuning at a 900MW coal plant. 84 models across 90+ sensors, optimized via Particle Swarm Optimization to reduce NOx, SOx, CO emissions. $3M annually.',
+      '$3M/year in fuel savings at a 900MW coal plant in Japan, plus measurable NOx, SOx, CO reductions. Built the ML + optimization stack — 84 models, 90+ sensors, Particle Swarm Optimization in closed loop with plant operators.',
     description:
       'ML-powered Digital Twin for Maizuru 900MW coal power plant. Built predictive models to optimize combustion, reduce emissions, and improve efficiency.',
     highlights: [
@@ -119,7 +119,7 @@ export const PROJECTS: Project[] = [
     stack: ['Multi-Agent Framework', 'Text-to-SQL', 'GPT Routing', 'EPM Security'],
     heroMetric: { value: ASTRAEUS_FACTORIAL_COMBINATIONS, label: 'Factorial Combinations' },
     caption:
-      'Deterministic agentic platform for CFO-grade financial analytics. Three parallel sub-agents, millisecond slicing across ~40K factorial combinations and ~60K geographies. GPT routes intent — deterministic agents handle truth.',
+      'Production analytics platform for RBC\'s CFO Group. Days of email back-and-forth replaced by seconds-level answers — across headcount, HR costs, and open positions at bank scale. Millisecond slicing under the hood; GPT routes intent, deterministic code handles truth.',
     description:
       'Production-grade platform for CFO-level financial insights — headcount analytics, HR costs, open positions — delivered via dashboard, chatbot, and inbox-ready reports.',
     highlights: [

@@ -54,6 +54,14 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'combustion-tuning',
     timeline: '2016 – 2019',
     era: 'Foundation',
+    tldr: {
+      problem:
+        'A 900MW coal plant in Japan ran with fuel inefficiency and high emissions — operator settings were calibrated against idealized bench conditions, not the live combustion dynamics the plant actually faced.',
+      decision:
+        'Built a Digital Twin — 84 regression models across 90+ sensors — optimized by Particle Swarm Optimization to recommend settings in closed loop with plant operators.',
+      impact:
+        '$3M/year in fuel savings and measurable NOx/SOx/CO reduction. The framework became a replicable template for other industrial clients at TCS.',
+    },
     sections: {
       context:
         'Maizuru is a 900MW coal power plant in Japan operated by a major energy company. Combustion inefficiency was costing millions annually in wasted fuel and excessive emissions (NOx, SOx, CO). The plant had 90+ sensors generating continuous operational data, but no systematic way to translate that data into actionable tuning recommendations for operators.',
@@ -97,6 +105,14 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'document-intelligence',
     timeline: '2021 – 2022',
     era: 'Cloud ML',
+    tldr: {
+      problem:
+        'Insurance claim document verification at Humana sat at ~70% accuracy with Document AI alone — too low for production, forcing expensive manual review.',
+      decision:
+        'Layered OpenCV pixel-level checkbox detection and a Random Forest classifier on top of Document AI OCR, routed through Vertex AI with BigQuery for downstream analytics.',
+      impact:
+        '99.95% checkbox accuracy — a production-ready pipeline. The structure-aware approach later informed RAG chunking strategy at RBC.',
+    },
     sections: {
       context:
         'Insurance claims processing is document-heavy — claim forms, policy documents, supporting evidence, identity verification. Quantiphi\'s insurance clients were drowning in manual review: adjusters and underwriters spending hours per claim extracting fields from scanned PDFs, photos of damaged property, handwritten forms, and multi-page policy documents. The bottleneck wasn\'t decision-making — it was getting structured data out of unstructured documents fast enough to make decisions at scale.',
@@ -139,6 +155,17 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'commodity-tax',
     timeline: '2022 – 2023',
     era: 'Enterprise Analytics',
+    tldr: {
+      problem:
+        'RBC\'s Commodity Tax return process consumed finance teams for months per cycle — manual General Ledger extraction, reconciliation, and error-prone return preparation.',
+      decision:
+        'PySpark pipeline for GL data extraction paired with Tableau dashboards — not as output, but as the transparency layer that let skeptical finance analysts audit every step.',
+      impact:
+        'Months → 90 minutes per cycle. CFO Quarterly Team Award (Q4 2023). The stakeholder-trust win that opened the door to every subsequent AI initiative at the CFO Group.',
+    },
+    sequencing:
+      'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with dashboards the CFO could audit, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then Aegis v2 (AI-native rewrite, 2 weeks, 2024), then Astraeus (production 2025), then conceive PAR Assist from an intern POC (shipped April 2026). Each project underwrote the next one\'s scope. The Commodity Tax wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
+    blogPostSlug: 'commodity-tax-cfo-trust',
     leadershipCallout:
       'This was my first project at RBC — and I treated it as an audition. By choosing Tableau as the transparency layer (not just an output), I gave skeptical finance stakeholders visibility into every step of the automation. The resulting trust didn\'t just deliver Commodity Tax — it opened the door for Aegis, Astraeus, and every AI initiative that followed. The months-to-90-minutes metric became the team\'s calling card with CFO leadership.',
     sections: {
@@ -178,6 +205,14 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'aegis',
     timeline: '2024 – 2025',
     era: 'Intelligent Systems',
+    tldr: {
+      problem:
+        'CFO Group analysts benchmarked KPIs against Big 6 Canadian banks manually via Supplementary Financial Packages — hours per query, error-prone, hard to scale.',
+      decision:
+        'Five-stage pipeline: intent parsing, embeddings-based KPI detection, LLM-assisted disambiguation, guardrailed SQL generation, deterministic formatting. SQL injection impossible by construction.',
+      impact:
+        'Shipped to production in 2 weeks — while simultaneously running Astraeus development and the Amplify internship program. 2025 CFO One RBC Team Award.',
+    },
     sections: {
       context:
         'RBC\'s CFO Group needed to benchmark financial KPIs against the Big 6 Canadian banks using Supplementary Financial Packages — publicly available but complex financial disclosures. Aegis v1 was a rules-based benchmarking engine I\'d built and productionized earlier. v2 was the AI-native evolution: natural language queries to validated SQL, with embeddings-based KPI disambiguation.',
@@ -216,6 +251,14 @@ export const CASE_STUDIES: CaseStudy[] = [
     projectId: 'astraeus',
     timeline: '2024 – Present',
     era: 'Intelligent Systems',
+    tldr: {
+      problem:
+        'CFO Group financial questions — "headcount by division, crossed with open positions, crossed with tenure" — bounced through days of email between analysts and leadership. No interactive system could answer across ~40K factorial combinations with entitlement controls.',
+      decision:
+        'Deterministic multi-tier agentic framework. Three specialized sub-agents (EPM, Headcount, Open Positions) in parallel. GPT strictly for intent routing; deterministic code for all computation and data access, with millisecond backend slicing.',
+      impact:
+        'Days of email replaced by seconds-level answers via dashboard, chatbot, and HTML reports. Recognized as a flagship CFO Group AI initiative. Architectural pattern published as a formal whitepaper.',
+    },
     leadershipCallout:
       'The defining leadership decision was choosing LLM-as-Router over a monolithic agent. Every instinct said "give the LLM full access and let it figure it out" — it\'s faster to build, easier to demo. But I pushed back because I\'d seen what happens when LLMs touch sensitive financial data in enterprise: non-deterministic outputs, data leakage risk, and no audit trail. The multi-tier architecture took longer to build but delivered what the CFO Group actually needs — trustworthy, auditable, deterministic analytics. I led this cross-functionally with GFT engineering while staying 70% hands-on in the codebase.',
     sections: {
@@ -262,6 +305,14 @@ export const CASE_STUDIES: CaseStudy[] = [
     timeline: '2025 – Present',
     era: 'Intelligent Systems',
     status: 'shipped',
+    tldr: {
+      problem:
+        'RBC\'s Project Approval Request process — governance for every major bank initiative — took weeks to draft. Fragmented templates, contradictory policies, and institutional knowledge locked in people\'s heads.',
+      decision:
+        'LangGraph agentic orchestration with typed MCP tool contracts and multi-layer RAG. Every field assignment traceable to a source — governance by construction.',
+      impact:
+        'Shipped April 2026 as a bank-wide platform. Scaled from intern Amplify POC to enterprise product — the largest-scope agentic AI initiative in the CFO Group.',
+    },
     leadershipCallout:
       'An intern in the 2025 Amplify program proposed a tool to help with PAR drafting. Most managers would have said "nice idea" and moved on. I recognized the potential — not just for a tool, but for an enterprise platform. I conceived the product vision, designed the agentic architecture, and led the productionization from intern POC to bank-wide platform. This is what leadership looks like in AI: recognizing an idea\'s potential, providing the technical vision to scale it, and creating the environment for it to succeed.',
     sections: {
