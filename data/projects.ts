@@ -1,3 +1,12 @@
+import {
+  DIGITAL_TWIN_SAVINGS,
+  HUMANA_ACCURACY,
+  COMMODITY_TAX_EFFICIENCY,
+  AEGIS_V2_BUILD_TIME,
+  ASTRAEUS_FACTORIAL_COMBINATIONS,
+  PAR_ASSIST_SCALE,
+} from './canonical';
+
 export interface ProjectPalette {
   primary: string;
   glow: string;
@@ -26,7 +35,7 @@ export const PROJECTS: Project[] = [
     subtitle: 'Digital Twin — 900MW Coal Plant',
     role: 'ML Engineer — 3-person R&D team (MHPS / TCS)',
     stack: ['R', 'Python', 'PSO', 'Multi-Output Regression', 'K-Fold CV'],
-    heroMetric: { value: '$3M', label: 'Annual Savings' },
+    heroMetric: { value: DIGITAL_TWIN_SAVINGS, label: 'Annual Savings' },
     caption:
       'Led ML engineering for combustion tuning at a 900MW coal plant. 84 models across 90+ sensors, optimized via Particle Swarm Optimization to reduce NOx, SOx, CO emissions. $3M annually.',
     description:
@@ -47,7 +56,7 @@ export const PROJECTS: Project[] = [
     subtitle: 'Cloud ML Pipeline — Insurance & Financial Services',
     role: 'ML Engineer — Quantiphi / Google Cloud partnership',
     stack: ['GCP', 'Vertex AI', 'Document AI', 'OpenCV', 'Random Forest'],
-    heroMetric: { value: '99.95%', label: 'Checkbox Accuracy' },
+    heroMetric: { value: HUMANA_ACCURACY, label: 'Checkbox Accuracy' },
     caption:
       '99.95% accuracy on checkbox verification for Humana — up from ~70% with Document AI alone. Hybrid pipeline: Document AI OCR, OpenCV pixel-level detection, Random Forest classification on BigTable + BigQuery.',
     description:
@@ -68,7 +77,7 @@ export const PROJECTS: Project[] = [
     subtitle: 'Process Automation — RBC CFO Group',
     role: 'Lead developer + stakeholder engagement',
     stack: ['PySpark', 'Tableau', 'General Ledger Extraction'],
-    heroMetric: { value: 'Months → 90min', label: 'Processing Time' },
+    heroMetric: { value: COMMODITY_TAX_EFFICIENCY, label: 'Processing Time' },
     caption:
       'Overhauled the Commodity Tax return process from a multi-month manual workflow to a 90-minute automated pipeline. The win that built CFO stakeholder trust and opened the door to AI.',
     description:
@@ -88,7 +97,7 @@ export const PROJECTS: Project[] = [
     subtitle: 'Text-to-SQL Benchmarking Engine — RBC CFO Group',
     role: 'Designed + shipped in two weeks',
     stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
-    heroMetric: { value: '2 weeks', label: 'Concept → Production' },
+    heroMetric: { value: AEGIS_V2_BUILD_TIME, label: 'Concept → Production' },
     caption:
       'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 shipped in two weeks while running Astraeus + Amplify.',
     description:
@@ -108,7 +117,7 @@ export const PROJECTS: Project[] = [
     subtitle: 'Financial Insights & Analysis Suite — RBC CFO Group',
     role: 'Architect, lead developer, product visionary',
     stack: ['Multi-Agent Framework', 'Text-to-SQL', 'GPT Routing', 'EPM Security'],
-    heroMetric: { value: '~40,000', label: 'Factorial Combinations' },
+    heroMetric: { value: ASTRAEUS_FACTORIAL_COMBINATIONS, label: 'Factorial Combinations' },
     caption:
       'Deterministic agentic platform for CFO-grade financial analytics. Three parallel sub-agents, millisecond slicing across ~40K factorial combinations and ~60K geographies. GPT routes intent — deterministic agents handle truth.',
     description:
@@ -128,7 +137,7 @@ export const PROJECTS: Project[] = [
     subtitle: 'Enterprise Agentic AI Platform — RBC Bank-wide',
     role: 'Conceived vision, led strategic + technical requirements',
     stack: ['LangGraph', 'MCP', 'PostgreSQL', 'Embeddings', 'Custom RAG'],
-    heroMetric: { value: 'Bank-wide', label: 'Target Scale' },
+    heroMetric: { value: PAR_ASSIST_SCALE, label: 'Target Scale' },
     caption:
       'Enterprise-wide agentic drafting platform for Project Approval Requests. LangGraph orchestration with MCP tools, multi-layer RAG, and semantic search — from intern POC to bank-wide initiative.',
     description:

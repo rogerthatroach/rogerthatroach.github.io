@@ -1,3 +1,10 @@
+import {
+  YEARS_EXPERIENCE,
+  DIGITAL_TWIN_SAVINGS,
+  PRODUCTION_SYSTEMS_COUNT,
+  AWARDS_COUNT,
+} from './canonical';
+
 export interface Metric {
   value: string;
   numericValue?: number;
@@ -6,11 +13,15 @@ export interface Metric {
   context: string;
 }
 
+// Display variants ('40K+', '2wk') deliberately differ from canonical
+// long forms ('~40,000', '2 weeks'). MetricsRibbon animates to the
+// numericValue and tacks on the suffix, so the short display form is a
+// rendering concern, not a truth concern.
 export const METRICS: Metric[] = [
-  { value: '8+', numericValue: 8, suffix: '+', label: 'Years in AI/ML', context: '2016–present' },
-  { value: '$3M', numericValue: 3, suffix: 'M', label: 'Cost Savings Delivered', context: 'Digital Twin — annual' },
-  { value: '4', numericValue: 4, label: 'Production AI Systems', context: 'PAR Assist, Astraeus, Aegis v1 & v2' },
+  { value: YEARS_EXPERIENCE, numericValue: 8, suffix: '+', label: 'Years in AI/ML', context: '2016–present' },
+  { value: DIGITAL_TWIN_SAVINGS, numericValue: 3, suffix: 'M', label: 'Cost Savings Delivered', context: 'Digital Twin — annual' },
+  { value: String(PRODUCTION_SYSTEMS_COUNT), numericValue: PRODUCTION_SYSTEMS_COUNT, label: 'Production AI Systems', context: 'PAR Assist, Astraeus, Aegis v1 & v2' },
   { value: '40K+', numericValue: 40, suffix: 'K+', label: 'Factorial Combinations', context: 'Astraeus — on-the-fly millisecond slicing' },
   { value: '2wk', numericValue: 2, suffix: 'wk', label: 'Fastest Delivery', context: 'Aegis v2 — full product' },
-  { value: '5', numericValue: 5, label: 'Awards & Recognition', context: 'RBC + TCS' },
+  { value: String(AWARDS_COUNT), numericValue: AWARDS_COUNT, label: 'Awards & Recognition', context: 'RBC + TCS' },
 ] as const;
