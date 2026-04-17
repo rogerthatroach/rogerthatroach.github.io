@@ -1,0 +1,64 @@
+In September 2022, I joined RBC&rsquo;s CFO Group as a Senior Data Scientist. No one had asked me to build AI. I was hired to help automate the Commodity Tax return process &mdash; a manual workflow that consumed finance analysts for months per cycle.
+
+By Q4 2023, the process took 90 minutes. The metric earned a CFO Quarterly Team Award. And more importantly, it earned the credibility to propose Aegis, Astraeus, and eventually PAR Assist &mdash; a cascade that shaped my next three years at the bank.
+
+This is the story of how automating a tax process became a stakeholder-trust project in disguise, and the architectural decision that made it land.
+
+## The problem
+
+Commodity tax returns at a major Canadian bank are not a small piece of paperwork. Finance teams pull transactions from General Ledger journals &mdash; millions of rows per cycle &mdash; reconcile them against tax categories, and produce returns that reach CFO-level sign-off. The process had accumulated years of institutional knowledge: undocumented edge cases, manual overrides, tribal understanding of which GL accounts mapped to which tax buckets.
+
+Automating it wasn&rsquo;t &ldquo;wrap a Python script around Excel.&rdquo; It meant codifying tribal knowledge without breaking anyone&rsquo;s trust in the numbers.
+
+## First project, first audition
+
+When you join an organization as the AI person and your first assignment is process automation, there are two ways to read it. You can treat it as a detour &mdash; &ldquo;I&rsquo;ll do this so I can get to the real AI work.&rdquo; Or you can treat it as an audition.
+
+I treated it as an audition. Finance leaders were not going to green-light a machine-learning platform for CFO-level decisions on the strength of my CV. They were going to green-light it on the strength of my first delivery.
+
+That framing changed how I built.
+
+## The architecture decision that mattered
+
+The obvious technical stack was straightforward: PySpark for the extraction (GL journals are too big for pandas at this scale), orchestration around the tax category mappings, output artifacts the finance team could hand off.
+
+The decision that mattered wasn&rsquo;t technical. It was architectural-as-stakeholder-management.
+
+I built Tableau dashboards **not as the output of the pipeline, but as its transparency layer.**
+
+Every step of the automation &mdash; the GL pull, the reconciliation, the category mapping, the aggregation &mdash; had a dashboard view that let a skeptical tax analyst drill in and see exactly what the pipeline had done. If a number looked wrong, the analyst could click through to the raw journal row. If a mapping surprised them, the dashboard showed the rule that produced it.
+
+This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation &mdash; even one with bugs in v1 &mdash; built a debuggable, auditable relationship between the analysts and the system.
+
+## The stakeholder story
+
+The first few cycles, I sat with tax analysts as they ran the pipeline. They&rsquo;d question a number; we&rsquo;d click into the Tableau view together; we&rsquo;d trace it back to the source; we&rsquo;d either confirm the automation&rsquo;s logic or I&rsquo;d fix a mapping. Each of those sessions was simultaneously a bug-hunt and a trust-building ritual.
+
+Within two cycles, analysts were running the pipeline themselves, bringing only the edge cases to me. Within four, they were suggesting new dashboards. By the time the Q4 2023 cycle finished in 90 minutes, the team&rsquo;s confidence in the system was greater than their confidence in the manual process it replaced.
+
+That confidence was the deliverable. The 90-minute metric was the side effect.
+
+## The result
+
+- **Months to 90 minutes** per cycle
+- **CFO Group RBC Quarterly Team Award** (Q4 2023)
+- A production pipeline that&rsquo;s processed every cycle since, with Tableau dashboards still serving as the monitoring surface
+- A finance team that started bringing ideas to the AI team, not the other way around
+
+## What this opened
+
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Aegis v1 &mdash; a rules-based benchmarking engine for the Big 6 Canadian banks &mdash; and get the air cover to build it. When Aegis v1 shipped, I could propose Aegis v2, the AI-native rewrite, and deliver it in two weeks while the team was already scaling Astraeus. When Astraeus reached production scale, I had the credibility to conceive PAR Assist from an intern&rsquo;s proof-of-concept and scale it to a bank-wide platform.
+
+Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. The Commodity Tax was underwriting every subsequent bet.
+
+## The pattern
+
+Your first project at a new organization isn&rsquo;t just a deliverable. It&rsquo;s the audition that determines which doors open next.
+
+The architectural decision I made &mdash; Tableau as a transparency layer, not an output &mdash; was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
+
+Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. PAR Assist&rsquo;s MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
+
+Commodity Tax was where I learned that.
+
+The technology changes. The pattern doesn&rsquo;t.
