@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Github, Linkedin, Mail } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY } from '@/data/hero';
+import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY, INDUSTRIES } from '@/data/hero';
 import { COMPANIES } from '@/data/companies';
 
 const ParticleField = dynamic(() => import('@/components/ParticleField'), {
@@ -107,14 +107,25 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-8 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-base"
+            className="mb-3 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-base"
           >
             {HERO.bio}
           </motion.p>
 
+          {/* Industries — pattern-matching signal for business-audience skimmers */}
+          <motion.p
+            custom={4}
+            variants={FADE_UP}
+            initial="hidden"
+            animate="visible"
+            className="mb-8 font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
+          >
+            {INDUSTRIES.join(' · ')}
+          </motion.p>
+
           {/* Companies strip — text treatments, not raw logos (see data/companies.ts) */}
           <motion.div
-            custom={4}
+            custom={5}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
@@ -142,7 +153,7 @@ export default function Hero() {
           </motion.div>
 
           <motion.div
-            custom={5}
+            custom={6}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"

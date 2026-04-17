@@ -36,3 +36,9 @@ export const HERO_SUMMARY = [
   `${PRODUCTION_SYSTEMS_COUNT} production systems`,
   `${YEARS_EXPERIENCE} years`,
 ] as const;
+
+/**
+ * Industries signal for business-audience readers pattern-matching on fit.
+ * Rendered as a small line beneath the bio in Hero.
+ */
+export const INDUSTRIES = ['Banking', 'Insurance', 'Utilities', 'Retail'] as const;
