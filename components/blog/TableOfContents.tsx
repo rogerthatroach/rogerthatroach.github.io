@@ -104,7 +104,7 @@ export default function TableOfContents() {
                 href={`#${h.id}`}
                 onClick={(e) => handleClick(e, h.id)}
                 className={cn(
-                  'block text-[11px] leading-snug transition-colors duration-150',
+                  'block py-1.5 text-[11px] leading-snug transition-colors duration-150',
                   h.level === 3 ? 'pl-3' : '',
                   activeId === h.id
                     ? 'font-medium text-accent'
