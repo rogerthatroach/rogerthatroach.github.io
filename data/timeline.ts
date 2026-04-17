@@ -13,7 +13,7 @@ export interface TimelineNode {
 export const TIMELINE: TimelineNode[] = [
   {
     id: 'rbc-lead',
-    era: 'Agentic AI',
+    era: 'Intelligent Systems',
     period: '2025 – Present',
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',

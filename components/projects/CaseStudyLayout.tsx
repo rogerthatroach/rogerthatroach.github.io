@@ -123,7 +123,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
   return (
     <PageTransition>
       <Nav />
-      <div id="main-content" className="px-6 pt-24 pb-12 md:px-16">
+      <main id="main-content" className="px-6 pt-24 pb-12 md:px-16">
         <div className="mx-auto max-w-content">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-4">
@@ -393,7 +393,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             </motion.div>
           )}
         </div>
-      </div>
+      </main>
       <Footer />
     </PageTransition>
   );
