@@ -30,6 +30,7 @@ const FADE_UP = {
 
 const TOC_SECTIONS = [
   { id: 'context', label: 'Context' },
+  { id: 'sequencing', label: 'Sequencing' },
   { id: 'my-role', label: 'My Role' },
   { id: 'stakeholders', label: 'Stakeholders' },
   { id: 'challenge', label: 'The Challenge' },
@@ -212,6 +213,48 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             ))}
           </motion.div>
 
+          {/* TL;DR — 3-bullet summary for skimmers / exec audience.
+              Rendered only when caseStudy.tldr is populated. */}
+          {caseStudy.tldr && (
+            <motion.div
+              custom={2}
+              variants={FADE_UP}
+              initial="hidden"
+              animate="visible"
+              className="mt-10 rounded-xl border border-border-subtle bg-surface/50 p-6"
+            >
+              <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                TL;DR
+              </p>
+              <dl className="grid gap-5 sm:grid-cols-3 sm:gap-6">
+                <div>
+                  <dt className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">
+                    Problem
+                  </dt>
+                  <dd className="mt-2 text-sm leading-relaxed text-text-secondary">
+                    {caseStudy.tldr.problem}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">
+                    Decision
+                  </dt>
+                  <dd className="mt-2 text-sm leading-relaxed text-text-secondary">
+                    {caseStudy.tldr.decision}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">
+                    Impact
+                  </dt>
+                  <dd className="mt-2 text-sm leading-relaxed text-text-secondary">
+                    {caseStudy.tldr.impact}
+                  </dd>
+                </div>
+              </dl>
+            </motion.div>
+          )}
+
           {/* TOC sidebar — xl screens only */}
           <CaseStudyTOC />
 
@@ -219,6 +262,14 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
           <Section id="context" title="Context">
             <p>{sections.context}</p>
           </Section>
+
+          {/* Sequencing — strategic-judgment paragraph contextualizing this
+              project within the broader portfolio arc. Optional. */}
+          {caseStudy.sequencing && (
+            <Section id="sequencing" title="Sequencing">
+              <p>{caseStudy.sequencing}</p>
+            </Section>
+          )}
 
           {/* My Role */}
           <Section id="my-role" title="My Role">

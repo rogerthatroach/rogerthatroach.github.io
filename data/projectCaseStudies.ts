@@ -17,6 +17,15 @@ export interface CaseStudySection {
   lessonsLearned: string;
 }
 
+export interface CaseStudyTLDR {
+  /** The business problem in one sentence — what was broken, for whom */
+  problem: string;
+  /** The architectural or strategic call, one sentence — what you chose and why */
+  decision: string;
+  /** The outcome in one sentence — ideally a canonical metric + scale of reach */
+  impact: string;
+}
+
 export interface CaseStudy {
   projectId: string;
   timeline: string;
@@ -24,6 +33,14 @@ export interface CaseStudy {
   status?: 'shipped' | 'in-progress';
   statusLabel?: string;
   leadershipCallout?: string;
+  /** Optional 3-bullet TL;DR rendered at the top of the case study page
+   *  for skimmer / exec-audience readers. When unset, page opens with
+   *  Context as before. */
+  tldr?: CaseStudyTLDR;
+  /** Optional sequencing / strategic-judgment narrative — short paragraph
+   *  that contextualizes this project within the broader portfolio arc.
+   *  Rendered after the Context section when set. */
+  sequencing?: string;
   sections: CaseStudySection;
   // Canonical formal deep-dive post (Track 1: Technical Explorations).
   blogPostSlug?: string;
