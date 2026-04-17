@@ -15,7 +15,7 @@ export default function CitationRef({ id }: CitationRefProps) {
     <a
       href={`#ref-${id}`}
       onClick={handleClick}
-      className="text-accent no-underline transition-colors hover:text-text-primary hover:underline"
+      className="text-accent underline decoration-accent/40 decoration-dotted underline-offset-2 transition-colors hover:text-text-primary hover:decoration-accent"
       title={`Jump to reference ${id}`}
     >
       [{id}]
