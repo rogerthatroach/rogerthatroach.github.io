@@ -56,6 +56,10 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
         </h2>
         <p className="mt-1 text-sm text-text-secondary">{project.subtitle}</p>
 
+        <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-text-secondary">
+          {project.caption}
+        </p>
+
         <div className="mt-3 flex items-baseline gap-2">
           <span
             className="font-mono text-lg font-bold"
