@@ -1,0 +1,87 @@
+{/*
+  DRAFT SCAFFOLD — not full prose. Section headers + 2-3 starter
+  sentences each, drawn from the existing Document Intelligence
+  case study. Your voice goes in the blanks. When fully authored,
+  remove all {/* TODO */} markers and flip status: 'draft' →
+  'published' in data/posts/index.ts.
+*/}
+
+At Quantiphi, I led the Document Intelligence work for Humana &mdash; an insurance claims processing pipeline where document verification accuracy went from ~70% with Google Cloud Document AI alone to 99.95% after a layered hybrid approach.
+
+The engineering that got there is one story. What I actually learned &mdash; the part that shaped every RAG pipeline I built at RBC three years later &mdash; is a different one.
+
+## The accuracy cliff
+
+{/* TODO: 2–3 sentences in your voice. Starter:
+Document verification is a step function, not a gradient. At 70%
+accuracy, the pipeline is unusable: every document needs manual
+review. At 95%, it&rsquo;s still unusable for most production use cases:
+the exceptions compound. At 99.95%, it becomes a full-automation
+pipeline. The engineering-value-per-percentage-point is wildly
+non-linear.
+*/}
+
+## The hybrid stack
+
+{/* TODO: Describe the three-layer approach and why each layer earned
+its place.
+- Document AI OCR as the base layer &mdash; cheap, good, not specific enough
+- OpenCV for pixel-level checkbox detection &mdash; targeted, deterministic
+- Random Forest classifier on top &mdash; learns the edge cases
+- Vertex AI for deployment; BigTable + BigQuery for ingestion at scale
+
+The question the reader wants answered: why this layered approach
+instead of training one bigger model? Cost-per-inference. Document
+AI is fast and cheap; custom models are slow and expensive. The
+architecture routes documents to the right layer based on what
+they need.
+*/}
+
+## ML economics is not ML metrics
+
+{/* TODO: This is the differentiating insight for the post.
+At production scale, cost-per-inference matters as much as accuracy.
+A pipeline that&rsquo;s 0.5% more accurate but 10× more expensive is
+the wrong trade for most use cases. The architectural decision
+to route expensive custom models only to documents that need them
+was the difference between a working pipeline and an economically
+infeasible one.
+
+Draw on your actual experience at Quantiphi: how did you think
+about cost-per-document? Were there moments where the team pushed
+for accuracy and you pushed back on economics?
+*/}
+
+## Document structure is information
+
+{/* TODO: The second big insight worth a section.
+Where a field appears in a document &mdash; header vs. body vs. footer
+&mdash; is itself signal. Knowing a &ldquo;date&rdquo; field is in the header
+vs. the body dramatically changes the right extraction approach.
+This structure-aware thinking carried over directly to RAG at RBC:
+chunking documents by structure (sections, headings) rather than
+fixed token windows was the difference between useful and useless
+retrieval.
+
+This connects Humana to your later work. Make that thread visible.
+*/}
+
+## The result
+
+- 99.95% checkbox accuracy (up from ~70%)
+- Production-ready pipeline for Humana&rsquo;s claims workflow
+- Replicable pattern that Quantiphi could adapt across other insurance clients
+- Architectural lessons that directly informed RAG design at RBC
+
+## The pattern
+
+{/* TODO: Zoom out. Two ideas to weave together:
+1. The accuracy cliff means investment shifts non-linearly as you
+   approach production-ready thresholds.
+2. Cost-per-inference becomes a first-class design concern at scale;
+   ML economics determines architecture as much as ML metrics.
+
+Both of these are general lessons that apply beyond document
+verification &mdash; you could close with one line about how they
+show up in later systems.
+*/}

@@ -192,6 +192,124 @@ export const POSTS: BlogPost[] = [
   },
   {
     meta: {
+      slug: 'astraeus-llm-as-router',
+      title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
+      subtitle:
+        'A builder-register companion to the formal Astraeus architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
+      date: '2026-05-22',
+      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'Astraeus'],
+      readingTime: '7 min read',
+      abstract:
+        'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building Astraeus \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
+      status: 'draft',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Deterministic Agentic Architectures (the formal companion)',
+        url: '/blog/agentic-ai',
+        description: 'The formal paper proving data-confidentiality and entitlement-safety of the LLM-as-Router architecture under defined threat models.',
+      },
+      {
+        title: 'How We Built PAR Assist',
+        url: '/blog/par-assist-building',
+        description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
+      },
+      {
+        title: 'Astraeus \u2014 Case Study',
+        url: '/projects/astraeus',
+        description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: {
+      slug: 'combustion-tuning-operators',
+      title: 'Digital Twin at 900MW: What the Plant Operators Taught Me',
+      subtitle:
+        'A builder-register companion to the Closed-Loop post \u2014 the stakeholder trust layer behind the $3M/year Digital Twin.',
+      date: '2026-06-05',
+      tags: ['Leadership', 'Industrial ML', 'Digital Twin', 'Trust Layer', 'TCS'],
+      readingTime: '6 min read',
+      abstract:
+        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover industrial ML as a trust problem with a modeling problem inside it: the 84-model + PSO stack that produced recommendations, and the relationship with plant operators that made them actionable. Ties the Digital Twin lesson to the Tableau-as-trust-layer pattern at RBC \u2014 same principle, different industry.',
+      status: 'draft',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Closed-Loop Optimization as a Unifying Pattern (the formal companion)',
+        url: '/blog/closed-loop',
+        description: 'The formal post that traces the sense-model-optimize-act pattern from PSO on a coal plant to agentic AI in enterprise finance. Same pattern, four domains.',
+      },
+      {
+        title: 'Combustion Tuning \u2014 Case Study',
+        url: '/projects/combustion-tuning',
+        description: 'The case study page: context, technical approach, impact, and the lessons that shaped later work.',
+      },
+    ],
+  },
+  {
+    meta: {
+      slug: 'document-intelligence-accuracy-cliff',
+      title: 'The Accuracy Cliff: 70% to 99.95% and Why ML Metrics Aren\u2019t ML Economics',
+      subtitle:
+        'The hybrid document-verification stack that got Humana\u2019s claims processing to production \u2014 and what it taught me about cost-per-inference as a first-class design concern.',
+      date: '2026-06-19',
+      tags: ['ML Economics', 'Document AI', 'Hybrid ML', 'Insurance', 'Quantiphi'],
+      readingTime: '6 min read',
+      abstract:
+        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover the accuracy cliff (why 70% is unusable, 95% still unusable, 99.95% enables full automation), the layered Document AI + OpenCV + Random Forest architecture that got there, and two insights that shaped later RAG work at RBC: cost-per-inference matters as much as accuracy at scale, and document structure is itself information.',
+      status: 'draft',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Document Intelligence \u2014 Case Study',
+        url: '/projects/document-intelligence',
+        description: 'The case study page: insurance-specific context, OCR challenges, the hybrid pipeline, and how the lessons carried over to RAG design at RBC.',
+      },
+      {
+        title: 'How We Built PAR Assist',
+        url: '/blog/par-assist-building',
+        description: 'Where the document-structure insight resurfaced: chunking by structure (not fixed token windows) was the difference between useful and useless retrieval.',
+      },
+    ],
+  },
+  {
+    meta: {
+      slug: 'aegis-v2-velocity',
+      title: 'Two Weeks, One Product: What Velocity Looks Like When Architecture Is Right',
+      subtitle:
+        'Aegis v2 shipped in 2 weeks while Astraeus was mid-flight and the Amplify program was running. A post about what makes that possible.',
+      date: '2026-07-03',
+      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Aegis'],
+      readingTime: '6 min read',
+      abstract:
+        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover the five-stage Aegis v2 pipeline (intent parsing, KPI detection, disambiguation, guardrailed SQL, deterministic formatting), and the differentiating insight: 2-week delivery isn\u2019t working harder \u2014 it\u2019s architectural clarity plus months of mental rehearsal plus ruthless scoping. Ties back to the Astraeus LLM-as-Router pattern \u2014 same family, tighter intent classification.',
+      status: 'draft',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Guardrailed Text-to-SQL (the formal companion)',
+        url: '/blog/text-to-sql',
+        description: 'The formal paper on the five-stage pipeline with safety guarantees: injection impossibility by construction, bounded disambiguation, schema compliance.',
+      },
+      {
+        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
+        url: '/blog/astraeus-llm-as-router',
+        description: 'The sister architectural call. Aegis v2 is the same pattern with a tighter intent classification.',
+      },
+      {
+        title: 'Aegis v2 \u2014 Case Study',
+        url: '/projects/aegis',
+        description: 'The case study page: context, the five-stage architecture, and the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: {
       slug: 'commodity-tax-cfo-trust',
       title: 'How Commodity Tax Built CFO Trust',
       subtitle:
