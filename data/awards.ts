@@ -3,6 +3,14 @@ export interface Award {
   org: string;
   year: string;
   detail?: string;
+  /**
+   * Optional path to an award image (certificate photo, trophy photo,
+   * announcement image) relative to /public. Rendered as a small
+   * thumbnail on the award card. When unset, the card renders a Trophy
+   * icon placeholder. Drop files at public/images/awards/{slug}.jpg or
+   * .webp. Roughly square, 400-600px on the long side, <80KB.
+   */
+  imagePath?: string;
 }
 
 export const AWARDS: Award[] = [

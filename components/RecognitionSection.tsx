@@ -16,30 +16,57 @@ export default function RecognitionSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-10 text-2xl font-bold text-text-primary sm:text-3xl"
+          className="mb-8 text-2xl font-bold text-text-primary sm:text-3xl"
         >
           Recognition
         </motion.h2>
 
-        <div className="flex flex-wrap gap-3">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {AWARDS.map((award, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ delay: 0.1 + i * 0.06, duration: 0.3 }}
-              className="flex items-center gap-2 rounded-lg border border-border-subtle bg-surface/50 px-3 py-2"
+            <motion.li
+              key={`${award.title}-${award.year}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ delay: 0.1 + i * 0.06, duration: 0.4 }}
+              className="flex gap-4 rounded-xl border border-border-subtle bg-surface/50 p-4"
             >
-              <Trophy size={12} className="shrink-0 text-accent" />
-              <div>
-                <span className="text-xs font-medium text-text-primary">{award.title}</span>
-                <span className="ml-1.5 text-[10px] text-text-tertiary">
-                  {award.org} · {award.year}
-                </span>
+              {/* Thumbnail slot.
+                  PLACEHOLDER — when a real image is ready:
+                    1. Drop file at public/images/awards/{slug}.jpg (or .webp)
+                    2. Set imagePath: '/images/awards/{slug}.jpg' on the award
+                       entry in data/awards.ts
+                  Until then, renders Trophy icon on an accent-tinted square. */}
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-subtle bg-accent-muted">
+                {award.imagePath ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={award.imagePath}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <Trophy size={22} className="text-accent" />
+                )}
               </div>
-            </motion.div>
+
+              <div className="min-w-0 flex-1">
+                <h3 className="text-sm font-semibold leading-snug text-text-primary">
+                  {award.title}
+                </h3>
+                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                  {award.org} · {award.year}
+                </p>
+                {award.detail && (
+                  <p className="mt-2 text-xs leading-relaxed text-text-secondary">
+                    {award.detail}
+                  </p>
+                )}
+              </div>
+            </motion.li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

@@ -27,7 +27,13 @@ export interface Project {
   deepDivePath?: string;
 }
 
-export const PROJECTS: Project[] = [
+/**
+ * Projects defined in chronological order (oldest → newest) so the arc
+ * narrative reads cleanly in source. Exported reversed at the end so
+ * consumers see latest-first (PAR Assist → Combustion Tuning), which is
+ * what recruiters and skimmers expect.
+ */
+const PROJECTS_CHRONOLOGICAL: Project[] = [
   // Arc 1: Foundation (2016-2019)
   {
     id: 'combustion-tuning',
@@ -152,3 +158,5 @@ export const PROJECTS: Project[] = [
     deepDivePath: '/projects/par-assist',
   },
 ];
+
+export const PROJECTS: Project[] = [...PROJECTS_CHRONOLOGICAL].reverse();
