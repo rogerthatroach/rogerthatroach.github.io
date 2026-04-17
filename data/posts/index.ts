@@ -190,4 +190,46 @@ export const POSTS: BlogPost[] = [
       { title: 'pgvector', url: 'https://github.com/pgvector/pgvector', description: 'Vector similarity search for PostgreSQL — the backbone that unifies structured metadata and embeddings in one transactional store.' },
     ],
   },
+  {
+    meta: {
+      slug: 'commodity-tax-cfo-trust',
+      title: 'How Commodity Tax Built CFO Trust',
+      subtitle:
+        'First project at RBC, first audition — and the architectural decision that turned a months-long manual process into a 90-minute automated one, and a skeptical finance team into the AI team\u2019s strongest sponsors.',
+      date: '2026-05-15',
+      tags: ['Leadership', 'Stakeholder Management', 'PySpark', 'Tableau', 'Process Automation'],
+      readingTime: '6 min read',
+      abstract:
+        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the stakeholder dynamics of automating institutional knowledge, and the cascade of AI initiatives this first project underwrote: Aegis v1, Aegis v2, Astraeus, PAR Assist.',
+      status: 'draft',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'How We Built PAR Assist (practitioner companion)',
+        url: '/blog/par-assist-building',
+        description: 'The other builder-register post in this corpus — same voice, different system. The PAR Assist story wouldn\u2019t have happened without the trust built here.',
+      },
+      {
+        title: 'Closed-Loop Optimization as a Unifying Pattern',
+        url: '/blog/closed-loop',
+        description: 'The underlying pattern traced across industrial PSO, cloud pipelines, enterprise finance, and agentic AI. Commodity Tax sits in the enterprise finance step of the arc.',
+      },
+      {
+        title: 'Commodity Tax — Case Study',
+        url: '/projects/commodity-tax',
+        description: 'The case study page: context, stakeholders, options considered, decision rationale, production narrative, and lessons learned.',
+      },
+      {
+        title: 'PySpark Documentation',
+        url: 'https://spark.apache.org/docs/latest/api/python/',
+        description: 'The pipeline backbone used for large-scale General Ledger extraction.',
+      },
+      {
+        title: 'Tableau for Data Engineering Transparency',
+        url: 'https://www.tableau.com/',
+        description: 'Used here as a trust and audit layer, not just an output surface — the architectural decision that made this project land.',
+      },
+    ],
+  },
 ];

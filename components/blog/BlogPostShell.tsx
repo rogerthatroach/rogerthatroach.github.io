@@ -25,6 +25,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'par-assist-building': dynamic(() => import('@/data/posts/par-assist-building.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'commodity-tax-cfo-trust': dynamic(() => import('@/data/posts/commodity-tax-cfo-trust.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
 };
 
 function PostSkeleton() {
