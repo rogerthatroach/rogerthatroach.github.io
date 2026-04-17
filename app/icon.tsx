@@ -8,7 +8,7 @@ export default function Icon() {
     (
       <div
         style={{
-          fontSize: 18,
+          fontSize: 15,
           background: '#0c0a0a',
           color: '#e8b77a',
           width: '100%',
@@ -21,7 +21,7 @@ export default function Icon() {
           letterSpacing: -1,
         }}
       >
-        HD
+        HSD
       </div>
     ),
     { ...size },
