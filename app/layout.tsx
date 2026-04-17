@@ -66,11 +66,12 @@ export const metadata: Metadata = {
   },
 };
 
-// Inline script to prevent flash of wrong theme
+// Inline script to prevent flash of wrong theme. Light is the default —
+// dark mode only activates if the user has explicitly toggled to it.
+// OS prefers-color-scheme is intentionally ignored.
 const themeScript = `
   (function() {
-    var t = localStorage.getItem('theme');
-    if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.getItem('theme') === 'dark') {
       document.documentElement.classList.add('dark');
     }
   })();
