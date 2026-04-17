@@ -28,6 +28,18 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'commodity-tax-cfo-trust': dynamic(() => import('@/data/posts/commodity-tax-cfo-trust.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'astraeus-llm-as-router': dynamic(() => import('@/data/posts/astraeus-llm-as-router.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
+  'combustion-tuning-operators': dynamic(() => import('@/data/posts/combustion-tuning-operators.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
+  'document-intelligence-accuracy-cliff': dynamic(() => import('@/data/posts/document-intelligence-accuracy-cliff.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
+  'aegis-v2-velocity': dynamic(() => import('@/data/posts/aegis-v2-velocity.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
 };
 
 function PostSkeleton() {

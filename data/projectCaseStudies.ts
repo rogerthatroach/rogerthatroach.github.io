@@ -100,6 +100,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         'This project taught me that the hardest part of ML isn\'t the model — it\'s the feedback loop. Getting plant operators to trust and act on ML recommendations required translating model outputs into terms they understood (specific valve positions, not abstract parameters). The PSO approach also taught me that optimization is a design pattern, not just a technique — a lesson that resurfaced years later in agentic AI.',
     },
     blogPostSlug: 'closed-loop',
+    companionBlogPostSlug: 'combustion-tuning-operators',
   },
   {
     projectId: 'document-intelligence',
@@ -150,6 +151,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       lessonsLearned:
         'Two things stayed with me. First, cost-per-inference matters as much as accuracy at scale — we had to architect the pipeline so expensive custom models only ran on documents that needed them, which taught me to think about ML economics, not just ML metrics. Second, document structure is information: knowing which section a field appears in (header vs. body vs. footer) dramatically improves extraction accuracy. This insight resurfaced directly when I built RAG pipelines at RBC — chunking documents by structure rather than fixed token windows was the difference between useful and useless retrieval.',
     },
+    blogPostSlug: 'document-intelligence-accuracy-cliff',
   },
   {
     projectId: 'commodity-tax',
@@ -246,6 +248,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         'Two weeks sounds fast, but the real work happened in the months before — research, brainstorming, and learning from v1\'s limitations. The sprint was crystallization, not improvisation. I also learned the power of decomposition: by breaking the pipeline into five stages with clear contracts, I could build and test each one independently. The speed came from clarity, not shortcuts.',
     },
     blogPostSlug: 'text-to-sql',
+    companionBlogPostSlug: 'aegis-v2-velocity',
   },
   {
     projectId: 'astraeus',
@@ -299,6 +302,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         'The biggest architectural insight was that LLMs and deterministic code serve different purposes — forcing an LLM to do computation it\'s bad at (and giving it data access it shouldn\'t have) is the wrong pattern. The LLM-as-Router approach is now my default for enterprise AI: let LLMs reason about intent, let code handle truth. The EPM-to-SQL entitlement modeling was also a lesson in domain immersion — I had to deeply understand how the bank\'s permission system worked before I could translate it into something the system could enforce.',
     },
     blogPostSlug: 'agentic-ai',
+    companionBlogPostSlug: 'astraeus-llm-as-router',
   },
   {
     projectId: 'par-assist',

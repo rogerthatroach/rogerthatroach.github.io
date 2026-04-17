@@ -1,0 +1,93 @@
+{/*
+  DRAFT SCAFFOLD — not full prose. Section headers + 2-3 starter
+  sentences each, drawn from the existing Aegis v2 case study.
+  Your voice goes in the blanks. When fully authored, remove all
+  {/* TODO */} markers and flip status: 'draft' → 'published'
+  in data/posts/index.ts.
+*/}
+
+Aegis v2 went from concept to production in two weeks. I was simultaneously running Astraeus development and the 2025 Amplify internship program. The product shipped anyway. It earned the 2025 CFO One RBC Team Award.
+
+This isn&rsquo;t a post about working harder. It&rsquo;s a post about what velocity actually looks like when the architecture is right.
+
+## The problem
+
+{/* TODO: 2–3 sentences in your voice. Starter:
+CFO Group analysts benchmarked KPIs against the Big 6 Canadian
+banks manually, via each bank&rsquo;s Supplementary Financial Package.
+Hours per query. Error-prone. Hard to explain to leadership when
+the numbers were questioned. Aegis v1, the rules-based engine I&rsquo;d
+shipped earlier, covered part of this but couldn&rsquo;t handle
+natural-language queries. v2 was the AI-native rewrite.
+*/}
+
+## The five-stage pipeline
+
+{/* TODO: The technical spine.
+1. Intent parsing — what is the user asking?
+2. KPI detection via embeddings similarity — which metric do they mean?
+3. LLM-assisted disambiguation — when there&rsquo;s ambiguity, clarify
+4. Guardrailed SQL generation — whitelisted schema, parameterized
+5. Deterministic formatting — predictable output
+
+SQL injection impossible by construction (parameterized queries +
+whitelisted schema). Disambiguation bounded by confidence thresholds.
+Every stage independently testable.
+
+The formal post (/blog/text-to-sql) has the proofs. This post should
+focus on how the pipeline design made the 2-week delivery possible.
+*/}
+
+## What 2 weeks actually requires
+
+{/* TODO: The differentiating insight. Speed doesn&rsquo;t come from
+working harder. It comes from:
+
+- The architecture was already mentally rehearsed from months of
+  thinking about the space. You weren&rsquo;t designing in the sprint;
+  you were implementing a design you&rsquo;d already committed to.
+- The pipeline was decomposable &mdash; 5 stages, each independently
+  buildable and testable. Speed = parallelizable work + clear
+  interfaces.
+- Ruthless scoping. What v2 did NOT do was as important as what
+  it did.
+
+Draw on your actual experience: what were you mentally rehearsing
+before the 2-week window opened? How did you decide what made v1
+→ v2 cut vs. stayed?
+*/}
+
+## The parallel workstreams
+
+{/* TODO: The leadership context.
+You weren&rsquo;t doing Aegis v2 in isolation. Astraeus was mid-flight.
+The Amplify program had interns you were mentoring. The 2-week
+sprint happened without dropping either &mdash; which is itself the
+real story of the velocity.
+
+What let you hold three workstreams? Clear state management, delegation
+discipline, the architectural clarity that meant Aegis v2 didn&rsquo;t
+need much real-time decision-making from you.
+*/}
+
+## The result
+
+- Shipped to production in 2 weeks
+- Natural-language KPI benchmarking replacing manual Supplementary Financial Package lookups
+- 2025 CFO One RBC Team Award
+- Aegis v1 &mdash; the rules-based predecessor &mdash; continued running in production through the rewrite
+
+## The pattern
+
+{/* TODO: Zoom out. Two ideas worth threading:
+1. Velocity is a downstream effect of clarity. The work that makes
+   a 2-week delivery possible is the 6 months of mental rehearsal
+   that preceded it.
+2. Decomposable pipelines beat monoliths for speed, for testability,
+   for delegation. Every stage in Aegis v2 is individually owned
+   and individually checkable.
+
+Close by connecting to Astraeus&rsquo;s LLM-as-Router: Aegis v2 is the
+same pattern with a tighter intent classification. The architectural
+family resembles itself across systems.
+*/}

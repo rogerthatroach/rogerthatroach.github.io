@@ -1,0 +1,69 @@
+{/*
+  DRAFT SCAFFOLD — not full prose. Section headers + 2-3 starter
+  sentences each, drawn from the existing Combustion Tuning case
+  study. Your voice goes in the blanks. When fully authored, remove
+  all {/* TODO */} markers and flip status: 'draft' → 'published'
+  in data/posts/index.ts.
+*/}
+
+In 2016, my first real job in data science was a coal plant. Specifically, a 900MW unit at the Maizuru power plant in Japan, and the machine-learning work TCS was doing to help it burn fuel more efficiently.
+
+The project that followed was where I learned that industrial ML is not a modeling problem. It&rsquo;s a trust problem with a modeling problem inside it.
+
+## The problem
+
+{/* TODO: 2–3 sentences in your voice. Starter:
+The plant&rsquo;s combustion settings had been calibrated against idealized
+bench conditions, not the live dynamics of an operating plant. Fuel
+blends shifted, sensor readings drifted, boiler behavior wasn&rsquo;t what
+the calibration assumed. The operating band was wide, and the plant
+ran inside it without precision.
+*/}
+
+## The technical approach
+
+{/* TODO: Cover the stack and why.
+- 84 multi-output regression models across 90+ sensors
+- k-fold cross-validation, R², RMSE, MAPE, fold variance checks
+- Particle Swarm Optimization over the model outputs as objective
+  functions
+- Closed-loop: sensors → models → PSO → operator adjustments
+
+The technical bullets exist already in the case study; this section
+is where you turn them into practitioner prose. What did you actually
+do day to day? What was hard?
+*/}
+
+## What the operators taught me
+
+{/* TODO: This is the heart of the post. Your actual story.
+Industrial ML recommendations are only valuable if operators trust
+them enough to act on them. A recommendation an operator ignores is
+a recommendation that does nothing. Your job wasn&rsquo;t just building
+models; it was building the credibility with the plant operators
+that made the models&rsquo; output actionable.
+
+Ideas to draw on:
+- How did you introduce yourself to the operators? What did that
+  first week look like?
+- What did they teach you about the plant that the data didn&rsquo;t?
+- Was there a moment where they pushed back and you learned from it?
+- How did recommendations move from &ldquo;suggested&rdquo; to &ldquo;actually
+  applied&rdquo; over the course of the project?
+*/}
+
+## The result
+
+- $3M/year in fuel savings
+- Measurable reduction in NOx, SOx, CO emissions
+- Framework became a replicable template for other industrial clients at TCS
+- Two Star of the Month awards, 2017 and 2019
+
+## The pattern
+
+{/* TODO: Zoom out. This is where the closed-loop pattern first
+appeared for you &mdash; sense, model, optimize, act &mdash; and where
+you learned that the &ldquo;act&rdquo; step depends on humans. The
+Tableau-as-trust-layer insight from Commodity Tax is the financial
+version of the same lesson you learned at 900MW. Tie them together.
+*/}
