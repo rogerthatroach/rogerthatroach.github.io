@@ -1,6 +1,5 @@
 import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
-import CareerArcNarrative from '@/components/CareerArcNarrative';
 import MetricsRibbon from '@/components/MetricsRibbon';
 import NowBuilding from '@/components/NowBuilding';
 import ProjectCard from '@/components/projects/ProjectCard';
@@ -17,10 +16,7 @@ export default function Home() {
       <Nav />
       <Hero />
 
-      {/* Through-line: the thesis that ties every system together */}
-      <CareerArcNarrative />
-
-      {/* Stats: the proof behind the thesis */}
+      {/* Through-line + Stats — thesis and proof in one block (was two sections) */}
       <MetricsRibbon />
 
       {/* Present-tense momentum */}
@@ -29,10 +25,10 @@ export default function Home() {
       {/* Projects: six entry points into the three-layer funnel.
           Simplified cards (no ReactFlow on homepage) — era badges carry the career arc.
           Full cards with diagrams live on /projects and case study pages. */}
-      <section id="work" className="px-6 py-20 md:px-16">
+      <section id="work" className="px-6 py-14 md:px-16">
         <div className="mx-auto max-w-content">
           <h2 className="mb-2 text-2xl font-bold text-text-primary sm:text-3xl">Projects</h2>
-          <p className="mb-10 max-w-2xl text-sm text-text-secondary">
+          <p className="mb-8 max-w-2xl text-sm text-text-secondary">
             Six systems across eight years. From power plant combustion tuning to bank-wide agentic
             AI. Click any card for the full case study.
           </p>

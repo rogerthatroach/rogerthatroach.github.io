@@ -9,7 +9,7 @@ export default function NowBuilding() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section ref={ref} id="now" className="px-6 py-20 md:px-16">
+    <section ref={ref} id="now" className="px-6 py-14 md:px-16">
       <div className="mx-auto max-w-content">
         <motion.p
           initial={{ opacity: 0, y: 12 }}
