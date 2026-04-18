@@ -44,6 +44,7 @@ export const TIMELINE: TimelineNode[] = [
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
+    logoPath: '/images/logos/rbc.svg',
   },
   {
     id: 'rbc-senior',
@@ -56,6 +57,7 @@ export const TIMELINE: TimelineNode[] = [
     skills: ['PySpark', 'SQL', 'Tableau', 'Financial Modeling', 'Aegis v1'],
     milestone: COMMODITY_TAX_EFFICIENCY,
     accent: 'amber',
+    logoPath: '/images/logos/rbc.svg',
   },
   {
     id: 'quantiphi',
@@ -79,5 +81,6 @@ export const TIMELINE: TimelineNode[] = [
     skills: ['R', 'Python', 'ggplot2', 'Regression', 'Classification', 'Clustering', 'CNNs', 'TensorFlow'],
     milestone: `${DIGITAL_TWIN_SAVINGS}/year savings`,
     accent: 'emerald',
+    logoPath: '/images/logos/tcs.svg',
   },
 ];
