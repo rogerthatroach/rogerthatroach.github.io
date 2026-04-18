@@ -9,7 +9,7 @@
     --color-surface: #ffffff;
     --color-surface-hover: #f2edea;
     --color-border: #e0d8d4;
-    --color-accent: #b07a82;
+    --color-accent: #8a5560;
     --color-accent-muted: #f0dfe1;
     --color-text-primary: #1a1412;
     --color-text-secondary: #5c5452;
@@ -76,6 +76,35 @@
   :focus:not(:focus-visible) {
     outline: none;
   }
+}
+
+/* Theme-aware palette classes — read CSS vars set via lib/palette.ts's
+   paletteStyle() helper. Light-mode defaults use the darker --p-l variant
+   (WCAG AA on warm-paper bg); dark-mode overrides swap to the bright --p-d
+   variant. Works in both server and client components — no hook needed. */
+.palette-pill {
+  color: var(--p-l);
+  background-color: var(--p-bg-l);
+  border-color: var(--p-border-l);
+}
+.palette-text {
+  color: var(--p-l);
+}
+.palette-border {
+  color: var(--p-l);
+  border-color: var(--p-border-l);
+}
+html.dark .palette-pill {
+  color: var(--p-d);
+  background-color: var(--p-bg-d);
+  border-color: var(--p-border-d);
+}
+html.dark .palette-text {
+  color: var(--p-d);
+}
+html.dark .palette-border {
+  color: var(--p-d);
+  border-color: var(--p-border-d);
 }
 
 /* Respect reduced motion preference */

@@ -8,7 +8,12 @@ import {
 } from './canonical';
 
 export interface ProjectPalette {
+  /** Bright/saturated — used for text in dark mode, and for tinted bg/border
+   *  in both modes. Usually a Tailwind 500-series color. */
   primary: string;
+  /** Darker variant — used for text in light mode to meet WCAG AA (4.5:1)
+   *  against the light background. Usually a Tailwind 700-series color. */
+  primaryLight: string;
   glow: string;
   bg: string;
 }
@@ -52,7 +57,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'Particle Swarm Optimization: models as objective functions, exploring input space to minimize emissions',
       'Closed-loop: optimal settings → plant operators adjust → $3M/yr saved + reduced NOx/SOx/CO',
     ],
-    palette: { primary: '#f59e0b', glow: 'shadow-amber-500/20', bg: 'from-amber-500/5' },
+    palette: { primary: '#f59e0b', primaryLight: '#92400e', glow: 'shadow-amber-500/20', bg: 'from-amber-500/5' },
     deepDivePath: '/projects/combustion-tuning',
   },
   // Arc 2: Cloud ML (2021-2022)
@@ -73,7 +78,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'BigTable + BigQuery backbone for ingestion and analytics at scale',
       'Parallel workstream: multi-million-row inventory analytics with SQL and Tableau for enterprise retail clients',
     ],
-    palette: { primary: '#06b6d4', glow: 'shadow-cyan-500/20', bg: 'from-cyan-500/5' },
+    palette: { primary: '#06b6d4', primaryLight: '#155e75', glow: 'shadow-cyan-500/20', bg: 'from-cyan-500/5' },
     deepDivePath: '/projects/document-intelligence',
   },
   // Arc 3: Enterprise Analytics (2022-2023)
@@ -93,7 +98,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'Advanced Tableau dashboards for financial KPI monitoring',
       'Recognized with CFO Group RBC Quarterly Team Award (Q4 2023)',
     ],
-    palette: { primary: '#ef4444', glow: 'shadow-red-500/20', bg: 'from-red-500/5' },
+    palette: { primary: '#ef4444', primaryLight: '#991b1b', glow: 'shadow-red-500/20', bg: 'from-red-500/5' },
     deepDivePath: '/projects/commodity-tax',
   },
   // Arc 4: Intelligent Systems (2024-present)
@@ -114,7 +119,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'Guarded, LLM-assisted disambiguation — pinpoints intended KPI without exposing sensitive data',
       'Guardrails: whitelisting, parameterization, testability',
     ],
-    palette: { primary: '#22c55e', glow: 'shadow-green-500/20', bg: 'from-green-500/5' },
+    palette: { primary: '#22c55e', primaryLight: '#166534', glow: 'shadow-green-500/20', bg: 'from-green-500/5' },
     deepDivePath: '/projects/aegis',
   },
   {
@@ -134,7 +139,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'EPM-to-SQL entitlement modeling: cube permissions → security groups → employees → transits → SQL tables',
       '~9,000 rollups, ~60,000 geographies, millisecond slicing across weekly and month-end granularity',
     ],
-    palette: { primary: '#3b82f6', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
+    palette: { primary: '#3b82f6', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
     deepDivePath: '/projects/astraeus',
   },
   {
@@ -154,7 +159,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'Chunking and embedding pipeline for enterprise documents with semantic search',
       'Originated from the Amplify internship program — scaled from intern POC to bank-wide initiative',
     ],
-    palette: { primary: '#8b5cf6', glow: 'shadow-purple-500/20', bg: 'from-purple-500/5' },
+    palette: { primary: '#8b5cf6', primaryLight: '#5b21b6', glow: 'shadow-purple-500/20', bg: 'from-purple-500/5' },
     deepDivePath: '/projects/par-assist',
   },
 ];

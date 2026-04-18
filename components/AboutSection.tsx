@@ -90,6 +90,8 @@ export default function AboutSection() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/portrait.webp"
+                srcSet="/images/portrait-sm.webp 700w, /images/portrait.webp 1000w"
+                sizes="280px"
                 alt="Harmilap Singh Dhaliwal"
                 className="h-full w-full object-cover"
                 loading="lazy"
