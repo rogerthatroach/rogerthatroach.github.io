@@ -33,10 +33,17 @@ export default function VisualizationContainer({
 
   return (
     <figure className={`my-8 ${className ?? ''}`}>
+      {/* suppressHydrationWarning: children(isVisible) is intentionally
+          different on server (false) vs first client render (may flip true
+          when the observer fires). Telling React not to warn here is safe
+          because we KNOW the markup will diverge and that divergence is
+          functional (diagram renders), not a bug. Fixes BP=96 from React
+          #418/#423/#425 errors on blog posts. */}
       <div
         ref={containerRef}
         className="overflow-hidden rounded-xl border border-border-subtle bg-surface/50"
         style={{ minHeight }}
+        suppressHydrationWarning
       >
         {children(isVisible)}
       </div>
