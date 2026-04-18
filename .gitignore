@@ -36,6 +36,17 @@ next-env.d.ts
 docs/specs/
 docs/career/
 docs/reference/
+docs/plans/
 CLAUDE.md
 CHANGELOG.md
 .claude/
+
+# Source/working files for assets that get post-processed
+# The processed outputs (portrait.webp, rbc.svg, tcs.svg) are committed;
+# the originals are not.
+public/images/IMG_*.jpg
+public/images/IMG_*.jpeg
+public/images/IMG_*.png
+public/images/IMG_*.heic
+public/images/logos/RBC/
+public/images/logos/Tata_Consultancy_Services/

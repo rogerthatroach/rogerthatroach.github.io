@@ -85,14 +85,14 @@ function CaseStudyTOC() {
 
   return (
     <nav
-      className="fixed top-28 hidden w-48 xl:block"
-      style={{ left: 'max(1rem, calc((100vw - 64rem) / 2 - 13rem))' }}
+      className="fixed top-28 hidden w-52 xl:block"
+      style={{ left: 'max(1rem, calc((100vw - 64rem) / 2 - 14rem))' }}
     >
       <div className="max-h-[calc(100vh-8rem)] overflow-y-auto border-l border-border-subtle pl-4">
         <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
           Contents
         </p>
-        <ul className="space-y-1.5">
+        <ul>
           {TOC_SECTIONS.map((s) => (
             <li key={s.id}>
               <a
@@ -102,7 +102,7 @@ function CaseStudyTOC() {
                   document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }}
                 className={cn(
-                  'block text-[11px] leading-snug transition-colors duration-150',
+                  'block py-1.5 text-[11px] leading-snug transition-colors duration-150',
                   activeId === s.id
                     ? 'font-medium text-accent'
                     : 'text-text-tertiary hover:text-text-secondary'

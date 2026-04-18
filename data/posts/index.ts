@@ -264,7 +264,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'FinancialBenchmarking'],
       readingTime: '6 min read',
       abstract:
-        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover the five-stage FinancialBenchmarking v2 pipeline (intent parsing, KPI detection, disambiguation, guardrailed SQL, deterministic formatting), and the differentiating insight: 2-week delivery isn\u2019t working harder \u2014 it\u2019s architectural clarity plus months of mental rehearsal plus ruthless scoping. Ties back to the WorkforceAnalytics LLM-as-Router pattern \u2014 same family, tighter intent classification.',
+        'FinancialBenchmarking v2 shipped in two weeks while WorkforceAnalytics was mid-flight and the Amplify program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the WorkforceAnalytics LLM-as-Router pattern \u2014 same family, tighter intent classification.',
       status: 'draft',
     },
     references: [],
