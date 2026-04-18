@@ -5,7 +5,6 @@ import Hero from '@/components/Hero';
 import MetricsRibbon from '@/components/MetricsRibbon';
 import NowBuilding from '@/components/NowBuilding';
 import SkillTimeline from '@/components/SkillTimeline';
-import AboutSection from '@/components/AboutSection';
 import RecognitionSection from '@/components/RecognitionSection';
 import Footer from '@/components/Footer';
 import { PROJECTS } from '@/data/projects';
@@ -94,9 +93,6 @@ export default function Home() {
 
       {/* Journey zoom-out */}
       <SkillTimeline />
-
-      {/* Leadership philosophy */}
-      <AboutSection />
 
       {/* Recognition: the close */}
       <RecognitionSection />
