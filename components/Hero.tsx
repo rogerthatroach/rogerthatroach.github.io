@@ -6,6 +6,7 @@ import { Github, Linkedin, Mail } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY, INDUSTRIES } from '@/data/hero';
 import { COMPANIES } from '@/data/companies';
+import { companyTextStyle } from '@/lib/palette';
 
 const ParticleField = dynamic(() => import('@/components/ParticleField'), {
   ssr: false,
@@ -142,8 +143,8 @@ export default function Hero() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`${c.name} — ${c.role} (${c.period})`}
-                className="group inline-flex items-center gap-2 rounded-md border border-border-subtle bg-surface/40 px-3 py-1.5 text-xs font-semibold tracking-wide backdrop-blur-sm transition-all hover:bg-surface-hover"
-                style={{ color: c.accent }}
+                className="palette-text group inline-flex items-center gap-2 rounded-md border border-border-subtle bg-surface/40 px-3 py-1.5 text-xs font-semibold tracking-wide backdrop-blur-sm transition-all hover:bg-surface-hover"
+                style={companyTextStyle(c)}
               >
                 {c.logo && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -200,8 +201,11 @@ export default function Hero() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/portrait.webp"
+            srcSet="/images/portrait-sm.webp 700w, /images/portrait.webp 1000w"
+            sizes="(max-width: 640px) 224px, 320px"
             alt="Harmilap Singh Dhaliwal"
             className="h-full w-full object-cover"
+            {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
           />
         </motion.div>
       </div>

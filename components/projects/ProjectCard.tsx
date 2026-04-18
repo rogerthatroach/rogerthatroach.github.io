@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import type { Project } from '@/data/projects';
 import type { CaseStudy } from '@/data/projectCaseStudies';
 import { useTilt } from '@/lib/useTilt';
+import { paletteStyle } from '@/lib/palette';
 
 interface ProjectCardProps {
   project: Project;
@@ -32,12 +33,8 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
       >
         <div className="flex items-center gap-3">
           <span
-            className="rounded-full px-2.5 py-0.5 text-[10px] font-medium"
-            style={{
-              color: project.palette.primary,
-              backgroundColor: `${project.palette.primary}15`,
-              border: `1px solid ${project.palette.primary}30`,
-            }}
+            className="palette-pill rounded-full border px-2.5 py-0.5 text-[10px] font-medium"
+            style={paletteStyle(project.palette)}
           >
             {caseStudy.era}
           </span>
@@ -62,8 +59,8 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
 
         <div className="mt-3 flex items-baseline gap-2">
           <span
-            className="font-mono text-lg font-bold"
-            style={{ color: project.palette.primary }}
+            className="palette-text font-mono text-lg font-bold"
+            style={paletteStyle(project.palette)}
           >
             {project.heroMetric.value}
           </span>
@@ -74,11 +71,8 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
           {project.stack.slice(0, 3).map((tech) => (
             <span
               key={tech}
-              className="rounded-full border px-2 py-0.5 text-[10px]"
-              style={{
-                borderColor: `${project.palette.primary}30`,
-                color: project.palette.primary,
-              }}
+              className="palette-border rounded-full border px-2 py-0.5 text-[10px]"
+              style={paletteStyle(project.palette)}
             >
               {tech}
             </span>

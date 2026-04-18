@@ -68,7 +68,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-accent underline-offset-2 hover:underline"
+        className="text-accent underline decoration-accent/50 decoration-dotted underline-offset-2 transition-colors hover:decoration-accent"
       >
         {children}
       </a>
