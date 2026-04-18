@@ -9,6 +9,7 @@ import PostCard from '@/components/blog/PostCard';
 export const metadata: Metadata = {
   title: 'Writing — Harmilap Singh Dhaliwal',
   description: 'Technical whitepapers on agentic AI, text-to-SQL, and closed-loop optimization.',
+  alternates: { canonical: '/blog' },
 };
 
 export default function BlogIndexPage() {

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: 'About — Harmilap Singh Dhaliwal',
   description:
     'Leadership philosophy, beliefs about building AI systems in regulated environments, and resume.',
+  alternates: { canonical: '/about' },
 };
 
 export default function AboutPage() {
