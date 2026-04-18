@@ -69,9 +69,12 @@ export default function Hero() {
       {/* Main identity — two-column on lg+ (portrait left, text right), stacked on mobile */}
       <div className="relative z-10 grid w-full max-w-content grid-cols-1 items-start gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          // initial={false}: skip the outer opacity/scale fade-in. Inner
+          // children still orchestrate their own staggered FADE_UP via the
+          // `custom` variants, so the composed entrance is preserved — we just
+          // don't gate everything inside on this wrapper's animation frame.
+          initial={false}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           className="lg:order-last"
         >
           <motion.p
@@ -191,11 +194,13 @@ export default function Hero() {
 
         {/* Portrait — head-centered 4:5 crop, face-isolated brightness boost
             baked into the source (see /tmp/face-brighten.py). Embossed on the
-            page: no border, no drop shadow. lg:mt-9 aligns the top with the name line. */}
+            page: no border, no drop shadow. lg:mt-9 aligns the top with the name line.
+            initial={false}: portrait IS the LCP target; a 350ms delay + 900ms
+            fade-in would force Lighthouse to wait for the animation to resolve
+            before scoring LCP. Paint at final state on first frame. */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.94, y: 12 }}
+          initial={false}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
           className="relative order-first mx-auto aspect-[4/5] w-48 overflow-hidden rounded-2xl sm:w-60 lg:mx-0 lg:mt-9 lg:w-72 xl:w-80"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
