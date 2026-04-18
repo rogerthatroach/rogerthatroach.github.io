@@ -97,7 +97,7 @@ export default function TableOfContents() {
         <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
           Contents
         </p>
-        <ul className="space-y-1.5">
+        <ul>
           {headings.map((h) => (
             <li key={h.id}>
               <a

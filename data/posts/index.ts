@@ -232,7 +232,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Industrial ML', 'Digital Twin', 'Trust Layer', 'TCS'],
       readingTime: '6 min read',
       abstract:
-        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover industrial ML as a trust problem with a modeling problem inside it: the 84-model + PSO stack that produced recommendations, and the relationship with plant operators that made them actionable. Ties the Digital Twin lesson to the Tableau-as-trust-layer pattern at RBC \u2014 same principle, different industry.',
+        'Industrial ML is not a modeling problem \u2014 it\u2019s a trust problem with a modeling problem inside it. The story of the Digital Twin at a 900MW coal plant in Japan: 84 regression models across 90+ sensors, Particle Swarm Optimization over the model outputs, and the first iteration of recommendations the plant operators ignored. What it took to build the credibility that made ML recommendations actionable at 900MW, and how the lesson ported to Commodity Tax at RBC six years later.',
       status: 'draft',
     },
     references: [],
@@ -259,7 +259,7 @@ export const POSTS: BlogPost[] = [
       tags: ['ML Economics', 'Document AI', 'Hybrid ML', 'Insurance', 'Quantiphi'],
       readingTime: '6 min read',
       abstract:
-        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover the accuracy cliff (why 70% is unusable, 95% still unusable, 99.95% enables full automation), the layered Document AI + OpenCV + Random Forest architecture that got there, and two insights that shaped later RAG work at RBC: cost-per-inference matters as much as accuracy at scale, and document structure is itself information.',
+        'Document verification accuracy is a step function, not a gradient: 70% is unusable, 95% is still unusable, 99.95% enables full automation. The story of getting Humana\u2019s checkbox extraction across that cliff via a hybrid stack \u2014 Document AI for OCR, OpenCV for pixel-level detection, Random Forest for edge cases. Plus two insights that shaped later RAG work at RBC: cost-per-inference matters as much as accuracy at scale, and document structure is itself information.',
       status: 'draft',
     },
     references: [],
@@ -286,7 +286,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Aegis'],
       readingTime: '6 min read',
       abstract:
-        'DRAFT SCAFFOLD \u2014 not yet fully written. The post will cover the five-stage Aegis v2 pipeline (intent parsing, KPI detection, disambiguation, guardrailed SQL, deterministic formatting), and the differentiating insight: 2-week delivery isn\u2019t working harder \u2014 it\u2019s architectural clarity plus months of mental rehearsal plus ruthless scoping. Ties back to the Astraeus LLM-as-Router pattern \u2014 same family, tighter intent classification.',
+        'Aegis v2 shipped in two weeks while Astraeus was mid-flight and the Amplify program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the Astraeus LLM-as-Router pattern \u2014 same family, tighter intent classification.',
       status: 'draft',
     },
     references: [],
