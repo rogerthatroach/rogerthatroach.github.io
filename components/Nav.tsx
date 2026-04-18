@@ -37,13 +37,13 @@ export default function Nav() {
           HSD
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-3 sm:gap-6">
           {NAV_LINKS.map((link) =>
             link.href.startsWith('/') && !link.href.startsWith('/#') ? (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-text-secondary transition-colors hover:text-text-primary"
+                className="text-xs text-text-secondary transition-colors hover:text-text-primary sm:text-sm"
               >
                 {link.label}
               </Link>
@@ -51,7 +51,7 @@ export default function Nav() {
               <a
                 key={link.href}
                 href={link.href}
-                className="hidden text-sm text-text-secondary transition-colors hover:text-text-primary sm:block"
+                className="text-xs text-text-secondary transition-colors hover:text-text-primary sm:text-sm"
               >
                 {link.label}
               </a>
