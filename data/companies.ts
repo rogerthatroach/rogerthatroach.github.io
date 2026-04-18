@@ -8,16 +8,12 @@ export interface Company {
   accent: string;
   /** Optional external profile link (company website or LinkedIn) */
   href?: string;
+  /** Optional logo path (relative to /public). When set, Hero renders the
+   *  logo next to the shortName. */
+  logo?: string;
 }
 
-/**
- * Work history, newest first. Rendered in Hero as a horizontal strip.
- *
- * NOTE on logos: we render text treatments (shortName in brand color),
- * not raw SVG logos. Reasons: trademarks, maintenance, and the site's
- * wabi-sabi aesthetic. If actual logo SVGs become available, extend
- * Company with `logo?: string` and render conditionally.
- */
+/** Work history, newest first. Rendered in Hero as a horizontal strip. */
 export const COMPANIES: Company[] = [
   {
     id: 'rbc',
@@ -27,6 +23,7 @@ export const COMPANIES: Company[] = [
     role: 'AI & Data Science Lead (2025–), Sr. Data Scientist (2022–2025)',
     accent: '#0051A5',
     href: 'https://www.rbc.com/',
+    logo: '/images/logos/rbc.svg',
   },
   {
     id: 'quantiphi',
@@ -45,5 +42,6 @@ export const COMPANIES: Company[] = [
     role: 'Data Scientist',
     accent: '#E31837',
     href: 'https://www.tcs.com/',
+    logo: '/images/logos/tcs.svg',
   },
 ];

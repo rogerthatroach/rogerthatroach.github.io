@@ -65,12 +65,13 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
-      {/* Main identity — centered, left-aligned text */}
-      <div className="relative z-10 max-w-content">
+      {/* Main identity — two-column on lg+ (portrait left, text right), stacked on mobile */}
+      <div className="relative z-10 grid w-full max-w-content grid-cols-1 items-start gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+          className="lg:order-last"
         >
           <motion.p
             custom={0}
@@ -144,6 +145,15 @@ export default function Hero() {
                 className="group inline-flex items-center gap-2 rounded-md border border-border-subtle bg-surface/40 px-3 py-1.5 text-xs font-semibold tracking-wide backdrop-blur-sm transition-all hover:bg-surface-hover"
                 style={{ color: c.accent }}
               >
+                {c.logo && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={c.logo}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-5 w-auto max-w-[48px] shrink-0 object-contain"
+                  />
+                )}
                 {c.shortName}
                 <span className="font-mono text-[10px] font-normal text-text-tertiary transition-colors group-hover:text-text-secondary">
                   {c.period}
@@ -176,6 +186,23 @@ export default function Hero() {
               </a>
             ))}
           </motion.div>
+        </motion.div>
+
+        {/* Portrait — head-centered 4:5 crop, face-isolated brightness boost
+            baked into the source (see /tmp/face-brighten.py). Embossed on the
+            page: no border, no drop shadow. lg:mt-9 aligns the top with the name line. */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.94, y: 12 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
+          className="relative order-first mx-auto aspect-[4/5] w-48 overflow-hidden rounded-2xl sm:w-60 lg:mx-0 lg:mt-9 lg:w-72 xl:w-80"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/portrait.webp"
+            alt="Harmilap Singh Dhaliwal"
+            className="h-full w-full object-cover"
+          />
         </motion.div>
       </div>
 
@@ -225,7 +252,7 @@ export default function Hero() {
               {NUMBER_SEQUENCE.map((_, i) => (
                 <motion.div
                   key={i}
-                  className="h-0.5 rounded-full"
+                  className="h-0.5 rounded-2xl"
                   animate={{
                     width: i === frame ? 24 : 6,
                     backgroundColor: i === frame ? 'var(--color-accent)' : 'var(--color-border)',
@@ -243,7 +270,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: sequenceDone ? 1 : 0 }}
         transition={{ delay: 0.5, duration: 0.8 }}
-        className="absolute bottom-28 left-1/2 z-10 -translate-x-1/2"
+        className="absolute bottom-28 left-1/2 z-10 hidden -translate-x-1/2 sm:block"
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}
