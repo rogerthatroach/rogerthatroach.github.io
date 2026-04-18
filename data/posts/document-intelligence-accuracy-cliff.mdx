@@ -1,87 +1,63 @@
-{/*
-  DRAFT SCAFFOLD — not full prose. Section headers + 2-3 starter
-  sentences each, drawn from the existing Document Intelligence
-  case study. Your voice goes in the blanks. When fully authored,
-  remove all {/* TODO */} markers and flip status: 'draft' →
-  'published' in data/posts/index.ts.
-*/}
-
 At Quantiphi, I led the Document Intelligence work for Humana &mdash; an insurance claims processing pipeline where document verification accuracy went from ~70% with Google Cloud Document AI alone to 99.95% after a layered hybrid approach.
 
 The engineering that got there is one story. What I actually learned &mdash; the part that shaped every RAG pipeline I built at RBC three years later &mdash; is a different one.
 
 ## The accuracy cliff
 
-{/* TODO: 2–3 sentences in your voice. Starter:
-Document verification is a step function, not a gradient. At 70%
-accuracy, the pipeline is unusable: every document needs manual
-review. At 95%, it&rsquo;s still unusable for most production use cases:
-the exceptions compound. At 99.95%, it becomes a full-automation
-pipeline. The engineering-value-per-percentage-point is wildly
-non-linear.
-*/}
+Document verification accuracy is a step function, not a gradient.
+
+At 70% accuracy, a pipeline is unusable: every document needs manual review, so the ML is doing nothing except adding latency. At 90%, it&rsquo;s still unusable for most production use cases: a 10% miss rate means one in ten claims flows through with wrong data, which is a worse outcome than slow-and-manual. At 95%, you can start routing high-confidence documents through auto-processing and flagging the rest for review, which saves some time but doesn&rsquo;t transform the workflow. At 99.95%, the pipeline becomes a full-automation system: the miss rate is low enough that the exceptions are an exception-handling problem, not a review-everything problem.
+
+The engineering value per percentage point is wildly non-linear. Going from 70% to 90% is a lot of effort with little workflow impact. Going from 95% to 99.95% is more effort with transformative workflow impact. Where you spend the engineering is a strategic decision, not a uniform optimization.
+
+Humana&rsquo;s checkbox extraction on scanned claim forms landed at ~70% with Document AI alone. Document AI is excellent at what it does &mdash; OCR, key-value extraction from structured forms &mdash; but on checkboxes specifically, where the signal is a few pixels of ink in a small box, general-purpose OCR plateaus well below the threshold that turns review-everything into exception-handling.
+
+We needed to be on the right side of the cliff.
 
 ## The hybrid stack
 
-{/* TODO: Describe the three-layer approach and why each layer earned
-its place.
-- Document AI OCR as the base layer &mdash; cheap, good, not specific enough
-- OpenCV for pixel-level checkbox detection &mdash; targeted, deterministic
-- Random Forest classifier on top &mdash; learns the edge cases
-- Vertex AI for deployment; BigTable + BigQuery for ingestion at scale
+The obvious instinct was to train a bigger custom model and expect it to clear 99%. The right answer was to stop trying to make one model carry the whole load.
 
-The question the reader wants answered: why this layered approach
-instead of training one bigger model? Cost-per-inference. Document
-AI is fast and cheap; custom models are slow and expensive. The
-architecture routes documents to the right layer based on what
-they need.
-*/}
+- **Document AI** handles OCR and layout parsing. It&rsquo;s fast, cheap per-inference, and it correctly identifies where the checkboxes *are* on the page even when it can&rsquo;t reliably tell whether they&rsquo;re ticked.
+- **OpenCV pixel-level detection** takes the bounding boxes Document AI returns and runs targeted image processing inside them. At the pixel level, "is there ink in this box" is a much cleaner problem than "is this checkbox ticked" at the document level. Deterministic, fast, transparent.
+- **Random Forest classification** sits on top and handles the edge cases the pixel-level detection can&rsquo;t cleanly classify: partially-marked boxes, smudged scans, unusual tick styles. Trained on a modest dataset of the genuinely ambiguous cases.
+- Everything runs through **Vertex AI** for deployment and **BigQuery** for downstream analytics.
+
+The layered architecture moved checkbox accuracy from ~70% to 99.95%. No single-model approach would have done that at Humana&rsquo;s scale without an order of magnitude more training data and inference cost.
 
 ## ML economics is not ML metrics
 
-{/* TODO: This is the differentiating insight for the post.
-At production scale, cost-per-inference matters as much as accuracy.
-A pipeline that&rsquo;s 0.5% more accurate but 10× more expensive is
-the wrong trade for most use cases. The architectural decision
-to route expensive custom models only to documents that need them
-was the difference between a working pipeline and an economically
-infeasible one.
+The second-order question nobody asks at the demo stage is: what does this cost per document, and does that cost scale with your business?
 
-Draw on your actual experience at Quantiphi: how did you think
-about cost-per-document? Were there moments where the team pushed
-for accuracy and you pushed back on economics?
-*/}
+Document AI is pennies per page. OpenCV is essentially free at the margin &mdash; it&rsquo;s deterministic compute, no model inference. Custom Vertex AI models are expensive relative to both. If you route every document through custom inference, the pipeline accuracy is great and the unit economics are terrible. The architecture has to be cost-conscious: cheap layers screen out what they can handle, expensive layers only run on what genuinely needs them.
+
+This sounds obvious written down. At the time, it wasn&rsquo;t. The industry instinct in 2021 was "more model solves it," and the infrastructure pricing was mostly invisible to the team making architecture decisions. We were doing cost-per-inference math alongside accuracy-per-model math because Humana&rsquo;s claim volume would have blown through its ML budget otherwise. Every subsequent production ML system I&rsquo;ve built has inherited the same habit: the unit economics are an architectural constraint, not a finance department concern.
 
 ## Document structure is information
 
-{/* TODO: The second big insight worth a section.
-Where a field appears in a document &mdash; header vs. body vs. footer
-&mdash; is itself signal. Knowing a &ldquo;date&rdquo; field is in the header
-vs. the body dramatically changes the right extraction approach.
-This structure-aware thinking carried over directly to RAG at RBC:
-chunking documents by structure (sections, headings) rather than
-fixed token windows was the difference between useful and useless
-retrieval.
+The other thing Humana taught me was that *where* a field appears in a document carries signal that isn&rsquo;t captured in the text alone.
 
-This connects Humana to your later work. Make that thread visible.
-*/}
+A date in the header of a claim form is a submission date. A date in the body is an incident date. A date in the footer is an approval date. The same three characters "1/5" in three different regions of the page have three different meanings and three different downstream uses. A pipeline that treats them identically because they&rsquo;re all "dates" will route claims incorrectly.
+
+We built the extraction layer to tag every field with its structural context: which section it came from, which column it lives in, whether it sits in a form-field bounding box or free-text. That context became an input feature downstream. Extraction accuracy improved; routing accuracy improved more.
+
+This insight carried directly into my later work at RBC. When I built the RAG pipelines for PAR Assist &mdash; chunking PDFs, PPTX decks, DOCX files &mdash; the instinct to chunk by structure (sections, headings) rather than by fixed token windows came straight from Humana. Retrieval quality depends on whether the chunks are semantically coherent. Structure-aware chunking produces coherent chunks. Fixed-window chunking produces decontextualized fragments. The difference between useful and useless retrieval is whether you respect the document&rsquo;s own organization.
 
 ## The result
 
-- 99.95% checkbox accuracy (up from ~70%)
-- Production-ready pipeline for Humana&rsquo;s claims workflow
-- Replicable pattern that Quantiphi could adapt across other insurance clients
-- Architectural lessons that directly informed RAG design at RBC
+- 99.95% checkbox accuracy, up from ~70% with Document AI alone
+- A production pipeline that Humana used for active claims workflows
+- A replicable GCP pattern that Quantiphi adapted across other insurance clients
+- Architectural lessons that shaped RAG design three years later
 
 ## The pattern
 
-{/* TODO: Zoom out. Two ideas to weave together:
-1. The accuracy cliff means investment shifts non-linearly as you
-   approach production-ready thresholds.
-2. Cost-per-inference becomes a first-class design concern at scale;
-   ML economics determines architecture as much as ML metrics.
+Two takeaways worth generalizing:
 
-Both of these are general lessons that apply beyond document
-verification &mdash; you could close with one line about how they
-show up in later systems.
-*/}
+1. **The accuracy cliff is non-linear.** The engineering value per percentage point depends on which cliff you&rsquo;re climbing. Spend effort where it crosses the threshold that changes the workflow shape, not uniformly across the accuracy spectrum.
+
+2. **Cost-per-inference is a first-class design concern at scale.** ML economics determines architecture as much as ML metrics do. Cheap layers screen; expensive layers only run when they earn the call.
+
+Both of these generalize beyond document processing. Every production ML system at enterprise scale has an accuracy cliff somewhere and a unit-cost constraint somewhere, and the architecture has to be designed for both. The instinct to ignore either one &mdash; "just make it more accurate" or "just add more compute" &mdash; is how production pipelines become economically infeasible.
+
+The technology changes. The pattern doesn&rsquo;t.
