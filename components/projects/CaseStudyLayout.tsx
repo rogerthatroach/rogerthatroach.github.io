@@ -10,6 +10,7 @@ import type { CaseStudy } from '@/data/projectCaseStudies';
 import PageTransition from '@/components/ui/PageTransition';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import { paletteStyle } from '@/lib/palette';
 
 interface CaseStudyLayoutProps {
   project: Project;
@@ -154,12 +155,8 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
           >
             <div className="flex flex-wrap items-center gap-3">
               <span
-                className="rounded-full px-3 py-1 font-mono text-xs font-medium"
-                style={{
-                  color: project.palette.primary,
-                  backgroundColor: `${project.palette.primary}15`,
-                  border: `1px solid ${project.palette.primary}30`,
-                }}
+                className="palette-pill rounded-full border px-3 py-1 font-mono text-xs font-medium"
+                style={paletteStyle(project.palette)}
               >
                 {caseStudy.era}
               </span>

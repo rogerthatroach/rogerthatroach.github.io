@@ -12,6 +12,16 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main id="main-content">
+      {/* Priority-hinted preload for the portrait (LCP candidate on /about). */}
+      <link
+        {...({
+          rel: 'preload',
+          as: 'image',
+          href: '/images/portrait.webp',
+          type: 'image/webp',
+          fetchpriority: 'high',
+        } as React.HTMLAttributes<HTMLLinkElement>)}
+      />
       <Nav />
       <div className="pt-16">
         <AboutSection />

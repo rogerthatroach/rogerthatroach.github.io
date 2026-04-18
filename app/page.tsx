@@ -9,10 +9,23 @@ import RecognitionSection from '@/components/RecognitionSection';
 import Footer from '@/components/Footer';
 import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
+import { paletteStyle } from '@/lib/palette';
 
 export default function Home() {
   return (
     <main id="main-content">
+      {/* Priority-hinted preload for the LCP portrait. Next's auto-preload
+          doesn't carry fetchpriority; this one does. Next hoists <link>
+          tags inside app-router components into <head>. */}
+      <link
+        {...({
+          rel: 'preload',
+          as: 'image',
+          imagesrcset: '/images/portrait-sm.webp 700w, /images/portrait.webp 1000w',
+          imagesizes: '(max-width: 640px) 224px, 320px',
+          fetchpriority: 'high',
+        } as React.HTMLAttributes<HTMLLinkElement>)}
+      />
       <Nav />
       <Hero />
 
@@ -51,12 +64,8 @@ export default function Home() {
                     className="group flex items-center gap-4 py-4 transition-colors hover:bg-surface-hover"
                   >
                     <span
-                      className="hidden shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-medium sm:inline"
-                      style={{
-                        color: project.palette.primary,
-                        backgroundColor: `${project.palette.primary}15`,
-                        border: `1px solid ${project.palette.primary}30`,
-                      }}
+                      className="palette-pill hidden shrink-0 rounded-full border px-2.5 py-0.5 text-[10px] font-medium sm:inline"
+                      style={paletteStyle(project.palette)}
                     >
                       {caseStudy.era}
                     </span>
@@ -70,8 +79,8 @@ export default function Home() {
                     </div>
                     <div className="hidden shrink-0 flex-col items-end md:flex">
                       <span
-                        className="font-mono text-sm font-bold"
-                        style={{ color: project.palette.primary }}
+                        className="palette-text font-mono text-sm font-bold"
+                        style={paletteStyle(project.palette)}
                       >
                         {project.heroMetric.value}
                       </span>
