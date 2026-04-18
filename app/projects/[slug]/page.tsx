@@ -38,6 +38,7 @@ export function generateMetadata({
   return {
     title: `${project.title} — ${project.subtitle}`,
     description: project.caption,
+    alternates: { canonical: `/projects/${params.slug}` },
     openGraph: {
       title: `${project.title} — ${project.subtitle}`,
       description: project.caption,
