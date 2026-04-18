@@ -86,22 +86,14 @@ export default function AboutSection() {
             transition={{ delay: 0.3, duration: 0.5 }}
             className="lg:sticky lg:top-24 lg:self-start lg:w-[280px]"
           >
-            {/*
-              PLACEHOLDER — when a real portrait is ready:
-              1. Drop the file at public/images/portrait.jpg (or .webp)
-              2. Replace the inner <div> with:
-                 <img src="/images/portrait.jpg" alt="Harmilap Singh Dhaliwal" className="h-full w-full object-cover" />
-              Keep the aspect ratio and rounded-2xl wrapper intact.
-            */}
             <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl border border-border-subtle bg-surface/50">
-              <div className="flex h-full items-center justify-center">
-                <div className="text-center">
-                  <div className="font-mono text-5xl font-semibold tracking-tight text-text-tertiary">HSD</div>
-                  <div className="mt-3 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                    Portrait
-                  </div>
-                </div>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/portrait.jpeg"
+                alt="Harmilap Singh Dhaliwal"
+                className="h-full w-full object-cover"
+                loading="lazy"
+              />
             </div>
 
             <a
