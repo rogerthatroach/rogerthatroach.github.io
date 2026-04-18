@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: 'Projects — Harmilap Singh Dhaliwal',
   description:
     'Case studies: from Digital Twins saving $3M to enterprise agentic AI platforms — the full story behind each project.',
+  alternates: { canonical: '/projects' },
 };
 
 export default function ProjectsIndexPage() {
