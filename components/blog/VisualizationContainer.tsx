@@ -31,19 +31,20 @@ export default function VisualizationContainer({
     return () => observer.disconnect();
   }, []);
 
+  // Known issue: hydration mismatch on the blog page (React #418/#423/#425)
+  // when the IntersectionObserver fires during initial hydration. Tried:
+  //   - suppressHydrationWarning on the wrapper (React still logs the errors
+  //     because these are hydration FAILURES, not just warnings)
+  //   - two-phase mount guard (fixed BP but Lighthouse mobile couldn't
+  //     measure LCP/TBT/TTI through the delayed diagram render, perf=0)
+  // Blog BP stays at 96/100 on the Lighthouse audit as a known gap;
+  // users don't see or hear about it. Mobile perf 97 is the priority.
   return (
     <figure className={`my-8 ${className ?? ''}`}>
-      {/* suppressHydrationWarning: children(isVisible) is intentionally
-          different on server (false) vs first client render (may flip true
-          when the observer fires). Telling React not to warn here is safe
-          because we KNOW the markup will diverge and that divergence is
-          functional (diagram renders), not a bug. Fixes BP=96 from React
-          #418/#423/#425 errors on blog posts. */}
       <div
         ref={containerRef}
         className="overflow-hidden rounded-xl border border-border-subtle bg-surface/50"
         style={{ minHeight }}
-        suppressHydrationWarning
       >
         {children(isVisible)}
       </div>
