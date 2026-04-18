@@ -1,69 +1,48 @@
-{/*
-  DRAFT SCAFFOLD — not full prose. Section headers + 2-3 starter
-  sentences each, drawn from the existing Combustion Tuning case
-  study. Your voice goes in the blanks. When fully authored, remove
-  all {/* TODO */} markers and flip status: 'draft' → 'published'
-  in data/posts/index.ts.
-*/}
-
-In 2016, my first real job in data science was a coal plant. Specifically, a 900MW unit at the Maizuru power plant in Japan, and the machine-learning work TCS was doing to help it burn fuel more efficiently.
+In 2016, my first serious job in data science was a coal plant. Specifically, a 900MW unit at the Maizuru power plant in Japan, and the machine-learning work TCS was doing in partnership with MHPS to help it burn fuel more efficiently.
 
 The project that followed was where I learned that industrial ML is not a modeling problem. It&rsquo;s a trust problem with a modeling problem inside it.
 
 ## The problem
 
-{/* TODO: 2–3 sentences in your voice. Starter:
-The plant&rsquo;s combustion settings had been calibrated against idealized
-bench conditions, not the live dynamics of an operating plant. Fuel
-blends shifted, sensor readings drifted, boiler behavior wasn&rsquo;t what
-the calibration assumed. The operating band was wide, and the plant
-ran inside it without precision.
-*/}
+Maizuru had 90-plus sensors generating continuous operational data: temperatures at different points in the boiler, pressure readings, air and fuel flow rates, emissions measurements for NOx, SOx, and CO. The plant&rsquo;s combustion settings had been calibrated during commissioning against idealized conditions, not against the live dynamics of a boiler running at 900MW under varying load. Fuel blends shifted. Sensor readings drifted. The plant was operating inside a wide band, which meant real money was leaking in fuel waste and real emissions were going out the stack that could have been lower.
+
+Nobody needed a paper about combustion optimization. They needed an operational tool that an operator could act on during the next tuning cycle.
 
 ## The technical approach
 
-{/* TODO: Cover the stack and why.
-- 84 multi-output regression models across 90+ sensors
-- k-fold cross-validation, R², RMSE, MAPE, fold variance checks
-- Particle Swarm Optimization over the model outputs as objective
-  functions
-- Closed-loop: sensors → models → PSO → operator adjustments
+The architectural question was whether to use one model or many.
 
-The technical bullets exist already in the case study; this section
-is where you turn them into practitioner prose. What did you actually
-do day to day? What was hard?
-*/}
+A single model predicting all the outputs is simpler to maintain, but it can&rsquo;t capture the distinct dynamics of each emission type. NOx behaves differently from SOx, which behaves differently from CO, which behaves differently from overall thermal efficiency. Compressing all of them into one prediction head means forcing the model to trade off objectives you&rsquo;d rather keep independent.
+
+We built 84 multi-output regression models instead, one per prediction target, validated the ensemble via k-fold cross-validation with R&sup2;, RMSE, MAPE, and fold-variance stability as criteria, and then used those models as the objective function for Particle Swarm Optimization. PSO explored the input space, treating each model as a black box that returned "given this sensor configuration, here&rsquo;s the predicted emission level." The optimizer searched for configurations that minimized emissions while keeping efficiency in bounds. The result was a set of recommended sensor settings for the next tuning cycle.
+
+That&rsquo;s the clean technical description. Day-to-day, it was a lot of dealing with sensor noise, arguing with ourselves about whether a particular fold&rsquo;s variance was signal or artifact, and rebuilding pipelines when a new data drop revealed something the training set hadn&rsquo;t covered.
 
 ## What the operators taught me
 
-{/* TODO: This is the heart of the post. Your actual story.
-Industrial ML recommendations are only valuable if operators trust
-them enough to act on them. A recommendation an operator ignores is
-a recommendation that does nothing. Your job wasn&rsquo;t just building
-models; it was building the credibility with the plant operators
-that made the models&rsquo; output actionable.
+The first iteration of the system produced recommendations. The operators ignored them.
 
-Ideas to draw on:
-- How did you introduce yourself to the operators? What did that
-  first week look like?
-- What did they teach you about the plant that the data didn&rsquo;t?
-- Was there a moment where they pushed back and you learned from it?
-- How did recommendations move from &ldquo;suggested&rdquo; to &ldquo;actually
-  applied&rdquo; over the course of the project?
-*/}
+Not out of malice. Out of the entirely reasonable position of: I have been tuning this plant for twenty years, you have been looking at the data for six months, why would I change a valve position because a spreadsheet told me to. If I make a wrong adjustment at 900MW, something expensive and possibly dangerous happens. The recommendation has to earn the adjustment.
+
+The first few tuning cycles after deployment, I spent more time with the operators than with the models. They would run the pipeline, see a recommendation, and ask me what it meant. Not in general terms. Specifically: which valve, by how much, why. An abstract recommendation &mdash; "increase air flow in the secondary zone by 3%" &mdash; was useless until it translated into the exact operational knob they were going to turn. So I learned their language. The recommendations started shipping in their terms, with traceable reasoning: the model predicts that moving this knob by this amount reduces NOx by this much, here&rsquo;s which sensors the prediction depends on, here&rsquo;s how confident we are.
+
+They also taught me things the data hadn&rsquo;t. The plant had quirks &mdash; which burner tended to run hot under certain load conditions, how the fuel supplier&rsquo;s blend varied seasonally, where a particular sensor was flaky and should be weighted less. None of this was in the dataset. All of it mattered. Some of the most valuable improvements to the system came from encoding operator intuition into features the model could use.
+
+Within a few cycles, recommendations were getting applied. Within more, operators were calling us to flag cases where the model was confused and asking how to improve it. The pipeline became collaborative, not prescriptive.
 
 ## The result
 
 - $3M/year in fuel savings
-- Measurable reduction in NOx, SOx, CO emissions
-- Framework became a replicable template for other industrial clients at TCS
-- Two Star of the Month awards, 2017 and 2019
+- Measurable reduction in NOx, SOx, and CO emissions
+- The Digital Twin concept became a replicable framework that TCS applied to other industrial clients
+- Star of the Month awards in 2017 and 2019
 
 ## The pattern
 
-{/* TODO: Zoom out. This is where the closed-loop pattern first
-appeared for you &mdash; sense, model, optimize, act &mdash; and where
-you learned that the &ldquo;act&rdquo; step depends on humans. The
-Tableau-as-trust-layer insight from Commodity Tax is the financial
-version of the same lesson you learned at 900MW. Tie them together.
-*/}
+This was the first time the closed-loop pattern appeared in my work &mdash; sense, model, optimize, act &mdash; and the first time I learned that the "act" step depends on humans who have to trust the system enough to do it.
+
+Six years later, when I was building Commodity Tax at RBC, the same pattern showed up in a different industry. The technical layer was PySpark and Tableau instead of regression models and PSO. The trust layer was finance analysts instead of plant operators. The requirement was the same: a system whose outputs the humans who own the decision are willing to act on, and whose reasoning they can audit when they&rsquo;re skeptical.
+
+That&rsquo;s not an industrial ML lesson or a financial AI lesson. It&rsquo;s a production AI lesson. The model being right is necessary; it is never sufficient.
+
+The technology changes. The pattern doesn&rsquo;t.
