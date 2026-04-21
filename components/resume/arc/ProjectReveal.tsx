@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useInView, useReducedMotion } from 'framer-motion';
 import type { ProjectHighlight, TimelineNode } from '@/data/timeline';
+import Glossed from '@/components/resume/story/Glossed';
 import { cn } from '@/lib/utils';
 
 const ACCENT_BORDER_STRONG: Record<TimelineNode['accent'], string> = {
@@ -72,14 +73,14 @@ export default function ProjectReveal({
         </p>
       )}
       <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-        {project.oneLiner}
+        <Glossed>{project.oneLiner}</Glossed>
       </p>
       {project.decisionRationale && (
         <div className="mt-3 rounded-md bg-background/40 p-3 text-xs leading-relaxed text-text-secondary">
           <span className="mr-2 font-mono font-semibold uppercase tracking-wider text-accent">
             Decision
           </span>
-          {project.decisionRationale}
+          <Glossed>{project.decisionRationale}</Glossed>
         </div>
       )}
       {(project.caseStudyLink || project.blogLink) && (
