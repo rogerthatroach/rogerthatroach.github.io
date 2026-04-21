@@ -46,7 +46,7 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
 
 export default function MetricsRibbon() {
   return (
-    <div className="border-y border-border-subtle bg-surface/30">
+    <div id="through-line" className="border-y border-border-subtle bg-surface/30">
       <div className="mx-auto max-w-content px-6 md:px-16">
         {/* Through-line: the thesis that ties every system together */}
         <div className="mx-auto max-w-2xl pt-12 text-center sm:pt-14">

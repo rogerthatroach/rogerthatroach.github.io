@@ -60,7 +60,7 @@ export default function Hero() {
   }, [frame, advance, sequenceDone]);
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 md:px-16">
+    <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 md:px-16">
       <ParticleField />
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
@@ -274,22 +274,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll prompt */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: sequenceDone ? 1 : 0 }}
-        transition={{ delay: 0.5, duration: 0.8 }}
-        className="absolute bottom-28 left-1/2 z-10 hidden -translate-x-1/2 sm:block"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-          className="flex flex-col items-center gap-2"
-        >
-          <span className="text-xs text-text-tertiary">Scroll</span>
-          <div className="h-8 w-px bg-gradient-to-b from-text-tertiary to-transparent" />
-        </motion.div>
-      </motion.div>
     </section>
   );
 }

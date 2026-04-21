@@ -6,7 +6,17 @@ import MetricsRibbon from '@/components/MetricsRibbon';
 import NowBuilding from '@/components/NowBuilding';
 import SkillTimeline from '@/components/SkillTimeline';
 import RecognitionSection from '@/components/RecognitionSection';
+import SectionProgress from '@/components/SectionProgress';
 import Footer from '@/components/Footer';
+
+const HOME_SECTIONS = [
+  { id: 'hero', label: 'Intro' },
+  { id: 'through-line', label: 'Through-line' },
+  { id: 'now', label: 'Now' },
+  { id: 'journey', label: 'Journey' },
+  { id: 'work', label: 'Projects' },
+  { id: 'recognition', label: 'Recognition' },
+];
 import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
 import { paletteStyle } from '@/lib/palette';
@@ -27,6 +37,7 @@ export default function Home() {
         } as React.HTMLAttributes<HTMLLinkElement>)}
       />
       <Nav />
+      <SectionProgress sections={HOME_SECTIONS} />
       <Hero />
 
       {/* Through-line + Stats — thesis and proof in one block (was two sections) */}
