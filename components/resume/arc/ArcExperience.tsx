@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion';
-import { ChevronDown, Download, ArrowRight, LayoutList } from 'lucide-react';
+import { ChevronDown, Download, ArrowRight, LayoutList, Linkedin } from 'lucide-react';
 import { TIMELINE } from '@/data/timeline';
 import { HERO } from '@/data/hero';
 import ArcProgress from './ArcProgress';
@@ -123,9 +123,10 @@ export default function ArcExperience() {
                 href={HERO.links.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-text-tertiary hover:text-accent"
+                className="group inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-surface/50 px-4 py-2 text-sm font-medium text-text-secondary transition-colors hover:border-accent/40 hover:text-accent"
               >
-                linkedin.com/in/harmilapsingh →
+                <Linkedin size={16} />
+                LinkedIn
               </a>
             </div>
           </div>
