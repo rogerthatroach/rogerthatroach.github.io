@@ -18,10 +18,10 @@ export interface Metric {
 // numericValue and tacks on the suffix, so the short display form is a
 // rendering concern, not a truth concern.
 export const METRICS: Metric[] = [
-  { value: YEARS_EXPERIENCE, numericValue: 8, suffix: '+', label: 'Years in AI/ML', context: '2016–present' },
+  { value: YEARS_EXPERIENCE, numericValue: 7.5, suffix: '+', label: 'Years in AI/ML', context: '2016–present' },
   { value: DIGITAL_TWIN_SAVINGS, numericValue: 3, suffix: 'M', label: 'Cost Savings Delivered', context: 'Digital Twin — annual' },
-  { value: String(PRODUCTION_SYSTEMS_COUNT), numericValue: PRODUCTION_SYSTEMS_COUNT, label: 'Production AI Systems', context: 'PAR Assist, Astraeus, Aegis v1 & v2' },
-  { value: '40K+', numericValue: 40, suffix: 'K+', label: 'Factorial Combinations', context: 'Astraeus — on-the-fly millisecond slicing' },
-  { value: '2wk', numericValue: 2, suffix: 'wk', label: 'Fastest Delivery', context: 'Aegis v2 — full product' },
+  { value: String(PRODUCTION_SYSTEMS_COUNT), numericValue: PRODUCTION_SYSTEMS_COUNT, label: 'Production AI Systems', context: 'PAR Assist, Astraeus, Aegis (v1 → v2 refactor)' },
+  { value: '40K+', numericValue: 40, suffix: 'K+', label: 'Transits Analyzed', context: 'Astraeus — on-the-fly millisecond slicing' },
+  { value: '2wk', numericValue: 2, suffix: 'wk', label: 'Fastest Refactor', context: 'Aegis v1 → v2 concurrent sprint' },
   { value: String(AWARDS_COUNT), numericValue: AWARDS_COUNT, label: 'Awards & Recognition', context: 'RBC + TCS' },
 ] as const;
