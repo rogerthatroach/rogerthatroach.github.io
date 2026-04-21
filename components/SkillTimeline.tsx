@@ -10,11 +10,11 @@ import { cn } from '@/lib/utils';
 
 const ACCENT_COLORS = {
   blue: { dot: 'bg-blue-500', border: 'border-blue-500/40', bg: 'bg-blue-500/10', text: 'text-blue-500', glow: 'shadow-blue-500/20' },
-  emerald: { dot: 'bg-emerald-500', border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-500', glow: 'shadow-emerald-500/20' },
-  amber: { dot: 'bg-amber-500', border: 'border-amber-500/40', bg: 'bg-amber-500/10', text: 'text-amber-500', glow: 'shadow-amber-500/20' },
-  purple: { dot: 'bg-purple-500', border: 'border-purple-500/40', bg: 'bg-purple-500/10', text: 'text-purple-500', glow: 'shadow-purple-500/20' },
-  cyan: { dot: 'bg-cyan-500', border: 'border-cyan-500/40', bg: 'bg-cyan-500/10', text: 'text-cyan-500', glow: 'shadow-cyan-500/20' },
-  rose: { dot: 'bg-rose-500', border: 'border-rose-500/40', bg: 'bg-rose-500/10', text: 'text-rose-500', glow: 'shadow-rose-500/20' },
+  emerald: { dot: 'bg-emerald-500', border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-300', glow: 'shadow-emerald-500/20' },
+  amber: { dot: 'bg-amber-500', border: 'border-amber-500/40', bg: 'bg-amber-500/10', text: 'text-amber-700 dark:text-amber-300', glow: 'shadow-amber-500/20' },
+  purple: { dot: 'bg-purple-500', border: 'border-purple-500/40', bg: 'bg-purple-500/10', text: 'text-purple-700 dark:text-purple-300', glow: 'shadow-purple-500/20' },
+  cyan: { dot: 'bg-cyan-500', border: 'border-cyan-500/40', bg: 'bg-cyan-500/10', text: 'text-cyan-700 dark:text-cyan-300', glow: 'shadow-cyan-500/20' },
+  rose: { dot: 'bg-rose-500', border: 'border-rose-500/40', bg: 'bg-rose-500/10', text: 'text-rose-700 dark:text-rose-300', glow: 'shadow-rose-500/20' },
 };
 
 interface SkillTimelineProps {

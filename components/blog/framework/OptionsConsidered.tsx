@@ -83,7 +83,7 @@ export default function OptionsConsidered({
 
             <dl className="mt-3 grid grid-cols-1 gap-3 text-xs sm:grid-cols-2">
               <div>
-                <dt className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                <dt className="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                   Pros
                 </dt>
                 <dd>
@@ -97,7 +97,7 @@ export default function OptionsConsidered({
                 </dd>
               </div>
               <div>
-                <dt className="mb-1 font-mono text-[9px] font-semibold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+                <dt className="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-rose-700 dark:text-rose-300">
                   Cons
                 </dt>
                 <dd>
