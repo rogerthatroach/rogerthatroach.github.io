@@ -1,8 +1,16 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html, useCursor } from '@react-three/drei';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import {
+  OrbitControls,
+  Html,
+  Float,
+  Sparkles,
+  Environment,
+  MeshTransmissionMaterial,
+  useCursor,
+} from '@react-three/drei';
 import * as THREE from 'three';
 import { AnimatePresence } from 'framer-motion';
 import { TIMELINE, type TimelineNode, type ProjectHighlight } from '@/data/timeline';
@@ -17,42 +25,91 @@ const ACCENT_HEX: Record<TimelineNode['accent'], string> = {
   rose: '#f43f5e',
 };
 
-/** One era rendered as a floating frame + project nodes in 3D space. */
+/** Shape vocabulary per era — visual signal of role complexity. */
+type ProjectShape = 'icosahedron' | 'box' | 'octahedron' | 'dodecahedron';
+
+function getProjectShape(eraIndex: number, total: number): ProjectShape {
+  // eraIndex 0 = bottom (oldest/TCS); last = top (RBC Lead)
+  // Increasing geometric complexity bottom-up = increasing abstraction
+  const t = eraIndex / Math.max(total - 1, 1);
+  if (t < 0.25) return 'icosahedron';
+  if (t < 0.5) return 'box';
+  if (t < 0.75) return 'octahedron';
+  return 'dodecahedron';
+}
+
+function ProjectGeometry({ shape, size = 0.32 }: { shape: ProjectShape; size?: number }) {
+  switch (shape) {
+    case 'icosahedron':
+      return <icosahedronGeometry args={[size, 0]} />;
+    case 'box':
+      return <boxGeometry args={[size * 1.35, size * 1.35, size * 1.35]} />;
+    case 'octahedron':
+      return <octahedronGeometry args={[size * 1.15, 0]} />;
+    case 'dodecahedron':
+      return <dodecahedronGeometry args={[size * 1.05, 0]} />;
+  }
+}
+
+/** One era — glass-transmission plane with floating project nodes + accent light. */
 function EraPlane({
   era,
+  eraIndex,
+  total,
   y,
   onProjectClick,
 }: {
   era: TimelineNode;
+  eraIndex: number;
+  total: number;
   y: number;
   onProjectClick: (p: ProjectHighlight) => void;
 }) {
   const color = ACCENT_HEX[era.accent];
   const projects = era.projects ?? [];
+  const shape = getProjectShape(eraIndex, total);
 
   return (
     <group position={[0, y, 0]}>
-      {/* Transparent plane — establishes the "floor" of the era */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[9, 4]} />
-        <meshStandardMaterial
+      {/* Glass plane — MeshTransmissionMaterial gives a frosted-crystal look */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[9, 4.2]} />
+        <MeshTransmissionMaterial
           color={color}
-          transparent
-          opacity={0.08}
-          side={THREE.DoubleSide}
-          roughness={0.9}
+          thickness={0.25}
+          roughness={0.18}
+          transmission={0.85}
+          ior={1.3}
+          chromaticAberration={0.04}
+          anisotropicBlur={0.1}
+          distortion={0.05}
+          distortionScale={0.2}
+          temporalDistortion={0.08}
+          attenuationColor={color}
+          attenuationDistance={1.4}
+          backside
+          backsideThickness={0.3}
         />
       </mesh>
 
-      {/* Frame edge — gives the plane definition */}
+      {/* Accent point light anchored below plane — bathes the projects in era color */}
+      <pointLight
+        position={[0, -0.5, 0]}
+        intensity={0.6}
+        color={color}
+        distance={5}
+        decay={1.5}
+      />
+
+      {/* Edge frame — gives the plane definition without being hard */}
       <lineSegments rotation={[-Math.PI / 2, 0, 0]}>
-        <edgesGeometry args={[new THREE.PlaneGeometry(9, 4)]} />
-        <lineBasicMaterial color={color} transparent opacity={0.7} />
+        <edgesGeometry args={[new THREE.PlaneGeometry(9, 4.2)]} />
+        <lineBasicMaterial color={color} transparent opacity={0.5} />
       </lineSegments>
 
-      {/* Era label — HTML overlay anchored at left edge of plane */}
+      {/* Era label anchored at left edge */}
       <Html
-        position={[-5.5, 0.2, 0]}
+        position={[-5.5, 0.25, 0]}
         center
         distanceFactor={10}
         className="pointer-events-none select-none"
@@ -78,45 +135,55 @@ function EraPlane({
         </div>
       </Html>
 
-      {/* Project nodes — arranged in a row in front of the plane */}
+      {/* Floating project nodes, wrapped in drei's Float for organic bob */}
       {projects.map((p, i) => {
         const spacing = 7 / Math.max(projects.length, 1);
         const x = -3.5 + spacing * (i + 0.5);
         return (
-          <ProjectNode
+          <Float
             key={`${era.id}-${i}`}
-            project={p}
-            position={[x, 0.4, 0]}
-            color={color}
-            onClick={() => onProjectClick(p)}
-          />
+            speed={1.4}
+            rotationIntensity={0.4}
+            floatIntensity={0.35}
+            floatingRange={[-0.08, 0.08]}
+          >
+            <ProjectNode
+              project={p}
+              position={[x, 0.55, 0]}
+              color={color}
+              shape={shape}
+              onClick={() => onProjectClick(p)}
+            />
+          </Float>
         );
       })}
     </group>
   );
 }
 
-/** A single clickable 3D project node with hover/float. */
+/** A single clickable 3D project node — jewel-tone emissive, shape per era. */
 function ProjectNode({
   project,
   position,
   color,
+  shape,
   onClick,
 }: {
   project: ProjectHighlight;
   position: [number, number, number];
   color: string;
+  shape: ProjectShape;
   onClick: () => void;
 }) {
   const ref = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
 
-  useFrame(({ clock }) => {
+  useFrame(() => {
     if (!ref.current) return;
-    // Gentle bob
-    ref.current.position.y = position[1] + Math.sin(clock.elapsedTime * 0.6 + position[0]) * 0.06;
-    ref.current.rotation.y += 0.006;
+    // Slow rotation adds life
+    ref.current.rotation.y += 0.005;
+    ref.current.rotation.x += 0.003;
   });
 
   return (
@@ -129,19 +196,23 @@ function ProjectNode({
       }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
-      scale={hovered ? 1.35 : 1}
+      scale={hovered ? 1.4 : 1}
     >
-      <sphereGeometry args={[0.28, 24, 24]} />
+      <ProjectGeometry shape={shape} />
       <meshStandardMaterial
         color={color}
         emissive={color}
-        emissiveIntensity={hovered ? 0.7 : 0.35}
-        roughness={0.3}
-        metalness={0.4}
+        emissiveIntensity={hovered ? 1.1 : 0.55}
+        roughness={0.15}
+        metalness={0.75}
       />
       {hovered && (
-        <Html position={[0, 0.55, 0]} center className="pointer-events-none select-none">
-          <div className="whitespace-nowrap rounded-md border border-border-subtle bg-surface px-2 py-1 font-mono text-[10px] font-semibold text-text-primary shadow-lg">
+        <Html
+          position={[0, 0.6, 0]}
+          center
+          className="pointer-events-none select-none"
+        >
+          <div className="whitespace-nowrap rounded-md border border-border-subtle bg-surface/95 px-2 py-1 font-mono text-[10px] font-semibold text-text-primary shadow-lg backdrop-blur-sm">
             {project.name}
           </div>
         </Html>
@@ -150,46 +221,97 @@ function ProjectNode({
   );
 }
 
-/** Scene graph — 4 eras stacked vertically along Y, lit from above-left. */
+/** Smooth camera interpolation — glides closer when a node is selected. */
+function CameraController({ selected }: { selected: ProjectHighlight | null }) {
+  const { camera } = useThree();
+  const target = useRef(new THREE.Vector3(11, 2, 11));
+
+  useFrame(() => {
+    // Pull in when selection open, push back when not
+    if (selected) {
+      target.current.set(8, 1.5, 9);
+    } else {
+      target.current.set(11, 2, 11);
+    }
+    camera.position.lerp(target.current, 0.035);
+    camera.lookAt(0, 0, 0);
+  });
+
+  return null;
+}
+
+/** The full 3D scene graph. */
 function SceneContents({
+  selected,
   onProjectClick,
 }: {
+  selected: ProjectHighlight | null;
   onProjectClick: (p: ProjectHighlight) => void;
 }) {
   // Chronological: TCS (bottom) → RBC Lead (top)
   const eras = [...TIMELINE].reverse();
-  const spacing = 2.4;
+  const spacing = 2.6;
 
   return (
     <>
-      <ambientLight intensity={0.45} />
-      <directionalLight position={[6, 10, 6]} intensity={0.9} castShadow />
-      <pointLight position={[-6, 4, 4]} intensity={0.4} color="#d4a0a7" />
+      {/* Ambient fill + warm environment reflection for metalness */}
+      <ambientLight intensity={0.35} />
+      <Environment preset="sunset" background={false} blur={0.6} />
 
+      {/* Directional key light */}
+      <directionalLight
+        position={[8, 12, 8]}
+        intensity={0.9}
+        color="#fff6eb"
+      />
+
+      {/* Era planes stacked along Y */}
       {eras.map((era, i) => {
         const y = (i - (eras.length - 1) / 2) * spacing;
         return (
           <EraPlane
             key={era.id}
             era={era}
+            eraIndex={i}
+            total={eras.length}
             y={y}
             onProjectClick={onProjectClick}
           />
         );
       })}
 
-      {/* Central vertical spine connecting all eras */}
+      {/* Central spine — emissive pillar threading all eras */}
       <mesh>
         <cylinderGeometry
           args={[
-            0.02,
-            0.02,
-            (eras.length - 1) * spacing + 1.5,
+            0.035,
+            0.035,
+            (eras.length - 1) * spacing + 2.2,
             8,
           ]}
         />
-        <meshBasicMaterial color="#888888" transparent opacity={0.25} />
+        <meshStandardMaterial
+          color="#ffffff"
+          emissive="#ffe8d2"
+          emissiveIntensity={0.8}
+          transparent
+          opacity={0.35}
+          roughness={0.3}
+        />
       </mesh>
+
+      {/* Sparkles — ambient atmosphere between eras */}
+      <Sparkles
+        count={100}
+        scale={[14, 12, 14]}
+        size={2.4}
+        speed={0.25}
+        color="#d4a0a7"
+        opacity={0.6}
+      />
+
+      {/* Camera glide */}
+      <CameraController selected={selected} />
     </>
   );
 }
@@ -197,11 +319,15 @@ function SceneContents({
 /**
  * Top-level 3D canvas for /resume/explore.
  *
- * Only mounted on viewports ≥ 900px and when reduced-motion is NOT set
- * (ExploreExperience gates this). Orbit controls enabled; auto-rotate
- * gives the scene life until the user takes control.
+ * Polish pass (Tier 6d-polish): MeshTransmissionMaterial on planes gives
+ * a frosted-crystal look; drei's Float wraps project nodes for organic
+ * bob; shape varies by era (icosahedron → box → octahedron → dodecahedron
+ * bottom-up = increasing abstraction); per-era point lights tint each
+ * plane's projects; Sparkles + Environment add atmosphere; CameraController
+ * smoothly interpolates on selection instead of jumping.
  *
- * Escape key closes any open detail card.
+ * ExploreExperience gates viewport/reduced-motion so CareerCanvas only
+ * mounts when appropriate.
  */
 export default function CareerCanvas() {
   const [selected, setSelected] = useState<ProjectHighlight | null>(null);
@@ -219,18 +345,23 @@ export default function CareerCanvas() {
       <Canvas
         camera={{ position: [11, 2, 11], fov: 45 }}
         dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+          toneMapping: THREE.ACESFilmicToneMapping,
+        }}
         shadows
       >
-        <SceneContents onProjectClick={setSelected} />
+        <SceneContents selected={selected} onProjectClick={setSelected} />
         <OrbitControls
           enablePan={false}
-          minDistance={7}
+          minDistance={6.5}
           maxDistance={22}
           minPolarAngle={Math.PI * 0.15}
           maxPolarAngle={Math.PI * 0.85}
           autoRotate={!selected}
-          autoRotateSpeed={0.4}
+          autoRotateSpeed={0.35}
           enableDamping
           dampingFactor={0.08}
         />
