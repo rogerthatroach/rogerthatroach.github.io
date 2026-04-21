@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Download, Linkedin, ArrowRight, ScrollText } from 'lucide-react';
+import { Download, Linkedin, ArrowRight, ScrollText, Waypoints } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import SkillTimeline from '@/components/SkillTimeline';
 import SkillGrid from '@/components/resume/SkillGrid';
 import { HERO } from '@/data/hero';
 import { YEARS_EXPERIENCE } from '@/data/canonical';
@@ -11,12 +10,12 @@ import { YEARS_EXPERIENCE } from '@/data/canonical';
 export const metadata: Metadata = {
   title: 'Resume — Harmilap Singh Dhaliwal',
   description:
-    'Interactive career resume: expandable timeline with per-role narrative, decision rationale, and per-project artifacts. Filterable skill grid. Static PDF available.',
+    'Filterable skills grid with first-shipped year and anchor project per capability. Static PDF + LinkedIn + scrollytelling and interactive-timeline variants linked.',
   alternates: { canonical: '/resume' },
   openGraph: {
     title: 'Resume — Harmilap Singh Dhaliwal',
     description:
-      'Interactive career resume. Click any role to expand: transition story, team shape, per-project decision rationale.',
+      'Skills organized by register, anchored to shipped projects. Interactive career timeline lives on the homepage.',
     url: 'https://rogerthatroach.github.io/resume',
     type: 'profile',
   },
@@ -38,8 +37,8 @@ export default function ResumePage() {
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
               {YEARS_EXPERIENCE} years across industrial, cloud, and financial-services AI.
-              Click any role below to expand — transition story, team shape, per-project decision
-              rationale, and cross-links to case studies.
+              Skills below group by register; the interactive career timeline with
+              per-role narrative lives on the homepage.
             </p>
 
             {/* Static PDF + LinkedIn — always available, in the hero area */}
@@ -74,11 +73,19 @@ export default function ResumePage() {
               </a>
             </div>
 
-            {/* Alternative variant link */}
+            {/* Alternative variants */}
             <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border-subtle pt-5 print:hidden">
               <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
                 Also try
               </span>
+              <Link
+                href="/#journey"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface/50 px-3 py-1 text-xs transition-colors hover:border-accent/40 hover:text-accent"
+              >
+                <Waypoints size={12} />
+                Interactive timeline (on homepage)
+                <ArrowRight size={10} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
               <Link
                 href="/resume/arc"
                 className="group inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface/50 px-3 py-1 text-xs transition-colors hover:border-accent/40 hover:text-accent"
@@ -90,9 +97,6 @@ export default function ResumePage() {
             </div>
           </div>
         </section>
-
-        {/* Expanded timeline — the primary resume content */}
-        <SkillTimeline expanded />
 
         {/* Skill grid */}
         <SkillGrid />
