@@ -310,6 +310,43 @@ export const POSTS: BlogPost[] = [
   },
   {
     meta: {
+      slug: 'commodity-tax-cfo-trust-framework',
+      title: 'How Commodity Tax Built CFO Trust — Framework A/B',
+      subtitle:
+        'Same story as the builder-register version, rebuilt through the writing rewrite framework: explicit constraints, options considered with pros/cons, decision rationale callouts, before/after diff, four-cycle stakeholder-trust walkthrough.',
+      date: '2026-04-21',
+      tags: ['Leadership', 'Framework A/B', 'Stakeholder Management', 'PySpark', 'Tableau'],
+      readingTime: '9 min read',
+      abstract:
+        'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into Aegis v1/v2, Astraeus, PAR Assist). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
+      status: 'published',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Original builder-register version (for A/B comparison)',
+        url: '/blog/commodity-tax-cfo-trust',
+        description: 'Same story, pure prose — no framework components. Read side-by-side to see what the framework adds.',
+      },
+      {
+        title: 'How We Built PAR Assist (practitioner companion)',
+        url: '/blog/par-assist-building',
+        description: 'The other builder-register post in this corpus — same voice, different system. The PAR Assist story wouldn\u2019t have happened without the trust built here.',
+      },
+      {
+        title: 'Writing rewrite framework spec',
+        url: 'https://github.com/rogerthatroach/rogerthatroach.github.io',
+        description: 'Canonical deep-post structure, reader-level targeting, component palette, quality gates. Lives in docs/specs/ — see repo.',
+      },
+      {
+        title: 'Commodity Tax — Case Study',
+        url: '/projects/commodity-tax',
+        description: 'The case study page: context, stakeholders, options considered, decision rationale, production narrative, and lessons learned.',
+      },
+    ],
+  },
+  {
+    meta: {
       slug: 'commodity-tax-cfo-trust',
       title: 'How Commodity Tax Built CFO Trust',
       subtitle:

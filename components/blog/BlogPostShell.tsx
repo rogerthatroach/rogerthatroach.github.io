@@ -28,6 +28,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'commodity-tax-cfo-trust': dynamic(() => import('@/data/posts/commodity-tax-cfo-trust.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'commodity-tax-cfo-trust-framework': dynamic(() => import('@/data/posts/commodity-tax-cfo-trust-framework.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
   'astraeus-llm-as-router': dynamic(() => import('@/data/posts/astraeus-llm-as-router.mdx'), {
     loading: () => <PostSkeleton />,
   }),
