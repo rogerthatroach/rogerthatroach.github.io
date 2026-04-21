@@ -30,8 +30,10 @@ export default function ArcExperience() {
   });
   const reduceMotion = useReducedMotion();
 
-  // Chronological order for the arc narrative
-  const eras = [...TIMELINE].reverse();
+  // Descending — newest role first (resume convention). Reader starts
+  // at the current substrate (agentic AI) and traces the pattern back
+  // to where it was forged at 900MW. Outro names the through-line.
+  const eras = TIMELINE;
 
   return (
     <>
@@ -58,10 +60,11 @@ export default function ArcExperience() {
               Four abstraction levels.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
-              Every role in this arc runs the same loop:{' '}
+              Every role runs the same loop:{' '}
               <strong className="text-text-primary">sense → model → optimize → act.</strong>{' '}
-              What changes is the substrate — from 900MW industrial sensors to enterprise
-              agentic AI. Scroll to walk the arc.
+              Starting where I am now — enterprise agentic AI — and tracing the pattern
+              back through financial services, cloud ML, and the industrial machine
+              learning where it was forged. Scroll to trace the arc back.
             </p>
 
             <div className="mt-8 flex items-center gap-2 text-xs text-text-tertiary">
