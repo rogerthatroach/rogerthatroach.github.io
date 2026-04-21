@@ -1,19 +1,31 @@
 'use client';
 
-import { useState, useId } from 'react';
+import { useState, useId, useRef, useEffect, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Inline hover/focus-revealed popover for glossary terms.
  *
- * Accessibility:
- * - Trigger is a focusable <span> with cursor-help
- * - Escape dismisses an open popover
- * - Popover has role="tooltip" + aria-describedby relationship
- * - Works with mouse hover AND keyboard focus
+ * Portal-rendered. The popover lives in document.body so it escapes any
+ * ancestor stacking context (sticky containers, backdrop-blur elements,
+ * etc. that were hiding it behind adjacent columns in /resume/arc).
  *
- * Used by Glossed.tsx which auto-wraps matching glossary terms in prose.
+ * Position is computed from the trigger's bounding box and updated on
+ * scroll / resize so the popover tracks the term as the page moves.
+ *
+ * Accessibility:
+ *   - Trigger is a focusable span with cursor-help
+ *   - Escape dismisses + blurs the trigger
+ *   - role="tooltip" + aria-describedby relationship
+ *   - Works on mouse hover AND keyboard focus
  */
+
+// useLayoutEffect warns in SSR; we gate with `mounted`, so effectively
+// client-only — safe to use the synchronous variant once mounted.
+const useIsoLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
 export default function HoverTerm({
   detail,
   children,
@@ -22,11 +34,43 @@ export default function HoverTerm({
   children: React.ReactNode;
 }) {
   const [show, setShow] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [pos, setPos] = useState<{ left: number; top: number }>({
+    left: 0,
+    top: 0,
+  });
+  const triggerRef = useRef<HTMLSpanElement>(null);
   const id = useId();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useIsoLayoutEffect(() => {
+    if (!show || !triggerRef.current) return;
+    const update = () => {
+      const el = triggerRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      setPos({
+        left: rect.left + rect.width / 2,
+        top: rect.bottom + 6,
+      });
+    };
+    update();
+    // Track scroll + resize so the popover follows the term
+    window.addEventListener('scroll', update, true);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update, true);
+      window.removeEventListener('resize', update);
+    };
+  }, [show]);
+
   return (
-    <span className="relative inline-block">
+    <>
       <span
+        ref={triggerRef}
         tabIndex={0}
         aria-describedby={show ? id : undefined}
         onMouseEnter={() => setShow(true)}
@@ -43,21 +87,31 @@ export default function HoverTerm({
       >
         {children}
       </span>
-      <AnimatePresence>
-        {show && (
-          <motion.span
-            id={id}
-            role="tooltip"
-            initial={{ opacity: 0, y: -4, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.96 }}
-            transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-            className="pointer-events-none absolute left-1/2 top-full z-30 mt-2 block w-64 -translate-x-1/2 rounded-lg border border-border-subtle bg-surface/95 p-3 text-xs font-normal not-italic leading-relaxed text-text-secondary shadow-xl backdrop-blur-md sm:w-72"
-          >
-            {detail}
-          </motion.span>
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {show && (
+              <motion.span
+                id={id}
+                role="tooltip"
+                initial={{ opacity: 0, y: -4, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -4, scale: 0.96 }}
+                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                style={{
+                  position: 'fixed',
+                  left: pos.left,
+                  top: pos.top,
+                  transform: 'translateX(-50%)',
+                }}
+                className="pointer-events-none z-[100] block w-64 max-w-[calc(100vw-2rem)] rounded-lg border border-border-subtle bg-surface/95 p-3 text-xs font-normal not-italic leading-relaxed text-text-secondary shadow-xl backdrop-blur-md sm:w-72"
+              >
+                {detail}
+              </motion.span>
+            )}
+          </AnimatePresence>,
+          document.body
         )}
-      </AnimatePresence>
-    </span>
+    </>
   );
 }
