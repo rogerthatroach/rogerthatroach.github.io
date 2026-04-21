@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion';
-import { ChevronDown, Download, ArrowRight, LayoutList, Box } from 'lucide-react';
+import { ChevronDown, Download, ArrowRight, LayoutList } from 'lucide-react';
 import { TIMELINE } from '@/data/timeline';
 import { HERO } from '@/data/hero';
 import ArcProgress from './ArcProgress';
@@ -107,14 +107,6 @@ export default function ArcExperience() {
               >
                 <LayoutList size={16} />
                 Structured resume view
-                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
-              <Link
-                href="/resume/explore"
-                className="group inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-surface/50 px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
-              >
-                <Box size={16} />
-                3D drill-down
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
               <a

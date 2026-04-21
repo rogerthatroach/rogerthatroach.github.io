@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Download, Linkedin, ArrowRight, ScrollText, Box } from 'lucide-react';
+import { Download, Linkedin, ArrowRight, ScrollText } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import SkillTimeline from '@/components/SkillTimeline';
@@ -74,7 +74,7 @@ export default function ResumePage() {
               </a>
             </div>
 
-            {/* A/B variant links */}
+            {/* Alternative variant link */}
             <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-border-subtle pt-5 print:hidden">
               <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
                 Also try
@@ -85,14 +85,6 @@ export default function ResumePage() {
               >
                 <ScrollText size={12} />
                 Scrollytelling variant
-                <ArrowRight size={10} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
-              <Link
-                href="/resume/explore"
-                className="group inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface/50 px-3 py-1 text-xs transition-colors hover:border-accent/40 hover:text-accent"
-              >
-                <Box size={12} />
-                3D drill-down variant
                 <ArrowRight size={10} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>
