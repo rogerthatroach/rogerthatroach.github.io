@@ -1,0 +1,300 @@
+import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
+import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
+import DecisionRationale from '@/components/blog/framework/DecisionRationale'
+import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
+import StepThrough from '@/components/blog/framework/StepThrough'
+import Glossed from '@/components/resume/story/Glossed'
+
+> **This is an A/B framework-rewrite** of [How Commodity Tax Built CFO Trust](/blog/commodity-tax-cfo-trust). Same story, same canonical numbers, applied to the [writing rewrite framework](/blog/commodity-tax-cfo-trust) — explicit constraints, options considered with pros/cons, decision rationale callouts, before/after diff, stakeholder-trust walkthrough. Compare the two to see what the framework does.
+
+In September 2022, I joined <Glossed>CFO Group</Glossed> at a major Canadian bank as a Senior Data Scientist. No one had asked me to build AI. I was hired to help automate the <Glossed>Commodity Tax</Glossed> return process — a manual workflow that consumed finance analysts for months per cycle.
+
+By Q4 2023, the process took **90 minutes**. The metric earned a CFO Quarterly Team Award. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually PAR Assist — a cascade that shaped the next three years.
+
+This post walks through the architectural decision that made it land, the constraints that shaped it, and what I&rsquo;d do differently.
+
+## Context
+
+Commodity tax returns at a major Canadian bank are not small paperwork. Finance teams pull transactions from General Ledger journals — millions of rows per cycle, covering **~$250M GST + ~$350M PVAT** in allocated tax liability — reconcile them against tax categories, and produce returns that reach CFO-level sign-off.
+
+The process had accumulated years of institutional knowledge: undocumented edge cases, manual overrides, tribal understanding of which GL accounts mapped to which tax buckets.
+
+Automating it wasn&rsquo;t &ldquo;wrap a Python script around Excel.&rdquo; It meant codifying tribal knowledge without breaking anyone&rsquo;s trust in the numbers.
+
+## Constraints
+
+Four constraints shaped every design decision. The Tableau-as-transparency-layer architecture (§5) is the only one that satisfies all four simultaneously.
+
+<ConstraintsBlock
+  constraints={[
+    {
+      kind: 'hard',
+      label: 'GL journal scale',
+      detail: 'Millions of rows per tax cycle across multiple GL systems. Incremental batching was acceptable; stateless one-pass was not.',
+    },
+    {
+      kind: 'hard',
+      label: 'Auditability',
+      detail: 'Every derived number must trace back to a specific journal entry. CFO-level sign-off requires an unbroken chain of custody.',
+    },
+    {
+      kind: 'soft',
+      label: 'Tool adoption friction',
+      detail: 'Finance team&rsquo;s muscle memory was Tableau + Excel. A new frontend would add adoption cost on top of automation cost.',
+    },
+    {
+      kind: 'soft',
+      label: 'First-impression risk',
+      detail: 'New AI hire, no internal reputation. A black-box v1 that produced correct answers but couldn&rsquo;t be inspected would have been worse than the manual process.',
+    },
+    {
+      kind: 'regulatory',
+      label: 'Tax return compliance',
+      detail: 'Returns feed statutory filings. SOX-adjacent controls mean the automation pipeline itself is audit-tested, not just the output.',
+    },
+  ]}
+/>
+
+## First project, first audition
+
+When you join an organization as the AI person and your first assignment is process automation, there are two ways to read it. You can treat it as a detour — &ldquo;I&rsquo;ll do this so I can get to the real AI work.&rdquo; Or you can treat it as an audition.
+
+I treated it as an audition. Finance leaders were not going to green-light a machine-learning platform for CFO-level decisions on the strength of my CV. They were going to green-light it on the strength of my first delivery.
+
+That framing changed how I built.
+
+## Options considered
+
+Two architectural decisions mattered. The first was close-to-obvious. The second was the whole thing.
+
+<OptionsConsidered
+  decision="Extraction pipeline for millions of GL journal rows per cycle"
+  options={[
+    {
+      name: 'PySpark on CDP',
+      chosen: true,
+      summary: 'Distributed dataframe on the enterprise-sanctioned platform.',
+      pros: [
+        'Scales to full-enterprise extraction in one pass',
+        'CDP is the sanctioned platform for PII-adjacent workloads — no governance fight',
+        'Code is maintainable by other data scientists, not just me',
+      ],
+      cons: [
+        'Steeper onboarding vs. pandas for collaborators unfamiliar with Spark',
+        'Local dev cycle slower than pure-Python',
+      ],
+    },
+    {
+      name: 'pandas with incremental batching',
+      pros: [
+        'Faster local iteration',
+        'Universal familiarity in the data team',
+      ],
+      cons: [
+        'Incremental batching gymnastics for datasets of this size',
+        'Memory pressure on any single machine running a full cycle',
+        'Edge cases in batch boundaries become new failure modes',
+      ],
+    },
+    {
+      name: 'SAS (incumbent finance tooling)',
+      pros: [
+        'Finance team already has SAS muscle memory',
+        'Some adjacent processes already use it',
+      ],
+      cons: [
+        'Not part of the AI team&rsquo;s stack — commits the future to SAS for any AI-adjacent work',
+        'Licensing cost scales with team adoption',
+      ],
+    },
+  ]}
+/>
+
+<DecisionRationale
+  option="PySpark on CDP"
+  summary="Match the data scale (hard constraint) and stay inside the sanctioned platform (regulatory)."
+>
+  <p>
+    PySpark is the only option that handles GL journal scale in one pass without batching gymnastics, and <Glossed>CDP</Glossed> is the sanctioned enterprise platform — staying inside it avoided a governance review that would have cost weeks. SAS was a dead end for any future AI-adjacent work; pandas would have failed at full-cycle scale. The decision wasn&rsquo;t close.
+  </p>
+</DecisionRationale>
+
+The second decision is the one that actually built trust.
+
+<OptionsConsidered
+  decision="Output architecture — what the finance team would interact with"
+  options={[
+    {
+      name: 'Static report artifact',
+      summary: 'Excel / PDF of the finished numbers, delivered at end of pipeline.',
+      pros: [
+        'Simplest implementation; matches existing manual-process hand-off pattern',
+        'Zero learning curve for reviewers',
+      ],
+      cons: [
+        'Black box — reviewers can&rsquo;t inspect how a number was produced',
+        'First time a number looks off, the team reverts to spreadsheets',
+        'Violates the auditability constraint in spirit if not in letter',
+      ],
+    },
+    {
+      name: 'Tableau dashboard as the output',
+      summary: 'Dynamic view of the finished numbers.',
+      pros: [
+        'Better UX than PDF',
+        'Familiar tool — uses existing Tableau muscle memory',
+      ],
+      cons: [
+        'Still a black box — dashboard shows the output, not the logic that produced it',
+        'Doesn&rsquo;t build the trust relationship needed for adoption',
+      ],
+    },
+    {
+      name: 'Tableau as the transparency layer',
+      chosen: true,
+      summary: 'Every pipeline step has a dashboard view that lets an analyst drill in and see what the pipeline did at that step.',
+      pros: [
+        'GL pull, reconciliation, category mapping, aggregation — each step is independently auditable',
+        'Reviewers can click from a suspicious number back to the raw journal row that produced it',
+        'Builds a debuggable, auditable relationship between the team and the system',
+        'Turns each review session into a simultaneous bug-hunt and trust-building ritual',
+      ],
+      cons: [
+        'More dashboards to build and maintain vs. a single output view',
+        'Analysts can see intermediate mess early on — requires a &ldquo;we&rsquo;ll fix this together&rdquo; framing',
+      ],
+    },
+    {
+      name: 'Custom audit UI',
+      pros: [
+        'Purpose-built for this exact workflow',
+        'No Tableau licensing dependency',
+      ],
+      cons: [
+        'Overengineered for v1',
+        'Competing tool surface the finance team has no reason to adopt',
+        'Couldn&rsquo;t be maintained by the data team long-term',
+      ],
+    },
+  ]}
+/>
+
+<DecisionRationale
+  option="Tableau as the transparency layer"
+  summary="The whole architectural call — output was the side effect, transparency was the product."
+>
+  <p>
+    This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation — even one with bugs in v1 — built a debuggable, auditable relationship between the analysts and the system.
+  </p>
+  <p>
+    This satisfies every constraint above simultaneously: audit trail (regulatory), inspection at every step (first-impression risk), Tableau familiarity (adoption friction), and scales with the PySpark pipeline&rsquo;s output shape (GL scale).
+  </p>
+</DecisionRationale>
+
+## The stakeholder-trust loop
+
+Building the dashboards was half the work. The other half was a four-cycle ritual of sitting with tax analysts and using the dashboards together.
+
+<StepThrough
+  label="How trust compounded across cycles"
+  steps={[
+    {
+      title: 'Cycle 1 — joint bug hunt',
+      caption: 'Q1 2023',
+      content: (
+        <p>
+          Analysts questioned numbers; we clicked into the Tableau view together; we traced each back to the source; we either confirmed the automation&rsquo;s logic or I fixed a mapping. Each session was simultaneously a bug-hunt and a trust-building ritual. The automation had real bugs in v1. Fixing them in the open — with the analysts watching — is what built trust, not shipping it perfectly.
+        </p>
+      ),
+    },
+    {
+      title: 'Cycle 2 — analysts run the pipeline',
+      caption: 'Q2 2023',
+      content: (
+        <p>
+          Analysts started running the pipeline themselves, bringing only the edge cases to me. The tool crossed from &ldquo;Milap&rsquo;s thing&rdquo; to &ldquo;our thing.&rdquo; I stopped being a dependency for normal cycles.
+        </p>
+      ),
+    },
+    {
+      title: 'Cycle 3 — analysts request new views',
+      caption: 'Q3 2023',
+      content: (
+        <p>
+          Analysts started suggesting new dashboards. This is the moment you know the relationship has flipped: they&rsquo;re pulling features from you because they see new use cases, not because you&rsquo;re trying to sell them on capabilities.
+        </p>
+      ),
+    },
+    {
+      title: 'Cycle 4 — 90-minute cycle, team award',
+      caption: 'Q4 2023',
+      content: (
+        <p>
+          The cycle finished in 90 minutes. The team&rsquo;s confidence in the system was greater than their confidence in the manual process it replaced. CFO Group RBC Quarterly Team Award landed.
+        </p>
+      ),
+    },
+  ]}
+/>
+
+That confidence was the deliverable. The 90-minute metric was the side effect.
+
+## Impact
+
+<BeforeAfterDiff
+  heading="What changed"
+  before={{
+    label: 'Before',
+    hint: 'Pre-automation',
+    content: (
+      <>
+        <p>Months per cycle of manual spreadsheet work.</p>
+        <ul className="mt-2 list-disc pl-5 text-xs">
+          <li>Finance analysts blocked on GL extraction</li>
+          <li>Category mappings held in tribal knowledge</li>
+          <li>Edge cases rediscovered every cycle</li>
+          <li>No audit trail between raw journal and final return</li>
+        </ul>
+      </>
+    ),
+  }}
+  after={{
+    label: 'After',
+    hint: 'Q4 2023 onward',
+    content: (
+      <>
+        <p><strong className="text-text-primary">90 minutes</strong> per cycle.</p>
+        <ul className="mt-2 list-disc pl-5 text-xs">
+          <li>CFO Group RBC Quarterly Team Award (Q4 2023)</li>
+          <li>Analysts run cycles independently; AI team consulted on edge cases only</li>
+          <li>Every derived number traces to a specific journal row via dashboard click-through</li>
+          <li>Finance team bringing ideas to the AI team, not the other way around</li>
+        </ul>
+      </>
+    ),
+  }}
+/>
+
+## What this opened
+
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose <Glossed>Aegis v1</Glossed> — a benchmarking engine for the Big 6 Canadian banks — and get the air cover to build it. When Aegis v1 shipped (2025 CFO One RBC Team Award), I could propose <Glossed>Aegis v2</Glossed>, the text-to-SQL refactor, and deliver it in a concurrent 2-week sprint while Astraeus productionization was underway. When <Glossed>Astraeus</Glossed> reached production scale, I had the credibility to conceive <Glossed>PAR Assist</Glossed> from an intern&rsquo;s proof-of-concept and scale it bank-wide.
+
+Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. Commodity Tax was underwriting every subsequent bet.
+
+## What I&rsquo;d do differently
+
+One scope call I&rsquo;d revisit: the first dashboard set deliberately did NOT surface the category-mapping rule book. Analysts could drill from final number → journal row, but the rules that produced each mapping lived in Python code. When new categories emerged (tax law changes, new GL accounts), only I could add them.
+
+In retrospect, I&rsquo;d have built a <em>mapping-rules dashboard</em> from cycle 2 onward — letting analysts propose rule additions directly (still requiring my code-review approval before production), turning the mapping layer from a single-person bottleneck into a shared surface. It would have cost ~1 extra week in v1 and saved much more than that across the next two years.
+
+## The pattern
+
+Your first project at a new organization isn&rsquo;t just a deliverable. It&rsquo;s the audition that determines which doors open next.
+
+The architectural decision — Tableau as a transparency layer, not an output — was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
+
+Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. PAR Assist&rsquo;s MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
+
+Commodity Tax was where I learned that.
+
+The technology changes. The pattern doesn&rsquo;t.
