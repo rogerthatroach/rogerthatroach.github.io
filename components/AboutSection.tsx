@@ -1,8 +1,9 @@
 'use client';
 
 import { useRef } from 'react';
+import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
-import { Linkedin, ArrowRight, Download, FileText } from 'lucide-react';
+import { Linkedin, ArrowRight, Download, FileText, LayoutList } from 'lucide-react';
 import { ABOUT } from '@/data/about';
 import { HERO } from '@/data/hero';
 
@@ -101,9 +102,22 @@ export default function AboutSection() {
               />
             </div>
 
-            {/* Contact + resume stack — parallel button treatment so LinkedIn
-                and Resume read as equally-weighted next steps. */}
+            {/* Contact + resume stack — parallel button treatment so the
+                interactive resume, PDF download, and LinkedIn read as
+                equally-weighted next steps. Interactive resume leads
+                because it's the richest entry point. */}
             <div className="mt-5 space-y-2.5">
+              <Link
+                href="/resume"
+                className="group flex items-center justify-between rounded-lg border border-accent/30 bg-accent-muted px-4 py-2.5 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <LayoutList size={16} />
+                  View interactive resume
+                </span>
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+
               <a
                 href={HERO.links.linkedin}
                 target="_blank"
@@ -122,11 +136,11 @@ export default function AboutSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 download
-                className="group flex items-center justify-between rounded-lg border border-accent/30 bg-accent-muted px-4 py-2.5 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background"
+                className="group flex items-center justify-between rounded-lg border border-border-subtle bg-surface/50 px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
               >
                 <span className="inline-flex items-center gap-2">
                   <Download size={16} />
-                  Download resume
+                  Download PDF
                 </span>
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </a>
@@ -139,7 +153,7 @@ export default function AboutSection() {
               >
                 <span className="inline-flex items-center gap-2">
                   <FileText size={16} />
-                  Open resume in browser
+                  Open PDF in browser
                 </span>
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </a>

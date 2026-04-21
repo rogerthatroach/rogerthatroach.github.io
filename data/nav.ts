@@ -8,4 +8,5 @@ export const NAV_LINKS: NavLink[] = [
   { label: 'Writing', href: '/blog' },
   { label: 'Journey', href: '/#journey' },
   { label: 'About', href: '/about' },
+  { label: 'Resume', href: '/resume' },
 ] as const;
