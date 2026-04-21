@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion';
 import type { TimelineNode } from '@/data/timeline';
 import ProjectReveal from './ProjectReveal';
+import Glossed from '@/components/resume/story/Glossed';
 import { cn } from '@/lib/utils';
 
 const ACCENT_TEXT: Record<TimelineNode['accent'], string> = {
@@ -121,7 +122,7 @@ export default function EraChapter({
                 Why this move
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                {era.transitionStory}
+                <Glossed>{era.transitionStory}</Glossed>
               </p>
             </div>
           )}
@@ -132,7 +133,7 @@ export default function EraChapter({
                 Team shape
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                {era.teamContext}
+                <Glossed>{era.teamContext}</Glossed>
               </p>
             </div>
           )}

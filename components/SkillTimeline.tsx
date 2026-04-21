@@ -1,11 +1,11 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import Link from 'next/link';
 import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import Section from '@/components/ui/Section';
 import { TIMELINE, type TimelineNode } from '@/data/timeline';
+import RoleStory from '@/components/resume/story/RoleStory';
 import { cn } from '@/lib/utils';
 
 const ACCENT_COLORS = {
@@ -181,104 +181,7 @@ function TimelineItem({
                     transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                     className="skill-timeline-details mt-4 overflow-hidden"
                   >
-                    <div className="space-y-4 pt-2">
-                      {node.headlineMetric && (
-                        <div
-                          className={cn(
-                            'rounded-lg border p-3',
-                            colors.border,
-                            'bg-background/30'
-                          )}
-                        >
-                          <div className="font-mono text-xl font-bold text-text-primary">
-                            {node.headlineMetric.value}
-                          </div>
-                          <div className="mt-0.5 text-xs text-text-tertiary">
-                            {node.headlineMetric.label}
-                          </div>
-                        </div>
-                      )}
-
-                      {node.transitionStory && (
-                        <div>
-                          <h4 className="mb-1 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                            Why this move
-                          </h4>
-                          <p className="text-sm leading-relaxed text-text-secondary">
-                            {node.transitionStory}
-                          </p>
-                        </div>
-                      )}
-
-                      {node.teamContext && (
-                        <div>
-                          <h4 className="mb-1 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                            Team shape
-                          </h4>
-                          <p className="text-sm leading-relaxed text-text-secondary">
-                            {node.teamContext}
-                          </p>
-                        </div>
-                      )}
-
-                      {node.projects && node.projects.length > 0 && (
-                        <div>
-                          <h4 className="mb-2 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                            Projects
-                          </h4>
-                          <ul className="space-y-3">
-                            {node.projects.map((project, i) => (
-                              <li
-                                key={i}
-                                className={cn(
-                                  'border-l-2 pl-3',
-                                  colors.border
-                                )}
-                              >
-                                <div className="flex items-baseline justify-between gap-2">
-                                  <strong className="text-sm font-semibold text-text-primary">
-                                    {project.name}
-                                  </strong>
-                                  {project.metric && (
-                                    <span className="font-mono text-[10px] text-text-tertiary">
-                                      {project.metric.value}
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="mt-1 text-sm leading-snug text-text-secondary">
-                                  {project.oneLiner}
-                                </p>
-                                {project.decisionRationale && (
-                                  <p className="mt-1 text-xs italic leading-relaxed text-text-tertiary">
-                                    {project.decisionRationale}
-                                  </p>
-                                )}
-                                {(project.caseStudyLink || project.blogLink) && (
-                                  <div className="mt-1.5 flex flex-wrap gap-3">
-                                    {project.caseStudyLink && (
-                                      <Link
-                                        href={project.caseStudyLink}
-                                        className="text-xs font-medium text-accent hover:underline"
-                                      >
-                                        Case study →
-                                      </Link>
-                                    )}
-                                    {project.blogLink && (
-                                      <Link
-                                        href={project.blogLink}
-                                        className="text-xs font-medium text-accent hover:underline"
-                                      >
-                                        Blog post →
-                                      </Link>
-                                    )}
-                                  </div>
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
+                    <RoleStory node={node} accentBorder={colors.border} />
                   </motion.div>
                 )}
               </AnimatePresence>
