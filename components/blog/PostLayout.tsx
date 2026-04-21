@@ -24,10 +24,14 @@ interface PostLayoutProps {
 }
 
 export default function PostLayout({ meta, references = [], furtherReading = [], relatedProject, children }: PostLayoutProps) {
+  // timeZone:'UTC' pins SSR and client to the same day — without it, a
+  // post dated '2026-04-21' renders as Apr 21 on the server (UTC) and Apr
+  // 20 for any reader west of UTC, tripping hydration error #418.
   const formattedDate = new Date(meta.date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   });
 
   return (
