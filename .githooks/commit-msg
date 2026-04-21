@@ -1,0 +1,37 @@
+#!/bin/bash
+# commit-msg hook — validates conventional commit format per CLAUDE.md §4
+# Format:  type(scope?): description
+# Valid types: feat, fix, refactor, docs, style, chore, perf, test, a11y, seo
+
+COMMIT_MSG_FILE="$1"
+FIRST_LINE=$(head -n1 "$COMMIT_MSG_FILE" | tr -d '\r')
+
+# Allow merge/revert/fixup/squash commits to bypass
+if echo "$FIRST_LINE" | grep -qE '^(Merge |Revert |Initial commit|fixup!|squash!)'; then
+  exit 0
+fi
+
+# Conventional commits format
+if echo "$FIRST_LINE" | grep -qE '^(feat|fix|refactor|docs|style|chore|perf|test|a11y|seo)(\([a-z0-9-]+\))?: .{1,}$'; then
+  # Also check line length (first line should be ≤100 chars)
+  LINE_LEN=${#FIRST_LINE}
+  if [ "$LINE_LEN" -gt 100 ]; then
+    echo "⚠ Commit subject is $LINE_LEN chars (target ≤100). Consider shortening."
+  fi
+  exit 0
+fi
+
+echo "✗ Invalid commit message format."
+echo ""
+echo "Expected:  type: description   OR   type(scope): description"
+echo "Valid types: feat, fix, refactor, docs, style, chore, perf, test, a11y, seo"
+echo ""
+echo "Got: $FIRST_LINE"
+echo ""
+echo "Examples:"
+echo "  feat(resume): Tier 6a — extend TimelineNode"
+echo "  fix(a11y): color-contrast on palette pills"
+echo "  chore: Tier 0 — session hygiene scaffolding"
+echo ""
+echo "See CLAUDE.md §4 for full conventions."
+exit 1

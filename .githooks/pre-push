@@ -1,0 +1,33 @@
+#!/bin/bash
+# Pre-push hook — full build before pushing to remote
+# Runs: npm run build (blocker)
+# Escape hatch: SKIP_CHECKS=1 git push ...  (emergencies only)
+
+set -e
+
+if [ "$SKIP_CHECKS" = "1" ]; then
+  echo "⚠️  SKIP_CHECKS=1 — bypassing pre-push build"
+  exit 0
+fi
+
+# Warn loudly if pushing to main
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" = "refs/heads/main" ]; then
+    echo "━━━ pushing to main — extra care ━━━"
+    if [ "$local_ref" != "refs/heads/main" ] && [ "$local_ref" != "refs/heads/dev" ]; then
+      echo "⚠ Pushing from unusual branch to main. Double-check."
+    fi
+  fi
+done
+
+echo "━━━ pre-push: full build ━━━"
+echo "→ npm run build"
+if ! npm run build > /tmp/build-prepush.log 2>&1; then
+  echo "✗ Build failed. Last 20 lines of /tmp/build-prepush.log:"
+  tail -20 /tmp/build-prepush.log
+  echo ""
+  echo "  Fix the build, or SKIP_CHECKS=1 git push (emergencies only)."
+  exit 1
+fi
+echo "  ✓ build passes"
+echo "━━━ ✓ pre-push passed ━━━"
