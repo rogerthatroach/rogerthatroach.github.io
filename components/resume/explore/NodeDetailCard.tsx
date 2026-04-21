@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { ProjectHighlight } from '@/data/timeline';
+import Glossed from '@/components/resume/story/Glossed';
 
 /**
  * Absolutely-positioned 2D detail panel shown when a 3D project node
@@ -57,7 +58,7 @@ export default function NodeDetailCard({
       )}
 
       <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-        {project.oneLiner}
+        <Glossed>{project.oneLiner}</Glossed>
       </p>
 
       {project.decisionRationale && (
@@ -65,7 +66,7 @@ export default function NodeDetailCard({
           <span className="mr-2 font-mono font-semibold uppercase tracking-wider text-accent">
             Decision
           </span>
-          {project.decisionRationale}
+          <Glossed>{project.decisionRationale}</Glossed>
         </div>
       )}
 
