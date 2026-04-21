@@ -35,6 +35,12 @@ export default function Home() {
       {/* Present-tense momentum */}
       <NowBuilding />
 
+      {/* The Journey — interactive career timeline (click any role for
+          headline metric + transition story + per-project decision
+          rationale via floating RoleOverlay). Placed above Projects so
+          the reader sees the arc before the individual works. */}
+      <SkillTimeline expanded heading="The Journey" />
+
       {/* Projects — compact list on homepage, full mosaic on /projects */}
       <section id="work" className="px-6 py-14 md:px-16">
         <div className="mx-auto max-w-content">
@@ -99,9 +105,6 @@ export default function Home() {
           </ul>
         </div>
       </section>
-
-      {/* Journey zoom-out */}
-      <SkillTimeline />
 
       {/* Recognition: the close */}
       <RecognitionSection />
