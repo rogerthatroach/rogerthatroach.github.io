@@ -48,7 +48,7 @@ export default function PostCard({ post, index }: PostCardProps) {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <Calendar size={12} />
-              {new Date(post.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              {new Date(post.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}
             </span>
             <span className="flex items-center gap-1">
               <Clock size={12} />

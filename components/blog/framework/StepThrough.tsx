@@ -117,7 +117,7 @@ export default function StepThrough({
                 role="tab"
                 aria-selected={i === idx}
                 aria-label={`Go to step ${i + 1}`}
-                className="group flex h-6 items-center justify-center px-1.5"
+                className="group flex h-6 min-w-6 items-center justify-center px-1.5"
               >
                 <span
                   className={cn(
