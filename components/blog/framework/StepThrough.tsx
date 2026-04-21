@@ -108,7 +108,7 @@ export default function StepThrough({
             Prev
           </button>
 
-          <div className="flex gap-1.5" role="tablist" aria-label="Step progress">
+          <div className="flex" role="tablist" aria-label="Step progress">
             {steps.map((_, i) => (
               <button
                 key={i}
@@ -117,13 +117,17 @@ export default function StepThrough({
                 role="tab"
                 aria-selected={i === idx}
                 aria-label={`Go to step ${i + 1}`}
-                className={cn(
-                  'h-1.5 rounded-full transition-all',
-                  i === idx
-                    ? 'w-6 bg-accent'
-                    : 'w-1.5 bg-border-subtle hover:bg-accent/50'
-                )}
-              />
+                className="group flex h-6 items-center justify-center px-1.5"
+              >
+                <span
+                  className={cn(
+                    'block h-1.5 rounded-full transition-all',
+                    i === idx
+                      ? 'w-6 bg-accent'
+                      : 'w-1.5 bg-border-subtle group-hover:bg-accent/50'
+                  )}
+                />
+              </button>
             ))}
           </div>
 
