@@ -1,11 +1,11 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence, useInView, useReducedMotion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 import Section from '@/components/ui/Section';
 import { TIMELINE, type TimelineNode } from '@/data/timeline';
-import RoleStory from '@/components/resume/story/RoleStory';
+import RoleOverlay from '@/components/resume/story/RoleOverlay';
 import { cn } from '@/lib/utils';
 
 const ACCENT_COLORS = {
@@ -19,12 +19,14 @@ const ACCENT_COLORS = {
 
 interface SkillTimelineProps {
   /**
-   * When true, each timeline item becomes an expandable disclosure
-   * revealing headline metric, transition story, team context, and
-   * per-project decision rationale. Used at /resume.
+   * When true (used at /resume), each timeline item shows an "Open role
+   * details →" trigger that opens a floating RoleOverlay with the full
+   * headline metric + transition story + team shape + per-project decision
+   * rationale. The timeline itself does NOT expand inline — the overlay
+   * floats above the viewport so the timeline stays at rest.
    *
-   * When false (default), renders the compact homepage view — byte-
-   * identical to prior behavior. Homepage regression-safe.
+   * When false (default, homepage), the trigger is hidden and the card
+   * renders compact. Homepage is byte-identical to prior behavior.
    */
   expanded?: boolean;
 }
@@ -33,20 +35,19 @@ function TimelineItem({
   node,
   index,
   expanded,
+  onOpen,
 }: {
   node: TimelineNode;
   index: number;
   expanded: boolean;
+  onOpen: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
   const colors = ACCENT_COLORS[node.accent];
   const isLeft = index % 2 === 0;
-  const reduceMotion = useReducedMotion();
 
-  const [isOpen, setIsOpen] = useState(false);
-
-  const hasExpandableContent =
+  const hasDetails =
     expanded &&
     Boolean(
       node.headlineMetric ||
@@ -54,18 +55,6 @@ function TimelineItem({
         node.teamContext ||
         (node.projects && node.projects.length > 0)
     );
-
-  // Escape key closes an open disclosure
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen]);
-
-  const detailsId = `timeline-details-${node.id}`;
 
   return (
     <div ref={ref} className="relative flex w-full items-start gap-4 md:gap-0">
@@ -80,7 +69,6 @@ function TimelineItem({
         <div className="w-px flex-1 bg-gradient-to-b from-border-subtle to-transparent" />
       </div>
 
-      {/* Card */}
       <div
         className={cn(
           'ml-8 flex-1 pb-12',
@@ -148,44 +136,24 @@ function TimelineItem({
             ))}
           </div>
 
-          {/* Expanded-mode disclosure trigger + content.
-              Rendered only when the node has extra narrative AND
-              SkillTimeline is in expanded mode (/resume). */}
-          {hasExpandableContent && (
-            <>
-              <button
-                type="button"
-                onClick={() => setIsOpen((v) => !v)}
-                aria-expanded={isOpen}
-                aria-controls={detailsId}
-                className={cn(
-                  'mt-5 flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-3 py-1.5 text-xs font-semibold transition-colors hover:border-accent/40 hover:text-accent',
-                  colors.text
-                )}
-              >
-                {isOpen ? 'Hide role details' : 'Show role details'}
-                <ChevronDown
-                  size={14}
-                  className={cn('transition-transform', isOpen && 'rotate-180')}
-                  aria-hidden="true"
-                />
-              </button>
-
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    id={detailsId}
-                    initial={reduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
-                    animate={reduceMotion ? { opacity: 1 } : { opacity: 1, height: 'auto' }}
-                    exit={reduceMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-                    className="skill-timeline-details mt-4 overflow-hidden"
-                  >
-                    <RoleStory node={node} accentBorder={colors.border} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </>
+          {/* "Open role details" trigger — only in expanded mode (/resume).
+              Instead of expanding inline, opens a floating RoleOverlay. */}
+          {hasDetails && (
+            <button
+              type="button"
+              onClick={onOpen}
+              className={cn(
+                'group mt-5 inline-flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-3 py-1.5 text-xs font-semibold transition-all hover:border-accent/40 hover:bg-surface',
+                colors.text
+              )}
+            >
+              Open role details
+              <ChevronRight
+                size={14}
+                className="transition-transform group-hover:translate-x-0.5"
+                aria-hidden="true"
+              />
+            </button>
           )}
         </motion.div>
       </div>
@@ -194,11 +162,22 @@ function TimelineItem({
 }
 
 export default function SkillTimeline({ expanded = false }: SkillTimelineProps) {
+  const [openNodeId, setOpenNodeId] = useState<string | null>(null);
+  const openNode = openNodeId
+    ? TIMELINE.find((n) => n.id === openNodeId) ?? null
+    : null;
+
   return (
     <Section id="journey" title={expanded ? 'Career Timeline' : 'The Journey'}>
       <div className="relative">
         {TIMELINE.map((node, i) => (
-          <TimelineItem key={node.id} node={node} index={i} expanded={expanded} />
+          <TimelineItem
+            key={node.id}
+            node={node}
+            index={i}
+            expanded={expanded}
+            onOpen={() => setOpenNodeId(node.id)}
+          />
         ))}
 
         <div className="absolute bottom-0 left-4 md:left-1/2 md:-translate-x-1/2">
@@ -211,6 +190,14 @@ export default function SkillTimeline({ expanded = false }: SkillTimelineProps) 
           />
         </div>
       </div>
+
+      {/* Single floating overlay, managed at this level so only one role is
+          open at a time and the timeline underneath stays at rest. */}
+      <AnimatePresence>
+        {openNode && (
+          <RoleOverlay node={openNode} onClose={() => setOpenNodeId(null)} />
+        )}
+      </AnimatePresence>
     </Section>
   );
 }
