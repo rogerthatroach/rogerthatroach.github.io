@@ -23,17 +23,17 @@ export interface Constraint {
 const KIND_STYLES: Record<ConstraintKind, { badge: string; border: string }> = {
   hard: {
     badge:
-      'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30',
+      'bg-rose-500/15 text-rose-800 dark:text-rose-200 border-rose-500/40',
     border: 'border-rose-500/25',
   },
   soft: {
     badge:
-      'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30',
+      'bg-amber-500/15 text-amber-800 dark:text-amber-200 border-amber-500/40',
     border: 'border-amber-500/25',
   },
   regulatory: {
     badge:
-      'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30',
+      'bg-blue-500/15 text-blue-800 dark:text-blue-200 border-blue-500/40',
     border: 'border-blue-500/25',
   },
 };
@@ -73,7 +73,7 @@ export default function ConstraintsBlock({
                 </strong>
                 <span
                   className={cn(
-                    'rounded-full border px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider',
+                    'rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider',
                     styles.badge
                   )}
                 >
