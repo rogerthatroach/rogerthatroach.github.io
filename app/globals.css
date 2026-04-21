@@ -152,3 +152,95 @@ html.dark .palette-border {
   width: 1px !important;
   overflow: hidden !important;
 }
+
+/* ────────────────────────────────────────────────────────────────
+ * Print styles — scoped to /resume.
+ *
+ * Goals:
+ *   - Clean monochrome output; no dark-mode bleed
+ *   - Hide nav, footer, particle field, theme toggle, variant link chips
+ *   - Force all expanded SkillTimeline disclosures open (the whole story
+ *     should land on one printable sheet, not hidden behind clicks)
+ *   - Single-column layout — print is narrower than screen
+ *   - Serif body for legibility on paper
+ * ──────────────────────────────────────────────────────────────── */
+@media print {
+  :root, .dark {
+    --color-bg: #ffffff !important;
+    --color-surface: #ffffff !important;
+    --color-surface-hover: #ffffff !important;
+    --color-border: #999999 !important;
+    --color-accent: #000000 !important;
+    --color-accent-muted: #f3f3f3 !important;
+    --color-text-primary: #000000 !important;
+    --color-text-secondary: #111111 !important;
+    --color-text-tertiary: #333333 !important;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt !important;
+  }
+
+  .resume-page {
+    /* Serif body on paper = more legible; also differentiates from screen. */
+    font-family: Georgia, 'Times New Roman', serif !important;
+  }
+
+  /* Hide non-essential chrome across the /resume page */
+  .resume-page nav,
+  .resume-page footer,
+  .resume-page .print\:hidden,
+  body > .pointer-events-none, /* particle field overlay */
+  button[aria-label*="theme" i],
+  button[aria-label*="Toggle" i] {
+    display: none !important;
+  }
+
+  /* Force all SkillTimeline disclosures open when printing */
+  .skill-timeline-details {
+    display: block !important;
+    height: auto !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+  }
+
+  /* Hide the expand/collapse trigger buttons when printing */
+  .resume-page button[aria-expanded] {
+    display: none !important;
+  }
+
+  /* Single-column layout for print */
+  .resume-page .md\:ml-0,
+  .resume-page .md\:w-\[calc\(50\%-1rem\)\],
+  .resume-page [class*="grid-cols"] {
+    width: 100% !important;
+    margin-left: 0 !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Left-align timeline on print (no alternating cards) */
+  .resume-page [class*="md:ml-auto"],
+  .resume-page [class*="md:pl-8"],
+  .resume-page [class*="md:pr-8"] {
+    margin-left: 2rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* Keep links visible but text-only-ish */
+  .resume-page a {
+    color: #000000 !important;
+    text-decoration: underline;
+  }
+
+  /* Avoid breaking a role card across pages when possible */
+  .resume-page [class*="rounded-xl border p-5"],
+  .resume-page [class*="rounded-xl border p-6"] {
+    page-break-inside: avoid;
+    border-color: #999999 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+}
