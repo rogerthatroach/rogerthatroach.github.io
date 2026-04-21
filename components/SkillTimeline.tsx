@@ -19,16 +19,17 @@ const ACCENT_COLORS = {
 
 interface SkillTimelineProps {
   /**
-   * When true (used at /resume), each timeline item shows an "Open role
-   * details →" trigger that opens a floating RoleOverlay with the full
-   * headline metric + transition story + team shape + per-project decision
-   * rationale. The timeline itself does NOT expand inline — the overlay
-   * floats above the viewport so the timeline stays at rest.
+   * Each timeline item shows an "Open role details →" trigger that opens
+   * a floating RoleOverlay with headline metric + transition story + team
+   * shape + per-project decision rationale. The timeline itself does NOT
+   * expand inline — the overlay floats above the viewport so the timeline
+   * stays at rest.
    *
-   * When false (default, homepage), the trigger is hidden and the card
-   * renders compact. Homepage is byte-identical to prior behavior.
+   * Used on both the homepage (under "The Journey") and /resume.
    */
   expanded?: boolean;
+  /** Section title override. Defaults vary by mode — see component. */
+  heading?: string;
 }
 
 function TimelineItem({
@@ -161,14 +162,15 @@ function TimelineItem({
   );
 }
 
-export default function SkillTimeline({ expanded = false }: SkillTimelineProps) {
+export default function SkillTimeline({ expanded = false, heading }: SkillTimelineProps) {
   const [openNodeId, setOpenNodeId] = useState<string | null>(null);
   const openNode = openNodeId
     ? TIMELINE.find((n) => n.id === openNodeId) ?? null
     : null;
+  const title = heading ?? (expanded ? 'Career Timeline' : 'The Journey');
 
   return (
-    <Section id="journey" title={expanded ? 'Career Timeline' : 'The Journey'}>
+    <Section id="journey" title={title}>
       <div className="relative">
         {TIMELINE.map((node, i) => (
           <TimelineItem
