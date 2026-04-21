@@ -106,11 +106,11 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     id: 'aegis',
     title: 'Aegis v2',
     subtitle: 'Text-to-SQL Benchmarking Engine — RBC CFO Group',
-    role: 'Designed + shipped in two weeks',
+    role: 'Refactored v1 → v2 in a concurrent 2-week sprint',
     stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
-    heroMetric: { value: AEGIS_V2_BUILD_TIME, label: 'Concept → Production' },
+    heroMetric: { value: AEGIS_V2_BUILD_TIME, label: 'v1 → v2 refactor' },
     caption:
-      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 shipped in two weeks while running Astraeus + Amplify.',
+      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 refactored in a concurrent 2-week sprint alongside Astraeus productionization and the Amplify program.',
     description:
       'Strategic benchmarking engine for the CFO Group. v1 derives KPIs from Big 6 Canadian banks\' Supplementary Financial Packages. v2 adds intent parsing, text-to-SQL, and embeddings-based KPI disambiguation.',
     highlights: [

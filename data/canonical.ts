@@ -31,14 +31,23 @@ export const AWARDS_COUNT = AWARDS.length;
 // CURATED COUNTS (flat — not structurally derivable)
 // ═══════════════════════════════════════════════════════════════════
 
-/** RBC production AI systems: PAR Assist, Astraeus, Aegis v1, Aegis v2 */
-export const PRODUCTION_SYSTEMS_COUNT = 4;
+/**
+ * RBC production AI systems (3):
+ *   1. PAR Assist  — pilot launched April 2026; enterprise rollout in progress
+ *   2. Astraeus    — production since Nov 2025
+ *   3. Aegis       — v1 shipped, v2 is a concurrent refactor of v1 (one product, two revisions)
+ *
+ * Per 2026-04-21 audit: do NOT present Aegis v2 as an independent 4th product.
+ * v2 was a 2-week focused refactor of v1 done alongside PAR Assist + Astraeus work.
+ */
+export const PRODUCTION_SYSTEMS_COUNT = 3;
 
 // ═══════════════════════════════════════════════════════════════════
 // CAREER SPAN
 // ═══════════════════════════════════════════════════════════════════
 
-export const YEARS_EXPERIENCE = '8+';
+/** TCS (3.3y) + Quantiphi (1y) + RBC (3.5y) = ~7.8y; round to 7.5+. */
+export const YEARS_EXPERIENCE = '7.5+';
 
 // ═══════════════════════════════════════════════════════════════════
 // PROJECT HERO METRICS (discrete, display-oriented)
@@ -55,12 +64,21 @@ export const COMMODITY_TAX_EFFICIENCY = 'Months → 90 min';
 /** Compact form for 3-slot displays (Hero NUMBER_SEQUENCE) */
 export const COMMODITY_TAX_EFFICIENCY_COMPACT = '90 min';
 
+/**
+ * Aegis v2 refactor sprint length. NOT an independent concept-to-production
+ * timeline — v2 is a 2-week refactor of v1 done alongside other primary work.
+ * Display label should read "v1 → v2 refactor" or similar, NOT "Concept → Production".
+ */
 export const AEGIS_V2_BUILD_TIME = '2 weeks';
 
+/** Transits: leaf-level routing / cost-centre units in Astraeus. */
 export const ASTRAEUS_FACTORIAL_COMBINATIONS = '~40,000';
+/** Rollups: intermediate aggregation levels above transits. */
 export const ASTRAEUS_ROLLUPS = '~9,000';
+/** Geography hierarchy size: total nodes in RBC's cost-centre geography tree (hierarchy, not transits). */
 export const ASTRAEUS_GEOGRAPHIES = '~60,000';
 
+/** PAR Assist pilot launched April 2026; bank-wide rollout in progress through Q2/Q3 2026. */
 export const PAR_ASSIST_SCALE = 'Bank-wide';
 
 // ═══════════════════════════════════════════════════════════════════
