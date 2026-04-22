@@ -227,7 +227,7 @@ export default function Hero() {
           // between the original (w-48→w-80, 192–320px) and the shrunk
           // pass — 176–288px — enough visual presence to anchor the left
           // column without dominating the thesis.
-          className="relative order-first mx-auto aspect-[4/5] w-36 overflow-hidden rounded-lg sm:w-44 lg:mx-0 lg:w-52 xl:w-56"
+          className="relative order-first mx-auto aspect-[4/5] w-36 overflow-hidden rounded-lg sm:w-44 lg:mx-0 lg:-mt-8 lg:w-52 xl:w-56"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
