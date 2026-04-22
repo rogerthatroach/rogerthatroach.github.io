@@ -6,7 +6,7 @@ import { HERO } from '@/data/hero';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border-subtle px-6 py-12 md:px-16">
+    <footer className="border-t border-border-subtle px-6 py-16 md:px-16">
       <div className="mx-auto flex max-w-content flex-col items-center gap-6 sm:flex-row sm:justify-between">
         <div className="flex items-center gap-6">
           <a
@@ -14,7 +14,7 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="text-text-tertiary transition-colors hover:text-accent"
+            className="text-text-tertiary transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
           >
             <Linkedin size={20} />
           </a>
@@ -23,14 +23,14 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
-            className="text-text-tertiary transition-colors hover:text-accent"
+            className="text-text-tertiary transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
           >
             <Github size={20} />
           </a>
           <a
             href={`mailto:${HERO.links.email}`}
             aria-label="Email"
-            className="text-text-tertiary transition-colors hover:text-accent"
+            className="text-text-tertiary transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
           >
             <Mail size={20} />
           </a>

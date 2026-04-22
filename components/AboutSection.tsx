@@ -13,7 +13,7 @@ export default function AboutSection() {
   const isInView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section ref={ref} id="about" className="px-6 py-8 md:px-16 md:py-10">
+    <section ref={ref} id="about" className="px-6 py-14 md:px-16 md:py-16">
       <div className="mx-auto max-w-content">
         <motion.h2
           // initial={false}: h2 is above the fold on mobile; letting it render

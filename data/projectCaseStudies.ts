@@ -93,7 +93,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       implementation:
         'Built 84 simultaneous ML regression models mapping sensor inputs to emission and efficiency outputs. Applied rigorous model selection using k-fold cross-validation with R², RMSE, MAPE, and fold variance stability as criteria. Then used Particle Swarm Optimization with the trained models as objective functions, exploring the input parameter space to find configurations that minimized emissions while maintaining efficiency. Results were delivered as recommended sensor settings to plant operators.',
       impact:
-        '$3M in annual cost savings through reduced fuel waste and improved combustion efficiency. Measurable reduction in NOx, SOx, and CO emissions. The Digital Twin concept was groundbreaking within TCS at the time — this project directly led to two Star of the Month awards and positioned the approach as a replicable framework for other industrial clients.',
+        '$3M in annual cost savings through reduced fuel waste and improved combustion efficiency. Measurable reduction in NOx, SOx, and CO emissions. This project directly led to two Star of the Month awards (Nov 2017, Jan 2019) and established the Digital Twin approach as the replicable pattern TCS adopted for other industrial clients.',
       inProduction:
         'The model was deployed as an operational tool at the Maizuru plant, with operators using recommended settings during combustion tuning cycles. The closed-loop feedback (model recommends → operator adjusts → sensors measure → model improves) ran continuously during my tenure.',
       lessonsLearned:
@@ -241,7 +241,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       implementation:
         'Stage 1: Rule-based intent parsing decomposes natural language into structured query components. Stage 2: KPI detection maps query terms to a metadata-rich KPI catalog. Stage 3: Embeddings-based similarity search + LLM-assisted disambiguation resolves ambiguous KPI references with confidence thresholds. Stage 4: Guardrailed SQL generation with whitelisting, parameterization, and forbidden keyword filtering. Stage 5: Deterministic formatting ensures consistent output.',
       impact:
-        'Shipped a production-grade text-to-SQL benchmarking engine in two weeks. The system provides formal safety guarantees: SQL injection is impossible by construction (parameterized queries + whitelisted schema), disambiguation is bounded by confidence thresholds, and every stage is independently testable. This velocity demonstrated that with the right preparation and architecture, complex AI systems can move from concept to production remarkably fast.',
+        'Shipped a production-grade text-to-SQL benchmarking engine in two weeks. The system provides formal safety guarantees: SQL injection is impossible by construction (parameterized queries + whitelisted schema), disambiguation is bounded by confidence thresholds, and every stage is independently testable. Two weeks, delivered concurrently with Astraeus productionization and the Amplify program — the speed came from crystallizing months of v1 learnings into a decomposed architecture, not from shortcuts.',
       inProduction:
         'Running in production within the CFO Group as the primary benchmarking tool. Finance analysts use natural language to query cross-bank KPI comparisons, replacing manual spreadsheet lookups.',
       lessonsLearned:
@@ -268,7 +268,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       context:
         'RBC\'s CFO Group needed a single platform for financial insights — headcount analytics, HR costs, open positions — that could serve multiple delivery channels: interactive dashboard, chatbot, and inbox-ready reports. The data spanned ~40,000 employee transits across ~9,000 organizational rollups and ~60,000 geography hierarchy nodes, with strict entitlement controls (users should only see data they\'re authorized to access).',
       myRole:
-        'Architect, lead developer, and product visionary. I conceived the "CFO-ready" vision — at-a-glance, trustworthy insights delivered to the inbox with seamless drill-through across data domains. I designed the agentic architecture, built the EPM-to-SQL entitlement model, led cross-functional delivery with GFT (Global Functions Technology), and wrote a significant portion of the codebase. ~70% hands-on.',
+        'Architect, lead developer, and product visionary. I conceived the "CFO-ready" vision — at-a-glance, trustworthy insights delivered to the inbox with drill-through across data domains. I designed the agentic architecture, built the EPM-to-SQL entitlement model, led cross-functional delivery with GFT (Global Functions Technology), and wrote a significant portion of the codebase. ~70% hands-on.',
       stakeholders:
         'CFO Group leadership (executive consumers), finance analysts and HR teams (daily users), GFT engineering peers (co-delivery on frontend and infrastructure), Director AI (governance and priority), Senior AI Scientist (direct report contributing to development).',
       challenge:

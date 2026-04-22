@@ -95,7 +95,7 @@ export const TIMELINE: TimelineNode[] = [
       label: 'Conceived + architected in 12 months',
     },
     transitionStory:
-      'Promoted internally from Senior Data Scientist after 2.5 years of progressive impact — Commodity Tax automation, Aegis v1 productionization, Astraeus groundwork. The Lead role added product vision (not just execution), cross-functional leadership of GFT peers, expanded hiring involvement, and ownership of net-new enterprise platforms (PAR Assist originated post-promotion via the Amplify program).',
+      'Promoted internally from Senior Data Scientist after 2.5 years — Commodity Tax (months → 90 min), Aegis v1 productionization, Astraeus groundwork. The Lead role added product vision (not just execution), cross-functional leadership of GFT peers, expanded hiring involvement, and ownership of net-new enterprise platforms (PAR Assist originated post-promotion via the Amplify program).',
     teamContext:
       'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (Amplify 2025 led the conversion of an intern POC → bank-wide product). Cross-functional leadership of GFT senior + junior peers on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
     projects: [

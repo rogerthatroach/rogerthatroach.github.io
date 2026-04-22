@@ -25,7 +25,6 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ transition: 'transform 0.15s ease-out' }}
       className="h-full"
     >
       <Link
@@ -44,7 +43,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
           </span>
           {caseStudy.status === 'in-progress' && (
             <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
-              {caseStudy.statusLabel ?? 'In Progress'}
+              {caseStudy.statusLabel ?? 'In Productionization'}
             </span>
           )}
         </div>
