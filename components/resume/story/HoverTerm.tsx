@@ -52,8 +52,18 @@ export default function HoverTerm({
       const el = triggerRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
+      const viewportW = window.innerWidth;
+      // Popover is w-64 (256px), capped at viewport-2rem on narrow screens.
+      // Keep the CSS value in sync if the class changes.
+      const popoverHalf = Math.min(256, viewportW - 32) / 2;
+      const margin = 12;
+      const center = rect.left + rect.width / 2;
+      const clamped = Math.max(
+        popoverHalf + margin,
+        Math.min(viewportW - popoverHalf - margin, center)
+      );
       setPos({
-        left: rect.left + rect.width / 2,
+        left: clamped,
         top: rect.bottom + 6,
       });
     };

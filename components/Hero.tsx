@@ -60,7 +60,13 @@ export default function Hero() {
   }, [frame, advance, sequenceDone]);
 
   return (
-    <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 md:px-16">
+    <section
+      id="hero"
+      // Mobile: pt-24 clears the fixed nav; pb-16 gives socials room to
+      // breathe above the next section. Desktop keeps the symmetric hero
+      // (items-center does the work when there's a whole viewport height).
+      className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pb-16 pt-24 md:px-16 md:pb-12 md:pt-0"
+    >
       <ParticleField />
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
@@ -128,7 +134,9 @@ export default function Hero() {
             {INDUSTRIES.join(' · ')}
           </motion.p>
 
-          {/* Companies strip — text treatments, not raw logos (see data/companies.ts) */}
+          {/* Companies strip — text treatments, not raw logos (see data/companies.ts).
+              Mobile: label takes full row (w-full) forcing pills to wrap
+              below. Desktop: label is auto-width and inline with pills. */}
           <motion.div
             custom={5}
             variants={FADE_UP}
@@ -136,7 +144,7 @@ export default function Hero() {
             animate="visible"
             className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-3"
           >
-            <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+            <span className="block w-full font-mono text-[10px] uppercase tracking-widest text-text-tertiary sm:inline sm:w-auto">
               Experience
             </span>
             {COMPANIES.map((c) => (
@@ -215,8 +223,10 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Number sequence — ambient strip at bottom of viewport */}
-      <div className="absolute bottom-10 left-0 right-0 z-10">
+      {/* Number sequence — ambient strip at bottom of viewport.
+          Hidden < sm: the absolute-positioned ticker otherwise overlaps the
+          social icons on mobile (content + ticker + bottom-10 > min-h-screen). */}
+      <div className="absolute bottom-10 left-0 right-0 z-10 hidden sm:block">
         <div className="mx-auto max-w-content px-6 md:px-16">
           <AnimatePresence mode="wait">
             {!sequenceDone && (

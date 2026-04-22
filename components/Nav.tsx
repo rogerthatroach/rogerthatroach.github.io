@@ -1,20 +1,41 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MoreVertical, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
 import { NAV_LINKS } from '@/data/nav';
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    const onClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onClick);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onClick);
+    };
+  }, [menuOpen]);
 
   return (
     <motion.nav
@@ -24,9 +45,13 @@ export default function Nav() {
       transition={{ delay: 0.5, duration: 0.5 }}
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        scrolled
-          ? 'bg-background/80 border-b border-border-subtle backdrop-blur-lg'
-          : 'bg-transparent'
+        // Always-on solid backdrop below md so the hero portrait doesn't
+        // bleed through on mobile. Desktop keeps the transparent-until-
+        // scroll pattern.
+        'bg-background/80 border-b border-border-subtle backdrop-blur-lg',
+        'md:border-transparent md:bg-transparent',
+        scrolled &&
+          'md:bg-background/80 md:border-border-subtle md:backdrop-blur-lg'
       )}
     >
       <div className="mx-auto flex max-w-content items-center justify-between px-6 py-4 md:px-16">
@@ -37,13 +62,14 @@ export default function Nav() {
           HSD
         </Link>
 
-        <div className="flex items-center gap-3 sm:gap-6">
+        {/* Desktop — inline links */}
+        <div className="hidden items-center gap-3 md:flex md:gap-6">
           {NAV_LINKS.map((link) =>
             link.href.startsWith('/') && !link.href.startsWith('/#') ? (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs text-text-secondary transition-colors hover:text-text-primary sm:text-sm"
+                className="text-xs text-text-secondary transition-colors hover:text-text-primary md:text-sm"
               >
                 {link.label}
               </Link>
@@ -51,13 +77,73 @@ export default function Nav() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-xs text-text-secondary transition-colors hover:text-text-primary sm:text-sm"
+                className="text-xs text-text-secondary transition-colors hover:text-text-primary md:text-sm"
               >
                 {link.label}
               </a>
             )
           )}
           <ThemeToggle />
+        </div>
+
+        {/* Mobile — kebab + theme only, dropdown holds the links */}
+        <div ref={menuRef} className="relative flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setMenuOpen((s) => !s)}
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={menuOpen}
+            aria-controls="nav-mobile-menu"
+            className="rounded-md border border-border-subtle bg-surface/70 p-2 text-text-secondary transition-colors hover:border-accent/40 hover:text-accent"
+          >
+            {menuOpen ? <X size={18} /> : <MoreVertical size={18} />}
+          </button>
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                id="nav-mobile-menu"
+                role="menu"
+                initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                className="absolute right-0 top-[calc(100%+0.5rem)] min-w-[12rem] overflow-hidden rounded-lg border border-border-subtle bg-background/95 shadow-xl backdrop-blur-lg"
+              >
+                <ul className="py-1">
+                  {NAV_LINKS.map((link) => {
+                    const isInternal =
+                      link.href.startsWith('/') && !link.href.startsWith('/#');
+                    const commonClass =
+                      'block px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent';
+                    return (
+                      <li key={link.href} role="none">
+                        {isInternal ? (
+                          <Link
+                            href={link.href}
+                            role="menuitem"
+                            onClick={() => setMenuOpen(false)}
+                            className={commonClass}
+                          >
+                            {link.label}
+                          </Link>
+                        ) : (
+                          <a
+                            href={link.href}
+                            role="menuitem"
+                            onClick={() => setMenuOpen(false)}
+                            className={commonClass}
+                          >
+                            {link.label}
+                          </a>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.nav>
