@@ -186,14 +186,14 @@ export default function ThemePicker() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={{ duration: 0.15, ease: [0.25, 0.1, 0.25, 1] }}
-            className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 overflow-hidden rounded-xl border border-border-subtle bg-surface/95 shadow-xl backdrop-blur-md"
+            className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-xl border border-border-subtle bg-surface shadow-xl"
           >
-            <div className="border-b border-border-subtle px-4 py-2.5">
+            <div className="border-b border-border-subtle px-3 py-1.5">
               <p className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
                 Theme
               </p>
             </div>
-            <ul className="max-h-[22rem] overflow-y-auto py-1">
+            <ul className="py-1">
               {THEMES.map((theme) => {
                 const isActive = theme.id === current;
                 return (
@@ -203,48 +203,42 @@ export default function ThemePicker() {
                       role="menuitemradio"
                       aria-checked={isActive}
                       onClick={() => select(theme.id)}
+                      title={theme.description}
                       className={cn(
-                        'group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors',
+                        'group flex w-full items-center gap-2.5 px-3 py-1.5 text-left transition-colors',
                         isActive
-                          ? 'bg-accent-muted/60'
+                          ? 'bg-accent-muted'
                           : 'hover:bg-surface-hover'
                       )}
                     >
-                      {/* Tri-color swatch preview */}
-                      <span className="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-md border border-border-subtle">
+                      {/* Tri-color swatch preview (compact) */}
+                      <span className="relative flex h-5 w-5 shrink-0 overflow-hidden rounded border border-border-subtle">
                         <span
                           className="absolute inset-0"
                           style={{ backgroundColor: theme.swatches.bg }}
                         />
                         <span
-                          className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-tl-md"
+                          className="absolute bottom-0 right-0 h-2 w-2 rounded-tl"
                           style={{ backgroundColor: theme.swatches.accent }}
                         />
                         <span
-                          className="absolute left-1 top-1 h-1.5 w-4 rounded-sm"
-                          style={{ backgroundColor: theme.swatches.text, opacity: 0.9 }}
+                          className="absolute left-[3px] top-[3px] h-[2px] w-2.5 rounded-full"
+                          style={{ backgroundColor: theme.swatches.text, opacity: 0.95 }}
                         />
                       </span>
 
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className={cn(
-                            'text-sm font-medium',
-                            isActive
-                              ? 'text-accent'
-                              : 'text-text-primary'
-                          )}
-                        >
-                          {theme.name}
-                        </p>
-                        <p className="text-[11px] text-text-tertiary">
-                          {theme.description}
-                        </p>
-                      </div>
+                      <p
+                        className={cn(
+                          'min-w-0 flex-1 truncate text-[13px] font-medium',
+                          isActive ? 'text-accent' : 'text-text-primary'
+                        )}
+                      >
+                        {theme.name}
+                      </p>
 
                       {isActive && (
                         <Check
-                          size={14}
+                          size={12}
                           aria-hidden="true"
                           className="shrink-0 text-accent"
                         />
