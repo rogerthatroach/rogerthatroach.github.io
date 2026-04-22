@@ -54,7 +54,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
       className="mt-16 scroll-mt-24"
     >
-      <h2 className="text-xl font-bold text-text-primary">{title}</h2>
+      <h2 className="font-display text-xl font-bold tracking-tight text-text-primary">{title}</h2>
       <div className="mt-4 space-y-3 text-sm leading-relaxed text-text-secondary">
         {children}
       </div>

@@ -97,7 +97,7 @@ export default function Nav() {
             aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={menuOpen}
             aria-controls="nav-mobile-menu"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-sm transition-colors hover:bg-surface-hover hover:text-text-primary"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-sm transition-colors hover:bg-surface-hover hover:text-text-primary"
           >
             <motion.div
               key={menuOpen ? 'x' : 'menu'}
