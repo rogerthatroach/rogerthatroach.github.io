@@ -8,12 +8,12 @@ import Glossed from '@/components/resume/story/Glossed';
 import { cn } from '@/lib/utils';
 
 const ACCENT_TEXT: Record<TimelineNode['accent'], string> = {
-  blue: 'text-blue-500',
-  emerald: 'text-emerald-500',
-  amber: 'text-amber-500',
-  purple: 'text-purple-500',
-  cyan: 'text-cyan-500',
-  rose: 'text-rose-500',
+  blue: 'text-blue-700 dark:text-blue-300',
+  emerald: 'text-emerald-700 dark:text-emerald-300',
+  amber: 'text-amber-700 dark:text-amber-300',
+  purple: 'text-purple-700 dark:text-purple-300',
+  cyan: 'text-cyan-700 dark:text-cyan-300',
+  rose: 'text-rose-700 dark:text-rose-300',
 };
 
 const ACCENT_BORDER: Record<TimelineNode['accent'], string> = {
