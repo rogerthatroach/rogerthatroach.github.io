@@ -6,24 +6,17 @@ import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import type { TimelineNode } from '@/data/timeline';
 import Glossed from './Glossed';
-import { cn } from '@/lib/utils';
+import { paletteStyle } from '@/lib/palette';
 
-const ACCENT_BORDER: Record<TimelineNode['accent'], string> = {
-  blue: 'border-blue-500/40',
-  emerald: 'border-emerald-500/40',
-  amber: 'border-amber-500/40',
-  purple: 'border-purple-500/40',
-  cyan: 'border-cyan-500/40',
-  rose: 'border-rose-500/40',
-};
-
-const ACCENT_TEXT: Record<TimelineNode['accent'], string> = {
-  blue: 'text-blue-500',
-  emerald: 'text-emerald-500',
-  amber: 'text-amber-500',
-  purple: 'text-purple-500',
-  cyan: 'text-cyan-500',
-  rose: 'text-rose-500',
+/**
+ * Era → palette. Mirrors data/projects.ts and SkillTimeline so the overlay
+ * picks up the same era color as the card that opened it.
+ */
+const ERA_PALETTES: Record<string, { primary: string; primaryLight: string }> = {
+  Foundation: { primary: '#fca5a5', primaryLight: '#991b1b' },
+  'Cloud ML': { primary: '#67e8f9', primaryLight: '#155e75' },
+  'Enterprise Analytics': { primary: '#fcd34d', primaryLight: '#92400e' },
+  'Intelligent Systems': { primary: '#93c5fd', primaryLight: '#1e40af' },
 };
 
 /**
@@ -42,6 +35,9 @@ export default function RoleOverlay({
   node: TimelineNode;
   onClose: () => void;
 }) {
+  const era = ERA_PALETTES[node.era];
+  const eraStyle = era ? paletteStyle(era) : undefined;
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -80,10 +76,8 @@ export default function RoleOverlay({
         exit={{ opacity: 0, y: 15, scale: 0.97 }}
         transition={{ type: 'spring', stiffness: 220, damping: 28 }}
         onClick={(e) => e.stopPropagation()}
-        className={cn(
-          'relative z-10 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border bg-surface/95 p-6 shadow-2xl backdrop-blur-xl md:p-8',
-          ACCENT_BORDER[node.accent]
-        )}
+        style={eraStyle}
+        className="palette-border relative z-10 max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border-2 bg-surface/95 p-6 shadow-2xl backdrop-blur-xl md:p-8"
       >
         <button
           type="button"
@@ -96,12 +90,7 @@ export default function RoleOverlay({
 
         {/* Header */}
         <div className="pr-10">
-          <p
-            className={cn(
-              'font-mono text-xs font-semibold uppercase tracking-widest',
-              ACCENT_TEXT[node.accent]
-            )}
-          >
+          <p className="palette-text font-mono text-xs font-semibold uppercase tracking-widest">
             {node.era} · {node.period}
           </p>
           <div className="mt-2 flex items-center gap-3">
@@ -126,12 +115,7 @@ export default function RoleOverlay({
 
         {/* Headline metric */}
         {node.headlineMetric && (
-          <div
-            className={cn(
-              'mt-5 rounded-lg border bg-background/40 p-4',
-              ACCENT_BORDER[node.accent]
-            )}
-          >
+          <div className="palette-border mt-5 rounded-lg border bg-background/40 p-4">
             <div className="font-mono text-2xl font-bold text-text-primary sm:text-3xl">
               {node.headlineMetric.value}
             </div>
@@ -185,10 +169,7 @@ export default function RoleOverlay({
             </h3>
             <ul className="space-y-3">
               {node.projects.map((project, i) => (
-                <li
-                  key={i}
-                  className={cn('border-l-2 pl-3', ACCENT_BORDER[node.accent])}
-                >
+                <li key={i} className="palette-border border-l-2 pl-3">
                   <div className="flex items-baseline justify-between gap-2">
                     <strong className="text-sm font-semibold text-text-primary">
                       {project.name}

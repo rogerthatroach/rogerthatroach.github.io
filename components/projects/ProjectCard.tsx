@@ -26,10 +26,11 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       style={{ transition: 'transform 0.15s ease-out' }}
+      className="h-full"
     >
       <Link
         href={`/projects/${project.id}`}
-        className="group flex min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
+        className="group flex h-full min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
       >
         <div className="flex items-center gap-3">
           <span
@@ -51,7 +52,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
         <h2 className="mt-3 text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
           {project.title}
         </h2>
-        <p className="mt-1 text-sm text-text-secondary">{project.subtitle}</p>
+        <p className="mt-1 line-clamp-1 text-sm text-text-secondary">{project.subtitle}</p>
 
         <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-text-secondary">
           {project.caption}
