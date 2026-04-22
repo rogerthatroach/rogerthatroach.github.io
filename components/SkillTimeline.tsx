@@ -108,7 +108,7 @@ function RoleCard({
         <span className="palette-text font-mono text-xs font-semibold uppercase tracking-wider">
           {node.era}
         </span>
-        <span className="font-mono text-xs text-text-tertiary">{node.period}</span>
+        <span className="font-mono text-xs text-text-secondary">{node.period}</span>
       </div>
 
       {showOrg ? (
