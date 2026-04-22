@@ -44,6 +44,18 @@ export default function DiagramsPlaygroundPage() {
           </p>
         </div>
 
+        <div className="mb-6 flex flex-wrap items-center gap-3">
+          <Link
+            href="/playground/diagrams/samples"
+            className="group inline-flex items-center gap-2 rounded-lg border border-accent/30 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background"
+          >
+            See 6 diagram paradigms → samples
+          </Link>
+          <span className="text-xs text-text-tertiary">
+            Sankey · force-directed · swim-lanes · sequence · sunburst · isometric
+          </span>
+        </div>
+
         <h1 className="mb-3 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
           PAR Assist · multi-level
         </h1>
