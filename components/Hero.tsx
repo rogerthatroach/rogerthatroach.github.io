@@ -72,17 +72,16 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
-      {/* Main identity — two-column on lg+ (text left for reading priority,
-          portrait right as a supporting focal point), stacked on mobile with
-          portrait on top.
+      {/* Main identity — two-column on lg+ (portrait left, text right) for
+          face-first impression that matches the "portrait as mnemonic" read,
+          stacked on mobile with portrait on top.
 
           The audit's original P0-7 ("no portrait in hero") was tier-mismatched —
           that pattern fits design-portfolio audiences (Rauno, Paco). Tier-1
           technical leaders writing for banking / research audiences (Hamel,
-          Eugene Yan, Boykis, Raschka) keep the portrait on the hero as a
-          quiet second focal point. Face mnemonic > tagline mnemonic for
-          hiring committees who meet dozens of candidates. */}
-      <div className="relative z-10 grid w-full max-w-content grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_auto] lg:gap-16">
+          Eugene Yan, Boykis, Raschka) put the portrait up front. Face
+          mnemonic > tagline mnemonic for hiring committees. */}
+      <div className="relative z-10 grid w-full max-w-content grid-cols-1 items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
         <motion.div
           // initial={false}: skip the outer opacity/scale fade-in. Inner
           // children still orchestrate their own staggered FADE_UP via the
@@ -90,6 +89,7 @@ export default function Hero() {
           // don't gate everything inside on this wrapper's animation frame.
           initial={false}
           animate={{ opacity: 1, scale: 1 }}
+          className="lg:order-last"
         >
           <motion.p
             custom={0}
@@ -217,16 +217,17 @@ export default function Hero() {
         <motion.div
           initial={false}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          // order-first on mobile so portrait leads the stack; lg:order-none
-          // hands control back to grid DOM order (text → 1fr left, portrait
-          // → auto right).
+          // order-first on mobile so portrait leads the stack; order unset
+          // on lg so DOM order places portrait in the first (auto) grid
+          // track — LEFT side. Grid uses items-center on the parent so
+          // portrait and text column vertically centre together, filling
+          // the hero without the portrait feeling floating-above-empty.
           //
-          // aspect-[4/5] preserved so the full source image renders uncropped
-          // (container matches the photo's native ratio). Sizes drop one
-          // step from the original (w-48 → xl:w-80 was 192–320px) to sit
-          // closer to the audit's "supporting, not dominant" framing —
-          // 192–288px, with 8px radius.
-          className="relative order-first mx-auto aspect-[4/5] w-40 overflow-hidden rounded-lg sm:w-48 lg:order-none lg:mx-0 lg:mt-9 lg:w-56 xl:w-60"
+          // aspect-[4/5] preserves the source image (no crop). Sizing sits
+          // between the original (w-48→w-80, 192–320px) and the shrunk
+          // pass — 176–288px — enough visual presence to anchor the left
+          // column without dominating the thesis.
+          className="relative order-first mx-auto aspect-[4/5] w-44 overflow-hidden rounded-lg sm:w-52 lg:mx-0 lg:w-64 xl:w-72"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

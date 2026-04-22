@@ -4,17 +4,23 @@
  * The card wrapper uses site default font; children override via className
  * so sans/mono swap in for the body + chip. Text content is identical
  * across cards by design — the only variable is the typeface.
+ *
+ * displayClass is optional: when provided, only the headline gets the
+ * display font (useful for serif-display + sans-body pairings like
+ * Fraunces or Instrument Serif over Inter).
  */
 export default function FontCard({
   name,
   note,
   sansClass,
   monoClass,
+  displayClass,
 }: {
   name: string;
   note: string;
   sansClass: string;
   monoClass: string;
+  displayClass?: string;
 }) {
   return (
     <div className="rounded-xl border border-border-subtle bg-surface/50 p-5">
@@ -32,13 +38,17 @@ export default function FontCard({
         </p>
       </div>
 
-      {/* Sample content — all sans body uses sansClass; all mono uses monoClass */}
+      {/* Sample content — body uses sansClass; mono uses monoClass;
+          headline uses displayClass if provided, otherwise falls back
+          to sansClass. */}
       <div className={`space-y-3 ${sansClass}`}>
         <p className={`${monoClass} text-[10px] uppercase tracking-widest text-accent`}>
           § Harmilap Singh Dhaliwal
         </p>
 
-        <h4 className="text-[clamp(1.25rem,2.5vw,1.75rem)] font-semibold leading-[1.1] tracking-[-0.01em] text-text-primary">
+        <h4
+          className={`${displayClass ?? ''} text-[clamp(1.25rem,2.5vw,1.75rem)] font-semibold leading-[1.1] tracking-[-0.01em] text-text-primary`}
+        >
           I build AI systems for regulated finance — from physical combustion
           to agentic workflows on $600M+ allocations.
         </h4>
