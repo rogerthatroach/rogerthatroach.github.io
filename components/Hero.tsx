@@ -79,7 +79,7 @@ export default function Hero() {
             1 · Role eyebrow — top band, full width.
             2 · Identity — portrait + (name + tagline + bio) side-by-side.
             3 · Context — industries / experience / socials, grouped tight. */}
-      <div className="relative z-10 mx-auto flex w-full max-w-content flex-col gap-8 px-6 md:px-16 lg:gap-10">
+      <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 md:px-16 lg:gap-10">
         {/* === 1 · Role eyebrow — its own line, full width, ceremonial === */}
         <motion.p
           custom={0}
@@ -125,7 +125,7 @@ export default function Hero() {
               // lg:whitespace-nowrap keeps the full name on one line at
               // desktop widths; mobile retains natural wrapping so it
               // doesn't overflow the column at 375px.
-              className="mb-3 text-[23px] font-bold leading-[1.05] tracking-tight text-text-primary sm:text-[28px] md:text-[34px] lg:whitespace-nowrap lg:text-[46px] xl:text-[57px]"
+              className="mb-3 text-[23px] font-bold leading-[1.05] tracking-tight text-text-primary sm:text-[28px] md:text-[34px] lg:whitespace-nowrap lg:text-[44px]"
             >
               {HERO.name}
             </motion.h1>
