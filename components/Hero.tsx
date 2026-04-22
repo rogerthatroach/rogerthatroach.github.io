@@ -106,7 +106,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-6 font-display text-4xl font-bold tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl"
+            className="mb-6 text-4xl font-bold tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl"
           >
             {HERO.name}
           </motion.h1>
@@ -226,7 +226,7 @@ export default function Hero() {
           // step from the original (w-48 → xl:w-80 was 192–320px) to sit
           // closer to the audit's "supporting, not dominant" framing —
           // 192–288px, with 8px radius.
-          className="relative order-first mx-auto aspect-[4/5] w-48 overflow-hidden rounded-lg sm:w-56 lg:order-none lg:mx-0 lg:mt-9 lg:w-64 xl:w-72"
+          className="relative order-first mx-auto aspect-[4/5] w-40 overflow-hidden rounded-lg sm:w-48 lg:order-none lg:mx-0 lg:mt-9 lg:w-56 xl:w-60"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
