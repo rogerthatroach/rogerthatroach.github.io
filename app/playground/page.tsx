@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter_Tight } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import PaletteColumn from '@/components/playground/PaletteColumn';
@@ -138,11 +140,32 @@ export default function PlaygroundPage() {
         <h1 className="mb-3 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
           Design playground
         </h1>
-        <p className="mb-16 max-w-2xl text-base text-text-secondary">
+        <p className="mb-10 max-w-2xl text-base text-text-secondary">
           Three comparisons below. Each renders the same content with a
           different treatment so differences aren&rsquo;t about content — only
           about typography, colour, and composition.
         </p>
+
+        {/* Experimental sub-pages — preview routes not promoted to production */}
+        <div className="mb-16 rounded-xl border border-border-subtle bg-surface/30 p-5">
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-accent">
+            Preview routes
+          </p>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <Link
+                href="/playground/projects-filmography"
+                className="group inline-flex items-center gap-2 text-text-primary transition-colors hover:text-accent"
+              >
+                <span className="font-medium">/projects as filmography table</span>
+                <span className="text-text-tertiary group-hover:text-accent">
+                  — audit P1-5 alternative to the current card grid
+                </span>
+                <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </li>
+          </ul>
+        </div>
 
         {/* ── Section 1: Palette comparison ─────────────────────────────── */}
         <section className="mb-20">
