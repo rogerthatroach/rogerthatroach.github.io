@@ -166,12 +166,24 @@ export default function PlaygroundPage() {
             </li>
             <li>
               <Link
+                href="/playground/home-projects-v2"
+                className="group inline-flex items-center gap-2 text-text-primary transition-colors hover:text-accent"
+              >
+                <span className="font-medium">Projects v2 — filmography + palette</span>
+                <span className="text-text-tertiary group-hover:text-accent">
+                  — Year / Era / Role columns with palette era pills retained
+                </span>
+                <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/playground/projects-filmography"
                 className="group inline-flex items-center gap-2 text-text-primary transition-colors hover:text-accent"
               >
-                <span className="font-medium">/projects as filmography table</span>
+                <span className="font-medium">/projects as filmography table (pure)</span>
                 <span className="text-text-tertiary group-hover:text-accent">
-                  — audit P1-5 alternative to the current card grid
+                  — audit P1-5 alternative without palette colors
                 </span>
                 <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
               </Link>
