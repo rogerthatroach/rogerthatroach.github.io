@@ -27,7 +27,7 @@ export default function HeroAuditPreviewPage() {
         {/* Private-preview banner */}
         <div className="border-b border-border-subtle bg-amber-500/5 px-6 py-3 md:px-16">
           <div className="mx-auto flex max-w-content items-start gap-3">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-amber-500">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-amber-700 dark:text-amber-400">
               Preview
             </p>
             <p className="text-xs text-text-secondary">

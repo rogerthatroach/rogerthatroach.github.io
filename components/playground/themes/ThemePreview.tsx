@@ -23,10 +23,10 @@ export default function ThemePreview({ theme }: { theme: Theme }) {
       <div className="mb-6 flex flex-wrap items-baseline justify-between gap-3 border-b pb-4"
            style={{ borderColor: theme.tokens.border }}>
         <div>
-          <h3 className="font-display text-2xl font-bold tracking-tight"
+          <h2 className="font-display text-2xl font-bold tracking-tight"
               style={{ color: theme.tokens.textPrimary }}>
             {theme.name}
-          </h3>
+          </h2>
           <p className="mt-0.5 text-sm" style={{ color: theme.tokens.textTertiary }}>
             {theme.subtitle}
           </p>
@@ -44,10 +44,10 @@ export default function ThemePreview({ theme }: { theme: Theme }) {
           <span className="mr-2" style={{ color: theme.tokens.textTertiary }}>§</span>
           AI &amp; Data Science Lead
         </p>
-        <h4 className="font-display text-2xl font-bold leading-tight tracking-tight md:text-3xl"
+        <h3 className="font-display text-2xl font-bold leading-tight tracking-tight md:text-3xl"
             style={{ color: theme.tokens.textPrimary }}>
           Harmilap Singh Dhaliwal
-        </h4>
+        </h3>
         <p className="mt-2 max-w-xl text-sm leading-relaxed md:text-base"
            style={{ color: theme.tokens.textSecondary }}>
           Architecting agentic AI for RBC CFO Group — the bank&rsquo;s largest function.
