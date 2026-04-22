@@ -50,7 +50,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
       id={id}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-10%' }}
+      viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
       className="mt-16 scroll-mt-24"
     >
@@ -291,7 +291,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
                   key={opt.option}
                   initial={{ opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
                   transition={{ delay: i * 0.08, duration: 0.4 }}
                   className={`rounded-lg border p-4 transition-colors ${
                     opt.chosen
@@ -357,7 +357,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
               transition={{ duration: 0.6 }}
               className="mt-16 rounded-lg border border-amber-500/20 bg-amber-500/5 p-6"
             >
@@ -404,7 +404,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
+              viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
               transition={{ duration: 0.6 }}
               className="mt-16 mb-12 grid gap-4 sm:grid-cols-2"
             >

@@ -186,7 +186,7 @@ export default function SkillTimeline({ expanded = false, heading }: SkillTimeli
           <motion.div
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className="h-3 w-3 rounded-full bg-accent shadow-lg shadow-accent/30"
           />
