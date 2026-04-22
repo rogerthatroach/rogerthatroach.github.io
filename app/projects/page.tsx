@@ -26,7 +26,7 @@ export default function ProjectsIndexPage() {
           <ArrowLeft size={16} />
           Home
         </Link>
-        <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Projects</h1>
+        <h1 className="font-display text-2xl font-bold text-text-primary sm:text-3xl">Projects</h1>
         <p className="mt-2 text-base text-text-secondary">
           The full story behind each project — context, decisions, trade-offs, and impact.
         </p>

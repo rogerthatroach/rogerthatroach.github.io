@@ -28,7 +28,7 @@ export default function BlogIndexPage() {
           <ArrowLeft size={16} />
           Home
         </Link>
-        <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
+        <h1 className="font-display text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
         <p className="mt-2 text-base text-text-secondary">
           Technical explorations — architecture patterns, formal guarantees, and the systems thinking behind the work.
         </p>

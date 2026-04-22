@@ -32,7 +32,7 @@ export default function ResumePage() {
             <p className="mb-3 font-mono text-xs uppercase tracking-widest text-accent">
               Interactive Resume
             </p>
-            <h1 className="mb-4 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
+            <h1 className="mb-4 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
               {HERO.name}
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">

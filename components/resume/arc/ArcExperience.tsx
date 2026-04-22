@@ -54,7 +54,7 @@ export default function ArcExperience() {
             <p className="font-mono text-xs uppercase tracking-widest text-accent">
               Career Arc
             </p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
+            <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
               Same pattern.
               <br />
               Four abstraction levels.

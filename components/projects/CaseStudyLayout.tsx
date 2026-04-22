@@ -170,7 +170,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
                 </span>
               )}
             </div>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
+            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
               {project.title}
             </h1>
             <p className="mt-2 font-mono text-sm tracking-widest text-accent">

@@ -127,7 +127,7 @@ export default function ColophonPage() {
           <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
             Colophon
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
             What this site is made of.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-text-secondary">
