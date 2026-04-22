@@ -62,105 +62,118 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      // Mobile: pt-24 clears the fixed nav; pb-16 gives socials room to
-      // breathe above the next section. Desktop keeps the symmetric hero
-      // (items-center does the work when there's a whole viewport height).
-      className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pb-16 pt-24 md:px-16 md:pb-12 md:pt-0"
+      // Section handles min-height, nav clearance (pt-24 mobile), and the
+      // full-bleed ParticleField + gradients. Horizontal padding moves to
+      // the inner container so its left/right edges match Nav's (both use
+      // mx-auto max-w-content + px-6 md:px-16, so HSD left-aligns with
+      // the hero's content and the theme toggle right-aligns with it).
+      className="relative flex min-h-screen items-center justify-center overflow-hidden pb-16 pt-24 md:pb-12 md:pt-0"
     >
       <ParticleField />
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
-      {/* Main identity — two-column on lg+ (portrait left, text right) for
-          face-first impression that matches the "portrait as mnemonic" read,
-          stacked on mobile with portrait on top.
-
-          The audit's original P0-7 ("no portrait in hero") was tier-mismatched —
-          that pattern fits design-portfolio audiences (Rauno, Paco). Tier-1
-          technical leaders writing for banking / research audiences (Hamel,
-          Eugene Yan, Boykis, Raschka) put the portrait up front. Face
-          mnemonic > tagline mnemonic for hiring committees. */}
-      <div className="relative z-10 grid w-full max-w-content grid-cols-1 items-center gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
-        <motion.div
-          // initial={false}: skip the outer opacity/scale fade-in. Inner
-          // children still orchestrate their own staggered FADE_UP via the
-          // `custom` variants, so the composed entrance is preserved — we just
-          // don't gate everything inside on this wrapper's animation frame.
-          initial={false}
-          animate={{ opacity: 1, scale: 1 }}
-          className="lg:order-last"
+      {/* Three stacked blocks so the hero reads as distinct visual signals,
+          not running paragraphs:
+            1 · Role eyebrow — top band, full width.
+            2 · Identity — portrait + (name + tagline + bio) side-by-side.
+            3 · Context — industries / experience / socials, grouped tight. */}
+      <div className="relative z-10 mx-auto flex w-full max-w-content flex-col gap-8 px-6 md:px-16 lg:gap-10">
+        {/* === 1 · Role eyebrow — its own line, full width, ceremonial === */}
+        <motion.p
+          custom={0}
+          variants={FADE_UP}
+          initial="hidden"
+          animate="visible"
+          className="font-mono text-sm font-bold tracking-[0.2em] text-accent sm:text-base"
         >
-          {/* Role eyebrow — bumped up a notch so it carries the current-seat
-              signal visibly without overpowering the name. */}
-          <motion.p
-            custom={0}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="mb-4 font-mono text-[13px] tracking-widest text-accent sm:text-sm"
-          >
-            {HERO.title}
-          </motion.p>
+          <span className="mr-2 text-text-tertiary">§</span>
+          {HERO.title}
+        </motion.p>
 
-          {/* Name — stepped down one size class so the tagline / bio fit
-              alongside the portrait's vertical height on desktop. */}
-          <motion.h1
-            custom={1}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="mb-4 text-2xl font-bold leading-[1.05] tracking-tight text-text-primary sm:text-3xl md:text-4xl lg:text-5xl"
+        {/* === 2 · Portrait + identity block ===
+            Portrait in the auto-width track; name / tagline / bio wrap
+            alongside it. items-center vertically balances the two. */}
+        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[auto_1fr] lg:gap-8">
+          {/* Portrait — order-first on mobile (leads the stack). Lives in the
+              first (auto) track on lg+. */}
+          <motion.div
+            initial={false}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="relative order-first mx-auto aspect-[4/5] w-32 overflow-hidden rounded-lg sm:w-40 lg:mx-0 lg:w-[188px] xl:w-[202px]"
           >
-            {HERO.name}
-          </motion.h1>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/portrait.webp"
+              srcSet="/images/portrait-sm.webp 700w, /images/portrait.webp 1000w"
+              sizes="(max-width: 1024px) 160px, 202px"
+              alt="Harmilap Singh Dhaliwal"
+              className="h-full w-full object-cover"
+              {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
+            />
+          </motion.div>
 
-          {/* Tagline — Fraunces upright (italic removed; reads more serious),
-              dimmer than the name. Contrast by color + size, not style. */}
-          <motion.p
-            custom={2}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="mb-3 max-w-2xl font-display text-base leading-[1.3] text-text-secondary sm:text-lg"
-          >
-            {HERO.tagline}
-          </motion.p>
+          {/* Name + tagline + bio — tight stack so the block reads as one
+              identity card, not three paragraphs. */}
+          <div>
+            <motion.h1
+              custom={1}
+              variants={FADE_UP}
+              initial="hidden"
+              animate="visible"
+              // lg:whitespace-nowrap keeps the full name on one line at
+              // desktop widths; mobile retains natural wrapping so it
+              // doesn't overflow the column at 375px.
+              className="mb-3 text-[23px] font-bold leading-[1.05] tracking-tight text-text-primary sm:text-[28px] md:text-[34px] lg:whitespace-nowrap lg:text-[46px] xl:text-[57px]"
+            >
+              {HERO.name}
+            </motion.h1>
 
-          {/* Bio — Fraunces regular, tertiary color. mb-10 creates a clear
-              separation so the INDUSTRIES / EXPERIENCE unit below reads as
-              its own block, not a continuation of the prose. */}
-          <motion.p
-            custom={3}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="mb-10 max-w-2xl font-display text-sm leading-[1.55] text-text-tertiary sm:text-base"
-          >
-            {HERO.bio}
-          </motion.p>
+            <motion.p
+              custom={2}
+              variants={FADE_UP}
+              initial="hidden"
+              animate="visible"
+              className="mb-3 max-w-2xl font-display text-[15px] leading-[1.3] text-text-secondary sm:text-[17px] md:text-[19px]"
+            >
+              {HERO.tagline}
+            </motion.p>
 
-          {/* Industries — grouped tight with the Experience row below so the
-              two read as one "context" block rather than tucked under bio. */}
+            <motion.p
+              custom={3}
+              variants={FADE_UP}
+              initial="hidden"
+              animate="visible"
+              className="max-w-2xl font-display text-[13px] leading-[1.55] text-text-tertiary sm:text-[15px]"
+            >
+              {HERO.bio}
+            </motion.p>
+          </div>
+        </div>
+
+        {/* === 3 · Context block — industries label + companies row + socials,
+            grouped tight so they read as "where I've been / how to reach me,"
+            clearly separate from the identity block above. === */}
+        <div className="flex flex-col gap-5 border-t border-border-subtle pt-6 sm:gap-6">
+          {/* Industries — tight to the companies row below. */}
           <motion.p
             custom={4}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-3 font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
+            className="font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
           >
             {INDUSTRIES.join(' · ')}
           </motion.p>
 
-          {/* Companies strip — text treatments, not raw logos (see data/companies.ts).
-              Mobile: label takes full row (w-full) forcing pills to wrap
-              below. Desktop: label is auto-width and inline with pills. */}
+          {/* Experience companies row. */}
           <motion.div
             custom={5}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-3"
+            className="flex flex-wrap items-center gap-x-5 gap-y-3"
           >
             <span className="block w-full font-mono text-[10px] uppercase tracking-widest text-text-tertiary sm:inline sm:w-auto">
               Experience
@@ -192,12 +205,14 @@ export default function Hero() {
             ))}
           </motion.div>
 
+          {/* Socials — smaller than before since they now share a grouped
+              block with industries + experience. */}
           <motion.div
             custom={6}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="flex items-center gap-6"
+            className="flex items-center gap-4 pt-1"
           >
             {[
               { href: HERO.links.linkedin, icon: Linkedin, label: 'LinkedIn' },
@@ -210,45 +225,13 @@ export default function Hero() {
                 target={label !== 'Email' ? '_blank' : undefined}
                 rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
                 aria-label={label}
-                className="rounded-lg border border-border-subtle bg-surface/50 p-3 text-text-secondary backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
+                className="rounded-lg border border-border-subtle bg-surface/50 p-2.5 text-text-secondary backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
               >
-                <Icon size={20} />
+                <Icon size={18} />
               </a>
             ))}
           </motion.div>
-        </motion.div>
-
-        {/* Portrait — head-centered 4:5 crop, face-isolated brightness boost
-            baked into the source (see /tmp/face-brighten.py). Embossed on the
-            page: no border, no drop shadow. lg:mt-9 aligns the top with the name line.
-            initial={false}: portrait IS the LCP target; a 350ms delay + 900ms
-            fade-in would force Lighthouse to wait for the animation to resolve
-            before scoring LCP. Paint at final state on first frame. */}
-        <motion.div
-          initial={false}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          // order-first on mobile so portrait leads the stack; order unset
-          // on lg so DOM order places portrait in the first (auto) grid
-          // track — LEFT side. Grid uses items-center on the parent so
-          // portrait and text column vertically centre together, filling
-          // the hero without the portrait feeling floating-above-empty.
-          //
-          // aspect-[4/5] preserves the source image (no crop). Sizing sits
-          // between the original (w-48→w-80, 192–320px) and the shrunk
-          // pass — 176–288px — enough visual presence to anchor the left
-          // column without dominating the thesis.
-          className="relative order-first mx-auto aspect-[4/5] w-36 overflow-hidden rounded-lg sm:w-44 lg:mx-0 lg:-mt-8 lg:w-52 xl:w-56"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/images/portrait.webp"
-            srcSet="/images/portrait-sm.webp 700w, /images/portrait.webp 1000w"
-            sizes="(max-width: 1024px) 224px, 288px"
-            alt="Harmilap Singh Dhaliwal"
-            className="h-full w-full object-cover"
-            {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
-          />
-        </motion.div>
+        </div>
       </div>
 
       {/* Number sequence — ambient strip at bottom of viewport.
