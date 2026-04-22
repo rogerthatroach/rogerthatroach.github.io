@@ -63,13 +63,13 @@ export default function ProjectsHybridTable({
                     <span className="font-semibold text-text-primary transition-colors group-hover:text-accent">
                       {project.title}
                     </span>
-                    <p className="mt-0.5 text-xs text-text-tertiary">
+                    <p className="mt-0.5 line-clamp-1 text-xs text-text-tertiary">
                       {project.subtitle}
                     </p>
                   </Link>
                 </td>
                 <td className="py-4 pr-6 align-top text-xs leading-relaxed text-text-secondary">
-                  {project.role}
+                  <span className="line-clamp-2">{project.role}</span>
                 </td>
                 <td className="py-4 align-top text-right">
                   <div className="flex items-start justify-end gap-3">

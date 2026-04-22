@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { METRICS } from '@/data/metrics';
 
-function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffix?: string; duration?: number }) {
+function AnimatedCounter({ value, prefix, suffix, duration = 2 }: { value: number; prefix?: string; suffix?: string; duration?: number }) {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
@@ -37,7 +37,7 @@ function AnimatedCounter({ value, suffix, duration = 2 }: { value: number; suffi
 
   return (
     <span ref={ref} className="font-mono text-2xl font-bold text-text-primary sm:text-3xl md:text-4xl">
-      {value === 3 && '$'}
+      {prefix}
       {hasAnimated ? count : 0}
       {suffix}
     </span>
@@ -86,7 +86,7 @@ export default function MetricsRibbon() {
               className="flex flex-col"
             >
               {metric.numericValue !== undefined ? (
-                <AnimatedCounter value={metric.numericValue} suffix={metric.suffix} />
+                <AnimatedCounter value={metric.numericValue} prefix={metric.prefix} suffix={metric.suffix} />
               ) : (
                 <span className="font-mono text-2xl font-bold text-text-primary sm:text-3xl md:text-4xl">
                   {metric.value}
