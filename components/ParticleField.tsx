@@ -153,11 +153,20 @@ export default function ParticleField() {
       setSupported(false);
     }
 
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (mq.matches) setVisible(false);
-    const handler = (e: MediaQueryListEvent) => setVisible(!e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    // Gate on both prefers-reduced-motion AND viewport ≥ md (768 px).
+    // The ~80 KB Three.js + continuous Canvas render is heavy for a
+    // decorative background on mobile — desktop gets the sakura drift,
+    // mobile gets the clean hero.
+    const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const desktopMq = window.matchMedia('(min-width: 768px)');
+    const update = () => setVisible(desktopMq.matches && !reducedMq.matches);
+    update();
+    reducedMq.addEventListener('change', update);
+    desktopMq.addEventListener('change', update);
+    return () => {
+      reducedMq.removeEventListener('change', update);
+      desktopMq.removeEventListener('change', update);
+    };
   }, []);
 
   if (!visible || !supported) return null;

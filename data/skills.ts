@@ -82,7 +82,7 @@ export const SKILLS: Skill[] = [
 
   // ─── Traditional ML & DL ───
   { name: 'TensorFlow', category: 'ml-dl', firstShipped: 2017, anchorProject: 'TCS — Combustion Tuning' },
-  { name: 'PyTorch', category: 'ml-dl' },
+  { name: 'PyTorch', category: 'ml-dl', firstShipped: 2018, anchorProject: 'TCS — LSTM on Ammonium Bisulphate deposition' },
   { name: 'scikit-learn', category: 'ml-dl', firstShipped: 2017, anchorProject: 'TCS' },
   { name: 'XGBoost', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Transformer Life (85% MAPE)' },
   { name: 'Regression (multi-output)', category: 'ml-dl', firstShipped: 2017, anchorProject: 'Combustion — 84 models', anchorLink: '/projects/combustion-tuning' },
@@ -97,7 +97,7 @@ export const SKILLS: Skill[] = [
   { name: 'PostgreSQL (+ pgvector)', category: 'data-eng', firstShipped: 2026, anchorProject: 'PAR Assist storage', anchorLink: '/projects/par-assist' },
   { name: 'PySpark', category: 'data-eng', firstShipped: 2022, anchorProject: 'Commodity Tax automation', anchorLink: '/projects/commodity-tax' },
   { name: 'SQL', category: 'data-eng', firstShipped: 2018, anchorProject: 'Aegis v2 text-to-SQL (anchor)', anchorLink: '/projects/aegis' },
-  { name: 'Hadoop / Spark', category: 'data-eng' },
+  { name: 'Hadoop / Spark', category: 'data-eng', firstShipped: 2022, anchorProject: 'Commodity Tax + Journal Entry automation (PySpark on Spark)', anchorLink: '/projects/commodity-tax' },
   { name: 'CDP (Cloudera Data Platform)', category: 'data-eng', firstShipped: 2023, anchorProject: 'Journal entry automation' },
   { name: 'ETL pipeline design', category: 'data-eng', firstShipped: 2017, anchorProject: 'TCS sensor pipelines', anchorLink: '/projects/combustion-tuning' },
   { name: 'Chunking & embedding pipelines', category: 'data-eng', firstShipped: 2026, anchorProject: 'PAR Assist document ingestion', anchorLink: '/projects/par-assist' },
