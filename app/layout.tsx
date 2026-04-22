@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Inter_Tight } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -11,6 +11,16 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains',
+  display: 'swap',
+});
+
+// Inter Tight — tighter display cut of Inter. Used only for the name
+// eyebrow/H1 and a few inline display lines (metric chains, "shipping"
+// header). Body prose still uses Inter.
+const interTight = Inter_Tight({
+  subsets: ['latin'],
+  variable: '--font-inter-tight',
+  weight: ['500', '600', '700'],
   display: 'swap',
 });
 
@@ -83,7 +93,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${interTight.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
