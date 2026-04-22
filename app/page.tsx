@@ -3,16 +3,18 @@ import { ArrowRight } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Hero from '@/components/Hero';
 import MetricsRibbon from '@/components/MetricsRibbon';
-import NowBuilding from '@/components/NowBuilding';
 import SkillTimeline from '@/components/SkillTimeline';
 import RecognitionSection from '@/components/RecognitionSection';
 import SectionProgress from '@/components/SectionProgress';
 import Footer from '@/components/Footer';
 
+// NowBuilding removed — "current work" is surfaced by Journey's top role
+// card (rbc-lead) with its role-details overlay; /now page carries the
+// Sivers-style monthly focus line. Removing avoided duplicate content
+// and resolved the id="now" namespace collision with the /now page.
 const HOME_SECTIONS = [
   { id: 'hero', label: 'Intro' },
   { id: 'through-line', label: 'Through-line' },
-  { id: 'now', label: 'Now' },
   { id: 'journey', label: 'Journey' },
   { id: 'work', label: 'Projects' },
   { id: 'recognition', label: 'Recognition' },
@@ -42,9 +44,6 @@ export default function Home() {
 
       {/* Through-line + Stats — thesis and proof in one block (was two sections) */}
       <MetricsRibbon />
-
-      {/* Present-tense momentum */}
-      <NowBuilding />
 
       {/* The Journey — interactive career timeline (click any role for
           headline metric + transition story + per-project decision
