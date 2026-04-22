@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
 import { HERO } from '@/data/hero';
 
@@ -32,6 +33,26 @@ export default function Footer() {
             <Mail size={20} />
           </a>
         </div>
+
+        {/* Secondary footer links — /now (current focus) + /colophon
+            (how the site is built). Ghost-weight so they stay polite. */}
+        <nav
+          aria-label="Meta"
+          className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
+        >
+          <Link
+            href="/now"
+            className="transition-colors hover:text-accent"
+          >
+            Now
+          </Link>
+          <Link
+            href="/colophon"
+            className="transition-colors hover:text-accent"
+          >
+            Colophon
+          </Link>
+        </nav>
 
         <div className="flex items-center gap-1.5 text-sm text-text-tertiary">
           <MapPin size={14} />

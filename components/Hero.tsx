@@ -106,7 +106,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-6 text-4xl font-bold tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl"
+            className="mb-6 font-display text-4xl font-bold tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl"
           >
             {HERO.name}
           </motion.h1>
@@ -220,15 +220,20 @@ export default function Hero() {
           // order-first on mobile so portrait leads the stack; lg:order-none
           // hands control back to grid DOM order (text → 1fr left, portrait
           // → auto right).
-          className="relative order-first mx-auto aspect-[4/5] w-48 overflow-hidden rounded-2xl sm:w-60 lg:order-none lg:mx-0 lg:mt-9 lg:w-72 xl:w-80"
+          //
+          // aspect-[5/4]: landscape crop (wider than tall). Source asset is
+          // 4:5 portrait, so object-top anchors the face to the top of the
+          // frame while the container is reshaped broader. Sizing stays
+          // within ~180–240px per the revised audit spec.
+          className="relative order-first mx-auto aspect-[5/4] w-56 overflow-hidden rounded-lg sm:w-60 lg:order-none lg:mx-0 lg:mt-9 lg:w-60 xl:w-64"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/images/portrait.webp"
             srcSet="/images/portrait-sm.webp 700w, /images/portrait.webp 1000w"
-            sizes="(max-width: 640px) 224px, 320px"
+            sizes="(max-width: 1024px) 240px, 256px"
             alt="Harmilap Singh Dhaliwal"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover object-top"
             {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
           />
         </motion.div>
