@@ -78,14 +78,31 @@ export const metadata: Metadata = {
   },
 };
 
-// Inline script to prevent flash of wrong theme. Light is the default —
-// dark mode only activates if the user has explicitly toggled to it.
-// OS prefers-color-scheme is intentionally ignored.
+// Inline script to prevent flash of wrong theme. Runs before React
+// hydrates so the document starts in the right theme.
+//
+// Reads localStorage['theme-pack']; falls back to legacy 'theme' key so
+// users who set dark mode pre-ThemePicker land on sakura-dark. Applies
+// both:
+//   - .dark class on <html>       → activates Tailwind dark: variants
+//   - data-theme attribute        → activates the CSS theme-pack block
+//
+// OS prefers-color-scheme is intentionally ignored — theme is an explicit
+// choice, not an environment default.
 const themeScript = `
   (function() {
-    if (localStorage.getItem('theme') === 'dark') {
-      document.documentElement.classList.add('dark');
-    }
+    try {
+      var pack = localStorage.getItem('theme-pack');
+      if (!pack) {
+        var legacy = localStorage.getItem('theme');
+        pack = legacy === 'dark' ? 'sakura-dark' : 'sakura-light';
+      }
+      var darkBase = ['sakura-dark','nord','solarized-dark','monokai'].indexOf(pack) !== -1;
+      if (darkBase) document.documentElement.classList.add('dark');
+      if (pack !== 'sakura-light' && pack !== 'sakura-dark') {
+        document.documentElement.setAttribute('data-theme', pack);
+      }
+    } catch (e) { /* localStorage blocked — fall through to default */ }
   })();
 `;
 
