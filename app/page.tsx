@@ -32,7 +32,7 @@ export default function Home() {
           rel: 'preload',
           as: 'image',
           imagesrcset: '/images/portrait-sm.webp 700w, /images/portrait.webp 1000w',
-          imagesizes: '(max-width: 1024px) 240px, 256px',
+          imagesizes: '(max-width: 1024px) 224px, 288px',
           fetchpriority: 'high',
         } as React.HTMLAttributes<HTMLLinkElement>)}
       />
