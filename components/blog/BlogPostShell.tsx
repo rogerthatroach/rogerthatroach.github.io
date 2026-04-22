@@ -22,6 +22,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'enterprise-agentic-ai-architecture': dynamic(() => import('@/data/posts/enterprise-agentic-ai.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'enterprise-agentic-ai-framework': dynamic(() => import('@/data/posts/enterprise-agentic-ai-framework.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
   'funding-request-drafting-platform-building': dynamic(() => import('@/data/posts/funding-request-drafting-platform-building.mdx'), {
     loading: () => <PostSkeleton />,
   }),
