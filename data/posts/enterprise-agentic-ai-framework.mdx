@@ -1,0 +1,374 @@
+import { AgenticArchitecturePAR } from '@/components/blog/BlogDiagrams'
+import MathBlock from '@/components/blog/MathBlock'
+import InlineEquation from '@/components/blog/InlineEquation'
+import TheoremBlock from '@/components/blog/TheoremBlock'
+import CitationRef from '@/components/blog/CitationRef'
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
+import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
+import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
+import DecisionRationale from '@/components/blog/framework/DecisionRationale'
+import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
+import StepThrough from '@/components/blog/framework/StepThrough'
+import Glossed from '@/components/resume/story/Glossed'
+import { tex } from '@/lib/katex'
+
+> **A/B rewrite of [Enterprise Agentic AI Architecture](/blog/enterprise-agentic-ai-architecture) via the writing rewrite framework.** Same content, practitioner register — decisions + options considered + constraints as first-class structure; the formal math moves to an optional appendix. `[PLACEHOLDER]` markers call out the content blocked on user input per the brief.
+
+---
+
+Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews — high-stakes, document-heavy workflows riddled with institutional knowledge that lives in people's heads rather than systems.
+
+Most teams throw a chatbot at this. But the user doesn't need a Q&A interface. They need a **collaborator** — something that understands where they are in a multi-step process, holds context across the entire session, pulls the right reference material at the right moment, and resolves contradictions between policy documents without the user knowing there was a conflict.
+
+That's not retrieval-augmented generation <CitationRef id={7} />. That's orchestration. This post walks through the architecture pattern that solves it, at <Glossed>PAR Assist</Glossed> inside <Glossed>RBC CFO Group</Glossed>.
+
+<VisualizationContainer minHeight={600} caption="The architecture at a glance: LangGraph orchestration, MCP tools, multi-layer RAG, PostgreSQL backbone. The rest of the post explains why each piece is shaped the way it is.">
+{() => <AgenticArchitecturePAR />}
+</VisualizationContainer>
+
+## Constraints before choices
+
+Four constraints shaped every architectural decision below. Two are hard (regulatory / technical absolutes), one soft (institutional momentum), one regulatory (auditability). Every downstream choice satisfies these first; aesthetics second.
+
+<ConstraintsBlock
+  constraints={[
+    {
+      kind: 'hard',
+      label: 'Context isolation',
+      detail: 'The LLM must never observe sensitive operational data. Every byte of regulated data passes through deterministic code paths; the language model sees intent parsing and routing — nothing else.',
+    },
+    {
+      kind: 'hard',
+      label: 'Stateful orchestration',
+      detail: 'A single drafting session lasts 30+ minutes across an unbounded number of turns. State must persist — templates, fields, conflicts, and assignment metadata — without loss across the session.',
+    },
+    {
+      kind: 'regulatory',
+      label: 'Full auditability',
+      detail: 'Every system action has to be a logged, typed tool invocation. "The agent did X" must be reconstructable after the fact, with inputs, outputs, timestamps, and the code path that produced it.',
+    },
+    {
+      kind: 'soft',
+      label: 'Heterogeneous retrieval',
+      detail: 'Policies, uploaded documents, and historical examples are shaped differently. Same retrieval function does not fit all three. Layers, not a single index.',
+    },
+  ]}
+/>
+
+## The three architectural decisions
+
+Three design calls separate a PAR-Assist-shaped system from a retrieval chatbot. Each one mapped to an explicit options comparison before it landed.
+
+### Decision 1 · Orchestration framework
+
+<OptionsConsidered
+  decision="How does the system route turns across a 30-minute drafting session?"
+  options={[
+    {
+      name: 'LangGraph',
+      summary: 'Directed graph with conditional edges and shared state.',
+      chosen: true,
+      pros: [
+        'Conditional routing — branch on workflow state, loop back for clarification or conflict resolution',
+        'Persistent shared state across turns; no bolt-on memory',
+        'Tool-call boundary is a first-class concept',
+      ],
+      cons: [
+        'More setup than a sequential chain',
+        'Debugging a graph is harder than a pipeline when routing misfires',
+      ],
+    },
+    {
+      name: 'LangChain sequential chains',
+      pros: ['Simple to compose; most LangChain tutorials assume this shape.'],
+      cons: [
+        'Linear composition cannot express conditional branching',
+        'Session state has to be bolted on via memory abstractions',
+        'Conflict-resolution loops are not expressible as a pipeline',
+      ],
+    },
+    {
+      name: 'Hand-rolled finite state machine',
+      pros: ['Zero framework dependency; total control over transitions.'],
+      cons: [
+        'We would be rewriting what LangGraph already provides',
+        'Tool-call boundary has to be hand-coded and hand-audited',
+        'No ecosystem of instrumentation, tracing, or integrations',
+      ],
+    },
+    {
+      name: 'CrewAI',
+      summary: '[PLACEHOLDER — was CrewAI evaluated? Paper-only / prototyped / dismissed on architectural fit? See brief §5.]',
+      pros: ['[PLACEHOLDER]'],
+      cons: ['[PLACEHOLDER]'],
+    },
+  ]}
+/>
+
+<DecisionRationale option="LangGraph">
+PAR workflows branch conditionally. A user picks a template, the agent extracts fields, sometimes a field is ambiguous (loop to clarify), sometimes two policies conflict (loop to resolve), sometimes the project type changes mid-draft (loop back to template selection). That shape is a graph, not a pipeline.
+
+The second reason: LangGraph's persistent-state model maps directly to Constraint 2. State isn't a memory add-on — it's the thing the graph operates over. Every node reads from and writes to the shared state, so conversation history, field values, and conflict records live in one place.
+
+Sequential chains would have forced us to bolt on both routing and memory. Hand-rolled FSM would have forced us to rebuild LangGraph's tracing surface. LangGraph was the shortest path to the constraints.
+</DecisionRationale>
+
+### Decision 2 · Action boundary
+
+Every action the agent takes — select a template, extract a field, resolve a conflict — has to pass through a typed, logged contract. That's how Constraint 3 (auditability) becomes a property of the system, not a promise.
+
+<OptionsConsidered
+  decision="What's the action-boundary abstraction for tool calls?"
+  options={[
+    {
+      name: 'MCP (Model Context Protocol) tools',
+      summary: 'Typed function contracts dispatched by the graph engine.',
+      chosen: true,
+      pros: [
+        'Every tool call is a typed function with declared input / output schemas',
+        'Dispatch goes through the engine — so every call lands in the audit log by construction',
+        'Portable: the same tool definitions move with the workflow if the graph topology evolves',
+      ],
+      cons: [
+        'More upfront contract-design work than free-form tool-use',
+        'MCP spec is still young; tooling ecosystem evolving',
+      ],
+    },
+    {
+      name: 'Free-form / function-calling',
+      pros: ['Maximum flexibility; LLM picks arguments dynamically.'],
+      cons: [
+        'Action space is implicit — no structural guarantee that every call is auditable',
+        'Auditability becomes a prompt-engineering discipline instead of a code-path invariant',
+      ],
+    },
+    {
+      name: 'LangChain @tool decorators',
+      summary: '[PLACEHOLDER — was this the pre-MCP state? Confirm if it was tried and why it was replaced. See brief §6.]',
+      pros: ['Low friction; decorator-based.'],
+      cons: ['[PLACEHOLDER]'],
+    },
+    {
+      name: 'Custom Python functions with manual logging',
+      pros: ['No framework dependency.'],
+      cons: [
+        'Every tool needs its own audit-log invocation — easy to forget one',
+        'No typed contract means input validation is ad-hoc',
+      ],
+    },
+  ]}
+/>
+
+<DecisionRationale option="MCP tools">
+The property we care about is: *"every action the agent takes is in the audit log."* With MCP, that's true by construction — the engine dispatches actions exclusively through the tool registry, so no code path exists outside it. With free-form function calling, the same property is a prompt-engineering discipline: it could be true, but it's not structurally guaranteed.
+
+Regulated finance cannot accept "probably true." MCP made the guarantee structural, not aspirational.
+</DecisionRationale>
+
+### Decision 3 · Retrieval architecture
+
+Three very different shapes of content feed the agent: the ongoing conversation, documents the user uploads mid-session, and the institutional knowledge base (policies, templates, historical examples). Treating all three with one retrieval function would have been cheaper to build but would have blurred the boundaries between them.
+
+<OptionsConsidered
+  decision="Single retrieval index, or layered retrievers per source?"
+  options={[
+    {
+      name: 'Multi-layer RAG (three retrievers, one per scope)',
+      summary: 'Conversation · User-uploaded · Institutional, each with its own chunking, thresholds, and scope rules.',
+      chosen: true,
+      pros: [
+        'Each layer can be tuned independently — threshold for conversation scope is looser; institutional threshold is tighter',
+        'Privacy guarantees become structural: user-uploaded docs live in a session-scoped index, never cross sessions',
+        'Format-aware chunking per source (PDFs structured, transcripts line-based, policies section-based)',
+      ],
+      cons: [
+        'More moving parts to operate',
+        'Retrieval orchestration logic is non-trivial — results have to be combined in a way that respects relative thresholds',
+      ],
+    },
+    {
+      name: 'Single RAG index',
+      summary: '[PLACEHOLDER — did a single-RAG baseline ship first and then get replaced, or was multi-layer the first architecture? See brief §7.]',
+      pros: ['Cheapest to build and operate; one vector store, one query function.'],
+      cons: [
+        'Forces a uniform chunking strategy across dissimilar source shapes',
+        'Session isolation becomes a filter at query time instead of a structural property of the index',
+        'Thresholds cannot be tuned per source',
+      ],
+    },
+    {
+      name: 'Graph RAG',
+      summary: '[PLACEHOLDER — was this evaluated given policy-document citation structure? See brief §7.]',
+      pros: ['Preserves inter-document relationships; good fit for policy-citation graphs.'],
+      cons: ['[PLACEHOLDER]'],
+    },
+  ]}
+/>
+
+<DecisionRationale option="Multi-layer RAG">
+Session-scoped isolation is the killer argument. When a user uploads a PDF mid-session — a policy memo, a template, a draft — that content should never appear in another user's retrieval results. With three separate layers, that property is structural: user-uploaded content lives in a session-scoped index and gets torn down with the session. With a single index, session isolation would be a post-retrieval filter, which is a correctness-as-runtime-check pattern — acceptable in some contexts, not in regulated finance.
+
+The format-aware chunking is the second reason. Policies live in sections with citation back-references. Transcripts are line-oriented. PDFs have headings. One chunker for all of them would underserve all of them.
+</DecisionRationale>
+
+## Implementation shape
+
+The tool contract is the spine of the system. Every tool follows the same structural pattern.
+
+```ts
+// Pseudo-code, not the live implementation.
+// [PLACEHOLDER — user to confirm which shapes are OK to show publicly. See brief §4.]
+
+// Example: template selection tool
+T_template_select: (intent: UserIntent, context: SessionContext)
+  => { template_id: string; confidence: number; rationale: string }
+
+// Example: field extraction tool
+T_field_extract: (field: FieldSpec, scope: RetrievalScope)
+  => { value: string; source_refs: Citation[]; flags: ExtractionFlag[] }
+
+// Every tool returns typed output. Every invocation lands in the audit log
+// by construction — dispatch happens inside the LangGraph engine.
+```
+
+The retrieval layer follows a similar typed-contract shape:
+
+```ts
+// Pseudo-code. [PLACEHOLDER — confirm if config shape is shareable.]
+RetrievalLayer {
+  scope:        'session' | 'user' | 'global'
+  chunker:      FormatAwareChunker     // picks strategy from source type
+  threshold:    number                  // [PLACEHOLDER — actual values redacted]
+  top_k:        number                  // [PLACEHOLDER]
+  reranker?:    RerankerFunction       // optional; layer-dependent
+}
+```
+
+## Timeline and velocity
+
+<StepThrough
+  label="Phase map — PAR Assist, November 2025 → April 2026"
+  steps={[
+    {
+      title: 'Nov 2025 — the one-page plan',
+      caption: '[PLACEHOLDER — team shape at this phase? See brief §2.]',
+      content: (
+        <>
+          One page, written to frame the opportunity: the Amplify-intern proof-of-concept was evidence the pattern worked. What was missing was a production shape and a thesis for why the pattern extended to every PAR type across every business line.
+        </>
+      ),
+    },
+    {
+      title: 'Feb 2026 — development begins',
+      caption: '[PLACEHOLDER — sprint count Feb → Apr? Team size? Parallel workstreams named? See brief §2.]',
+      content: (
+        <>
+          Real development started after holidays and team restructuring. Running in parallel: Astraeus productionization and the tail end of Aegis v2 refactor.
+        </>
+      ),
+    },
+    {
+      title: 'April 2026 — pilot launch',
+      caption: 'Pilot launched April 2026; enterprise rollout through Q2/Q3 2026.',
+      content: (
+        <>
+          Pilot with the first wave of PAR authors. The rollout plan expands across RBC business lines through Q2/Q3 2026.
+        </>
+      ),
+    },
+  ]}
+/>
+
+## Before and after
+
+<BeforeAfterDiff
+  label="Drafting a PAR — before and after"
+  before={{
+    label: 'Before',
+    content: (
+      <>
+        <strong>[PLACEHOLDER — see brief §1]</strong>. The honest qualitative version: the drafting process took multi-revision, multi-meeting cycles. Authors spent most of their time hunting for the right template, resolving contradictions between policy documents, and guessing which fields applied to which project type.
+      </>
+    ),
+    hint: 'Qualitative pending user approval of specific numbers.',
+  }}
+  after={{
+    label: 'After',
+    content: (
+      <>
+        A <strong>guided interactive session</strong>. The agent surfaces the right template, extracts candidate field values from uploaded source material, resolves policy conflicts in-flight, and flags genuine ambiguity for the author to decide. <strong>[PLACEHOLDER — adoption / revision-cycle reduction numbers TBD per brief §1.]</strong>
+      </>
+    ),
+    hint: 'Specific metric pending.',
+  }}
+/>
+
+## War story
+
+**[PLACEHOLDER — pick one per brief §3. The three candidates are:]**
+
+- **A.** Single-pass RAG was latency-heavy and noisy → refactored to multi-layer with format-aware chunking. Lesson: retrieval architecture must match source semantic shape.
+- **B.** Initial agent design was monolithic (one agent, many tools) — hit context limits → refactored to graph with conditional routing. Lesson: orchestration is a graph problem, not a prompt problem.
+- **C.** Your own scope cut or walk-back — a tool that got removed, a feature that was planned and abandoned, an architectural decision reversed after benchmarking.
+
+The point of the war story is to show the revision — the thing that didn't work first, what the fix cost, and the lesson that generalizes. Placeholder until resolved.
+
+## What transfers
+
+The pattern — **conditional-graph orchestration + typed action boundary + layered retrieval + unified state store** — transfers to any enterprise workflow that combines (a) multi-turn state, (b) heterogeneous sources, and (c) regulatory audit requirements. PAR drafting is one instance. Budget-request review, compliance audit, credit-memo drafting, M&A checklist work — same skeleton, different domain anchors.
+
+The substrate changes; the shape doesn't. That's what makes agentic AI viable in regulated environments: structural guarantees from the architecture, not prompt-engineering discipline at the margin.
+
+---
+
+## Formal notation appendix
+
+The sections above are the practitioner treatment. For readers who want the mathematical framing — context isolation as a set-theoretic statement, state-persistence as an inductive proof, the graph definition as <InlineEquation html={tex("G = (V, E, \\mathcal{S}, \\delta)")} /> — this appendix preserves it. This is the same formal content as the [sibling post](/blog/enterprise-agentic-ai-architecture), compressed.
+
+<TheoremBlock variant="definition" number={1} title="System requirements (formal)">
+Let <InlineEquation html={tex("\\mathcal{W}")} /> denote the space of enterprise workflows, <InlineEquation html={tex("\\mathcal{U}")} /> user utterances, <InlineEquation html={tex("\\mathcal{D}")} /> the document corpus, and <InlineEquation html={tex("\\mathcal{S}")} /> the workflow-state space. System <InlineEquation html={tex("\\mathcal{F}")} /> satisfies:
+
+<MathBlock html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{sensitive}} = \\emptyset", true)} />
+
+<MathBlock html={tex("s_{t+1} = \\delta(s_t, u_t, a_t), \\quad \\delta: \\mathcal{S} \\times \\mathcal{U} \\times \\mathcal{A} \\to \\mathcal{S}", true)} />
+
+<MathBlock html={tex("\\text{retrieve}(q, s_t) = \\bigoplus_{l=1}^{L} R_l(q, s_t, \\mathcal{D}_l)", true)} />
+
+<MathBlock html={tex("\\forall a \\in \\mathcal{A}: a = \\text{Tool}_k(\\text{input}_k) \\mapsto \\text{output}_k \\in \\text{AuditLog}", true)} />
+</TheoremBlock>
+
+<TheoremBlock variant="definition" number={2} title="Agentic workflow graph">
+An agentic workflow system is a directed graph <InlineEquation html={tex("G = (V, E, \\mathcal{S}, \\delta)")} /> where <InlineEquation html={tex("V = \\{v_{\\text{parse}}, v_{\\text{route}}, v_{\\text{execute}}, v_{\\text{respond}}\\}")} />, <InlineEquation html={tex("E \\subseteq V \\times V")} />, and each node reads from and writes to <InlineEquation html={tex("\\mathcal{S}")} /><CitationRef id={6} />.
+</TheoremBlock>
+
+<MathBlock html={tex("v_{\\text{next}} = \\text{Router}(s_t) = \\begin{cases} v_{\\text{clarify}} & \\text{if ambiguous}(s_t) \\\\ v_{\\text{resolve}} & \\text{if conflict}(s_t) \\\\ v_{\\text{assign}} & \\text{if field\\_pending}(s_t) \\\\ v_{\\text{respond}} & \\text{if complete}(s_t) \\end{cases}", true)} />
+
+<TheoremBlock variant="theorem" number={1} title="Context isolation">
+<MathBlock html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{sensitive}} = \\emptyset", true)} />
+
+By construction: the LLM operates only at <InlineEquation html={tex("v_{\\text{parse}}")} /> and <InlineEquation html={tex("v_{\\text{route}}")} />, receiving <InlineEquation html={tex("(u_t, \\mathcal{M})")} />. All data access occurs within MCP tools in a separate context<CitationRef id={10} />. Tool outputs are post-processed into summaries before rejoining the agent context. Since <InlineEquation html={tex("\\mathcal{M}")} /> contains only schema structure and summaries contain only status, the intersection with <InlineEquation html={tex("\\mathcal{D}_{\\text{sensitive}}")} /> is empty.
+</TheoremBlock>
+
+<MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{database remembers}}", true)} />
+
+That separation is what makes agentic AI viable in regulated environments<CitationRef id={3} /><CitationRef id={13} /> — structural guarantees, not prompt engineering tricks.
+
+---
+
+## Cite as
+
+```bibtex
+@misc{dhaliwal2026enterpriseagenticframework,
+  author = {Dhaliwal, Harmilap Singh},
+  title  = {Enterprise Agentic AI Architecture (framework rewrite): Decisions, Options Considered, and Formal Guarantees},
+  year   = {2026},
+  month  = {April},
+  url    = {https://rogerthatroach.github.io/blog/enterprise-agentic-ai-framework}
+}
+```
+
+*Dhaliwal, Harmilap Singh. (April 2026). Enterprise Agentic AI Architecture (framework rewrite). https://rogerthatroach.github.io/blog/enterprise-agentic-ai-framework.*
+
+---
+
+*This post describes architectural patterns and engineering decisions at a level of abstraction that does not reveal proprietary code, data, or internal screenshots. Concrete details (system names, metrics, timeline specifics) appear only where they have already been shared publicly. Everything else is generalized to the pattern.*
