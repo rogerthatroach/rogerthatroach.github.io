@@ -17,7 +17,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     h2: ({ children }) => {
       const id = slugify(children);
-      return <h2 id={id} className="scroll-mt-24 mb-4 mt-12 text-2xl font-semibold text-text-primary">{children}</h2>;
+      return <h2 id={id} className="scroll-mt-24 mb-4 mt-12 font-display text-2xl font-semibold tracking-tight text-text-primary">{children}</h2>;
     },
     h3: ({ children }) => {
       const id = slugify(children);
