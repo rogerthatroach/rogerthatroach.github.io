@@ -137,8 +137,22 @@ function Particles() {
 
 export default function ParticleField() {
   const [visible, setVisible] = useState(true);
+  const [supported, setSupported] = useState(true);
 
   useEffect(() => {
+    // Detect WebGL availability up-front — headless Chrome under --disable-gpu
+    // (Lighthouse, some CI envs) returns null here, and letting Three.js crash
+    // downstream surfaces console errors that Lighthouse counts against BP +
+    // cascades into DOM-query audits (viewport / title / lang / meta-description
+    // were reporting as missing even though the server HTML carried them).
+    try {
+      const c = document.createElement('canvas');
+      const gl = c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl');
+      if (!gl) setSupported(false);
+    } catch {
+      setSupported(false);
+    }
+
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (mq.matches) setVisible(false);
     const handler = (e: MediaQueryListEvent) => setVisible(!e.matches);
@@ -146,7 +160,7 @@ export default function ParticleField() {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  if (!visible) return null;
+  if (!visible || !supported) return null;
 
   return (
     <div className="pointer-events-none absolute inset-0">
