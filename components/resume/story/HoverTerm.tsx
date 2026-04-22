@@ -53,17 +53,21 @@ export default function HoverTerm({
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const viewportW = window.innerWidth;
-      // Popover is w-64 (256px), capped at viewport-2rem on narrow screens.
-      // Keep the CSS value in sync if the class changes.
-      const popoverHalf = Math.min(256, viewportW - 32) / 2;
+      // Popover width: w-64 (256) on mobile, sm:w-72 (288) above 640, with
+      // max-w-[calc(100vw-2rem)] acting as an upper cap on narrow screens.
+      // We store the edge coordinate directly so we don't depend on a CSS
+      // translate (which Framer overwrites during the enter animation).
+      const baseWidth = viewportW >= 640 ? 288 : 256;
+      const popoverWidth = Math.min(baseWidth, viewportW - 32);
+      const halfWidth = popoverWidth / 2;
       const margin = 12;
       const center = rect.left + rect.width / 2;
-      const clamped = Math.max(
-        popoverHalf + margin,
-        Math.min(viewportW - popoverHalf - margin, center)
+      const clampedCenter = Math.max(
+        halfWidth + margin,
+        Math.min(viewportW - halfWidth - margin, center)
       );
       setPos({
-        left: clamped,
+        left: clampedCenter - halfWidth,
         top: rect.bottom + 6,
       });
     };
@@ -112,7 +116,6 @@ export default function HoverTerm({
                   position: 'fixed',
                   left: pos.left,
                   top: pos.top,
-                  transform: 'translateX(-50%)',
                 }}
                 className="pointer-events-none z-[100] block w-64 max-w-[calc(100vw-2rem)] rounded-lg border border-border-subtle bg-surface/95 p-3 text-xs font-normal not-italic leading-relaxed text-text-secondary shadow-xl backdrop-blur-md sm:w-72"
               >
