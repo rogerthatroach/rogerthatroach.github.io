@@ -9,6 +9,10 @@ In November 2025, I wrote a one-page plan for an AI system that would transform 
 
 This is the story of how it happened, what I learned about scaling an intern&rsquo;s proof-of-concept into an enterprise product, and why the hardest part had nothing to do with technology.
 
+<VisualizationContainer minHeight={600} caption="PAR Assist architecture at a glance: LangGraph orchestration, MCP tools as the action boundary, three RAG layers, PostgreSQL + pgvector backbone. The rest of the post explains why each piece is shaped the way it is.">
+{() => <AgenticArchitecturePAR />}
+</VisualizationContainer>
+
 ## The problem
 
 Project Approval Requests (PARs) are how major banks govern significant initiatives. They&rsquo;re high-stakes documents that require institutional knowledge, policy compliance, and cross-referencing dozens of templates, rules, and historical examples. The drafting process took weeks. Most of that time was spent hunting for the right template, resolving contradictions between policy documents, and guessing which fields applied to which project type.
@@ -22,10 +26,6 @@ During the 2025 Amplify internship program, one of the four interns I was managi
 I saw the shape of something bigger. Not a chatbot. An agentic platform that could understand where you were in the workflow, pull the right context at the right moment, resolve conflicts between policies automatically, and adapt to any PAR type across any business line.
 
 ## The architecture decisions
-
-<VisualizationContainer minHeight={600} caption="PAR Assist architecture: LangGraph orchestration, MCP tools, multi-layer RAG, PostgreSQL backbone.">
-{() => <AgenticArchitecturePAR />}
-</VisualizationContainer>
 
 **Why LangGraph over vanilla chains.** A PAR workflow isn&rsquo;t linear. At any point, the system might need to clarify an ambiguity, resolve a conflict between two policy documents, or switch templates because the user&rsquo;s project type changed mid-draft. LangGraph models this as a directed graph with persistent state. Conditional routing based on workflow state is the core capability. Sequential chains couldn&rsquo;t express it.
 
@@ -73,3 +73,24 @@ PAR Assist follows the same closed-loop pattern as every system I&rsquo;ve built
 - **Act.** Guided enterprise decisions, auditable end to end.
 
 The technology is different from Particle Swarm Optimization on a 900MW coal plant. The architecture is the same. The formal post [makes that isomorphism rigorous](/blog/closed-loop). This post is the version I&rsquo;d tell you at lunch.
+
+---
+
+## Cite as
+
+```bibtex
+@misc{dhaliwal2026parassist,
+  author  = {Dhaliwal, Harmilap Singh},
+  title   = {How We Built PAR Assist: From Intern POC to Bank-Wide Product},
+  year    = {2026},
+  month   = {April},
+  url     = {https://rogerthatroach.github.io/blog/par-assist-building},
+  note    = {Companion to the formal architecture post}
+}
+```
+
+Or plain text: *Dhaliwal, Harmilap Singh. (April 2026). How We Built PAR Assist: From Intern POC to Bank-Wide Product. https://rogerthatroach.github.io/blog/par-assist-building.*
+
+---
+
+*This post describes architectural patterns and engineering decisions at a level of abstraction that does not reveal proprietary code, data, model outputs, or internal screenshots. Concrete RBC-internal details (system names, team composition, specific metrics) appear only where they have already been shared publicly. Everything else is generalized to the pattern.*
