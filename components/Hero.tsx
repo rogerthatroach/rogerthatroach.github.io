@@ -91,58 +91,63 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           className="lg:order-last"
         >
+          {/* Role eyebrow — bumped up a notch so it carries the current-seat
+              signal visibly without overpowering the name. */}
           <motion.p
             custom={0}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-4 font-mono text-sm tracking-widest text-accent"
+            className="mb-4 font-mono text-[13px] tracking-widest text-accent sm:text-sm"
           >
             {HERO.title}
           </motion.p>
 
+          {/* Name — stepped down one size class so the tagline / bio fit
+              alongside the portrait's vertical height on desktop. */}
           <motion.h1
             custom={1}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-5 text-3xl font-bold leading-[1.05] tracking-tight text-text-primary sm:text-4xl md:text-5xl lg:text-6xl"
+            className="mb-4 text-2xl font-bold leading-[1.05] tracking-tight text-text-primary sm:text-3xl md:text-4xl lg:text-5xl"
           >
             {HERO.name}
           </motion.h1>
 
-          {/* Tagline — Fraunces italic, dimmer than the name, capped smaller
-              so the H1 stays the unambiguous primary. Contrast by style +
-              color instead of size-weight competition. */}
+          {/* Tagline — Fraunces upright (italic removed; reads more serious),
+              dimmer than the name. Contrast by color + size, not style. */}
           <motion.p
             custom={2}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-4 max-w-2xl font-display text-base italic leading-[1.25] text-text-secondary sm:text-lg"
+            className="mb-3 max-w-2xl font-display text-base leading-[1.3] text-text-secondary sm:text-lg"
           >
             {HERO.tagline}
           </motion.p>
 
-          {/* Bio — Fraunces regular, one step dimmer still, tight leading
-              kept inside body comfort zone. */}
+          {/* Bio — Fraunces regular, tertiary color. mb-10 creates a clear
+              separation so the INDUSTRIES / EXPERIENCE unit below reads as
+              its own block, not a continuation of the prose. */}
           <motion.p
             custom={3}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-3 max-w-2xl font-display text-sm leading-[1.55] text-text-tertiary sm:text-base"
+            className="mb-10 max-w-2xl font-display text-sm leading-[1.55] text-text-tertiary sm:text-base"
           >
             {HERO.bio}
           </motion.p>
 
-          {/* Industries — pattern-matching signal for business-audience skimmers */}
+          {/* Industries — grouped tight with the Experience row below so the
+              two read as one "context" block rather than tucked under bio. */}
           <motion.p
             custom={4}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-8 font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
+            className="mb-3 font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
           >
             {INDUSTRIES.join(' · ')}
           </motion.p>
