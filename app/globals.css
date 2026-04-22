@@ -114,6 +114,14 @@ html.dark .palette-card {
   border-color: var(--p-border-d);
   background-color: var(--p-bg-d);
 }
+/* Full-alpha left border — used by ProjectReveal / era-tagged callouts
+   where the left accent needs to pop against a neutral card body. */
+.palette-border-l {
+  border-left-color: var(--p-l);
+}
+html.dark .palette-border-l {
+  border-left-color: var(--p-d);
+}
 
 /* Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
