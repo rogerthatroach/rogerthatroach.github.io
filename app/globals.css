@@ -37,59 +37,70 @@
      dark: variants keep working; light-base themes drop it. Bootstrap
      in app/layout.tsx handles both based on localStorage. */
 
-  /* Nord — arctic blue, dark base */
+  /* Aurora (née Nord) — arctic blue, dark base.
+     accent-muted tuned to #34425a solid (darker than canonical Nord
+     #5e81ac at 33% alpha) so #88c0d0 text on button clears 4.5:1 AA. */
   html[data-theme='nord'] {
     --color-bg: #2e3440;
     --color-surface: #3b4252;
     --color-surface-hover: #434c5e;
     --color-border: #4c566a;
     --color-accent: #88c0d0;
-    --color-accent-muted: #5e81ac55;
+    --color-accent-muted: #34425a;
     --color-text-primary: #eceff4;
     --color-text-secondary: #d8dee9;
     --color-text-tertiary: #a7b0c0;
     --color-diagram-grid: #434c5e;
   }
 
-  /* Solarized Dark — Ethan Schoonover 2011, CIELAB-calibrated */
+  /* Obsidian (née Solarized Dark) — Ethan Schoonover 2011, CIELAB-
+     calibrated. Accent brightened from canonical #268bd2 (4.07:1 on
+     base03) to #4fb3f5 (6.59:1) so body-weight accent text passes AA.
+     Everything else is source-faithful. */
   html[data-theme='solarized-dark'] {
     --color-bg: #002b36;
     --color-surface: #073642;
     --color-surface-hover: #0a4553;
     --color-border: #586e75;
-    --color-accent: #268bd2;
-    --color-accent-muted: #268bd244;
+    --color-accent: #4fb3f5;
+    --color-accent-muted: #4fb3f522;
     --color-text-primary: #fdf6e3;
     --color-text-secondary: #93a1a1;
     --color-text-tertiary: #839496;
     --color-diagram-grid: #0a4553;
   }
 
-  /* Monokai — Sublime classic, magenta/lime on warm black */
+  /* Ember (née Monokai) — Sublime classic, signature pink on warm
+     black. Accent bumped from canonical #f92672 (3.92:1) to #ff6b9d
+     (5.47:1) — slightly lighter pink that still reads unmistakably
+     Monokai but clears AA. */
   html[data-theme='monokai'] {
     --color-bg: #272822;
     --color-surface: #2f302a;
     --color-surface-hover: #3e3d32;
     --color-border: #49483e;
-    --color-accent: #f92672;
-    --color-accent-muted: #f9267222;
+    --color-accent: #ff6b9d;
+    --color-accent-muted: #ff6b9d22;
     --color-text-primary: #f8f8f2;
     --color-text-secondary: #cfcfc2;
     --color-text-tertiary: #a6a68a;
     --color-diagram-grid: #3e3d32;
   }
 
-  /* Paper — editorial cream + black ink, light base */
+  /* Papyrus (née Paper) — editorial cream + black ink, light base.
+     text-tertiary darkened from #6e6e66 (4.48:1, one hair below) to
+     #67675f (5.10:1). Accent darkened from #8b5e34 (4.13:1 on muted)
+     to #7a4e28 (5.29:1). */
   html[data-theme='paper'] {
     --color-bg: #f4efe6;
     --color-surface: #ebe5da;
     --color-surface-hover: #ddd6c9;
     --color-border: #c9c1b3;
-    --color-accent: #8b5e34;
-    --color-accent-muted: #8b5e3422;
+    --color-accent: #7a4e28;
+    --color-accent-muted: #7a4e2822;
     --color-text-primary: #1a1a1a;
     --color-text-secondary: #4a4a44;
-    --color-text-tertiary: #6e6e66;
+    --color-text-tertiary: #67675f;
     --color-diagram-grid: #ddd6c9;
   }
 
