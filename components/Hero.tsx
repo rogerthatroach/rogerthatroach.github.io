@@ -106,27 +106,32 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-5 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl lg:text-6xl"
+            className="mb-5 text-3xl font-bold leading-[1.05] tracking-tight text-text-primary sm:text-4xl md:text-5xl lg:text-6xl"
           >
             {HERO.name}
           </motion.h1>
 
+          {/* Tagline — Fraunces italic, dimmer than the name, capped smaller
+              so the H1 stays the unambiguous primary. Contrast by style +
+              color instead of size-weight competition. */}
           <motion.p
             custom={2}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-4 max-w-3xl font-display text-lg leading-snug text-text-primary sm:text-xl md:text-2xl"
+            className="mb-4 max-w-2xl font-display text-base italic leading-[1.25] text-text-secondary sm:text-lg"
           >
             {HERO.tagline}
           </motion.p>
 
+          {/* Bio — Fraunces regular, one step dimmer still, tight leading
+              kept inside body comfort zone. */}
           <motion.p
             custom={3}
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-3 max-w-3xl font-display text-sm leading-relaxed text-text-secondary sm:text-base"
+            className="mb-3 max-w-2xl font-display text-sm leading-[1.55] text-text-tertiary sm:text-base"
           >
             {HERO.bio}
           </motion.p>
