@@ -83,7 +83,7 @@ export default function RoleOverlay({
           type="button"
           onClick={onClose}
           aria-label="Close role details"
-          className="absolute right-4 top-4 rounded-full p-1.5 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
+          className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
         >
           <X size={18} aria-hidden="true" />
         </button>

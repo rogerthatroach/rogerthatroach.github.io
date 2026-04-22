@@ -61,6 +61,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
+      aria-label="Intro"
       // Section handles min-height, nav clearance (pt-24 mobile), and the
       // full-bleed ParticleField + gradients. Horizontal padding moves to
       // the inner container so its left/right edges match Nav's (both use
