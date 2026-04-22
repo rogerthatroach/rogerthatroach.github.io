@@ -37,7 +37,7 @@ const PALETTES = [
   {
     name: 'Current — Sakura / Wabi-Sabi',
     description:
-      'Ships today. Warm-dark foreground, muted rose accent. Distinctive without being loud.',
+      'Ships today. Warm-dark foreground, muted rose accent. Distinctive without being loud. Reviewed Apr 2026 vs oxblood/algae alternatives — sakura kept as the chosen palette.',
     base: 'dark' as const,
     vars: {
       '--color-bg': '#0c0a0a',
@@ -49,40 +49,6 @@ const PALETTES = [
       '--color-text-primary': '#f0ebe8',
       '--color-text-secondary': '#a89e9b',
       '--color-text-tertiary': '#8a8181',
-    },
-  },
-  {
-    name: 'Audit A — Oxblood / Bone',
-    description:
-      'Audit recommendation. Editorial, warm, confident. High contrast. Risks: dates fast, feels "wine cellar."',
-    base: 'light' as const,
-    vars: {
-      '--color-bg': '#F6F2EA',
-      '--color-surface': '#FFFFFF',
-      '--color-surface-hover': '#EEE8DC',
-      '--color-border': '#D9D2C3',
-      '--color-accent': '#8B1A1A',
-      '--color-accent-muted': '#F4D9D9',
-      '--color-text-primary': '#1A1614',
-      '--color-text-secondary': '#5C534B',
-      '--color-text-tertiary': '#7A7268',
-    },
-  },
-  {
-    name: 'Audit B — Algae on Near-black',
-    description:
-      'Audit recommendation. Technical, bold, modern. Reads as "machine learning terminal." Risks: screams "dev tool."',
-    base: 'dark' as const,
-    vars: {
-      '--color-bg': '#07090A',
-      '--color-surface': '#0F1214',
-      '--color-surface-hover': '#161A1D',
-      '--color-border': '#1F2428',
-      '--color-accent': '#3FE69D',
-      '--color-accent-muted': '#0F2E22',
-      '--color-text-primary': '#E8EDEB',
-      '--color-text-secondary': '#98A3A0',
-      '--color-text-tertiary': '#6F7A77',
     },
   },
 ];
@@ -186,6 +152,18 @@ export default function PlaygroundPage() {
             Preview routes
           </p>
           <ul className="space-y-2 text-sm">
+            <li>
+              <Link
+                href="/playground/hero-audit"
+                className="group inline-flex items-center gap-2 text-text-primary transition-colors hover:text-accent"
+              >
+                <span className="font-medium">Hero — audit P0-4 spec</span>
+                <span className="text-text-tertiary group-hover:text-accent">
+                  — pitch-first thesis hero with CTAs, no portrait
+                </span>
+                <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </li>
             <li>
               <Link
                 href="/playground/projects-filmography"
