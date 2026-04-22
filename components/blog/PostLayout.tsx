@@ -55,7 +55,7 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
           href="/blog"
           className="text-sm text-text-tertiary transition-colors hover:text-accent"
         >
-          Writing
+          Writings
         </Link>
       </div>
 
