@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter_Tight } from 'next/font/google';
+import { Inter_Tight, Fraunces, Instrument_Serif } from 'next/font/google';
 import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import Link from 'next/link';
@@ -13,6 +13,15 @@ import HeroVariant from '@/components/playground/HeroVariant';
 const interTight = Inter_Tight({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
+});
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+});
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
 });
 
 export const metadata: Metadata = {
@@ -78,16 +87,24 @@ const PALETTES = [
   },
 ];
 
-const FONTS = [
+interface FontSpec {
+  name: string;
+  note: string;
+  sansClass: string;
+  monoClass: string;
+  displayClass?: string;
+}
+
+const FONTS: FontSpec[] = [
   {
     name: 'Current — Inter + JetBrains Mono',
-    note: 'Shipping today. Familiar, crisp, widely tested.',
+    note: 'Shipping today. Familiar, crisp, widely tested. Body prose in Inter, tech chips and eyebrows in JetBrains.',
     sansClass: 'font-body',
     monoClass: 'font-mono',
   },
   {
     name: 'Audit A — Geist Sans + Geist Mono',
-    note: 'Vercel pair. Slightly tighter spacing than Inter; mono is distinctive without being noisy.',
+    note: 'Vercel pair. Slightly tighter spacing than Inter; mono is distinctive without being noisy. Safe modern swap.',
     sansClass: GeistSans.className,
     monoClass: GeistMono.className,
   },
@@ -97,7 +114,21 @@ const FONTS = [
     sansClass: interTight.className,
     monoClass: 'font-mono',
   },
-] as const;
+  {
+    name: 'Editorial — Inter + Fraunces (serif display)',
+    note: 'Keeps Inter body; Fraunces warm serif only on the headline. Pairs well with wabi-sabi palette — Japanese craft/editorial sites use this register.',
+    sansClass: 'font-body',
+    monoClass: 'font-mono',
+    displayClass: fraunces.className,
+  },
+  {
+    name: 'Literary — Inter + Instrument Serif',
+    note: 'Thin-strokes display serif on the headline; body stays Inter. Signals "long-form writing" — good fit for blog H1s if you want that register shift.',
+    sansClass: 'font-body',
+    monoClass: 'font-mono',
+    displayClass: instrumentSerif.className,
+  },
+];
 
 const HERO_VARIANTS = [
   {
@@ -214,6 +245,7 @@ export default function PlaygroundPage() {
                 note={f.note}
                 sansClass={f.sansClass}
                 monoClass={f.monoClass}
+                displayClass={f.displayClass}
               />
             ))}
           </div>
