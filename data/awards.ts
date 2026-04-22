@@ -29,19 +29,19 @@ export const AWARDS: Award[] = [
   {
     title: 'Innovation Pride Award',
     org: 'TCS',
-    year: '2019',
+    year: 'Sep 2019',
     detail: '2nd out of 600 — Computer Vision Hackathon',
   },
   {
     title: 'Star of the Month',
     org: 'TCS',
-    year: '2019',
+    year: 'Jan 2019',
     detail: 'Successful deployment of Digital Twin application',
   },
   {
     title: 'Star of the Month',
     org: 'TCS',
-    year: '2017',
+    year: 'Nov 2017',
     detail: 'Groundbreaking ML research for Digital Twin',
   },
 ];

@@ -84,6 +84,12 @@ export default function Footer() {
           <span>{HERO.location}</span>
         </div>
       </div>
+
+      {/* Copyright — trust signal: "this site is maintained". Year is
+          rendered via new Date() so it never goes stale on Jan 1. */}
+      <div className="mx-auto mt-8 flex max-w-content items-center justify-center border-t border-border-subtle/60 pt-6 text-[11px] text-text-tertiary">
+        <span>© {new Date().getFullYear()} {HERO.name}. Built in the open — see <Link href="/colophon" className="transition-colors hover:text-accent">colophon</Link>.</span>
+      </div>
     </footer>
   );
 }
