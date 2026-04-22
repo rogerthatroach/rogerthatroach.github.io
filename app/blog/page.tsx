@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import PostCard from '@/components/blog/PostCard';
 
 export const metadata: Metadata = {
-  title: 'Writing — Harmilap Singh Dhaliwal',
+  title: 'Writings — Harmilap Singh Dhaliwal',
   description: 'Technical whitepapers on agentic AI, text-to-SQL, and closed-loop optimization.',
   alternates: { canonical: '/blog' },
 };
@@ -28,7 +28,7 @@ export default function BlogIndexPage() {
           <ArrowLeft size={16} />
           Home
         </Link>
-        <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Writing</h1>
+        <h1 className="text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
         <p className="mt-2 text-base text-text-secondary">
           Technical explorations — architecture patterns, formal guarantees, and the systems thinking behind the work.
         </p>
