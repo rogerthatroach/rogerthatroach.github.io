@@ -29,7 +29,13 @@ export default function AboutSection() {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,42rem)_auto] lg:gap-14">
           {/* Text column */}
           <div>
-            {/* Opener — the thesis. Also above-the-fold on mobile and a likely
+            {/* Thesis mapping — the four abstraction levels made explicit.
+                Leads the page: the "Three things I've learned..." opener
+                below is a teaser for the three beliefs, so keeping the
+                mapping between opener and beliefs broke that flow. */}
+            <ThesisMapping />
+
+            {/* Opener — the thesis. Above-the-fold on mobile and a likely
                 LCP candidate — render at final state immediately. */}
             <motion.p
               initial={false}
@@ -52,11 +58,6 @@ export default function AboutSection() {
                 </motion.p>
               ))}
             </div>
-
-            {/* Thesis mapping — the four abstraction levels made explicit.
-                Each row links to the anchor case study. Director-audience
-                wants to see the pattern before the principles. */}
-            <ThesisMapping />
 
             {/* Three beliefs — render immediately. The first belief paragraph
                 is the mobile LCP target (portrait is below-the-fold on narrow
