@@ -86,13 +86,13 @@ export default function Hero() {
           <motion.div
             initial={false}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="relative order-first mx-auto aspect-[4/5] w-32 overflow-hidden rounded-lg sm:w-40 lg:mx-0 lg:w-[188px] xl:w-[202px]"
+            className="relative order-first mx-auto aspect-[4/5] w-[155px] overflow-hidden rounded-lg sm:w-[194px] lg:mx-0 lg:w-[228px] xl:w-[244px]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/portrait.webp"
               srcSet="/images/portrait-sm.webp 700w, /images/portrait.webp 1000w"
-              sizes="(max-width: 1024px) 160px, 202px"
+              sizes="(max-width: 1024px) 194px, 244px"
               alt="Harmilap Singh Dhaliwal"
               className="h-full w-full object-cover"
               {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
@@ -108,7 +108,7 @@ export default function Hero() {
               variants={FADE_UP}
               initial="hidden"
               animate="visible"
-              className="mb-2 font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-accent sm:text-sm"
+              className="mb-2 font-mono text-[15px] font-bold uppercase tracking-[0.18em] text-accent sm:text-[16px]"
             >
               <span className="mr-2 text-text-tertiary">§</span>
               {HERO.title}
@@ -122,7 +122,7 @@ export default function Hero() {
               // lg:whitespace-nowrap keeps the full name on one line at
               // desktop widths; mobile retains natural wrapping so it
               // doesn't overflow the column at 375px.
-              className="mb-3 text-[23px] font-bold leading-[1.05] tracking-tight text-text-primary sm:text-[28px] md:text-[34px] lg:whitespace-nowrap lg:text-[44px]"
+              className="mb-3 text-[28px] font-bold leading-[1.05] tracking-tight text-text-primary sm:text-[34px] md:text-[41px] lg:whitespace-nowrap lg:text-[53px]"
             >
               {HERO.name}
             </motion.h1>
@@ -132,7 +132,7 @@ export default function Hero() {
               variants={FADE_UP}
               initial="hidden"
               animate="visible"
-              className="mb-3 max-w-2xl font-display text-[17px] leading-[1.3] text-text-secondary sm:text-[19px] md:text-[22px]"
+              className="mb-3 max-w-2xl font-display text-[21px] leading-[1.3] text-text-secondary sm:text-[23px] md:text-[26px]"
             >
               {HERO.tagline}
             </motion.p>
@@ -142,7 +142,7 @@ export default function Hero() {
               variants={FADE_UP}
               initial="hidden"
               animate="visible"
-              className="max-w-2xl font-display text-[15px] leading-[1.55] text-text-tertiary sm:text-[17px]"
+              className="max-w-2xl font-display text-[19px] leading-[1.55] text-text-tertiary sm:text-[21px]"
             >
               {HERO.bio}
             </motion.p>

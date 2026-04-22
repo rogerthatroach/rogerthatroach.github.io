@@ -16,7 +16,7 @@ export default function RecognitionSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="mb-8 text-2xl font-bold text-text-primary sm:text-3xl"
+          className="mb-8 font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl"
         >
           Recognition
         </motion.h2>
