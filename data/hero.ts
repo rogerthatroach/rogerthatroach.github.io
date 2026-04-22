@@ -21,8 +21,8 @@ export const NUMBER_SEQUENCE: NumberFrame[] = [
 export const HERO = {
   name: 'Harmilap Singh Dhaliwal',
   title: 'AI & Data Science Lead — RBC',
-  tagline: 'I architect AI systems across four domains — industrial, cloud, enterprise, agentic. I lead the teams that ship them.',
-  bio: 'Eight years shipping production AI — from 900MW combustion tuning in Japan to bank-wide agentic platforms in Toronto. Hands-on ~70% of the time; leading growing teams the rest.',
+  tagline: 'Architecting agentic AI for enterprise finance at RBC CFO Group — the bank’s largest function.',
+  bio: 'Eight years from 900MW power plants in Japan to bank-wide AI platforms in Toronto. Same closed loop. Four abstraction levels.',
   location: 'Toronto, Canada',
   links: {
     linkedin: 'https://www.linkedin.com/in/harmilapsingh',
