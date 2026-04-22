@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MoreVertical, X } from 'lucide-react';
+import { MoreVertical, X, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
 import { NAV_LINKS } from '@/data/nav';
@@ -121,6 +121,26 @@ export default function Nav() {
                 className="absolute right-0 top-[calc(100%+0.5rem)] min-w-[12rem] overflow-hidden rounded-xl border border-border-subtle bg-gradient-to-b from-surface-hover to-surface shadow-2xl"
               >
                 <ul className="py-1">
+                  {/* Search trigger — mobile equivalent of ⌘K. Fires the
+                      same cmdk:open custom event that the footer hint
+                      button uses. */}
+                  <li role="none">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        document.dispatchEvent(new Event('cmdk:open'));
+                      }}
+                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
+                    >
+                      <Search size={14} aria-hidden="true" />
+                      Search
+                    </button>
+                  </li>
+                  <li role="none" aria-hidden="true">
+                    <div className="mx-4 my-1 border-t border-border-subtle" />
+                  </li>
                   {NAV_LINKS.map((link) => {
                     const isInternal =
                       link.href.startsWith('/') && !link.href.startsWith('/#');

@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
 import { HERO } from '@/data/hero';
@@ -34,8 +36,8 @@ export default function Footer() {
           </a>
         </div>
 
-        {/* Secondary footer links — /now (current focus) + /colophon
-            (how the site is built). Ghost-weight so they stay polite. */}
+        {/* Secondary footer links — /now · /colophon · ⌘K search hint.
+            Ghost-weight so they stay polite. */}
         <nav
           aria-label="Meta"
           className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
@@ -47,11 +49,34 @@ export default function Footer() {
             Now
           </Link>
           <Link
+            href="/papers"
+            className="transition-colors hover:text-accent"
+          >
+            Papers
+          </Link>
+          <Link
             href="/colophon"
             className="transition-colors hover:text-accent"
           >
             Colophon
           </Link>
+          {/* ⌘K hint — keyboard shortcut discoverability. Clickable: fires
+              cmdk:open event so mouse users can trigger the palette too. */}
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof document !== 'undefined') {
+                document.dispatchEvent(new Event('cmdk:open'));
+              }
+            }}
+            className="hidden items-center gap-1.5 transition-colors hover:text-accent sm:inline-flex"
+            aria-label="Open search (Cmd or Ctrl K)"
+          >
+            <kbd className="rounded border border-border-subtle bg-surface/50 px-1.5 py-0.5 text-[10px]">
+              ⌘K
+            </kbd>
+            Search
+          </button>
         </nav>
 
         <div className="flex items-center gap-1.5 text-sm text-text-tertiary">

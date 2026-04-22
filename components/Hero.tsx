@@ -2,11 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Github, Linkedin, Mail } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY, INDUSTRIES } from '@/data/hero';
-import { COMPANIES } from '@/data/companies';
-import { companyTextStyle } from '@/lib/palette';
+import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY } from '@/data/hero';
 
 const ParticleField = dynamic(() => import('@/components/ParticleField'), {
   ssr: false,
@@ -152,86 +151,37 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* === 3 · Context block — industries label + companies row + socials,
-            grouped tight so they read as "where I've been / how to reach me,"
-            clearly separate from the identity block above. === */}
-        <div className="flex flex-col gap-5 border-t border-border-subtle pt-6 sm:gap-6">
-          {/* Industries — tight to the companies row below. */}
-          <motion.p
-            custom={4}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
+        {/* === 3 · CTAs — primary "Read case studies" + secondary "Contact / CV".
+            Middle ground between the audit's pitch-first hero and the prior
+            identity-heavy context block: keeps the portrait + name + tagline
+            + bio above (individuality), drops industries/experience/socials
+            (clutter), adds two explicit next-steps. Social links live in
+            the Footer. === */}
+        <motion.div
+          custom={4}
+          variants={FADE_UP}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-wrap items-center gap-5 pt-2"
+        >
+          <Link
+            href="/projects"
+            className="group inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-muted px-5 py-2.5 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background"
           >
-            {INDUSTRIES.join(' · ')}
-          </motion.p>
-
-          {/* Experience companies row. */}
-          <motion.div
-            custom={5}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-wrap items-center gap-x-5 gap-y-3"
+            Read case studies
+            <ArrowRight
+              size={14}
+              aria-hidden="true"
+              className="transition-transform group-hover:translate-x-0.5"
+            />
+          </Link>
+          <Link
+            href="/about"
+            className="text-sm text-text-secondary underline-offset-4 transition-colors hover:text-text-primary hover:underline"
           >
-            <span className="block w-full font-mono text-[10px] uppercase tracking-widest text-text-tertiary sm:inline sm:w-auto">
-              Experience
-            </span>
-            {COMPANIES.map((c) => (
-              <a
-                key={c.id}
-                href={c.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                title={`${c.name} — ${c.role} (${c.period})`}
-                className="palette-text group inline-flex items-center gap-2 rounded-md border border-border-subtle bg-surface/40 px-3 py-1.5 text-xs font-semibold tracking-wide backdrop-blur-sm transition-all hover:bg-surface-hover"
-                style={companyTextStyle(c)}
-              >
-                {c.logo && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={c.logo}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-5 w-auto max-w-[48px] shrink-0 object-contain"
-                  />
-                )}
-                {c.shortName}
-                <span className="font-mono text-[10px] font-normal text-text-tertiary transition-colors group-hover:text-text-secondary">
-                  {c.period}
-                </span>
-              </a>
-            ))}
-          </motion.div>
-
-          {/* Socials — smaller than before since they now share a grouped
-              block with industries + experience. */}
-          <motion.div
-            custom={6}
-            variants={FADE_UP}
-            initial="hidden"
-            animate="visible"
-            className="flex items-center gap-4 pt-1"
-          >
-            {[
-              { href: HERO.links.linkedin, icon: Linkedin, label: 'LinkedIn' },
-              { href: HERO.links.github, icon: Github, label: 'GitHub' },
-              { href: `mailto:${HERO.links.email}`, icon: Mail, label: 'Email' },
-            ].map(({ href, icon: Icon, label }) => (
-              <a
-                key={label}
-                href={href}
-                target={label !== 'Email' ? '_blank' : undefined}
-                rel={label !== 'Email' ? 'noopener noreferrer' : undefined}
-                aria-label={label}
-                className="rounded-lg border border-border-subtle bg-surface/50 p-2.5 text-text-secondary backdrop-blur-sm transition-all hover:border-accent/30 hover:text-accent hover:shadow-lg hover:shadow-accent/10"
-              >
-                <Icon size={18} />
-              </a>
-            ))}
-          </motion.div>
-        </div>
+            Contact / CV
+          </Link>
+        </motion.div>
       </div>
 
       {/* Number sequence — ambient strip at bottom of viewport.
