@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import PaletteColumn from '@/components/playground/PaletteColumn';
+import PaletteSection from '@/components/playground/PaletteSection';
 import FontCard from '@/components/playground/FontCard';
 import HeroVariant from '@/components/playground/HeroVariant';
 
@@ -29,6 +29,7 @@ const PALETTES = [
     name: 'Current — Sakura / Wabi-Sabi',
     description:
       'Ships today. Warm-dark foreground, muted rose accent. Distinctive without being loud.',
+    base: 'dark' as const,
     vars: {
       '--color-bg': '#0c0a0a',
       '--color-surface': '#151212',
@@ -45,6 +46,7 @@ const PALETTES = [
     name: 'Audit A — Oxblood / Bone',
     description:
       'Audit recommendation. Editorial, warm, confident. High contrast. Risks: dates fast, feels "wine cellar."',
+    base: 'light' as const,
     vars: {
       '--color-bg': '#F6F2EA',
       '--color-surface': '#FFFFFF',
@@ -61,6 +63,7 @@ const PALETTES = [
     name: 'Audit B — Algae on Near-black',
     description:
       'Audit recommendation. Technical, bold, modern. Reads as "machine learning terminal." Risks: screams "dev tool."',
+    base: 'dark' as const,
     vars: {
       '--color-bg': '#07090A',
       '--color-surface': '#0F1214',
@@ -73,7 +76,7 @@ const PALETTES = [
       '--color-text-tertiary': '#6F7A77',
     },
   },
-] as const;
+];
 
 const FONTS = [
   {
@@ -183,16 +186,7 @@ export default function PlaygroundPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            {PALETTES.map((p) => (
-              <PaletteColumn
-                key={p.name}
-                name={p.name}
-                description={p.description}
-                vars={p.vars}
-              />
-            ))}
-          </div>
+          <PaletteSection palettes={PALETTES} />
         </section>
 
         {/* ── Section 2: Font pairings ──────────────────────────────────── */}
