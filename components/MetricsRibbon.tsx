@@ -53,7 +53,7 @@ export default function MetricsRibbon() {
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
             transition={{ duration: 0.7 }}
             className="text-base leading-relaxed text-text-secondary"
           >
@@ -66,7 +66,7 @@ export default function MetricsRibbon() {
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
+            viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
             transition={{ duration: 0.7, delay: 0.3 }}
             className="mt-3 text-base leading-relaxed text-text-secondary"
           >
@@ -81,7 +81,7 @@ export default function MetricsRibbon() {
               key={metric.label}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
+              viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
               transition={{ delay: i * 0.07, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
               className="flex flex-col"
             >
