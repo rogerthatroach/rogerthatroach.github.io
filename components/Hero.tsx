@@ -126,7 +126,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-3 max-w-3xl text-sm leading-relaxed text-text-secondary"
+            className="mb-3 max-w-3xl font-display text-sm leading-relaxed text-text-secondary sm:text-base"
           >
             {HERO.bio}
           </motion.p>
