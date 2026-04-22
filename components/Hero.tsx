@@ -104,49 +104,33 @@ export default function Hero() {
               above the name as the "who + where" frame. Tagline and bio
               bumped up in size so they carry real weight on desktop. */}
           <div>
-            <motion.p
-              custom={0}
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
-              className="mb-2 font-mono text-[15px] font-bold uppercase tracking-[0.18em] text-accent sm:text-[16px]"
-            >
+            {/* Identity text — eyebrow, name, tagline, bio — renders at
+                final state immediately (no entrance delay). Bio is the LCP
+                candidate on mobile (largest rendered element below the
+                portrait), so the prior FADE_UP cascade pushed LCP past 4 s.
+                The CTA row + status pill below still animate for the
+                "living page" feel; the content itself lands instantly. */}
+            <p className="mb-2 font-mono text-[15px] font-bold uppercase tracking-[0.18em] text-accent sm:text-[16px]">
               <span className="mr-2 text-text-tertiary">§</span>
               {HERO.title}
-            </motion.p>
+            </p>
 
-            <motion.h1
-              custom={1}
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
+            <h1
               // lg:whitespace-nowrap keeps the full name on one line at
               // desktop widths; mobile retains natural wrapping so it
               // doesn't overflow the column at 375px.
               className="mb-3 text-[28px] font-bold leading-[1.05] tracking-tight text-text-primary sm:text-[34px] md:text-[41px] lg:whitespace-nowrap lg:text-[53px]"
             >
               {HERO.name}
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              custom={2}
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
-              className="mb-3 max-w-2xl font-display text-[21px] leading-[1.3] text-text-secondary sm:text-[23px] md:text-[26px]"
-            >
+            <p className="mb-3 max-w-2xl font-display text-[21px] leading-[1.3] text-text-secondary sm:text-[23px] md:text-[26px]">
               {HERO.tagline}
-            </motion.p>
+            </p>
 
-            <motion.p
-              custom={3}
-              variants={FADE_UP}
-              initial="hidden"
-              animate="visible"
-              className="max-w-2xl font-display text-[19px] leading-[1.55] text-text-tertiary sm:text-[21px]"
-            >
+            <p className="max-w-2xl font-display text-[19px] leading-[1.55] text-text-tertiary sm:text-[21px]">
               {HERO.bio}
-            </motion.p>
+            </p>
           </div>
         </div>
 
