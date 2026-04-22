@@ -72,8 +72,17 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
-      {/* Main identity — two-column on lg+ (portrait left, text right), stacked on mobile */}
-      <div className="relative z-10 grid w-full max-w-content grid-cols-1 items-start gap-10 lg:grid-cols-[auto_1fr] lg:gap-16">
+      {/* Main identity — two-column on lg+ (text left for reading priority,
+          portrait right as a supporting focal point), stacked on mobile with
+          portrait on top.
+
+          The audit's original P0-7 ("no portrait in hero") was tier-mismatched —
+          that pattern fits design-portfolio audiences (Rauno, Paco). Tier-1
+          technical leaders writing for banking / research audiences (Hamel,
+          Eugene Yan, Boykis, Raschka) keep the portrait on the hero as a
+          quiet second focal point. Face mnemonic > tagline mnemonic for
+          hiring committees who meet dozens of candidates. */}
+      <div className="relative z-10 grid w-full max-w-content grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_auto] lg:gap-16">
         <motion.div
           // initial={false}: skip the outer opacity/scale fade-in. Inner
           // children still orchestrate their own staggered FADE_UP via the
@@ -81,7 +90,6 @@ export default function Hero() {
           // don't gate everything inside on this wrapper's animation frame.
           initial={false}
           animate={{ opacity: 1, scale: 1 }}
-          className="lg:order-last"
         >
           <motion.p
             custom={0}
@@ -209,7 +217,10 @@ export default function Hero() {
         <motion.div
           initial={false}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="relative order-first mx-auto aspect-[4/5] w-48 overflow-hidden rounded-2xl sm:w-60 lg:mx-0 lg:mt-9 lg:w-72 xl:w-80"
+          // order-first on mobile so portrait leads the stack; lg:order-none
+          // hands control back to grid DOM order (text → 1fr left, portrait
+          // → auto right).
+          className="relative order-first mx-auto aspect-[4/5] w-48 overflow-hidden rounded-2xl sm:w-60 lg:order-none lg:mx-0 lg:mt-9 lg:w-72 xl:w-80"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
