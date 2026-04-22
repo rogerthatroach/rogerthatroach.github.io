@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MoreVertical, X, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import ThemeToggle from './ThemeToggle';
+import ThemePicker from './ThemePicker';
 import { NAV_LINKS } from '@/data/nav';
 
 export default function Nav() {
@@ -83,11 +83,11 @@ export default function Nav() {
               </a>
             )
           )}
-          <ThemeToggle />
+          <ThemePicker />
         </div>
 
         {/* Mobile — kebab (left) + theme toggle (right), dropdown holds links.
-            Kebab shares the circular-chip design language of ThemeToggle; the
+            Kebab shares the circular-chip design language of ThemePicker; the
             dropdown panel mirrors RoleOverlay's frosted-glass treatment. */}
         <div ref={menuRef} className="relative flex items-center gap-2 md:hidden">
           <motion.button
@@ -108,7 +108,7 @@ export default function Nav() {
               {menuOpen ? <X size={18} /> : <MoreVertical size={18} />}
             </motion.div>
           </motion.button>
-          <ThemeToggle />
+          <ThemePicker />
           <AnimatePresence>
             {menuOpen && (
               <motion.div
