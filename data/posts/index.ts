@@ -171,6 +171,35 @@ export const POSTS: BlogPost[] = [
   },
   {
     meta: {
+      slug: 'enterprise-agentic-ai-framework',
+      title: 'Enterprise Agentic AI Architecture (framework rewrite) — A/B preview',
+      subtitle:
+        'The same PAR Assist system, rewritten in practitioner register via the writing rewrite framework. Decisions + options considered + constraints as first-class structure; the formal math moves to an optional appendix.',
+      date: '2026-04-22',
+      tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Framework A/B'],
+      readingTime: '10 min read',
+      abstract:
+        'A/B rewrite of the formal Enterprise Agentic AI Architecture post using the writing rewrite framework (OptionsConsidered / ConstraintsBlock / DecisionRationale / BeforeAfterDiff / StepThrough). Same system, practitioner register. Formal math preserved as a bottom appendix for mathematically-inclined readers. [PLACEHOLDER] markers surface the content blocked on the brief\u2019s seven questions (metrics, timeline, war story, code shapes, alternatives actually evaluated).',
+      status: 'published',
+    },
+    references: [
+      { id: 1, authors: 'Yao, S. et al.', title: 'ReAct: Synergizing Reasoning and Acting in Language Models', venue: 'ICLR', year: 2023 },
+      { id: 2, authors: 'Schick, T. et al.', title: 'Toolformer: Language Models Can Teach Themselves to Use Tools', venue: 'NeurIPS', year: 2023 },
+      { id: 3, authors: 'Wang, L. et al.', title: 'A Survey on Large Language Model based Autonomous Agents', venue: 'arXiv preprint arXiv:2308.11432', year: 2023, url: 'https://arxiv.org/abs/2308.11432' },
+      { id: 5, authors: 'Anthropic', title: 'Model Context Protocol Specification', venue: 'modelcontextprotocol.io', year: 2024, url: 'https://modelcontextprotocol.io/' },
+      { id: 6, authors: 'LangChain, Inc.', title: 'LangGraph: Multi-Actor Applications with LLMs', venue: 'LangChain, Inc.', year: 2024, url: 'https://langchain-ai.github.io/langgraph/' },
+      { id: 7, authors: 'Lewis, P. et al.', title: 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks', venue: 'NeurIPS', year: 2020 },
+      { id: 10, authors: 'Li, H. et al.', title: 'Privacy in Large Language Models: Attacks, Defenses and Future Directions', venue: 'arXiv preprint arXiv:2310.10383', year: 2023, url: 'https://arxiv.org/abs/2310.10383' },
+      { id: 13, authors: 'Mialon, G. et al.', title: 'Augmented Language Models: A Survey', venue: 'Transactions on Machine Learning Research', year: 2023 },
+    ],
+    furtherReading: [
+      { title: 'Enterprise Agentic AI Architecture (original formal post)', url: '/blog/enterprise-agentic-ai-architecture', description: 'The sibling post — same system, formal register, theorem/proof structure throughout. Compare with this rewrite to see the register swap.' },
+      { title: 'How We Built PAR Assist (builder story)', url: '/blog/par-assist-building', description: 'The third register — conversational builder story, same architecture.' },
+      { title: 'Writing rewrite framework spec', url: 'https://github.com/rogerthatroach/rogerthatroach.github.io', description: 'Canonical deep-post structure, reader-level targeting, component palette. Lives in docs/specs/ — see repo.' },
+    ],
+  },
+  {
+    meta: {
       slug: 'par-assist-building',
       title: 'How We Built PAR Assist: From Intern POC to Bank-Wide Product',
       subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind a bank-wide agentic AI platform.',
