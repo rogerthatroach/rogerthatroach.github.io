@@ -62,7 +62,7 @@ export default function ArcProgress({ eras }: { eras: TimelineNode[] }) {
       aria-label="Career arc progress"
       className="fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 lg:block"
     >
-      <ul className="flex flex-col gap-5">
+      <ul className="flex flex-col gap-1">
         {eras.map((era, i) => {
           const isActive = era.id === activeId;
           return (
@@ -72,7 +72,7 @@ export default function ArcProgress({ eras }: { eras: TimelineNode[] }) {
                 onClick={() => scrollTo(era.id)}
                 aria-label={`Jump to chapter ${i + 1}: ${era.era}`}
                 aria-current={isActive ? 'step' : undefined}
-                className="group flex items-center gap-3"
+                className="group flex min-h-[44px] items-center gap-3 px-2"
               >
                 <span
                   className={cn(
