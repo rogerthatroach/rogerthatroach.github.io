@@ -106,7 +106,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-6 text-4xl font-bold tracking-tight text-text-primary sm:text-5xl md:text-6xl lg:text-7xl"
+            className="mb-5 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl lg:text-6xl"
           >
             {HERO.name}
           </motion.h1>
@@ -116,7 +116,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-5 max-w-2xl text-lg text-text-secondary sm:text-xl md:text-2xl"
+            className="mb-4 max-w-3xl text-base text-text-secondary sm:text-lg md:text-xl"
           >
             {HERO.tagline}
           </motion.p>
@@ -126,7 +126,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-3 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-base"
+            className="mb-3 max-w-3xl text-sm leading-relaxed text-text-secondary"
           >
             {HERO.bio}
           </motion.p>
@@ -227,7 +227,7 @@ export default function Hero() {
           // between the original (w-48→w-80, 192–320px) and the shrunk
           // pass — 176–288px — enough visual presence to anchor the left
           // column without dominating the thesis.
-          className="relative order-first mx-auto aspect-[4/5] w-44 overflow-hidden rounded-lg sm:w-52 lg:mx-0 lg:w-64 xl:w-72"
+          className="relative order-first mx-auto aspect-[4/5] w-36 overflow-hidden rounded-lg sm:w-44 lg:mx-0 lg:w-52 xl:w-56"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
