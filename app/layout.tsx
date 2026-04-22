@@ -92,7 +92,14 @@ export const metadata: Metadata = {
 const themeScript = `
   (function() {
     try {
-      var pack = localStorage.getItem('theme-pack');
+      var valid = ['sakura-light','sakura-dark','nord','solarized-dark','monokai','paper'];
+      // URL param override — e.g. ?theme=monokai — ephemeral (not
+      // persisted), useful for preview links and Lighthouse sweeps.
+      var params = new URLSearchParams(window.location.search);
+      var urlTheme = params.get('theme');
+      var pack = urlTheme && valid.indexOf(urlTheme) !== -1
+        ? urlTheme
+        : localStorage.getItem('theme-pack');
       if (!pack) {
         var legacy = localStorage.getItem('theme');
         pack = legacy === 'dark' ? 'sakura-dark' : 'sakura-light';

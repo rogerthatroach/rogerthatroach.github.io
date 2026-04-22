@@ -37,7 +37,7 @@ export default function HomeProjectsV2PreviewPage() {
         </Link>
 
         <div className="mb-10 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm text-text-secondary">
-          <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-amber-500">
+          <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-amber-700 dark:text-amber-400">
             Preview · not live on homepage
           </p>
           <p>
