@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FileBadge } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { NUMBER_SEQUENCE, HERO, HERO_SUMMARY } from '@/data/hero';
 
@@ -73,25 +73,11 @@ export default function Hero() {
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
 
-      {/* Three stacked blocks so the hero reads as distinct visual signals,
-          not running paragraphs:
-            1 · Role eyebrow — top band, full width.
-            2 · Identity — portrait + (name + tagline + bio) side-by-side.
-            3 · Context — industries / experience / socials, grouped tight. */}
+      {/* Two stacked blocks:
+            1 · Identity — portrait + [role eyebrow, name, tagline, bio].
+            2 · CTAs — Read case studies, Contact / CV. */}
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 md:px-16 lg:gap-10">
-        {/* === 1 · Role eyebrow — its own line, full width, ceremonial === */}
-        <motion.p
-          custom={0}
-          variants={FADE_UP}
-          initial="hidden"
-          animate="visible"
-          className="font-mono text-sm font-bold tracking-[0.2em] text-accent sm:text-base"
-        >
-          <span className="mr-2 text-text-tertiary">§</span>
-          {HERO.title}
-        </motion.p>
-
-        {/* === 2 · Portrait + identity block ===
+        {/* === 1 · Portrait + identity block ===
             Portrait in the auto-width track; name / tagline / bio wrap
             alongside it. items-center vertically balances the two. */}
         <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[auto_1fr] lg:gap-8">
@@ -113,9 +99,21 @@ export default function Hero() {
             />
           </motion.div>
 
-          {/* Name + tagline + bio — tight stack so the block reads as one
-              identity card, not three paragraphs. */}
+          {/* Role eyebrow + name + tagline + bio — role now sits immediately
+              above the name as the "who + where" frame. Tagline and bio
+              bumped up in size so they carry real weight on desktop. */}
           <div>
+            <motion.p
+              custom={0}
+              variants={FADE_UP}
+              initial="hidden"
+              animate="visible"
+              className="mb-2 font-mono text-[13px] font-bold uppercase tracking-[0.18em] text-accent sm:text-sm"
+            >
+              <span className="mr-2 text-text-tertiary">§</span>
+              {HERO.title}
+            </motion.p>
+
             <motion.h1
               custom={1}
               variants={FADE_UP}
@@ -134,7 +132,7 @@ export default function Hero() {
               variants={FADE_UP}
               initial="hidden"
               animate="visible"
-              className="mb-3 max-w-2xl font-display text-[15px] leading-[1.3] text-text-secondary sm:text-[17px] md:text-[19px]"
+              className="mb-3 max-w-2xl font-display text-[17px] leading-[1.3] text-text-secondary sm:text-[19px] md:text-[22px]"
             >
               {HERO.tagline}
             </motion.p>
@@ -144,7 +142,7 @@ export default function Hero() {
               variants={FADE_UP}
               initial="hidden"
               animate="visible"
-              className="max-w-2xl font-display text-[13px] leading-[1.55] text-text-tertiary sm:text-[15px]"
+              className="max-w-2xl font-display text-[15px] leading-[1.55] text-text-tertiary sm:text-[17px]"
             >
               {HERO.bio}
             </motion.p>
@@ -177,8 +175,13 @@ export default function Hero() {
           </Link>
           <Link
             href="/about"
-            className="text-sm text-text-secondary underline-offset-4 transition-colors hover:text-text-primary hover:underline"
+            className="group inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface/50 px-5 py-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
           >
+            <FileBadge
+              size={14}
+              aria-hidden="true"
+              className="text-text-tertiary transition-colors group-hover:text-accent"
+            />
             Contact / CV
           </Link>
         </motion.div>
