@@ -127,7 +127,7 @@ export default function PlaygroundPage() {
       >
         {/* Banner — make the purpose of the page obvious */}
         <div className="mb-12 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-sm text-text-secondary">
-          <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-amber-500">
+          <p className="mb-1 font-mono text-[10px] uppercase tracking-widest text-amber-700 dark:text-amber-400">
             Playground · private
           </p>
           <p>

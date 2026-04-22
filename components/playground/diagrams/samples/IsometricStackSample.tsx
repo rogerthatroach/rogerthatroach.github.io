@@ -100,9 +100,9 @@ export default function IsometricStackSample() {
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h4 className="text-sm font-bold" style={{ color: layer.color }}>
+                <h3 className="text-sm font-bold" style={{ color: layer.color }}>
                   {layer.title}
-                </h4>
+                </h3>
                 <p className="mt-0.5 text-[10px] leading-snug text-text-tertiary">
                   {layer.subtitle}
                 </p>
