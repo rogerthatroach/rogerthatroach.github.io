@@ -24,7 +24,7 @@ export default function CurrentRoleCard() {
         <p className="palette-text font-mono text-xs font-semibold uppercase tracking-widest">
           Now · {current.era}
         </p>
-        <span className="font-mono text-xs text-text-tertiary">{current.period}</span>
+        <span className="font-mono text-xs text-text-secondary">{current.period}</span>
       </div>
 
       <div className="mt-3 flex items-center gap-3">
@@ -42,7 +42,7 @@ export default function CurrentRoleCard() {
           {current.role}
         </h2>
       </div>
-      <p className="mt-1 text-sm text-text-tertiary">{current.org}</p>
+      <p className="mt-1 text-sm text-text-secondary">{current.org}</p>
 
       <p className="mt-4 text-sm leading-relaxed text-text-secondary">
         {current.description}
@@ -50,7 +50,7 @@ export default function CurrentRoleCard() {
 
       {current.teamContext && (
         <div className="mt-4 border-t border-border-subtle pt-3">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
             Team shape
           </p>
           <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
