@@ -86,19 +86,29 @@ export default function Nav() {
           <ThemeToggle />
         </div>
 
-        {/* Mobile — kebab + theme only, dropdown holds the links */}
+        {/* Mobile — kebab (left) + theme toggle (right), dropdown holds links.
+            Kebab shares the circular-chip design language of ThemeToggle; the
+            dropdown panel mirrors RoleOverlay's frosted-glass treatment. */}
         <div ref={menuRef} className="relative flex items-center gap-2 md:hidden">
-          <ThemeToggle />
-          <button
+          <motion.button
             type="button"
             onClick={() => setMenuOpen((s) => !s)}
+            whileTap={{ scale: 0.9 }}
             aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={menuOpen}
             aria-controls="nav-mobile-menu"
-            className="rounded-md border border-border-subtle bg-surface/70 p-2 text-text-secondary transition-colors hover:border-accent/40 hover:text-accent"
+            className="relative flex h-10 w-10 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-sm transition-colors hover:bg-surface-hover hover:text-text-primary"
           >
-            {menuOpen ? <X size={18} /> : <MoreVertical size={18} />}
-          </button>
+            <motion.div
+              key={menuOpen ? 'x' : 'menu'}
+              initial={{ rotate: -90, opacity: 0, scale: 0 }}
+              animate={{ rotate: 0, opacity: 1, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              {menuOpen ? <X size={18} /> : <MoreVertical size={18} />}
+            </motion.div>
+          </motion.button>
+          <ThemeToggle />
           <AnimatePresence>
             {menuOpen && (
               <motion.div
@@ -108,7 +118,7 @@ export default function Nav() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
                 transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-                className="absolute right-0 top-[calc(100%+0.5rem)] min-w-[12rem] overflow-hidden rounded-lg border border-border-subtle bg-background/95 shadow-xl backdrop-blur-lg"
+                className="absolute right-0 top-[calc(100%+0.5rem)] min-w-[12rem] overflow-hidden rounded-xl border border-border-subtle bg-surface/95 shadow-2xl backdrop-blur-xl"
               >
                 <ul className="py-1">
                   {NAV_LINKS.map((link) => {
