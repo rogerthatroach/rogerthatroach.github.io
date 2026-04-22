@@ -149,7 +149,7 @@ export default function Hero() {
         >
           <Link
             href="/projects"
-            className="group inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-muted px-5 py-2.5 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background"
+            className="group inline-flex items-center gap-2 rounded-lg border border-accent/30 bg-accent-muted px-5 py-2.5 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background"
           >
             Read case studies
             <ArrowRight
@@ -160,7 +160,7 @@ export default function Hero() {
           </Link>
           <Link
             href="/about"
-            className="group inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface/50 px-5 py-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
+            className="group inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-surface/50 px-5 py-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
           >
             <FileBadge
               size={14}

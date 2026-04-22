@@ -178,6 +178,18 @@ export default function PlaygroundPage() {
             </li>
             <li>
               <Link
+                href="/playground/themes"
+                className="group inline-flex items-center gap-2 text-text-primary transition-colors hover:text-accent"
+              >
+                <span className="font-medium">Themes — 5 VSCode-style register presets</span>
+                <span className="text-text-tertiary group-hover:text-accent">
+                  — Sakura vs Nord vs Solarized Dark vs Monokai vs Paper
+                </span>
+                <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </li>
+            <li>
+              <Link
                 href="/playground/projects-filmography"
                 className="group inline-flex items-center gap-2 text-text-primary transition-colors hover:text-accent"
               >
