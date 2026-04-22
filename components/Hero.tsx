@@ -186,6 +186,27 @@ export default function Hero() {
             Contact / CV
           </Link>
         </motion.div>
+
+        {/* Availability signal — recruiters filter for location + openness.
+            Single-line status pill makes both visible above the fold without
+            duplicating footer content. */}
+        <motion.p
+          custom={5}
+          variants={FADE_UP}
+          initial="hidden"
+          animate="visible"
+          className="mt-1 inline-flex items-center gap-2 text-xs text-text-tertiary"
+        >
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-60" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+          </span>
+          <span>
+            <span className="text-text-secondary">Based in {HERO.location}</span>
+            <span className="mx-2 opacity-40">·</span>
+            <span>Open to conversations</span>
+          </span>
+        </motion.p>
       </div>
 
       {/* Number sequence — ambient strip at bottom of viewport.
