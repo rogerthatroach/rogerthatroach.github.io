@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Fraunces } from 'next/font/google';
+import CommandPalette from '@/components/CommandPalette';
 import './globals.css';
 
 const inter = Inter({
@@ -130,6 +131,9 @@ export default function RootLayout({
           Skip to content
         </a>
         {children}
+        {/* ⌘K search — listens globally for Cmd/Ctrl+K and for the
+            `cmdk:open` custom event fired from mobile nav dropdown. */}
+        <CommandPalette />
       </body>
     </html>
   );
