@@ -25,22 +25,14 @@ export default function SkillGrid() {
   }, []);
 
   return (
-    <section id="skills" className="px-6 py-14 md:px-16">
-      <div className="mx-auto max-w-content">
-        <div className="mb-6 flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
-            Skills
-          </h2>
-          <span
-            aria-live="polite"
-            className="font-mono text-xs text-text-tertiary"
-          >
-            {visibleSkills.length} of {SKILLS.length} shown
-          </span>
-        </div>
+    <div id="skills">
+      <div className="mb-4 flex flex-wrap items-baseline justify-end gap-3">
+        <span aria-live="polite" className="font-mono text-xs text-text-tertiary">
+          {visibleSkills.length} of {SKILLS.length} shown
+        </span>
+      </div>
 
-        {/* Filter buttons */}
-        <div role="group" aria-label="Filter skills by category" className="mb-6 flex flex-wrap gap-2">
+      <div role="group" aria-label="Filter skills by category" className="mb-6 flex flex-wrap gap-2">
           <FilterButton
             active={filter === 'all'}
             onClick={() => setFilter('all')}
@@ -107,9 +99,8 @@ export default function SkillGrid() {
               );
             })}
           </AnimatePresence>
-        </motion.ul>
-      </div>
-    </section>
+      </motion.ul>
+    </div>
   );
 }
 

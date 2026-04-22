@@ -5,24 +5,14 @@ import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion
 import type { TimelineNode } from '@/data/timeline';
 import ProjectReveal from './ProjectReveal';
 import Glossed from '@/components/resume/story/Glossed';
-import { cn } from '@/lib/utils';
+import { paletteStyle } from '@/lib/palette';
 
-const ACCENT_TEXT: Record<TimelineNode['accent'], string> = {
-  blue: 'text-blue-700 dark:text-blue-300',
-  emerald: 'text-emerald-700 dark:text-emerald-300',
-  amber: 'text-amber-700 dark:text-amber-300',
-  purple: 'text-purple-700 dark:text-purple-300',
-  cyan: 'text-cyan-700 dark:text-cyan-300',
-  rose: 'text-rose-700 dark:text-rose-300',
-};
-
-const ACCENT_BORDER: Record<TimelineNode['accent'], string> = {
-  blue: 'border-blue-500/40',
-  emerald: 'border-emerald-500/40',
-  amber: 'border-amber-500/40',
-  purple: 'border-purple-500/40',
-  cyan: 'border-cyan-500/40',
-  rose: 'border-rose-500/40',
+/** Era → palette. Mirrors SkillTimeline + data/projects.ts. */
+const ERA_PALETTES: Record<string, { primary: string; primaryLight: string }> = {
+  Foundation: { primary: '#fca5a5', primaryLight: '#991b1b' },
+  'Cloud ML': { primary: '#67e8f9', primaryLight: '#155e75' },
+  'Enterprise Analytics': { primary: '#fcd34d', primaryLight: '#92400e' },
+  'Intelligent Systems': { primary: '#93c5fd', primaryLight: '#1e40af' },
 };
 
 /**
@@ -46,6 +36,8 @@ export default function EraChapter({
 }) {
   const ref = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
+  const palette = ERA_PALETTES[era.era];
+  const style = palette ? paletteStyle(palette) : undefined;
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -67,6 +59,7 @@ export default function EraChapter({
       id={`era-${era.id}`}
       data-era={era.id}
       aria-label={`${era.era} — ${era.org}`}
+      style={style}
       className="relative border-t border-border-subtle px-6 py-20 md:px-16 md:py-24"
     >
       <div className="mx-auto grid max-w-content gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
@@ -77,7 +70,7 @@ export default function EraChapter({
           }
           className="lg:sticky lg:top-28 lg:self-start"
         >
-          <p className={cn('font-mono text-xs uppercase tracking-widest', ACCENT_TEXT[era.accent])}>
+          <p className="palette-text font-mono text-xs uppercase tracking-widest">
             Chapter {index + 1} of {total} · {era.era}
           </p>
 
@@ -101,12 +94,7 @@ export default function EraChapter({
           </p>
 
           {era.headlineMetric && (
-            <div
-              className={cn(
-                'mt-6 rounded-lg border bg-surface/60 p-4',
-                ACCENT_BORDER[era.accent]
-              )}
-            >
+            <div className="palette-border mt-6 rounded-lg border-2 bg-surface/60 p-4">
               <div className="font-mono text-2xl font-bold text-text-primary sm:text-3xl">
                 {era.headlineMetric.value}
               </div>
@@ -158,7 +146,6 @@ export default function EraChapter({
               <ProjectReveal
                 key={`${era.id}-${i}`}
                 project={project}
-                accent={era.accent}
                 index={i}
               />
             ))
