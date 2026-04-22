@@ -17,7 +17,7 @@
     --color-diagram-grid: #d4ccc8;
   }
 
-  /* Dark mode */
+  /* Sakura Dark (default dark mode) */
   .dark {
     --color-bg: #0c0a0a;
     --color-surface: #151212;
@@ -29,6 +29,68 @@
     --color-text-secondary: #a89e9b;
     --color-text-tertiary: #8a8181;
     --color-diagram-grid: #262626;
+  }
+
+  /* ── Theme packs (overlay on top of .dark or default light) ──────────
+     data-theme="X" wins over .dark because these rules are later in the
+     cascade. Dark-base themes still carry the .dark class so Tailwind's
+     dark: variants keep working; light-base themes drop it. Bootstrap
+     in app/layout.tsx handles both based on localStorage. */
+
+  /* Nord — arctic blue, dark base */
+  html[data-theme='nord'] {
+    --color-bg: #2e3440;
+    --color-surface: #3b4252;
+    --color-surface-hover: #434c5e;
+    --color-border: #4c566a;
+    --color-accent: #88c0d0;
+    --color-accent-muted: #5e81ac55;
+    --color-text-primary: #eceff4;
+    --color-text-secondary: #d8dee9;
+    --color-text-tertiary: #a7b0c0;
+    --color-diagram-grid: #434c5e;
+  }
+
+  /* Solarized Dark — Ethan Schoonover 2011, CIELAB-calibrated */
+  html[data-theme='solarized-dark'] {
+    --color-bg: #002b36;
+    --color-surface: #073642;
+    --color-surface-hover: #0a4553;
+    --color-border: #586e75;
+    --color-accent: #268bd2;
+    --color-accent-muted: #268bd244;
+    --color-text-primary: #fdf6e3;
+    --color-text-secondary: #93a1a1;
+    --color-text-tertiary: #839496;
+    --color-diagram-grid: #0a4553;
+  }
+
+  /* Monokai — Sublime classic, magenta/lime on warm black */
+  html[data-theme='monokai'] {
+    --color-bg: #272822;
+    --color-surface: #2f302a;
+    --color-surface-hover: #3e3d32;
+    --color-border: #49483e;
+    --color-accent: #f92672;
+    --color-accent-muted: #f9267222;
+    --color-text-primary: #f8f8f2;
+    --color-text-secondary: #cfcfc2;
+    --color-text-tertiary: #a6a68a;
+    --color-diagram-grid: #3e3d32;
+  }
+
+  /* Paper — editorial cream + black ink, light base */
+  html[data-theme='paper'] {
+    --color-bg: #f4efe6;
+    --color-surface: #ebe5da;
+    --color-surface-hover: #ddd6c9;
+    --color-border: #c9c1b3;
+    --color-accent: #8b5e34;
+    --color-accent-muted: #8b5e3422;
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #4a4a44;
+    --color-text-tertiary: #6e6e66;
+    --color-diagram-grid: #ddd6c9;
   }
 
   html {
