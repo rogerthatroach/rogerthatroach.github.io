@@ -6,6 +6,7 @@ import { motion, useInView } from 'framer-motion';
 import { Linkedin, ArrowRight, Download, FileText, LayoutList } from 'lucide-react';
 import { ABOUT } from '@/data/about';
 import { HERO } from '@/data/hero';
+import ThesisMapping from './ThesisMapping';
 
 export default function AboutSection() {
   const ref = useRef<HTMLElement>(null);
@@ -51,6 +52,11 @@ export default function AboutSection() {
                 </motion.p>
               ))}
             </div>
+
+            {/* Thesis mapping — the four abstraction levels made explicit.
+                Each row links to the anchor case study. Director-audience
+                wants to see the pattern before the principles. */}
+            <ThesisMapping />
 
             {/* Three beliefs — render immediately. The first belief paragraph
                 is the mobile LCP target (portrait is below-the-fold on narrow
