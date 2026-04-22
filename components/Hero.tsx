@@ -106,7 +106,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-5 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl lg:text-6xl"
+            className="mb-5 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl lg:text-6xl"
           >
             {HERO.name}
           </motion.h1>
@@ -116,7 +116,7 @@ export default function Hero() {
             variants={FADE_UP}
             initial="hidden"
             animate="visible"
-            className="mb-4 max-w-3xl text-base text-text-secondary sm:text-lg md:text-xl"
+            className="mb-4 max-w-3xl font-display text-lg leading-snug text-text-primary sm:text-xl md:text-2xl"
           >
             {HERO.tagline}
           </motion.p>
