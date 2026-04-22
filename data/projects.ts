@@ -95,7 +95,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'Transformed the Commodity Tax return process with PySpark pipelines and Tableau dashboards for financial KPI monitoring.',
     highlights: [
       'PySpark pipeline for General Ledger Journal data extraction at scale',
-      'Advanced Tableau dashboards for financial KPI monitoring',
+      'Tableau dashboards for financial KPI monitoring (CFO Group adoption vehicle)',
       'Recognized with CFO Group RBC Quarterly Team Award (Q4 2023)',
     ],
     palette: { primary: '#fcd34d', primaryLight: '#92400e', glow: 'shadow-amber-500/20', bg: 'from-amber-500/5' },
