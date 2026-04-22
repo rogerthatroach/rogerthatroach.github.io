@@ -25,7 +25,7 @@ const config: Config = {
       fontFamily: {
         body: ['var(--font-inter)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-jetbrains)', 'monospace'],
-        display: ['var(--font-inter-tight)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-fraunces)', 'Georgia', 'serif'],
       },
       fontSize: {
         metric: ['2.5rem', { lineHeight: '1' }],

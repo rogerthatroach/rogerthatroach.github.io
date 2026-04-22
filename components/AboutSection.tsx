@@ -21,7 +21,7 @@ export default function AboutSection() {
           // target on /about is this heading (portrait is below on narrow vw).
           initial={false}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 text-2xl font-bold text-text-primary sm:text-3xl"
+          className="mb-6 font-display text-2xl font-bold text-text-primary sm:text-3xl"
         >
           About
         </motion.h2>

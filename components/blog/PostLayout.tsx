@@ -61,7 +61,7 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
 
       {/* Header */}
       <header className="mb-12">
-        <h1 className="text-2xl font-bold leading-tight text-text-primary sm:text-3xl md:text-4xl">
+        <h1 className="font-display text-2xl font-bold leading-tight text-text-primary sm:text-3xl md:text-4xl">
           {meta.title}
         </h1>
         <p className="mt-3 text-lg text-text-secondary">{meta.subtitle}</p>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono, Inter_Tight } from 'next/font/google';
+import { Inter, JetBrains_Mono, Fraunces } from 'next/font/google';
 import './globals.css';
 
 const inter = Inter({
@@ -14,13 +14,14 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-// Inter Tight — tighter display cut of Inter. Used only for the name
-// eyebrow/H1 and a few inline display lines (metric chains, "shipping"
-// header). Body prose still uses Inter.
-const interTight = Inter_Tight({
+// Fraunces — warm serif display cut. Used for page H1s, section H2s,
+// blog/case-study titles. Body prose stays in Inter; tech chips + mono
+// eyebrows stay in JetBrains Mono. Pairs naturally with the sakura /
+// wabi-sabi palette.
+const fraunces = Fraunces({
   subsets: ['latin'],
-  variable: '--font-inter-tight',
-  weight: ['500', '600', '700'],
+  variable: '--font-fraunces',
+  weight: ['400', '500', '600', '700'],
   display: 'swap',
 });
 
@@ -93,7 +94,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${interTight.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script

@@ -171,7 +171,7 @@ export default function PlaygroundPage() {
           </p>
         </div>
 
-        <h1 className="mb-3 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+        <h1 className="mb-3 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
           Design playground
         </h1>
         <p className="mb-10 max-w-2xl text-base text-text-secondary">
