@@ -11,7 +11,7 @@ import type { Variants } from 'framer-motion';
 /**
  * blurIn — soft, confident-restraint entrance. Used by disclosure reveals
  * in the /resume expanded SkillTimeline and by scrollytelling chapter
- * reveals in /resume/arc.
+ * reveals in the /resume career arc.
  *
  * Spring physics (stiffness 200, damping 25) lands with natural settle
  * rather than a linear ease. Blur phase-out is the distinctive signal;
