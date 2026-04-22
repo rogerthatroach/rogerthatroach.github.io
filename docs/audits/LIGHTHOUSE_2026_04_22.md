@@ -81,27 +81,48 @@ Converted eyebrow / name / tagline / bio from `motion.p` with `FADE_UP` variants
 
 **Production (CDN, HTTP/2, compressed):** TBD — awaiting fresh deploy to verify; expected Perf ≥ 98 on home-mobile given the localhost improvement + CDN acceleration delta on other routes.
 
-## 3. Score snapshot (all routes, post-fix baseline)
+## 3. Final score snapshot (production, commit `c93797b`)
 
-*[To be filled once final production deploy of `7e61817` is live. Placeholder table:]*
+After all three fixes deployed (WebGL guard + Hero LCP + palette-card contrast):
 
 | Route | Form | Perf | A11y | BP | SEO |
 |---|---|---|---|---|---|
-| `/` | mobile | _pending_ | 100 | 100 | 100 |
-| `/` | desktop | 100 | 100 | 100 | 100 |
-| `/resume` | mobile | 97 | 96 | 100 | 100 |
-| `/resume` | desktop | 100 | 96 | 100 | 100 |
-| `/projects/par-assist` | mobile | 96 | 100 | 100 | 100 |
-| `/blog/enterprise-agentic-ai-architecture` | mobile | 94 | 100 | 100 | 100 |
+| `/` | mobile | **100** | **100** | **100** | **100** |
+| `/` | desktop | **100** | **100** | **100** | **100** |
+| `/resume` | mobile | **100** | **100** | 96† | **100** |
+| `/resume` | desktop | **100** | **100** | **100** | **100** |
+| `/projects/par-assist` | mobile | 96 | **100** | **100** | **100** |
+| `/blog/enterprise-agentic-ai-architecture` | mobile | 94 | **100** | **100** | **100** |
 
-The `/resume` A11y at 96 (vs 100 elsewhere) is tracked as P1 in [`CODEBASE_AUDIT_2026_04_22.md`](CODEBASE_AUDIT_2026_04_22.md) §3 Track 6 (dark-mode contrast on palette-card tints, ArcProgress dot hit-area — partially mitigated by the 44×44 min-height fix but rail-internal overlap may still be flagged).
+† resume-mobile BP briefly dropped from 100 → 96 on one re-run (likely run-to-run variance on the same commit; desktop stayed at 100).
+
+### 3.1 Net improvement (pre-fix vs. post-fix, homepage)
+
+| Metric | Pre-fix (prod) | Post-fix (prod) | Δ |
+|---|---|---|---|
+| home-mobile Perf | 98 | **100** | +2 |
+| home-mobile A11y | 59 | **100** | **+41** |
+| home-mobile BP | 89 | **100** | +11 |
+| home-mobile SEO | 82 | **100** | +18 |
+| home-mobile LCP | 4.2 s* | **1.9 s** | **−2.3 s** |
+| home-desktop A11y | 59 | **100** | **+41** |
+
+\* The 4.2 s LCP was measured on the **fixed-for-WebGL** run (post-55b997e, pre-7e61817). The original 98 Perf score was misleadingly inflated because WebGL errors short-circuited several audits.
+
+### 3.2 Contrast fix (commit `c93797b`)
+
+Lighthouse flagged `/resume` A11y 96 due to `text-text-tertiary` (#706764) on palette-card blue tint (`#e6e6ed` after 15% alpha blend) = 4.43:1 contrast — just below WCAG AA's 4.5:1 threshold. Three elements: period, org subtitle, team-shape label.
+
+Fix: promoted those three to `text-text-secondary` (#575451 in light mode) inside palette-card regions. Applied to both [`CurrentRoleCard.tsx`](../../components/resume/CurrentRoleCard.tsx) (the actual failing surface) and [`SkillTimeline.tsx:111`](../../components/SkillTimeline.tsx#L111) (same `RoleCard` component, same tint, pre-emptive fix for homepage parity).
+
+Result: `/resume` A11y 96 → **100** on both mobile and desktop.
 
 ## 4. Open items after this run
 
-1. **Verify production Perf ≥ 95 on home-mobile** once `7e61817` is live and CDN-cached.
-2. **Resume A11y gap to 100** — trace the specific audits Lighthouse flags (likely palette-card contrast on tint at 15% alpha; or ArcProgress hit-area after the fix). Requires browser DevTools to confirm the specific failing audits.
-3. **Perf: 900 ms unused JavaScript on homepage** (`bd904a5c` + `b536a0f1` + `6496` chunks). Likely Three.js + Framer Motion + geist fonts. Dynamic imports or tree-shake review owed.
-4. **LCP on mobile: targets < 2.5 s** — localhost post-fix measured 2.8 s; CDN should shave ≥ 500 ms. Re-measure after deploy.
+1. **Project + blog mobile Perf 94-96** — not shipping-blockers, but worth a sweep. Largest chunks are Three.js (homepage ParticleField is now WebGL-guarded but chunk still ships), Framer Motion, and @xyflow/react for the ReactFlow diagrams on case-study pages. Dynamic-import review owed if we want Perf 100 across all routes.
+2. **900 ms unused JavaScript on homepage** (`bd904a5c` + `b536a0f1` + `6496` chunks). Tree-shake or code-split review.
+3. **BP run-to-run variance on resume-mobile** (100 → 96). Investigate once with verbose output to identify which audit toggles.
+4. **No device-emulated LCP measurement** yet — Lighthouse simulates throttling. A real device test via WebPageTest or field data from CrUX would validate the 1.9 s LCP holds under real mobile conditions.
 
 ## 5. Methodology notes + limitations
 
