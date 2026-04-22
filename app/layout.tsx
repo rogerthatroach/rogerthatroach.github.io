@@ -111,6 +111,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body">
+        {/* hi. curious how this was built? /colophon */}
         <a
           href="#main-content"
           className="fixed left-4 top-4 z-[100] -translate-y-20 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-background transition-transform focus:translate-y-0"
