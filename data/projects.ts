@@ -137,7 +137,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'Deterministic multi-tier agentic framework with 3 specialized sub-agents (EPM, Headcount, Open Positions) running in parallel',
       'GPT used strictly for intent detection and routing — no sensitive data leaves the environment',
       'EPM-to-SQL entitlement modeling: cube permissions → security groups → employees → transits → SQL tables',
-      '~9,000 rollups, ~60,000 geographies, millisecond slicing across weekly and month-end granularity',
+      '~9,000 rollups, ~60,000 geography hierarchy nodes, millisecond slicing across weekly and month-end granularity',
     ],
     palette: { primary: '#3b82f6', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
     deepDivePath: '/projects/astraeus',
