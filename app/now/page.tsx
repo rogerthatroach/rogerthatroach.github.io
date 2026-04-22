@@ -57,7 +57,7 @@ export default function NowPage() {
               href="https://nownownow.com/about"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent underline-offset-4 hover:underline"
+              className="text-accent underline underline-offset-4 hover:text-text-primary"
             >/now</a> page, in the Derek Sivers sense: current focus in three bullets, updated every few weeks. Not an activity log. Not a changelog. The answer to &ldquo;what are you up to?&rdquo;
           </p>
 

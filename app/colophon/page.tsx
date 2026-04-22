@@ -28,7 +28,7 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
           href="https://rsms.me/inter/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-accent underline-offset-4 hover:underline"
+          className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
           Inter
         </a>{' '}
@@ -68,7 +68,7 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
         href="https://github.com/rogerthatroach/rogerthatroach.github.io"
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-1.5 text-accent underline-offset-4 hover:underline"
+        className="inline-flex items-center gap-1.5 text-accent underline underline-offset-4 hover:text-text-primary"
       >
         <Github size={14} />
         rogerthatroach/rogerthatroach.github.io
