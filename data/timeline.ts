@@ -48,6 +48,19 @@ export interface TimelineNode {
    *   3. Set logoPath below. Keep SVGs under ~5KB.
    */
   logoPath?: string;
+  /**
+   * Optional Tailwind size class override for the logo. Default:
+   * `h-11 w-auto max-w-[160px] md:h-12`. Square-aspect logos (TCS)
+   * need a bigger height to match the visual weight of horizontal
+   * wordmarks (RBC, Quantiphi) rendered at the default.
+   */
+  logoClass?: string;
+  /**
+   * When true, the group header renders the logo + date range only,
+   * skipping the org-name text. Useful for companies whose logo IS
+   * the wordmark (TCS) — the text next to the logo becomes redundant.
+   */
+  hideOrgNameInHeader?: boolean;
 
   // ───────────────────────────────────────────────────────────────
   // Fields below surface ONLY in the expanded /resume view (SkillTimeline
@@ -235,6 +248,14 @@ export const TIMELINE: TimelineNode[] = [
     milestone: `${DIGITAL_TWIN_SAVINGS}/year savings`,
     accent: 'emerald',
     logoPath: '/images/logos/tcs.svg',
+    // TCS source had ~80% blank vertical space (viewBox 2000x2000 around a
+    // 1800x480 mark). Cropped the SVG's viewBox to the tight bounds; mark
+    // is a ~3.75:1 wide wordmark now. Rendered ~20% under default height
+    // so it sits a notch smaller than RBC / Quantiphi headers.
+    logoClass: 'h-10 w-auto max-w-[156px] md:h-11',
+    // Logo already carries the "Tata Consultancy Services" wordmark — no
+    // need to restate it in text next to it.
+    hideOrgNameInHeader: true,
     headlineMetric: {
       value: DIGITAL_TWIN_SAVINGS,
       label: 'Annual savings — Maizuru 900MW Digital Twin',

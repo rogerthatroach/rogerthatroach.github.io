@@ -40,6 +40,8 @@ interface SkillTimelineProps {
 interface TimelineGroup {
   org: string;
   logoPath?: string;
+  logoClass?: string;
+  hideOrgNameInHeader?: boolean;
   /** Ordered as in TIMELINE — latest first. */
   nodes: TimelineNode[];
 }
@@ -51,7 +53,13 @@ function groupByOrg(nodes: TimelineNode[]): TimelineGroup[] {
     if (last && last.org === node.org) {
       last.nodes.push(node);
     } else {
-      groups.push({ org: node.org, logoPath: node.logoPath, nodes: [node] });
+      groups.push({
+        org: node.org,
+        logoPath: node.logoPath,
+        logoClass: node.logoClass,
+        hideOrgNameInHeader: node.hideOrgNameInHeader,
+        nodes: [node],
+      });
     }
   }
   return groups;
@@ -199,14 +207,26 @@ function TimelineRow({
                 src={group.logoPath}
                 alt=""
                 aria-hidden="true"
-                className="h-11 w-auto max-w-[160px] shrink-0 object-contain md:h-12"
+                className={cn(
+                  'shrink-0 object-contain',
+                  group.logoClass ?? 'h-11 w-auto max-w-[160px] md:h-12'
+                )}
                 loading="lazy"
               />
             )}
-            <div className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-              <h3 className="truncate text-base font-bold tracking-tight text-text-primary sm:text-lg">
-                {group.org}
-              </h3>
+            <div
+              className={cn(
+                'flex min-w-0 flex-1',
+                group.hideOrgNameInHeader
+                  ? 'items-center justify-end'
+                  : 'flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-3'
+              )}
+            >
+              {!group.hideOrgNameInHeader && (
+                <h3 className="truncate text-base font-bold tracking-tight text-text-primary sm:text-lg">
+                  {group.org}
+                </h3>
+              )}
               <span className="font-mono text-xs text-text-tertiary">
                 {groupDateRange(group.nodes)}
               </span>
