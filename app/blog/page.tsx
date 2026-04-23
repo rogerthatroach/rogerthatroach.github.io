@@ -50,7 +50,10 @@ interface ProjectGroup {
 }
 
 export default function BlogIndexPage() {
-  const published = POSTS.filter(isPostPublic);
+  // NB: wrap `isPostPublic` in an arrow; `.filter(isPostPublic)` would
+  // pass (element, index, array) and the array index would clobber the
+  // function's default `now` parameter (see data/posts/index.ts).
+  const published = POSTS.filter((p) => isPostPublic(p));
 
   // Group posts by projectId. PROJECTS is already newest-first (PAR
   // Assist → Combustion Tuning); pattern posts fall into a final group.

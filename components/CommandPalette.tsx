@@ -5,10 +5,26 @@ import { useRouter } from 'next/navigation';
 import { Command } from 'cmdk';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
-import { Search, Home, User, FolderKanban, FileText, FileBadge, Sparkles, Hammer, Moon, Linkedin, Github, Mail, ArrowRight } from 'lucide-react';
+import { Search, Home, User, FolderKanban, FileText, FileBadge, Sparkles, Hammer, Palette, Linkedin, Github, Mail, ArrowRight } from 'lucide-react';
 import { HERO } from '@/data/hero';
 import { POSTS, isPostPublic } from '@/data/posts';
 import { PROJECTS } from '@/data/projects';
+
+// Six theme packs mirror ThemePicker.tsx — keep this table in sync when
+// that list changes. The palette lets users jump straight to any theme
+// from ⌘K without opening the nav picker.
+type ThemeId = 'sakura-light' | 'sakura-dark' | 'nord' | 'solarized-dark' | 'monokai' | 'paper';
+const THEMES: { id: ThemeId; label: string; base: 'light' | 'dark' }[] = [
+  { id: 'sakura-light',    label: 'Theme · Sakura Light',        base: 'light' },
+  { id: 'sakura-dark',     label: 'Theme · Sakura Dark',         base: 'dark'  },
+  { id: 'nord',            label: 'Theme · Aurora (Nord)',       base: 'dark'  },
+  { id: 'solarized-dark',  label: 'Theme · Obsidian (Solarized)', base: 'dark'  },
+  { id: 'monokai',         label: 'Theme · Ember (Monokai)',     base: 'dark'  },
+  { id: 'paper',           label: 'Theme · Papyrus (Paper)',     base: 'light' },
+];
+const THEME_BASES: Record<ThemeId, 'light' | 'dark'> = Object.fromEntries(
+  THEMES.map((t) => [t.id, t.base])
+) as Record<ThemeId, 'light' | 'dark'>;
 
 /**
  * ⌘K command palette — cmdk under the hood, Framer Motion for enter/exit.
@@ -67,12 +83,21 @@ export default function CommandPalette() {
     [router],
   );
 
-  const toggleTheme = useCallback(() => {
+  // Apply a theme-pack by id — mirrors the logic in `components/ThemePicker.tsx`
+  // so ⌘K theme changes stay consistent with the nav picker.
+  const applyThemePack = useCallback((id: ThemeId) => {
     setOpen(false);
-    const isDark = document.documentElement.classList.contains('dark');
-    const next = isDark ? 'light' : 'dark';
-    localStorage.setItem('theme', next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    const html = document.documentElement;
+    const base = THEME_BASES[id];
+    if (base === 'dark') html.classList.add('dark');
+    else html.classList.remove('dark');
+    if (id === 'sakura-light' || id === 'sakura-dark') {
+      html.removeAttribute('data-theme');
+    } else {
+      html.setAttribute('data-theme', id);
+    }
+    localStorage.setItem('theme-pack', id);
+    localStorage.removeItem('theme'); // drop legacy key
   }, []);
 
   if (!mounted) return null;
@@ -163,13 +188,19 @@ export default function CommandPalette() {
                   ))}
                 </Command.Group>
 
+                <Command.Group heading="Themes">
+                  {THEMES.map((t) => (
+                    <PaletteItem
+                      key={t.id}
+                      icon={Palette}
+                      label={t.label}
+                      value={`theme ${t.id} ${t.label}`}
+                      onSelect={() => applyThemePack(t.id)}
+                    />
+                  ))}
+                </Command.Group>
+
                 <Command.Group heading="Actions">
-                  <PaletteItem
-                    icon={Moon}
-                    label="Toggle theme"
-                    value="theme dark light mode toggle sun moon"
-                    onSelect={toggleTheme}
-                  />
                   <PaletteItem
                     icon={Linkedin}
                     label="Open LinkedIn"
