@@ -18,7 +18,21 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
   },
   {
     label: 'Styling',
-    value: 'Tailwind CSS with CSS-variable-backed theme tokens. Dark mode default; warm sakura accents on a wabi-sabi paper palette.',
+    value: (
+      <>
+        Tailwind CSS with CSS-variable-backed theme tokens. Six themes live
+        behind the palette picker in the nav:{' '}
+        <span className="font-mono">Sakura</span> (warm paper / wabi-sabi,
+        default),{' '}
+        <span className="font-mono">Aurora</span> (arctic blue, née Nord),{' '}
+        <span className="font-mono">Obsidian</span> (CIELAB-precise, née
+        Solarized Dark),{' '}
+        <span className="font-mono">Ember</span> (warm black + pink spark,
+        née Monokai),{' '}
+        <span className="font-mono">Papyrus</span> (editorial cream + ink,
+        née Paper). Every theme AA-tuned.
+      </>
+    ),
   },
   {
     label: 'Typography',
@@ -50,7 +64,38 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
   },
   {
     label: 'Diagrams',
-    value: 'ReactFlow for interactive architecture diagrams. Hand-authored SVG where layout is static. KaTeX pre-rendered at module scope for math.',
+    value: (
+      <>
+        ReactFlow for interactive architecture diagrams with animated
+        bezier edges. Custom node types (hero hub, dot, rail, label) for
+        non-rectangular shapes. Hand-authored SVG where layout is static.
+        KaTeX pre-rendered at module scope for math (never pass LaTeX
+        through client-component props). The PAR Assist{' '}
+        <a
+          href="/blog/enterprise-agentic-ai-framework"
+          className="text-accent underline underline-offset-4 hover:text-text-primary"
+        >
+          envelope diagram
+        </a>{' '}
+        is the current worked example.
+      </>
+    ),
+  },
+  {
+    label: 'Writing framework',
+    value: (
+      <>
+        Blog posts run through a reusable rewrite framework:{' '}
+        <span className="font-mono">OptionsConsidered</span>,{' '}
+        <span className="font-mono">ConstraintsBlock</span>,{' '}
+        <span className="font-mono">DecisionRationale</span>,{' '}
+        <span className="font-mono">StepThrough</span>,{' '}
+        <span className="font-mono">BeforeAfterDiff</span>. Decisions and
+        their alternatives become first-class structure; formal math moves
+        to an appendix for readers who want it. Spec lives at{' '}
+        <span className="font-mono">docs/specs/WRITING_REWRITE_FRAMEWORK.md</span>.
+      </>
+    ),
   },
   {
     label: 'Hosting',
