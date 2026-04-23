@@ -74,14 +74,11 @@ function RoleCard({
   node,
   expanded,
   isInView,
-  showOrg,
   onOpen,
 }: {
   node: TimelineNode;
   expanded: boolean;
   isInView: boolean;
-  /** When false, logo + org header are omitted (rendered at group level). */
-  showOrg: boolean;
   onOpen: () => void;
 }) {
   const era = ERA_PALETTES[node.era];
@@ -111,26 +108,7 @@ function RoleCard({
         <span className="font-mono text-xs text-text-secondary">{node.period}</span>
       </div>
 
-      {showOrg ? (
-        <>
-          <div className="mt-3 flex items-center gap-3">
-            {node.logoPath && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={node.logoPath}
-                alt=""
-                aria-hidden="true"
-                className="h-7 w-auto max-w-[120px] shrink-0 object-contain"
-                loading="lazy"
-              />
-            )}
-            <h3 className="text-base font-bold text-text-primary">{node.org}</h3>
-          </div>
-          <p className="text-sm text-text-secondary">{node.role}</p>
-        </>
-      ) : (
-        <h3 className="mt-3 text-base font-bold text-text-primary">{node.role}</h3>
-      )}
+      <h3 className="mt-3 text-base font-bold text-text-primary">{node.role}</h3>
 
       <p className="mt-3 text-sm leading-relaxed text-text-secondary">
         {node.description}
@@ -184,11 +162,11 @@ function TimelineRow({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-80px' });
-  const isMulti = group.nodes.length > 1;
   const isLeft = index % 2 === 0;
 
-  // All groups alternate L/R across the spine — multi-node groups (RBC)
-  // render a parent card with stacked era cards inside their half-column.
+  // All groups render the same card shell with a prominent header
+  // (logo + org name + date range + separator). Single-role groups
+  // still wrap their one role in the shell for visual consistency.
   const columnClasses = cn(
     'md:w-[calc(50%-1rem)]',
     isLeft ? 'md:pr-8' : 'md:ml-auto md:pl-8'
@@ -208,62 +186,45 @@ function TimelineRow({
       </div>
 
       <div className={cn('ml-8 flex-1 pb-12 md:ml-0 md:flex-none', columnClasses)}>
-        {isMulti ? (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-            className="rounded-2xl border border-border-subtle bg-surface/40 p-4 md:p-5"
-          >
-            <div className="mb-4 flex items-center gap-3 border-b border-border-subtle pb-3">
-              {group.logoPath && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={group.logoPath}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-7 w-auto max-w-[120px] shrink-0 object-contain"
-                  loading="lazy"
-                />
-              )}
-              <div className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-                <h3 className="truncate text-sm font-bold text-text-primary sm:text-base">
-                  {group.org}
-                </h3>
-                <span className="font-mono text-xs text-text-tertiary">
-                  {groupDateRange(group.nodes)}
-                </span>
-              </div>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+          className="rounded-2xl border border-border-subtle bg-surface/40 p-4 md:p-5"
+        >
+          <div className="mb-4 flex items-center gap-4 border-b border-border-subtle pb-4">
+            {group.logoPath && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={group.logoPath}
+                alt=""
+                aria-hidden="true"
+                className="h-11 w-auto max-w-[160px] shrink-0 object-contain md:h-12"
+                loading="lazy"
+              />
+            )}
+            <div className="flex min-w-0 flex-1 flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+              <h3 className="truncate text-base font-bold tracking-tight text-text-primary sm:text-lg">
+                {group.org}
+              </h3>
+              <span className="font-mono text-xs text-text-tertiary">
+                {groupDateRange(group.nodes)}
+              </span>
             </div>
+          </div>
 
-            <div className="space-y-3">
-              {group.nodes.map((node) => (
-                <RoleCard
-                  key={node.id}
-                  node={node}
-                  expanded={expanded}
-                  isInView={isInView}
-                  showOrg={false}
-                  onOpen={() => onOpen(node.id)}
-                />
-              ))}
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
-          >
-            <RoleCard
-              node={group.nodes[0]}
-              expanded={expanded}
-              isInView={isInView}
-              showOrg={true}
-              onOpen={() => onOpen(group.nodes[0].id)}
-            />
-          </motion.div>
-        )}
+          <div className="space-y-3">
+            {group.nodes.map((node) => (
+              <RoleCard
+                key={node.id}
+                node={node}
+                expanded={expanded}
+                isInView={isInView}
+                onOpen={() => onOpen(node.id)}
+              />
+            ))}
+          </div>
+        </motion.div>
       </div>
     </div>
   );
