@@ -1,7 +1,7 @@
-import { SubAgentExecution } from '@/components/blog/BlogDiagrams'
+import AstraeusCascade from '@/components/blog/diagrams/AstraeusCascade'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 
-> **A practitioner-register companion to the formal post [Deterministic Agentic Architectures for Enterprise Financial Analytics](/blog/agentic-ai).** That post formalizes the separation-of-concerns architecture as a proof of data-confidentiality and entitlement safety. This one is the story of the architectural call, the pressure to make the opposite call, and what the pattern taught me about building AI in regulated finance.
+> **A builder-register companion to the formal post [Deterministic Agentic Architectures for Enterprise Financial Analytics](/blog/agentic-ai) and the practitioner rewrite [LLM-as-Router in Practice — Four Decisions](/blog/astraeus-llm-as-router-framework).** The formal post proves data-confidentiality and entitlement safety by construction. The practitioner post lays the four architectural decisions and their alternatives out as first-class structure. This one is the story of the call — the pressure to make the opposite call, and what the pattern taught me about building AI in regulated finance.
 
 ---
 
@@ -15,7 +15,7 @@ This is the story of why, and what it took to build.
 
 ## The problem
 
-RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions &mdash; &ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo; &mdash; and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in an EPM (Enterprise Performance Management) system: ~40,000 factorial combinations, ~9,000 organizational rollups, ~60,000 geography hierarchy nodes, with strict entitlement controls at every level.
+RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions &mdash; &ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo; &mdash; and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in an EPM (Enterprise Performance Management) system: ~40,000 employee transits (the leaf-level routing unit), ~9,000 parent rollups, an ~80,000-node business hierarchy, and a ~60,000-node geography hierarchy — with strict entitlement controls at every level.
 
 No interactive system could answer those questions in under a day. No off-the-shelf product understood the CFO Group&rsquo;s permission model. And every off-the-shelf AI tool that might have helped required giving the LLM full access to the data.
 
@@ -39,15 +39,16 @@ The seductive option fails all four.
 
 The pattern I landed on is straightforward to describe and fiddly to build:
 
-- GPT is used *strictly* for intent detection: what kind of question is this? Which sub-agent should handle it?
-- Three sub-agents &mdash; EPM, Headcount, Open Positions &mdash; run in parallel. Each is deterministic Python that queries the data store, applies entitlements at the SQL level, and returns structured results.
-- The LLM never sees raw data. It sees a classification decision to make, then hands off.
-- Results assemble into a dashboard, a chatbot response, or an HTML report through deterministic formatting code.
+- GPT-4.1 is used *strictly* for intent work: parse, route, and — if in scope — up to three parallel metadata extractions (one per candidate domain).
+- Between two dashed walls, a deterministic Cython-compiled Python layer does the real work: EPM entitlement chain (cube → security → employees → transits → SQL), then event-level ins-outs math over ~40K transits.
+- Aggregates cross back up; a final LLM call (or up to three parallel sub-agents, then combined) synthesizes the answer.
+- The LLM never sees raw data. It sees classification decisions on the way down and aggregates on the way up.
+- Single Postgres backbone beneath everything — state, entitlements, hierarchies, audit log.
 
-This is LLM-as-Router. The LLM does what language models are good at (classify intent, disambiguate phrasing, handle synonyms). The deterministic layer does everything else.
+This is LLM-as-Router. The LLM does what language models are good at (classify intent, disambiguate phrasing, handle synonyms). The deterministic layer does everything else. *[For the decision tree behind each of these — orchestration shape, computation layer, entitlement enforcement, synthesis strategy — see the [practitioner post](/blog/astraeus-llm-as-router-framework).]*
 
-<VisualizationContainer title="Three sub-agents in parallel" subtitle="GPT routes intent; each sub-agent handles its own domain with deterministic code and SQL-level entitlement enforcement.">
-  <SubAgentExecution />
+<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: LLM intent (parse / route / metadata extract), deterministic Cython compute with EPM entitlement chain and event-level ins-outs math, LLM synthesis then combine. Only parsed metadata crosses down; only structured aggregates cross up.">
+{() => <AstraeusCascade />}
 </VisualizationContainer>
 
 The EPM-to-SQL entitlement modeling alone took weeks of domain immersion &mdash; cube permissions map to security groups, which map to employees, which map to transits (the atomic unit of the data model), which map to SQL WHERE clauses. That mapping had to be bulletproof, not best-effort. No prompt was going to get it right.
@@ -64,7 +65,7 @@ Three things, in the order they mattered:
 
 ## The result
 
-- ~40K factorial combinations, ~9K rollups, ~60K geographies, all sliced at millisecond backend latency
+- ~40K employee transits with ~9K parent rollups — sliced at millisecond backend latency across any cross-domain combination
 - Three delivery channels from a single architecture: dashboard, chatbot, and HTML reports generated for executive consumption
 - Days of email replaced by seconds-level answers
 - Zero sensitive data ever reaching the language model
