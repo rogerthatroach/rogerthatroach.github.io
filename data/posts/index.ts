@@ -264,12 +264,12 @@ export const POSTS: BlogPost[] = [
       title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
       subtitle:
         'A builder-register companion to the formal Astraeus architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
-      date: '2026-05-22',
+      date: '2026-04-18',
       tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'Astraeus'],
       readingTime: '7 min read',
       abstract:
         'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building Astraeus \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
-      status: 'draft',
+      status: 'published',
       projectId: 'astraeus',
       register: 'builder',
     },
@@ -281,9 +281,63 @@ export const POSTS: BlogPost[] = [
         description: 'The formal paper proving data-confidentiality and entitlement-safety of the LLM-as-Router architecture under defined threat models.',
       },
       {
+        title: 'LLM-as-Router in Practice (the practitioner rewrite)',
+        url: '/blog/astraeus-llm-as-router-framework',
+        description: 'The same architecture in practitioner register \u2014 four decisions as first-class structure with options considered, constraint cards, and decision rationale for each.',
+      },
+      {
         title: 'How We Built PAR Assist',
         url: '/blog/par-assist-building',
         description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
+      },
+      {
+        title: 'Astraeus \u2014 Case Study',
+        url: '/projects/astraeus',
+        description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: {
+      slug: 'astraeus-llm-as-router-framework',
+      title: 'LLM-as-Router in Practice \u2014 Four Decisions',
+      subtitle:
+        'A practitioner-register rewrite of the Astraeus architecture. Constraints, options considered, and decision rationale for each of the four calls that separate LLM-as-Router from the seductive monolithic pattern.',
+      date: '2026-04-23',
+      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'EPM', 'Entitlement', 'Astraeus'],
+      readingTime: '14 min read',
+      abstract:
+        'Astraeus ships on an architecture with two dashed walls: the LLM handles intent, the deterministic Cython-compiled Python layer handles compute, and LLM-as-Router links the two without the model ever touching operational data. This post lays the four architectural decisions as first-class structure \u2014 orchestration shape (LLM-as-Router over monolithic agent / chain / multi-agent), computation layer (Cython over pure Python / SQL / Rust), entitlement enforcement (EPM passthrough pre-compute over post-filter / LLM-policy / RLS), and synthesis strategy (router-decides hybrid over always-single / always-parallel / template-render). Each decision gets its constraints, its alternatives with honest pros/cons, and the rationale that produced the call. The narrative behind those calls lives in the builder companion; the formal proofs of data-confidentiality and entitlement safety live in the formal post.',
+      status: 'published',
+      projectId: 'astraeus',
+      register: 'practitioner',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Deterministic Agentic Architectures (the formal companion)',
+        url: '/blog/agentic-ai',
+        description: 'The sibling post \u2014 same system, formal register, theorem/proof structure. Compare with this rewrite to see the register swap.',
+      },
+      {
+        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent (the builder story)',
+        url: '/blog/astraeus-llm-as-router',
+        description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
+      },
+      {
+        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (PAR Assist)',
+        url: '/blog/enterprise-agentic-ai-framework',
+        description: 'The same register applied to PAR Assist \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
+      },
+      {
+        title: 'LangGraph Documentation',
+        url: 'https://langchain-ai.github.io/langgraph/',
+        description: 'Directed-graph workflow orchestration with persistent state \u2014 the framework precedent for routing-style orchestration.',
+      },
+      {
+        title: 'Cython: Python with C Performance',
+        url: 'https://cython.readthedocs.io/',
+        description: 'The compiled-Python toolchain behind the event-level ins-outs math.',
       },
       {
         title: 'Astraeus \u2014 Case Study',

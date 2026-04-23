@@ -37,6 +37,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'astraeus-llm-as-router': dynamic(() => import('@/data/posts/astraeus-llm-as-router.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'astraeus-llm-as-router-framework': dynamic(() => import('@/data/posts/astraeus-llm-as-router-framework.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
   'combustion-tuning-operators': dynamic(() => import('@/data/posts/combustion-tuning-operators.mdx'), {
     loading: () => <PostSkeleton />,
   }),
