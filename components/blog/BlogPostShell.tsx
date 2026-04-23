@@ -37,6 +37,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'workforce-analytics-llm-as-router': dynamic(() => import('@/data/posts/workforce-analytics-llm-as-router.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'workforce-analytics-routing-framework': dynamic(() => import('@/data/posts/workforce-analytics-routing-framework.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
   'combustion-tuning-operators': dynamic(() => import('@/data/posts/combustion-tuning-operators.mdx'), {
     loading: () => <PostSkeleton />,
   }),
