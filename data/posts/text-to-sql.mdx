@@ -43,36 +43,36 @@ comparisons.
 ### 2.2 Formal Requirements
 
 <TheoremBlock variant="definition" number={1} title="Injection Safety">
-  <p>
+  <div>
     No user input string <InlineEquation html={tex("q \\in \\mathcal{Q}")} /> can cause
     execution of SQL operations outside the predefined operation set <InlineEquation html={tex("\\mathcal{O} = \\{\\text{SELECT}\\}")} />:
-  </p>
+  </div>
   <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\text{op}(\\text{SQL}(q)) \\in \\mathcal{O}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="definition" number={2} title="Schema Compliance">
-  <p>
+  <div>
     Generated SQL may reference only tables <InlineEquation html={tex("T_{\\text{allowed}}")} /> and columns <InlineEquation html={tex("C_{\\text{allowed}}")} /> in the registered schema:
-  </p>
+  </div>
   <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(\\text{SQL}(q)) \\subseteq C_{\\text{allowed}}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="definition" number={3} title="Disambiguation Correctness">
-  <p>
+  <div>
     If the system resolves an ambiguous KPI reference, the resolved KPI must be the
     one the user intended with probability at least <InlineEquation html={tex("1 - \\epsilon")} /> for a configurable confidence threshold <InlineEquation html={tex("\\epsilon")} />:
-  </p>
+  </div>
   <MathBlock html={tex("P(\\hat{k} = k^*) \\geq 1 - \\epsilon", true)} />
-  <p>
+  <div>
     Otherwise, the system must request clarification rather than guess.
-  </p>
+  </div>
 </TheoremBlock>
 
 <TheoremBlock variant="definition" number={4} title="Testability">
-  <p>
+  <div>
     Every pipeline stage must be independently testable with deterministic inputs and
     outputs:
-  </p>
+  </div>
   <MathBlock html={tex("\\forall \\text{ stage } s_i: \\exists \\text{ test suite } T_i \\text{ s.t. } s_i \\text{ is deterministic on } T_i", true)} />
 </TheoremBlock>
 
@@ -203,17 +203,17 @@ where <InlineEquation html={tex("\\tau_{\\min}")} /> is the minimum similarity t
 ### 5.3 Why Embeddings Over Keyword Matching
 
 <TheoremBlock variant="proposition" number={3} title="Embedding Robustness to Synonymy">
-  <p>
+  <div>
     For semantically equivalent metric references <InlineEquation html={tex("\\mu_1 \\equiv_{\\text{sem}} \\mu_2")} /> (e.g.,
     "NIM" and "Net Interest Margin"), embedding similarity
     preserves retrieval:
-  </p>
+  </div>
   <MathBlock html={tex("\\mu_1 \\equiv_{\\text{sem}} \\mu_2 \\implies |\\text{sim}(k, \\mu_1) - \\text{sim}(k, \\mu_2)| < \\delta", true)} />
-  <p>
+  <div>
     for small <InlineEquation html={tex("\\delta")} />, assuming the embedding model captures
     semantic similarity (a property validated empirically for modern sentence
     transformers <CitationRef id={5} />).
-  </p>
+  </div>
 </TheoremBlock>
 
 Keyword matching fails here because "NIM" shares zero tokens with
@@ -272,29 +272,29 @@ The LLM outputs a selection <InlineEquation html={tex("\\hat{k} \\in \\mathcal{K
 ### 6.3 Confidence Thresholding
 
 <TheoremBlock variant="definition" number={6} title="Disambiguation Decision Function">
-  <p>The disambiguation outcome is:</p>
+  <div>The disambiguation outcome is:</div>
   <MathBlock
     html={tex("\\text{outcome}(\\hat{k}, p) = \\begin{cases} \\text{accept}(\\hat{k}) & \\text{if } p \\geq 1 - \\epsilon \\\\ \\text{clarify}(\\mathcal{K}_c) & \\text{if } p < 1 - \\epsilon \\end{cases}", true)}
   />
-  <p>
+  <div>
     where <InlineEquation html={tex("\\epsilon")} /> is the maximum acceptable error
     probability from Requirement 3.
-  </p>
+  </div>
 </TheoremBlock>
 
 <TheoremBlock variant="proposition" number={4} title="Disambiguation Safety">
-  <p>
+  <div>
     If the LLM's confidence score is calibrated (i.e., <InlineEquation html={tex("P(\\hat{k} = k^* \\mid p) \\geq p")} /> for all confidence
     levels <InlineEquation html={tex("p")} />), then the disambiguation decision function satisfies Requirement 3:
-  </p>
+  </div>
   <MathBlock html={tex("P(\\hat{k} = k^*) \\geq 1 - \\epsilon \\text{ whenever outcome} = \\text{accept}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
-  <p>
+  <div>
     The accept condition requires <InlineEquation html={tex("p \\geq 1 - \\epsilon")} />. By
     calibration, <InlineEquation html={tex("P(\\hat{k} = k^* \\mid p) \\geq p \\geq 1 - \\epsilon")} />. <InlineEquation html={tex("\\square")} />
-  </p>
+  </div>
 </TheoremBlock>
 
 In practice, LLM confidence scores are not perfectly calibrated <CitationRef id={6} />, so we set <InlineEquation html={tex("\\epsilon")} /> conservatively (we use <InlineEquation html={tex("\\epsilon = 0.05")} />) and validate calibration empirically on
@@ -308,28 +308,28 @@ Once the KPI is resolved, SQL generation uses a hybrid approach: a template libr
 provides the structural skeleton, and parameterization fills in the specific values.
 
 <TheoremBlock variant="definition" number={7} title="SQL Template">
-  <p>
+  <div>
     A template <InlineEquation html={tex("T")} /> is a SQL string with typed placeholders:
-  </p>
+  </div>
   <MathBlock html={tex("T(\\text{kpi\\_id}: \\text{int},\\; \\text{period}: \\text{date},\\; \\text{entity}: \\text{string}) = \\text{SELECT } \\ldots \\text{ WHERE kpi\\_id = :kpi\\_id AND } \\ldots", true)} />
-  <p>
+  <div>
     Templates are pre-authored and reviewed for each query pattern (peer comparison,
     time series trend, single-point lookup, cross-entity ranking).
-  </p>
+  </div>
 </TheoremBlock>
 
 ### 7.2 Formal Safety Properties
 
 <TheoremBlock variant="theorem" number={3} title="Injection Impossibility">
-  <p>
+  <div>
     If all user-supplied values are passed as parameterized bindings (not
     string-interpolated into the SQL), then SQL injection is impossible:
-  </p>
+  </div>
   <MathBlock html={tex("\\forall q \\in \\mathcal{Q}: \\nexists \\text{ substring } s \\text{ of } q \\text{ that executes as SQL}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
-  <p>
+  <div>
     Parameterized queries separate code (the SQL template) from data (the parameter
     values) at the database driver level <CitationRef id={7} />. The driver processes the SQL template as
     a prepared statement, compiling it into an execution plan before binding parameter
@@ -337,26 +337,26 @@ provides the structural skeleton, and parameterization fills in the specific val
     Therefore, no content of <InlineEquation html={tex("q")} /> — regardless of its structure
     or embedded SQL keywords — can alter the query's syntactic structure or
     execution plan.
-  </p>
+  </div>
 </TheoremBlock>
 
 <TheoremBlock variant="theorem" number={4} title="Schema Compliance">
-  <p>
+  <div>
     If the template library <InlineEquation html={tex("\\mathcal{T}")} /> references only
     tables in <InlineEquation html={tex("T_{\\text{allowed}}")} /> and columns in <InlineEquation html={tex("C_{\\text{allowed}}")} />, and templates are selected (not
     generated), then Requirement 2 is satisfied:
-  </p>
+  </div>
   <MathBlock html={tex("\\forall T \\in \\mathcal{T}: \\text{tables}(T) \\subseteq T_{\\text{allowed}} \\wedge \\text{cols}(T) \\subseteq C_{\\text{allowed}}", true)} />
   <MathBlock html={tex("\\text{template\\_select}: \\mathcal{I} \\rightarrow \\mathcal{T} \\implies \\text{tables}(\\text{SQL}(q)) \\subseteq T_{\\text{allowed}}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
-  <p>
+  <div>
     The SQL execution uses only templates from <InlineEquation html={tex("\\mathcal{T}")} />. Each template is authored and reviewed to
     reference only allowed tables and columns. Since no dynamic table or column names
     enter through parameters (which are values, not identifiers), the schema boundary
     is preserved.
-  </p>
+  </div>
 </TheoremBlock>
 
 ### 7.3 Validation Layer

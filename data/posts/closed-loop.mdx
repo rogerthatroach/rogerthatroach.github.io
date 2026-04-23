@@ -62,11 +62,11 @@ The formal treatment focuses on Level 1 (PSO for combustion tuning), where the m
 ### 2.1 Formal Definition
 
 <TheoremBlock variant="definition" number={1} title="Closed-Loop Optimization System">
-  <p className="mb-2">
+  <div className="mb-2">
     A closed-loop optimization system <InlineEquation html={tex("\\mathcal{S}")} /> is a 4-tuple:
-  </p>
+  </div>
   <MathBlock html={tex("\\mathcal{S} = (\\mathcal{Z},\\; \\mathcal{M},\\; \\mathcal{O},\\; \\mathcal{A})", true)} />
-  <p className="mb-2">where:</p>
+  <div className="mb-2">where:</div>
   <ul className="list-inside list-disc space-y-1">
     <li>
       <InlineEquation html={tex("\\mathcal{Z}: \\text{Environment} \\rightarrow \\mathcal{X}")} /> is
@@ -107,26 +107,26 @@ The system forms a closed loop because actuation modifies the environment, which
 ### 2.2 Properties
 
 <TheoremBlock variant="proposition" number={1} title="Feedback">
-  <p>
+  <div>
     The system improves over time because actuation changes the environment, producing new
     observations that update the model:
-  </p>
+  </div>
   <MathBlock html={tex("\\mathcal{M}_{t+1} = \\text{update}(\\mathcal{M}_t,\\; \\mathcal{Z}(\\text{Environment}_{t+1}))", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proposition" number={2} title="Constraint Satisfaction">
-  <p>
+  <div>
     The optimization function operates within a feasible set defined by operational,
     regulatory, or safety constraints:
-  </p>
+  </div>
   <MathBlock html={tex("\\mathcal{X}^* = \\underset{x \\in \\mathcal{F}}{\\text{argmin}}\\; J(x) \\quad \\text{where} \\quad \\mathcal{F} = \\{x \\in \\mathcal{X} \\mid c_j(x) \\leq 0,\\; j = 1, \\ldots, p\\}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proposition" number={3} title="Human-in-the-Loop">
-  <p>
+  <div>
     In high-stakes domains,
     <InlineEquation html={tex("\\mathcal{A}")} /> includes a human judgment gate:
-  </p>
+  </div>
   <MathBlock html={tex("\\mathcal{A}(x^*) = \\begin{cases} \\text{apply}(x^*) & \\text{if human approves} \\\\ \\text{hold}(x^*) & \\text{otherwise} \\end{cases}", true)} />
 </TheoremBlock>
 
@@ -219,9 +219,9 @@ Inter-Fold Variance (<InlineEquation html={tex("\\sigma^2_{\\text{fold}}")} />):
 where <InlineEquation html={tex("R^2_{i,k}")} /> is the <InlineEquation html={tex("R^2")} /> score of model <InlineEquation html={tex("i")} /> on fold <InlineEquation html={tex("k")} />.
 
 <TheoremBlock variant="definition" number={2} title="Model Selection Criterion">
-  <p>
+  <div>
     The selected model for output <InlineEquation html={tex("i")} /> is:
-  </p>
+  </div>
   <MathBlock html={tex("f_i^* = \\underset{f \\in \\mathcal{F}}{\\text{argmax}}\\; R^2_i(f) \\quad \\text{subject to} \\quad \\sigma^2_{\\text{fold},i}(f) < \\sigma_{\\max}", true)} />
 </TheoremBlock>
 
@@ -241,9 +241,9 @@ The stability constraint (<InlineEquation html={tex("\\sigma^2_{\\text{fold}} < 
 Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart <CitationRef id={1} />, is a population-based metaheuristic inspired by collective behavior in biological swarms. A population of <InlineEquation html={tex("N")} /> particles navigates an <InlineEquation html={tex("n")} />-dimensional search space, each evaluating a candidate solution at its position.
 
 <TheoremBlock variant="definition" number={3} title="Particle State">
-  <p className="mb-2">
+  <div className="mb-2">
     Each particle <InlineEquation html={tex("i")} /> at iteration <InlineEquation html={tex("t")} /> has:
-  </p>
+  </div>
   <ul className="list-inside list-disc space-y-1">
     <li>
       Position: <InlineEquation html={tex("\\mathbf{x}_i^{(t)} \\in \\mathbb{R}^n")} /> (a candidate
@@ -286,14 +286,14 @@ where:
 - <InlineEquation html={tex("r_1, r_2 \\sim \\text{Uniform}(0, 1)")} /> are stochastic scaling factors
 
 <TheoremBlock variant="proposition" number={5} title="Convergence Behavior">
-  <p>
+  <div>
     Under the condition <InlineEquation html={tex("w < 1")} /> and
     <InlineEquation html={tex("c_1 + c_2 > 0")} />, the swarm contracts toward a region containing
     <InlineEquation html={tex("\\mathbf{g}^{(t)}")} /> <CitationRef id={2} />. With linearly decreasing inertia weight
     <InlineEquation html={tex("w(t) = w_{\\max} - (w_{\\max} - w_{\\min}) \\cdot t/t_{\\max}")} />,
     the swarm transitions from exploration (high <InlineEquation html={tex("w")} />, broad search)
     to exploitation (low <InlineEquation html={tex("w")} />, local refinement).
-  </p>
+  </div>
 </TheoremBlock>
 
 <VisualizationContainer
@@ -324,17 +324,17 @@ where <InlineEquation html={tex("\\alpha_1, \\alpha_2, \\alpha_3")} /> are weigh
 Why PSO over gradient-based methods?
 
 <TheoremBlock variant="theorem" number={5} title="Non-Convexity Robustness">
-  <p>
+  <div>
     For a non-convex objective <InlineEquation html={tex("J")} /> with multiple local minima,
     gradient-based methods converge to the nearest local minimum from initialization. PSO, as
     a population-based stochastic optimizer, samples from multiple basins of attraction
     simultaneously, providing probabilistic guarantees of finding the global minimum that
     gradient methods cannot <CitationRef id={3} />.
-  </p>
+  </div>
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
-  <p className="mb-2">
+  <div className="mb-2">
     <em>Sketch of argument.</em> Consider a landscape with <InlineEquation html={tex("B")} /> basins
     of attraction. A single gradient descent trajectory explores exactly one basin. A PSO
     swarm of <InlineEquation html={tex("N")} /> particles, initialized uniformly, places approximately
@@ -345,12 +345,12 @@ Why PSO over gradient-based methods?
     the swarm will eventually converge there (under appropriate
     <InlineEquation html={tex("w, c_1, c_2")} /> settings). The probability of at least one particle
     initializing in the global basin approaches 1 as <InlineEquation html={tex("N")} /> grows:
-  </p>
+  </div>
   <MathBlock html={tex("P(\\text{global basin covered}) = 1 - \\left(1 - \\frac{V_{\\text{global}}}{V_{\\text{total}}}\\right)^N", true)} />
-  <p>
+  <div>
     where <InlineEquation html={tex("V_{\\text{global}}")} /> is the volume of the global basin
     relative to the total search space <InlineEquation html={tex("V_{\\text{total}}")} />.
-  </p>
+  </div>
 </TheoremBlock>
 
 ### 3.5 Actuation: Human-in-the-Loop
@@ -372,7 +372,7 @@ The system achieved:
 ### 4.1 Structural Isomorphism
 
 <TheoremBlock variant="definition" number={4} title="Structural Isomorphism">
-  <p className="mb-2">
+  <div className="mb-2">
     Two closed-loop optimization systems
     <InlineEquation html={tex("\\mathcal{S}_1 = (\\mathcal{Z}_1, \\mathcal{M}_1, \\mathcal{O}_1, \\mathcal{A}_1)")} />
     and
@@ -380,12 +380,12 @@ The system achieved:
     are structurally isomorphic if there exist bijective mappings
     <InlineEquation html={tex("\\phi_Z, \\phi_M, \\phi_O, \\phi_A")} /> such that the compositional
     structure is preserved:
-  </p>
+  </div>
   <MathBlock html={tex("\\phi_A \\circ \\phi_O \\circ \\phi_M \\circ \\phi_Z(\\mathcal{S}_1) \\cong \\mathcal{S}_2", true)} />
-  <p>
+  <div>
     That is, the four-phase flow (sense &rarr; model &rarr; optimize &rarr; act) is the same
     in both systems, even if the concrete implementations differ entirely.
-  </p>
+  </div>
 </TheoremBlock>
 
 ### 4.2 Level 2: Cloud Document Processing (2021–2022)
