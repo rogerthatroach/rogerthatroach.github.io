@@ -264,15 +264,18 @@ const nodeTypes = {
 const edgeTypes = { animated: AnimatedEdge };
 
 // ── Layout constants ─────────────────────────────────────────────────
-// Canvas ~1320w × 680h. Three horizontal bands separated by dashed walls.
-// Flow is top → bottom per band, cascade pattern.
+// Canvas ~880w × ~1000h — near-square portrait. Three horizontal bands
+// separated by dashed walls. Flow is top → bottom per band. Rows that
+// used to be five-wide (LLM intent) or four-wide (synthesis) are now
+// stacked so the canvas fits the blog's narrow prose column without
+// vertical letterboxing.
 
 const initialNodes: Node[] = [
   // ═══ Envelope label (top-left) ═══
   {
     id: 'env-label',
     type: 'label',
-    position: { x: 30, y: 10 },
+    position: { x: 20, y: 10 },
     data: {
       text: 'LLM never touches operational data · by construction',
       color: HERO,
@@ -286,7 +289,7 @@ const initialNodes: Node[] = [
   {
     id: 'band1-label',
     type: 'label',
-    position: { x: 30, y: 70 },
+    position: { x: 20, y: 55 },
     data: {
       text: 'Band 1 · LLM intent (no data touched)',
       color: LLM,
@@ -295,43 +298,41 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // User query
+  // User query — top center
   {
     id: 'user',
     type: 'pill',
-    position: { x: 580, y: 100 },
-    data: { label: 'User query', sub: '"headcount by division × open positions × tenure"', color: HERO, size: 'sm' } satisfies PillNodeData,
+    position: { x: 310, y: 95 },
+    data: { label: 'User query', sub: '"headcount × open positions × tenure"', color: HERO, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
 
-  // LLM call 1: parse
+  // Parse + Route — row 1 of 2 (sequential flow control)
   {
     id: 'parse',
     type: 'pill',
-    position: { x: 150, y: 170 },
+    position: { x: 180, y: 185 },
     data: { badge: 'LLM 1', label: 'Parse intent', sub: 'GPT-4.1', color: LLM, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
-
-  // LLM call 2: route
   {
     id: 'route',
     type: 'pill',
-    position: { x: 400, y: 170 },
+    position: { x: 480, y: 185 },
     data: { badge: 'LLM 2', label: 'Route', sub: 'in scope?', color: LLM, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
 
-  // LLM calls 3-5: metadata extract
-  { id: 'meta-1', type: 'pill', position: { x: 680, y: 170 }, data: { badge: 'LLM 3', label: 'Extract · Headcount', sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'meta-2', type: 'pill', position: { x: 920, y: 170 }, data: { badge: 'LLM 4', label: 'Extract · HR Costs', sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'meta-3', type: 'pill', position: { x: 1160, y: 170 }, data: { badge: 'LLM 5', label: 'Extract · Open Pos.', sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  // Metadata extractors — row 2 of 2 (parallel fan-out, 3-wide)
+  { id: 'meta-1', type: 'pill', position: { x: 130, y: 275 }, data: { badge: 'LLM 3', label: 'Headcount',  sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'meta-2', type: 'pill', position: { x: 360, y: 275 }, data: { badge: 'LLM 4', label: 'HR Costs',   sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'meta-3', type: 'pill', position: { x: 590, y: 275 }, data: { badge: 'LLM 5', label: 'Open Pos.',  sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
 
   // Sidenote on metadata fan-out
   {
     id: 'sidenote-parallel',
     type: 'label',
-    position: { x: 30, y: 220 },
+    position: { x: 20, y: 290 },
     data: { text: 'up to 3 parallel', sub: 'fires only if relevant', color: LLM, size: 'xs' } satisfies LabelNodeData,
     draggable: false,
   },
@@ -340,13 +341,13 @@ const initialNodes: Node[] = [
   {
     id: 'wall-1',
     type: 'label',
-    position: { x: 500, y: 248 },
+    position: { x: 160, y: 355 },
     data: {
       text: '═══ WALL · only parsed metadata crosses down ═══',
       color: WALL,
       size: 'xs',
       align: 'center',
-      width: 440,
+      width: 580,
     } satisfies LabelNodeData,
     draggable: false,
   },
@@ -355,37 +356,37 @@ const initialNodes: Node[] = [
   {
     id: 'band2-label',
     type: 'label',
-    position: { x: 30, y: 300 },
+    position: { x: 20, y: 395 },
     data: {
-      text: 'Band 2 · Deterministic · Cython-compiled Python',
+      text: 'Band 2 · Deterministic · Cython',
       color: COMPUTE,
       size: 'xs',
     } satisfies LabelNodeData,
     draggable: false,
   },
 
-  // EPM entitlement chain (wide horizontal)
+  // EPM entitlement chain (horizontal, centered)
   {
     id: 'entitle-chain',
     type: 'chain',
-    position: { x: 240, y: 310 },
+    position: { x: 185, y: 415 },
     data: {
       label: 'EPM entitlement chain (applied before compute)',
-      steps: ['cube perms', 'security groups', 'employees', 'transits', 'SQL tables'],
+      steps: ['cube', 'security', 'employees', 'transits', 'SQL'],
       color: ENTITLE,
     } satisfies ChainNodeData,
     draggable: false,
   },
 
-  // Hero node: event-level ins-outs math
+  // Hero node: event-level ins-outs math (narrower sub line)
   {
     id: 'compute',
     type: 'pill',
-    position: { x: 430, y: 400 },
+    position: { x: 180, y: 520 },
     data: {
       badge: 'Hero',
       label: 'Event-level ins-outs math',
-      sub: 'Cython · netting semantics · milliseconds over 40K transits',
+      sub: 'Cython · netting · ms over 40K transits',
       color: COMPUTE,
       size: 'lg',
       glow: true,
@@ -393,18 +394,18 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // Scale callout
+  // Scale callout — to the right of compute
   {
     id: 'scale-callout',
     type: 'label',
-    position: { x: 880, y: 400 },
+    position: { x: 580, y: 525 },
     data: {
       text: '40K! factorial combinations',
-      sub: '~40K transits (leaves) · ~9K parent rollups · ~80K business · ~60K geography',
+      sub: '~40K transits · ~9K rollups · ~80K business · ~60K geography',
       color: HERO,
       size: 'sm',
       dashedBorder: true,
-      width: 280,
+      width: 260,
     } satisfies LabelNodeData,
     draggable: false,
   },
@@ -413,13 +414,13 @@ const initialNodes: Node[] = [
   {
     id: 'wall-2',
     type: 'label',
-    position: { x: 500, y: 478 },
+    position: { x: 160, y: 625 },
     data: {
       text: '═══ WALL · only structured aggregates cross up ═══',
       color: WALL,
       size: 'xs',
       align: 'center',
-      width: 440,
+      width: 580,
     } satisfies LabelNodeData,
     draggable: false,
   },
@@ -428,7 +429,7 @@ const initialNodes: Node[] = [
   {
     id: 'band3-label',
     type: 'label',
-    position: { x: 30, y: 530 },
+    position: { x: 20, y: 665 },
     data: {
       text: 'Band 3 · LLM synthesis (aggregates only)',
       color: LLM,
@@ -437,51 +438,49 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // Synthesis pill (single-call path)
+  // Synthesis pills — 4-wide, shortened labels to fit narrow canvas
   {
     id: 'synth-1',
     type: 'pill',
-    position: { x: 260, y: 540 },
-    data: { badge: 'LLM 6 · path A', label: '1 synthesis call', sub: 'simple answer', color: LLM, size: 'sm' } satisfies PillNodeData,
+    position: { x: 60, y: 695 },
+    data: { badge: 'path A', label: '1 call', sub: 'simple answer', color: LLM, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
+  { id: 'sub-epm',  type: 'pill', position: { x: 250, y: 695 }, data: { badge: 'path B', label: 'EPM',        color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'sub-hc',   type: 'pill', position: { x: 430, y: 695 }, data: { badge: 'path B', label: 'Headcount',  color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'sub-open', type: 'pill', position: { x: 620, y: 695 }, data: { badge: 'path B', label: 'Open pos.',  color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
 
-  // Three final subagents (parallel path)
-  { id: 'sub-epm',  type: 'pill', position: { x: 640, y: 540 }, data: { badge: 'path B', label: 'EPM subagent',       color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'sub-hc',   type: 'pill', position: { x: 830, y: 540 }, data: { badge: 'path B', label: 'Headcount subagent', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'sub-open', type: 'pill', position: { x: 1030, y: 540 }, data: { badge: 'path B', label: 'Open-Positions subagent', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-
-  // Combine
+  // Combine (centered)
   {
     id: 'combine',
     type: 'pill',
-    position: { x: 580, y: 610 },
+    position: { x: 370, y: 780 },
     data: { label: 'Combine', sub: 'one answer', color: HERO, size: 'sm', glow: true } satisfies PillNodeData,
     draggable: false,
   },
 
-  // Delivery channels
-  { id: 'deliver-dash', type: 'pill', position: { x: 340, y: 680 }, data: { label: 'Dashboard', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'deliver-chat', type: 'pill', position: { x: 580, y: 680 }, data: { label: 'Chatbot', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'deliver-html', type: 'pill', position: { x: 790, y: 680 }, data: { label: 'HTML reports', sub: 'inbox-ready', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
+  // Delivery channels (3-wide, centered)
+  { id: 'deliver-dash', type: 'pill', position: { x: 150, y: 860 }, data: { label: 'Dashboard', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'deliver-chat', type: 'pill', position: { x: 370, y: 860 }, data: { label: 'Chatbot', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'deliver-html', type: 'pill', position: { x: 570, y: 860 }, data: { label: 'HTML reports', sub: 'inbox-ready', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
 
   // ═══ Postgres backbone rail ═══
   {
     id: 'rail-label',
     type: 'label',
-    position: { x: 40, y: 755 },
+    position: { x: 30, y: 925 },
     data: { text: 'Everything reads/writes below · single Postgres', color: DATA, size: 'xs' } satisfies LabelNodeData,
     draggable: false,
   },
   {
     id: 'postgres',
     type: 'rail',
-    position: { x: 40, y: 785 },
+    position: { x: 30, y: 955 },
     data: {
       label: 'Postgres backbone',
       color: DATA,
-      tokens: ['event log', 'entitlement catalog', 'business hierarchy', 'geo hierarchy', 'audit'],
-      width: 1240,
+      tokens: ['event log', 'entitlements', 'business hier.', 'geo hier.', 'audit'],
+      width: 820,
     } satisfies RailNodeData,
     draggable: false,
   },
@@ -529,37 +528,33 @@ export default function AstraeusCascade() {
   const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
-    <div className="relative h-[880px] w-full">
-      {/* Two dashed walls — the hero visual */}
+    <div
+      className="relative w-full"
+      style={{ aspectRatio: '880 / 1020' }}
+    >
+      {/* Two dashed walls — the hero visual. Positioned in % of the
+          container so they scale with the responsive aspect-ratio box.
+          Y-values are tuned to sit between bands; the textual wall
+          labels inside the ReactFlow viewport carry the semantics. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute rounded-full border-2 border-dashed"
+        className="pointer-events-none absolute border-t-2 border-dashed"
         style={{
-          left: 220,
-          top: 262,
-          width: 1000,
-          height: 0,
+          left: '10%',
+          right: '10%',
+          top: '36%',
           borderColor: `${WALL}88`,
-          borderTopWidth: 2,
-          borderBottomWidth: 0,
-          borderLeftWidth: 0,
-          borderRightWidth: 0,
           zIndex: 0,
         }}
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute rounded-full border-2 border-dashed"
+        className="pointer-events-none absolute border-t-2 border-dashed"
         style={{
-          left: 220,
-          top: 492,
-          width: 1000,
-          height: 0,
+          left: '10%',
+          right: '10%',
+          top: '63%',
           borderColor: `${WALL}88`,
-          borderTopWidth: 2,
-          borderBottomWidth: 0,
-          borderLeftWidth: 0,
-          borderRightWidth: 0,
           zIndex: 0,
         }}
       />
