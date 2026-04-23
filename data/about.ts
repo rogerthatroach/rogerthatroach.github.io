@@ -11,7 +11,7 @@ export const ABOUT = {
     },
     {
       lead: 'Second, the best ideas come from everywhere.',
-      body: "PAR Assist started as an intern's proof-of-concept during the Amplify program. I saw the shape of something bigger, resourced it, and scaled the vision. Today it's shipping as a bank-wide agentic AI platform. My job as a leader isn't to have the best ideas. It's to recognize them, clear the path to production, and make sure everyone knows where they started.",
+      body: "PAR Assist started as an intern's proof-of-concept during the Amplify program. I saw it could scale from a one-team prototype to a bank-wide platform, resourced it, and led the productionization. Today it's the pilot for the bank's first true agentic AI deployment. My job as a leader isn't to have the best ideas. It's to recognize them, clear the path to production, and make sure everyone knows where they started.",
     },
     {
       lead: 'Third, trust beats accuracy in regulated AI.',

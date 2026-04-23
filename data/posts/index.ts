@@ -136,13 +136,13 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'enterprise-agentic-ai-architecture',
-      title: 'Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Multi-Layer RAG',
-      subtitle: 'A separation-of-concerns approach to LLM-powered enterprise workflow orchestration with formal guarantees on context isolation, action auditability, and retrieval scoping.',
+      title: 'Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Field-Group Retrieval',
+      subtitle: 'A separation-of-concerns approach to LLM-powered enterprise workflow orchestration inside a single-agent governance envelope, with formal guarantees on context isolation, action auditability, and retrieval scoping over disjoint field-group partitions.',
       date: '2026-03-22',
       tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'PostgreSQL', 'Formal Methods'],
       readingTime: '12 min read',
       abstract:
-        'We formalize an agentic workflow system as a directed graph with persistent state, typed MCP tool contracts, and layered retrieval functions. The architecture provides formal guarantees: context isolation (the LLM never observes sensitive data), action boundary enforcement (all agent actions are typed, logged tool invocations), and retrieval scoping (user document indices are session-partitioned with zero cross-contamination). We prove these properties hold by construction and describe a production implementation for enterprise document workflows.',
+        'We formalize an agentic workflow system as a directed graph with persistent state, typed MCP tool contracts, and two-stage field-group retrieval with N parallel scoped extraction calls. The architecture provides formal guarantees: context isolation (the LLM never observes sensitive data), action boundary enforcement (every agent action is a typed, logged MCP tool invocation), retrieval scoping (field-group partitioning with provenance-preserving dict-union merge), and single-agent envelope (multi-agent behaviour without multi-agent primitives). We prove these properties hold by construction and describe a production implementation for enterprise document workflows at bank scale.',
       status: 'published',
     },
     references: [
@@ -172,14 +172,14 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'enterprise-agentic-ai-framework',
-      title: 'Enterprise Agentic AI Architecture (framework rewrite) — A/B preview',
+      title: 'Enterprise Agentic AI Architecture — Practitioner Rewrite',
       subtitle:
-        'The same PAR Assist system, rewritten in practitioner register via the writing rewrite framework. Decisions + options considered + constraints as first-class structure; the formal math moves to an optional appendix.',
+        'The same PAR Assist system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
       date: '2026-04-22',
-      tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Framework A/B'],
+      tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Single-Agent Envelope'],
       readingTime: '10 min read',
       abstract:
-        'A/B rewrite of the formal Enterprise Agentic AI Architecture post using the writing rewrite framework (OptionsConsidered / ConstraintsBlock / DecisionRationale / BeforeAfterDiff / StepThrough). Same system, practitioner register. Formal math preserved as a bottom appendix for mathematically-inclined readers. [PLACEHOLDER] markers surface the content blocked on the brief\u2019s seven questions (metrics, timeline, war story, code shapes, alternatives actually evaluated).',
+        'PAR Assist — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel Sonnet-4.5 extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
       status: 'published',
     },
     references: [
@@ -202,12 +202,12 @@ export const POSTS: BlogPost[] = [
     meta: {
       slug: 'par-assist-building',
       title: 'How We Built PAR Assist: From Intern POC to Bank-Wide Product',
-      subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind a bank-wide agentic AI platform.',
+      subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind the bank\u2019s first true agentic AI platform.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '9 min read',
       abstract:
-        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 Amplify program became PAR Assist, a bank-wide agentic AI platform that shipped April 2026. Architecture decisions as trade-offs, not theorems: why LangGraph over chains, why MCP tools as the action boundary, why three RAG layers, why PostgreSQL + pgvector. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea. A conversational companion to the formal post that proves context isolation by construction.',
+        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 Amplify program became PAR Assist, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea.',
       status: 'published',
     },
     references: [],

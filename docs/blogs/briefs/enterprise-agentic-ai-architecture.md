@@ -1,13 +1,24 @@
 # Brief: enterprise-agentic-ai-architecture
 
-**Reader level:** engineer
-**Target word count:** ~3,500 (currently ~2,200 in math-heavy form)
-**Companion post:** par-assist-building (director register)
-**Canonical sources:** `data/posts/enterprise-agentic-ai.mdx` + `docs/blogs/HANDOFF_BLOG_PAR_ASSIST.md` + `docs/career/CAREER_KNOWLEDGE_BASE.md` §PAR Assist
+**Status:** ✅ **SHIPPED (2026-04-22, sanitized 2026-04-23)** — three companion surfaces now render the actual system, no fabricated detail remaining.
+
+**Delivered surfaces:**
+
+- `/blog/enterprise-agentic-ai-architecture` — formal math register. Rewritten 2026-04-23 to replace the fabricated three-layer RAG formalism (`R = R₁ ⊕ R₂ ⊕ R₃` over conversation/uploaded-docs/institutional-knowledge) with two-stage field-group retrieval math (`retrieve(q,s) = ⨁_{g ∈ G(q,s)} κ(topₖ(q, 𝒟_g))`). Added theorem: "Single-Agent Envelope" (parallelism via tool-dispatch fan-out, not multi-agent primitives). N parallel scoped extraction with dict-union merge over disjoint field domains is now a formal definition. Context isolation proof updated for the new topology.
+- `/blog/enterprise-agentic-ai-framework` — practitioner register. Built out via the writing rewrite framework components (ConstraintsBlock, OptionsConsidered ×2, DecisionRationale, StepThrough, BeforeAfterDiff). All `[PLACEHOLDER]` tokens resolved in the 2026-04-22 session with architectural details supplied by the owner (groups, N parallel calls, Sonnet-4.5, decision-tree dialog, Postgres one-store, coverage loop, v2 skills teaser).
+- `/blog/par-assist-building` — builder/director register. Surgical rewrite 2026-04-23: removed the "three RAG layers" section; replaced with single-agent envelope constraint + LangGraph maturity rationale + field-group retrieval + N parallel extraction explanation. Caption updated to describe the envelope diagram.
+- `/projects/par-assist` — case study. Narrative aligned with blog posts; diagram is a re-export of the envelope visual so case study + blog share one source of truth.
+
+**Directional-only metric** still pending specific numbers: drafting time before/after, revision-cycle ratio. Memory-flagged to re-ask before any public share.
+
+**Companion post:** `par-assist-building` (director register, shipped 2026-04-17, sanitized 2026-04-23)
+**Canonical sources:** `data/posts/enterprise-agentic-ai.mdx` + `docs/career/CAREER_KNOWLEDGE_BASE.md` + `docs/career/RESUME_RAW.md` §3.1
 
 ---
 
-## Current state audit (against framework §1 spec)
+## Historical planning notes (pre-shipping — preserved as reference)
+
+### Current state audit (against framework §1 spec) — [pre-rewrite snapshot]
 
 | § | Section | Current coverage | Gap |
 |---|---|---|---|

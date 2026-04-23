@@ -1,7 +1,7 @@
 import { AgenticArchitecturePAR } from '@/components/blog/BlogDiagrams'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 
-> **A conversational companion to the formal post [Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Multi-Layer RAG](/blog/enterprise-agentic-ai-architecture).** That post formalizes the system as a directed graph with typed MCP tool contracts and proves context isolation by construction. This one tells the story: how an intern&rsquo;s prototype became a bank-wide product, what architecture decisions we made and why, and the leadership lessons that had nothing to do with the code.
+> **A conversational companion to the formal post [Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Field-Group Retrieval](/blog/enterprise-agentic-ai-architecture).** That post formalizes the system as a directed graph with typed MCP tool contracts, two-stage field-group retrieval, and N parallel scoped extraction calls — and proves context isolation by construction. This one tells the story: how an intern&rsquo;s prototype became the bank&rsquo;s first true agentic AI platform, what architecture decisions we made and why, and the leadership lessons that had nothing to do with the code.
 
 ---
 
@@ -9,7 +9,7 @@ In November 2025, I wrote a one-page plan for an AI system that would transform 
 
 This is the story of how it happened, what I learned about scaling an intern&rsquo;s proof-of-concept into an enterprise product, and why the hardest part had nothing to do with technology.
 
-<VisualizationContainer minHeight={600} caption="PAR Assist architecture at a glance: LangGraph orchestration, MCP tools as the action boundary, three RAG layers, PostgreSQL + pgvector backbone. The rest of the post explains why each piece is shaped the way it is.">
+<VisualizationContainer minHeight={1040} caption="PAR Assist at a glance: the dashed envelope is the v1 single-agent governance scope. Intake → template MCP tool with decision-tree dialog → stage-1 field-group hub → N parallel extraction lanes (top-10 chunks · custom compression · Sonnet-4.5 call per group) → dict-union merge → coverage + follow-ups loop. Postgres rail beneath carries everything. The rest of the post explains why each piece is shaped the way it is.">
 {() => <AgenticArchitecturePAR />}
 </VisualizationContainer>
 
@@ -23,25 +23,23 @@ This wasn&rsquo;t a search problem. It was an orchestration problem.
 
 During the 2025 Amplify internship program, one of the four interns I was managing prototyped a concept: what if an AI assistant could guide you through a PAR step by step? The prototype was rough, a basic chatbot with a single RAG layer, but the insight was sharp. The user didn&rsquo;t need answers. They needed guidance through a process.
 
-I saw the shape of something bigger. Not a chatbot. An agentic platform that could understand where you were in the workflow, pull the right context at the right moment, resolve conflicts between policies automatically, and adapt to any PAR type across any business line.
+I saw it could scale from a one-team prototype to a bank-wide platform. Not a chatbot. An agentic platform that could understand where you were in the workflow, pull the right context at the right moment, resolve conflicts between policies automatically, and adapt to any PAR type across any business line.
 
 ## The architecture decisions
 
-**Why LangGraph over vanilla chains.** A PAR workflow isn&rsquo;t linear. At any point, the system might need to clarify an ambiguity, resolve a conflict between two policy documents, or switch templates because the user&rsquo;s project type changed mid-draft. LangGraph models this as a directed graph with persistent state. Conditional routing based on workflow state is the core capability. Sequential chains couldn&rsquo;t express it.
+**The governance constraint that shaped everything.** PAR Assist was the first true agentic system approved for production at the bank. The governance envelope for v1 was a single agent, one approved scope — no multi-agent orchestration. Every architectural decision below had to deliver agentic *behaviour* (branching dialog, parallel specialized work, multi-turn state) without crossing into multi-agent *shape*. That constraint is the spine of the system.
 
-**Why MCP tools as the action boundary.** Every action the agent takes is a typed, logged tool invocation: template selection, field assignment, conflict resolution, ambiguity detection. No invisible prompt engineering. Every decision is auditable. In a regulated environment, that&rsquo;s not optional.
+**Why LangGraph over CrewAI / AutoGen.** Two reasons, in that order. First: at evaluation time LangGraph was the most mature, stable graph-orchestration library — production-deployed elsewhere, active maintenance. In a regulated-finance first-deployment context, stable-and-maintained outranks elegant-on-paper. Second: the drafting session is shaped like a graph, not a pipeline — template selection, field-group retrieval, extraction, sometimes loop back to clarify open follow-ups. LangGraph&rsquo;s checkpointer wires directly into Postgres, so session durability comes for free. CrewAI and AutoGen were considered but not deeply evaluated — multi-agent primitives wouldn&rsquo;t have cleared the single-agent governance bar anyway.
 
-**Why three RAG layers, not one.** A single RAG layer couldn&rsquo;t handle the retrieval complexity of an enterprise workflow:
+**Why MCP tools as the action boundary.** Every action the agent takes is a typed, logged tool invocation — template selection, retrieval, compression, extraction, merge, coverage. No invisible prompt engineering. With MCP, the property *every action lands in the audit log* is structural, not aspirational — the engine dispatches actions only through the tool registry, so no code path exists outside it. In a regulated environment, that guarantee isn&rsquo;t optional.
 
-- **Conversation history** (session-scoped): so the agent never loses context across a 30-minute drafting session.
-- **Uploaded documents** (user-scoped): PDFs, decks, Word docs the user brings to the table, chunked and embedded on the fly, invisible to every other user.
-- **Institutional knowledge** (global scope): policies, templates, historical examples, best practices, used to select the right prompts for each field.
+**Why field-group retrieval beat flat RAG.** A PAR has hundreds of target fields across templates, most of them partially repeating across template types. Flat top-k retrieval surfaces chunks from unrelated fields — too much relevant-looking text, not enough that maps to a specific field. We organized the knowledge base around the *target* the LLM extracts toward: field groups aggregate logically related fields across templates. Stage-1 retrieval picks relevant groups for the session; stage-2 retrieves top-10 chunks per group; custom compression fits them into a Sonnet-4.5 system prompt that carries up to 20 fields of rich metadata. Flat RAG would work for a Q&A chatbot. It doesn&rsquo;t work for structured extraction across a template with categorically different fields.
 
-Each layer has its own retrieval function, relevance threshold, and scope rules. The results are combined before being passed to the agent.
+**How we got N parallel extraction inside a single-agent envelope.** The problem shape wanted specialist sub-agents per field domain. Governance said no. The architecture that slipped through: the relevant group count N from stage-1 retrieval becomes the parallelism — up to N Sonnet-4.5 calls fire at once, each carrying its group&rsquo;s compressed chunks, ≤20 fields of metadata, and guardrails + few-shot good/bad examples scoped to its group. Each returns a JSON dictionary. The merge is a dict union (groups disjoint by construction). From the outside it looks agentic: branching dialog, parallel specialized work. From governance review, it&rsquo;s one agent calling tools.
 
-**Why PostgreSQL + pgvector.** Structured metadata and vector embeddings in one transactional store. No sync problems between vector store and application database, no two-system consistency headaches.
+**Why PostgreSQL is the backbone.** One store for LangGraph checkpoints, tool-invocation logs, raw ingested content, mapped intermediates, embeddings (via pgvector), and audit trail. Unusual — retrieval usually sits in a dedicated vector store — but at PAR scale pgvector is sufficient, and co-locating state with embeddings with audit means a full session provenance is a handful of joins. Backup / replication / access control only solved once.
 
-**Context isolation.** The LLM parses intent and routes. It never sees sensitive operational data. All data access happens through MCP tools and deterministic Python code. The code paths that touch sensitive data and the code paths that touch the LLM are physically separate. This isn&rsquo;t a prompt engineering trick. It&rsquo;s an architectural guarantee. The formal post proves this property by construction. The informal version: you can&rsquo;t leak what you can&rsquo;t reach.
+**Context isolation.** The LLM operates at intent parsing and extraction nodes only. Sensitive data access happens exclusively through MCP tools in a separate context. This isn&rsquo;t a prompt-engineering trick; it&rsquo;s a structural invariant the graph topology enforces. The formal post proves it by construction. The informal version: you can&rsquo;t leak what you can&rsquo;t reach.
 
 ## The leadership lessons
 
@@ -55,7 +53,7 @@ The hardest part wasn&rsquo;t the architecture. It was three things.
 
 ## The result
 
-PAR Assist ships bank-wide on April 16, 2026. Less than three months from when real development started. What was weeks of manual drafting becomes a guided interactive session. It targets key PAR authors: project sponsors, senior leaders, PMO teams, across all RBC business lines.
+PAR Assist&rsquo;s pilot launched in April 2026, less than three months from when real development started after holidays and team restructuring. Enterprise rollout across RBC business lines continues through Q2 and Q3 2026. What was weeks of manual drafting becomes a guided interactive session — one that cites every extracted field back to a policy, guideline, or few-shot example. It targets key PAR authors: project sponsors, senior leaders, PMO teams, across all RBC business lines. And crucially, v1 is the substrate the v2 multi-agent &ldquo;skills&rdquo; framework is being built on — not a throwaway, but the part of v2 that already passed governance review.
 
 ## What I&rsquo;d do differently
 
@@ -67,10 +65,10 @@ Involve end users (PAR authors) earlier in the design process. We built based on
 
 PAR Assist follows the same closed-loop pattern as every system I&rsquo;ve built.
 
-- **Sense.** Ingest policies, documents, user input.
-- **Model.** LangGraph agents reason about intent and context.
-- **Optimize.** RAG retrieval, MCP tool selection, disambiguation.
-- **Act.** Guided enterprise decisions, auditable end to end.
+- **Sense.** Ingest uploaded material (pptx / docx / pdf / txt / images via GPT-4-turbo OCR); template MCP tool classifies the PAR type via decision-tree dialog.
+- **Model.** Stage-1 retrieval picks relevant field groups; stage-2 retrieves top-10 chunks per group; custom compression fits them into scoped prompts.
+- **Optimize.** N parallel Sonnet-4.5 extraction calls; dict-union merge; coverage analyzer surfaces intelligent follow-ups.
+- **Act.** Rendered PAR draft with every field cited back to its source, auditable end to end via one Postgres store.
 
 The technology is different from Particle Swarm Optimization on a 900MW coal plant. The architecture is the same. The formal post [makes that isomorphism rigorous](/blog/closed-loop). This post is the version I&rsquo;d tell you at lunch.
 
