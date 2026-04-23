@@ -147,16 +147,17 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     title: 'PAR Assist',
     subtitle: 'Enterprise Agentic AI Platform — RBC Bank-wide',
     role: 'Conceived vision, led strategic + technical requirements',
-    stack: ['LangGraph', 'MCP', 'PostgreSQL', 'Embeddings', 'Custom RAG'],
+    stack: ['LangGraph', 'MCP', 'PostgreSQL + pgvector', 'Sonnet 4.5', 'Field-group RAG'],
     heroMetric: { value: PAR_ASSIST_SCALE, label: 'Target Scale' },
     caption:
-      'Enterprise-wide agentic drafting platform for Project Approval Requests. LangGraph orchestration with MCP tools, multi-layer RAG, and semantic search — from intern POC to bank-wide initiative.',
+      'The bank’s first true agentic AI platform. Single-agent governance envelope, LangGraph on Postgres, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls merging as dict-union, coverage + follow-ups loop.',
     description:
       'Enterprise-wide drafting tool for Project Approval Requests — a critical governance process. Acts as a personal assistant guiding users through each step, utilizing metadata, rules, policies, historical examples, and best practices.',
     highlights: [
-      'LangGraph agentic orchestration with MCP tools for template selection, field assignment, conflict resolution, and ambiguity checks',
-      'Multi-layer custom/dynamic RAG: conversation history, uploaded documents (PDF, PPTX, DOCX, TXT), and field assignment prompts',
-      'Chunking and embedding pipeline for enterprise documents with semantic search',
+      'First agentic framework approved for production at the bank — agentic behaviour (branching dialog, N parallel extraction) inside a single-agent governance envelope',
+      'Two-stage field-group retrieval: stage-1 picks relevant field groups, stage-2 retrieves top-10 chunks per group, custom compression feeds Sonnet-4.5 calls',
+      'N parallel extraction calls (one per relevant group, ≤20 fields + guardrails + few-shot good/bad per prompt) merging as a deterministic dict-union',
+      'Every action is a typed MCP tool dispatched through LangGraph — auditability structural, not aspirational. One Postgres store for state, logs, embeddings, and audit trail.',
       'Originated from the Amplify internship program — scaled from intern POC to bank-wide initiative',
     ],
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },

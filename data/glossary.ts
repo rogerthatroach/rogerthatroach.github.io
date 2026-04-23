@@ -60,10 +60,14 @@ export const GLOSSARY: Record<string, string> = {
 
   // ── Technical concepts ──
   LangGraph:
-    'Graph-based LLM orchestration library. Chosen for PAR Assist over plain LangChain chains because PAR workflows branch conditionally (template selection → field assignment → conflict resolution loops back).',
-  MCP: 'Model Context Protocol — emerging standard for exposing tools to LLM agents. PAR Assist uses MCP for template selection, field assignment, conflict resolution, ambiguity detection.',
+    'Graph-based LLM orchestration library. Picked for PAR Assist for maturity (most stable orchestrator at evaluation time) and because PAR drafting is a conditional-branching workflow — template selection → field-group retrieval → extraction → coverage loops back on open follow-ups.',
+  MCP: 'Model Context Protocol — emerging standard for typed, logged tool contracts. In PAR Assist every action (template selection, retrieval, compression, extraction, merge, coverage) is an MCP tool dispatched through the graph engine, so auditability is structural, not aspirational.',
   pgvector:
-    'PostgreSQL vector-similarity extension. PAR Assist uses it alongside relational PAR metadata so embeddings stay co-located with the data they describe.',
+    'PostgreSQL vector-similarity extension. PAR Assist uses pgvector alongside LangGraph checkpoints + logs + raw/mapped content + audit trail — one Postgres store holds every layer of the session, so the full provenance for any draft is one query away.',
+  'field-group retrieval':
+    'PAR Assist\'s two-stage retrieval pattern. Stage 1 picks which logically-related field groups are relevant to the session. Stage 2 runs similarity search within each group for top-10 chunks, then custom compression fits them into a Sonnet-4.5 prompt with up to 20 fields of rich metadata per call.',
+  'single-agent envelope':
+    'The governance constraint behind PAR Assist v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
   'Command-A':
     'Cohere\'s agent-oriented LLM used in Astraeus. Its context limits drove the refactor from a monolith agent into 3 parallel sub-agents (EPM / Headcount / Open Positions).',
   PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS for closed-loop boiler control.',
