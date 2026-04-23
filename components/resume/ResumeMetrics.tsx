@@ -28,7 +28,7 @@ const RESUME_METRICS = [
   },
   {
     value: String(PRODUCTION_SYSTEMS_COUNT),
-    label: 'Production AI Systems',
+    label: 'Production Gen AI Systems',
     context: 'PAR Assist · Astraeus · Aegis',
   },
 ];

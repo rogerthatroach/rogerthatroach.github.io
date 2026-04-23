@@ -33,7 +33,7 @@ export const HERO = {
 
 export const HERO_SUMMARY = [
   `${AWARDS_COUNT} awards`,
-  `${PRODUCTION_SYSTEMS_COUNT} production systems`,
+  `${PRODUCTION_SYSTEMS_COUNT} production Gen AI systems`,
   `${YEARS_EXPERIENCE} years`,
 ] as const;
 
