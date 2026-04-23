@@ -22,6 +22,19 @@ export interface BlogPostMeta {
     | 'commodity-tax'
     | 'document-intelligence'
     | 'combustion-tuning';
+  /**
+   * Register / reader-level tag — rendered on the /blog index as a
+   * wabi-sabi glyph in each card's top-right corner, so a reader
+   * coming in can see which of a project's multiple posts to open
+   * first without opening all of them.
+   *
+   *   - 'formal'       — theorem / proof / math register
+   *   - 'practitioner' — decisions + options considered + rationale
+   *   - 'builder'      — narrative / director / story register
+   *
+   * Posts without this field render no tag.
+   */
+  register?: 'formal' | 'practitioner' | 'builder';
 }
 
 export interface Reference {
@@ -68,6 +81,7 @@ export const POSTS: BlogPost[] = [
         'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee transits across ~9,000 organizational rollups with millisecond-level response times, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
       status: 'published',
       projectId: 'workforceAnalytics',
+      register: 'formal',
     },
     references: [
       { id: 1, authors: 'Zhao, W.X. et al.', title: 'A Survey of Large Language Models', venue: 'arXiv preprint arXiv:2303.18223', year: 2023, url: 'https://arxiv.org/abs/2303.18223' },
@@ -101,6 +115,7 @@ export const POSTS: BlogPost[] = [
         'We present a five-stage decomposed pipeline — intent parsing, KPI detection via embedding similarity, LLM-assisted disambiguation, guardrailed SQL generation, and deterministic formatting — for converting natural-language financial queries into validated SQL. The architecture provides formal safety guarantees: injection impossibility by construction, schema compliance, and disambiguation correctness.',
       status: 'published',
       projectId: 'financialBenchmarking',
+      register: 'formal',
     },
     references: [
       { id: 1, authors: 'Pourreza, M. & Rafiei, D.', title: 'DIN-SQL: Decomposed In-Context Learning of Text-to-SQL with Self-Correction', venue: 'NeurIPS', year: 2023 },
@@ -130,6 +145,7 @@ export const POSTS: BlogPost[] = [
       abstract:
         'We examine the closed-loop optimization pattern — sense, model, optimize, act — as it manifests across four domains: industrial PSO for combustion tuning at a 900MW coal plant, cloud document processing, financial process automation, and enterprise agentic AI. We demonstrate structural isomorphism across levels and argue that pattern recognition across abstraction levels constitutes a design methodology.',
       status: 'published',
+      register: 'formal',
     },
     references: [
       { id: 1, authors: 'Kennedy, J. & Eberhart, R.', title: 'Particle Swarm Optimization', venue: 'Proceedings of ICNN\'95 — International Conference on Neural Networks', year: 1995 },
@@ -162,6 +178,7 @@ export const POSTS: BlogPost[] = [
         'We formalize an agentic workflow system as a directed graph with persistent state, typed MCP tool contracts, and two-stage field-group retrieval with N parallel scoped extraction calls. The architecture provides formal guarantees: context isolation (the LLM never observes sensitive data), action boundary enforcement (every agent action is a typed, logged MCP tool invocation), retrieval scoping (field-group partitioning with provenance-preserving dict-union merge), and single-agent envelope (multi-agent behaviour without multi-agent primitives). We prove these properties hold by construction and describe a production implementation for enterprise document workflows at bank scale.',
       status: 'published',
       projectId: 'funding-request-drafting',
+      register: 'formal',
     },
     references: [
       { id: 1, authors: 'Yao, S. et al.', title: 'ReAct: Synergizing Reasoning and Acting in Language Models', venue: 'ICLR', year: 2023 },
@@ -200,6 +217,7 @@ export const POSTS: BlogPost[] = [
         'AI/LLM Drafting Platform — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel approved foundation model extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
       status: 'published',
       projectId: 'funding-request-drafting',
+      register: 'practitioner',
     },
     references: [
       { id: 1, authors: 'Yao, S. et al.', title: 'ReAct: Synergizing Reasoning and Acting in Language Models', venue: 'ICLR', year: 2023 },
@@ -229,6 +247,7 @@ export const POSTS: BlogPost[] = [
         'The story of how an intern\u2019s one-page proof-of-concept during the 2025 Amplify program became AI/LLM Drafting Platform, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea.',
       status: 'published',
       projectId: 'funding-request-drafting',
+      register: 'builder',
     },
     references: [],
     furtherReading: [
@@ -252,6 +271,7 @@ export const POSTS: BlogPost[] = [
         'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building WorkforceAnalytics \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
       status: 'draft',
       projectId: 'workforceAnalytics',
+      register: 'builder',
     },
     references: [],
     furtherReading: [
@@ -317,6 +337,7 @@ export const POSTS: BlogPost[] = [
         'FinancialBenchmarking v2 shipped in two weeks while WorkforceAnalytics was mid-flight and the Amplify program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the WorkforceAnalytics LLM-as-Router pattern \u2014 same family, tighter intent classification.',
       status: 'draft',
       projectId: 'financialBenchmarking',
+      register: 'builder',
     },
     references: [],
     furtherReading: [
@@ -350,6 +371,7 @@ export const POSTS: BlogPost[] = [
         'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into FinancialBenchmarking v1/v2, WorkforceAnalytics, AI/LLM Drafting Platform). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
       status: 'published',
       projectId: 'commodity-tax',
+      register: 'practitioner',
     },
     references: [],
     furtherReading: [
@@ -388,6 +410,7 @@ export const POSTS: BlogPost[] = [
         'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the stakeholder dynamics of automating institutional knowledge, and the cascade of AI initiatives this first project underwrote: FinancialBenchmarking v1, FinancialBenchmarking v2, WorkforceAnalytics, AI/LLM Drafting Platform.',
       status: 'draft',
       projectId: 'commodity-tax',
+      register: 'builder',
     },
     references: [],
     furtherReading: [
