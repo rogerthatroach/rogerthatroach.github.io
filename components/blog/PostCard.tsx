@@ -11,6 +11,17 @@ interface PostCardProps {
   index: number;
 }
 
+// Wabi-sabi glyphs for the three register marks. Picked for restraint
+// over loudness — single characters, muted, generous space around them.
+// '§' rigid section mark fits formal/theorem register; '¶' pilcrow fits
+// the prose of decisions and options; '◯' open circle fits narrative/
+// story register (emptiness, spaciousness, the wabi-sabi side).
+const REGISTER_MARK: Record<NonNullable<BlogPostMeta['register']>, { glyph: string; label: string }> = {
+  formal:       { glyph: '§', label: 'formal' },
+  practitioner: { glyph: '¶', label: 'practitioner' },
+  builder:      { glyph: '◯', label: 'builder' },
+};
+
 export default function PostCard({ post, index }: PostCardProps) {
   const { ref, handleMouseMove, handleMouseLeave } = useTilt<HTMLDivElement>();
 
@@ -26,9 +37,23 @@ export default function PostCard({ post, index }: PostCardProps) {
     >
       <Link
         href={`/blog/${post.slug}`}
-        className="group flex min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
+        className="group relative flex min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
       >
-        <h2 className="line-clamp-2 text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
+        {post.register && (
+          <div
+            aria-label={`Register: ${REGISTER_MARK[post.register].label}`}
+            className="pointer-events-none absolute right-5 top-5 flex items-baseline gap-1.5 text-text-tertiary/70 transition-colors group-hover:text-text-tertiary"
+          >
+            <span className="font-display text-base leading-none" aria-hidden="true">
+              {REGISTER_MARK[post.register].glyph}
+            </span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em]">
+              {REGISTER_MARK[post.register].label}
+            </span>
+          </div>
+        )}
+
+        <h2 className="line-clamp-2 pr-20 text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
           {post.title}
         </h2>
         <p className="mt-1 line-clamp-2 text-sm text-text-secondary">{post.subtitle}</p>
