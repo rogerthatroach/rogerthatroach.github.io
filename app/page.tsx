@@ -70,7 +70,7 @@ export default function Home() {
             </Link>
           </div>
           <p className="mb-6 max-w-2xl text-sm text-text-secondary">
-            Six systems across eight years. From power plant combustion tuning to bank-wide agentic
+            Six systems across 7.5+ years. From power plant combustion tuning to bank-wide agentic
             AI.
           </p>
 

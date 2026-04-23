@@ -44,7 +44,7 @@ export const PAPERS: Paper[] = [
     subtitle:
       'Patterns, constraints, and decisions for building agentic AI inside a regulated financial function.',
     abstract:
-      'Most AI-adoption writing is framed from the builder side — frameworks, benchmarks, and tool choices. This paper is written from inside a bank CFO function: what the constraints actually look like, how decisions get made, which patterns transfer from industrial ML and cloud ML, and where regulated-finance AI diverges. The goal is to hand a useful map to the AI leader joining a bank, and a useful vocabulary to the bank leader hiring one. Eight years of pattern — sense, model, optimize, act — applied to physical, cloud, financial, and agentic substrates, with the last substrate worked out in detail. No proprietary code or data; patterns only.',
+      'Most AI-adoption writing is framed from the builder side — frameworks, benchmarks, and tool choices. This paper is written from inside a bank CFO function: what the constraints actually look like, how decisions get made, which patterns transfer from industrial ML and cloud ML, and where regulated-finance AI diverges. The goal is to hand a useful map to the AI leader joining a bank, and a useful vocabulary to the bank leader hiring one. 7.5+ years of pattern — sense, model, optimize, act — applied to physical, cloud, financial, and agentic substrates, with the last substrate worked out in detail. No proprietary code or data; patterns only.',
     year: 2026,
     pages: 12,
     draftStarted: '2026-04-22',
