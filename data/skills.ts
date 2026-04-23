@@ -72,7 +72,7 @@ export const SKILLS: Skill[] = [
   // ─── GenAI & Agentic ───
   { name: 'LangGraph', category: 'genai', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
   { name: 'MCP (Model Context Protocol)', category: 'genai', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'Multi-layer RAG', category: 'genai', firstShipped: 2024, anchorProject: 'EDS Automation → AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'Field-group RAG (two-stage retrieval)', category: 'genai', firstShipped: 2024, anchorProject: 'EDS Automation → AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
   { name: 'Text-to-SQL', category: 'genai', firstShipped: 2025, anchorProject: 'FinancialBenchmarking v2', anchorLink: '/projects/financialBenchmarking' },
   { name: 'Embeddings / semantic search', category: 'genai', firstShipped: 2025, anchorProject: 'FinancialBenchmarking v2 KPI disambiguation', anchorLink: '/projects/financialBenchmarking' },
   { name: 'Prompt engineering', category: 'genai', firstShipped: 2024, anchorProject: 'All RBC GenAI work' },
