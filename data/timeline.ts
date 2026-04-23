@@ -192,6 +192,7 @@ export const TIMELINE: TimelineNode[] = [
     period: '2021 – 2022',
     org: 'Quantiphi Inc.',
     role: 'Machine Learning Engineer',
+    logoPath: '/images/logos/quantiphi.svg',
     description:
       'Deployed ML models on Google Cloud for insurance and financial clients. Document verification pipelines, Vertex AI, entity extraction at scale.',
     skills: ['GCP', 'Vertex AI', 'AutoML', 'Document AI', 'SQL', 'Tableau'],
