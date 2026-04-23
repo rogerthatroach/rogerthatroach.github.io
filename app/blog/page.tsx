@@ -101,6 +101,44 @@ export default function BlogIndexPage() {
           a set.
         </p>
 
+        {/* Register legend — quiet, single-line. The glyph + word beside
+            each card in its top-right mirrors these three marks. */}
+        <dl className="mt-6 flex flex-wrap items-baseline gap-x-6 gap-y-2 text-[11px] text-text-tertiary">
+          <div className="flex items-baseline gap-1.5">
+            <dt aria-hidden="true" className="font-display text-base leading-none">
+              §
+            </dt>
+            <dd className="font-mono uppercase tracking-[0.18em]">
+              formal
+              <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
+                theorem · proof · math
+              </span>
+            </dd>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <dt aria-hidden="true" className="font-display text-base leading-none">
+              ¶
+            </dt>
+            <dd className="font-mono uppercase tracking-[0.18em]">
+              practitioner
+              <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
+                decisions · options considered · rationale
+              </span>
+            </dd>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <dt aria-hidden="true" className="font-display text-base leading-none">
+              ◯
+            </dt>
+            <dd className="font-mono uppercase tracking-[0.18em]">
+              builder
+              <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
+                story · lessons · leadership
+              </span>
+            </dd>
+          </div>
+        </dl>
+
         {groups.length === 0 ? (
           <p className="mt-16 text-center text-sm text-text-tertiary">Posts coming soon.</p>
         ) : (
