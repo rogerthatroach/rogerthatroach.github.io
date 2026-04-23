@@ -18,7 +18,7 @@ export const GLOSSARY: Record<string, string> = {
   'AI/LLM Drafting Platform':
     'Enterprise-wide agentic AI platform guiding project funding request drafting. Bank-wide pilot launched April 2026; rollout through Q2/Q3 2026.',
   WorkforceAnalytics:
-    'Production analytics platform for CFO Group — millisecond slicing across ~40K transits. GPT for intent routing only; deterministic agents handle all computation.',
+    'Production analytics platform for CFO Group — millisecond slicing across ~40K transits with event-level ins-outs math (Cython-compiled). approved foundation model used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
   'FinancialBenchmarking v1':
     'Canadian Supplementary Benchmarking engine for peer-bank KPI comparisons (Big 6). Productionized 2024. 2025 CFO One RBC Team Award.',
   'FinancialBenchmarking v2':
@@ -69,7 +69,7 @@ export const GLOSSARY: Record<string, string> = {
   'single-agent envelope':
     'The governance constraint behind AI/LLM Drafting Platform v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
   'approved foundation model':
-    'An approved pretrained foundation model accessed through internal model endpoints.',
+    'The model used in WorkforceAnalytics for all LLM calls (parse, route, metadata extract, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
   PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS for closed-loop boiler control.',
   'closed-loop':
     'Sense → model → optimize → act. The pattern that repeats across every role in my career, at progressively higher abstraction levels.',

@@ -125,10 +125,10 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: 'WorkforceAnalytics',
         oneLiner:
-          'Production analytics platform for CFO Group — dynamic headcount, HR costs, open positions at bank scale with millisecond slicing.',
+          'Production analytics platform for CFO Group — dynamic headcount, HR costs, open positions at bank scale with millisecond slicing. Production since Nov 2025.',
         decisionRationale:
-          'Deterministic agents + GPT for intent routing only — regulated finance cannot tolerate LLM hallucination on numbers. Refactored monolith → 3 parallel sub-agents (EPM / Headcount / Open Positions) because approved foundation model context limits made a single agent infeasible.',
-        metric: { value: '~40K transits', label: 'analyzed in ms' },
+          'Two-wall architecture. approved foundation model on the intent side (parse, route, metadata extract, synthesis — never touches data). Cython-compiled Python on the compute side, with EPM-to-SQL entitlement chain applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail.',
+        metric: { value: '~40K transits', label: 'arbitrary combinations · ms' },
         caseStudyLink: '/projects/workforceAnalytics',
       },
       {
