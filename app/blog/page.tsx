@@ -94,50 +94,58 @@ export default function BlogIndexPage() {
           <ArrowLeft size={16} />
           Home
         </Link>
-        <h1 className="font-display text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
-        <p className="mt-2 max-w-2xl text-base text-text-secondary">
-          Technical explorations — architecture patterns, formal guarantees, and the systems
-          thinking behind the work. Grouped by project so posts about the same system read as
-          a set.
-        </p>
 
-        {/* Register legend — quiet, single-line. The glyph + word beside
-            each card in its top-right mirrors these three marks. */}
-        <dl className="mt-6 flex flex-wrap items-baseline gap-x-6 gap-y-2 text-[11px] text-text-tertiary">
-          <div className="flex items-baseline gap-1.5">
-            <dt aria-hidden="true" className="font-display text-base leading-none">
-              §
-            </dt>
-            <dd className="font-mono uppercase tracking-[0.18em]">
-              formal
-              <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
-                theorem · proof · math
-              </span>
-            </dd>
-          </div>
-          <div className="flex items-baseline gap-1.5">
-            <dt aria-hidden="true" className="font-display text-base leading-none">
-              ¶
-            </dt>
-            <dd className="font-mono uppercase tracking-[0.18em]">
-              practitioner
-              <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
-                decisions · options considered · rationale
-              </span>
-            </dd>
-          </div>
-          <div className="flex items-baseline gap-1.5">
-            <dt aria-hidden="true" className="font-display text-base leading-none">
-              ◯
-            </dt>
-            <dd className="font-mono uppercase tracking-[0.18em]">
-              builder
-              <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
-                story · lessons · leadership
-              </span>
-            </dd>
-          </div>
-        </dl>
+        {/* Sticky header: title + subtitle + register legend stay pinned
+            below the nav while the grouped cards scroll beneath. The
+            translucent background + soft bottom border give the surface
+            enough contrast to separate from scrolling content without
+            breaking the wabi-sabi restraint. */}
+        <div className="sticky top-16 z-20 -mx-6 border-b border-border-subtle/40 bg-background/85 px-6 pb-5 pt-3 backdrop-blur-md md:-mx-16 md:px-16">
+          <h1 className="font-display text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
+          <p className="mt-2 max-w-2xl text-base text-text-secondary">
+            Technical explorations — architecture patterns, formal guarantees, and the systems
+            thinking behind the work. Grouped by project so posts about the same system read as
+            a set.
+          </p>
+
+          {/* Register legend — quiet, single-line. The glyph + word beside
+              each card in its top-right mirrors these three marks. */}
+          <dl className="mt-5 flex flex-wrap items-baseline gap-x-6 gap-y-2 text-[11px] text-text-tertiary">
+            <div className="flex items-baseline gap-1.5">
+              <dt aria-hidden="true" className="font-display text-base leading-none">
+                §
+              </dt>
+              <dd className="font-mono uppercase tracking-[0.18em]">
+                formal
+                <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
+                  theorem · proof · math
+                </span>
+              </dd>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <dt aria-hidden="true" className="font-display text-base leading-none">
+                ¶
+              </dt>
+              <dd className="font-mono uppercase tracking-[0.18em]">
+                practitioner
+                <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
+                  decisions · options considered · rationale
+                </span>
+              </dd>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <dt aria-hidden="true" className="font-display text-base leading-none">
+                ◯
+              </dt>
+              <dd className="font-mono uppercase tracking-[0.18em]">
+                builder
+                <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
+                  story · lessons · leadership
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </div>
 
         {groups.length === 0 ? (
           <p className="mt-16 text-center text-sm text-text-tertiary">Posts coming soon.</p>
