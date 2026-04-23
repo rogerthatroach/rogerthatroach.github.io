@@ -1,4 +1,5 @@
-import { AgenticArchitecture, SubAgentExecution, EPMTranslation, FullSystemArchitecture, EventModelAnimation } from "@/components/blog/BlogDiagrams"
+import { AgenticArchitecture, SubAgentExecution, EPMTranslation, EventModelAnimation } from "@/components/blog/BlogDiagrams"
+import AstraeusCascade from '@/components/blog/diagrams/AstraeusCascade'
 import MathBlock from '@/components/blog/MathBlock';
 import { tex } from '@/lib/katex';
 import InlineEquation from '@/components/blog/InlineEquation';
@@ -8,10 +9,10 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern — **LLM-as-Router** — that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent detection layer and a deterministic computation layer, prove that this architecture preserves data confidentiality under defined threat models, and describe a production implementation processing ~40,000 employee transits across ~9,000 organizational rollups with millisecond-level query response for a major bank's CFO Group.
+Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern — **LLM-as-Router** — that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group — up to six GPT-4.1 calls per query (parse, route, up to three parallel metadata extractions, one-or-three-then-combined synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee transits with millisecond response times.
 
-<VisualizationContainer minHeight={500} caption="Full System Architecture: Two-layer LLM-as-Router pattern with parallel sub-agents and entitlement enforcement">
-  {(isVisible) => <FullSystemArchitecture />}
+<VisualizationContainer minHeight={900} caption="Figure 1. The Cascade. Two dashed walls separate the three bands: LLM intent (parse / route / metadata extract), deterministic Cython-compiled compute with EPM entitlement chain and event-level ins-outs math, LLM synthesis (one call or up to three parallel final subagents, then combined). Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
+  {(isVisible) => <AstraeusCascade />}
 </VisualizationContainer>
 
 ## 1. Introduction
@@ -108,13 +109,21 @@ where:
 
 The intent space is finite and enumerable, which is what makes the downstream agents deterministic — they handle a known set of structured inputs, not open-ended natural language.
 
-### 3.3 Sub-Agent Orchestration
+### 3.3 Call Layering and Sub-Agent Orchestration
 
-The computation layer consists of <InlineEquation html={tex("k")} /> specialized sub-agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
+The production system organizes LLM work into **up to six calls per query** arranged in three phases. The first two phases sit on the LLM *intent* side of the deterministic wall; the third phase sits on the LLM *synthesis* side.
+
+**Phase 1 — Parse and route (two LLM calls).** A parse call extracts structured intent from the natural-language query; a route call decides whether the query is in scope for the Astraeus domain and, if so, which downstream phase to invoke. If the query is out of scope, execution terminates here — neither phase 2 nor the deterministic compute layer is touched.
+
+**Phase 2 — Metadata extraction (up to three parallel LLM calls, conditional).** When the routing decision warrants, one metadata-extract call fires per candidate domain (Headcount, HR Costs, Open Positions), in parallel. Each call returns a structured parameter set scoped to its domain — time range, organizational scope, comparison shape — *without* any data access. This is the final LLM touch before the first wall.
+
+**Phase 3 — Synthesis (one call, or up to three parallel final sub-agents then combined).** After the deterministic layer returns aggregates, the system either (path A) issues a single synthesis call to compose the answer, or (path B) fans out to up to three parallel final sub-agents — one for EPM/cost, one for headcount, one for open positions — whose outputs are combined deterministically into the user-facing response. The choice between path A and path B is made by the phase-1 router based on the cross-domain structure of the query.
+
+Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
 
 <MathBlock html={tex("\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})", true)} />
 
-In the production system, <InlineEquation html={tex("k = 3")} />: an EPM/cost agent, a headcount agent, and an open positions agent. These execute in parallel:
+In the production system <InlineEquation html={tex("k = 3")} />: an EPM/cost agent, a headcount agent, and an open positions agent. These execute in parallel:
 
 <MathBlock html={tex("\\mathcal{A}_{\\text{compute}} = A_1 \\| A_2 \\| A_3", true)} />
 
@@ -285,7 +294,7 @@ This is guaranteed by construction, not by post-hoc reconciliation. The event mo
 
 ## 7. Production Validation
 
-The architecture has been deployed in production serving a major bank's CFO Group with the following measured characteristics:
+The architecture has been deployed in production at a major bank's CFO Group since November 2025, with the following measured characteristics:
 
 <div className="my-6 overflow-x-auto">
   <table className="w-full text-sm">
@@ -297,38 +306,62 @@ The architecture has been deployed in production serving a major bank's CFO Grou
     </thead>
     <tbody className="text-text-secondary">
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Employee transits processed</td>
-        <td className="py-2 font-mono">~40,000</td>
+        <td className="py-2 pr-4">LLM model</td>
+        <td className="py-2 font-mono">GPT-4.1 (intent side only)</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Organizational rollups</td>
+        <td className="py-2 pr-4">LLM calls per query</td>
+        <td className="py-2 font-mono">Up to 6 (1 parse · 1 route · up to 3 metadata · 1 or up to 3 synthesis)</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Deterministic compute</td>
+        <td className="py-2 font-mono">Cython-compiled Python</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Employee transits processed</td>
+        <td className="py-2 font-mono">~40,000 (leaves; arbitrary-combination queryable)</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Parent rollups</td>
         <td className="py-2 font-mono">~9,000</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Geographies</td>
+        <td className="py-2 pr-4">Business-hierarchy nodes</td>
+        <td className="py-2 font-mono">~80,000</td>
+      </tr>
+      <tr className="border-b border-border-subtle/50">
+        <td className="py-2 pr-4">Geography-hierarchy nodes</td>
         <td className="py-2 font-mono">~60,000</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">Query response latency</td>
-        <td className="py-2 font-mono">Millisecond-level</td>
+        <td className="py-2 font-mono">Millisecond-level across arbitrary cuts</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Sub-agent count</td>
-        <td className="py-2 font-mono">3 (parallel)</td>
+        <td className="py-2 pr-4">Final sub-agent count (synthesis side)</td>
+        <td className="py-2 font-mono">3 (EPM / Headcount / Open Positions), parallel</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">LLM data exposure</td>
         <td className="py-2 font-mono">Zero (by construction, per Theorem 1)</td>
       </tr>
-      <tr>
+      <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">Entitlement model</td>
         <td className="py-2 font-mono">EPM-to-SQL (per Section 5)</td>
+      </tr>
+      <tr>
+        <td className="py-2 pr-4">Persistence</td>
+        <td className="py-2 font-mono">Single Postgres (event log · entitlement catalog · hierarchies · audit)</td>
       </tr>
     </tbody>
   </table>
 </div>
 
 The system delivers financial insights through three channels: a production-grade dynamic dashboard, a conversational chatbot interface, and inbox-ready HTML reports — all enforcing the same entitlement model.
+
+### 7.1 The "Impossible" Capability
+
+Before Astraeus, dynamic *ins-outs* analysis — *"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"* — was off the table. Previous attempts had modelled the problem as factorial: with ~40K transits queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in milliseconds.
 
 ## 8. Related Work
 

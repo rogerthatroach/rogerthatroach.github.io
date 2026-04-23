@@ -18,7 +18,7 @@ export const GLOSSARY: Record<string, string> = {
   'PAR Assist':
     'Enterprise-wide agentic AI platform guiding Project Approval Request drafting. Bank-wide pilot launched April 2026; rollout through Q2/Q3 2026.',
   Astraeus:
-    'Production analytics platform for CFO Group — millisecond slicing across ~40K transits. GPT for intent routing only; deterministic agents handle all computation.',
+    'Production analytics platform for CFO Group — millisecond slicing across ~40K transits with event-level ins-outs math (Cython-compiled). GPT-4.1 used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
   'Aegis v1':
     'Canadian Supplementary Benchmarking engine for peer-bank KPI comparisons (Big 6). Productionized 2024. 2025 CFO One RBC Team Award.',
   'Aegis v2':
@@ -68,8 +68,8 @@ export const GLOSSARY: Record<string, string> = {
     'PAR Assist\'s two-stage retrieval pattern. Stage 1 picks which logically-related field groups are relevant to the session. Stage 2 runs similarity search within each group for top-10 chunks, then custom compression fits them into a Sonnet-4.5 prompt with up to 20 fields of rich metadata per call.',
   'single-agent envelope':
     'The governance constraint behind PAR Assist v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
-  'Command-A':
-    'Cohere\'s agent-oriented LLM used in Astraeus. Its context limits drove the refactor from a monolith agent into 3 parallel sub-agents (EPM / Headcount / Open Positions).',
+  'GPT-4.1':
+    'The model used in Astraeus for all LLM calls (parse, route, metadata extract, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
   PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS for closed-loop boiler control.',
   'closed-loop':
     'Sense → model → optimize → act. The pattern that repeats across every role in my career, at progressively higher abstraction levels.',
