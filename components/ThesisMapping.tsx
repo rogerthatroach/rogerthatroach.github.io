@@ -48,7 +48,7 @@ const LEVELS: LevelMap[] = [
   {
     level: 'Intelligent',
     id: 'rbc-lead',
-    highlight: 'PAR Drafting Assistant + CFO Analytics Engine · LangGraph · pgvector · text-to-SQL',
+    highlight: 'FundingRequest + WorkforceAnalytics · LangGraph · pgvector · text-to-SQL',
     href: '/projects/funding-request-drafting',
   },
 ];

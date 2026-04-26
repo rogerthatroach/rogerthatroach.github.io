@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * AI/LLM Drafting Platform architecture diagram — used on /projects/funding-request-drafting.
+ * FundingRequest architecture diagram — used on /projects/funding-request-drafting.
  *
  * Single source of truth: re-exports the "envelope" diagram built for
  * the blog post (`components/blog/diagrams/AgenticArchitecturePAR.tsx`).
