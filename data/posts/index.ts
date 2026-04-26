@@ -209,12 +209,12 @@ export const POSTS: BlogPost[] = [
       slug: 'enterprise-agentic-ai-framework',
       title: 'Enterprise Agentic AI Architecture — Practitioner Rewrite',
       subtitle:
-        'The same PAR Drafting Assistant system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
+        'The same Prometheus system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
       date: '2026-04-22',
       tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Single-Agent Envelope'],
       readingTime: '10 min read',
       abstract:
-        'PAR Drafting Assistant — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel Sonnet-4.5 extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
+        'Prometheus — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel Sonnet-4.5 extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
       status: 'published',
       projectId: 'par-assist',
       register: 'practitioner',
@@ -231,20 +231,20 @@ export const POSTS: BlogPost[] = [
     ],
     furtherReading: [
       { title: 'Enterprise Agentic AI Architecture (original formal post)', url: '/blog/enterprise-agentic-ai-architecture', description: 'The sibling post — same system, formal register, theorem/proof structure throughout. Compare with this rewrite to see the register swap.' },
-      { title: 'How We Built PAR Drafting Assistant (builder story)', url: '/blog/par-assist-building', description: 'The third register — conversational builder story, same architecture.' },
+      { title: 'How We Built Prometheus (builder story)', url: '/blog/par-assist-building', description: 'The third register — conversational builder story, same architecture.' },
       { title: 'Writing rewrite framework spec', url: 'https://github.com/rogerthatroach/rogerthatroach.github.io', description: 'Canonical deep-post structure, reader-level targeting, component palette. Lives in docs/specs/ — see repo.' },
     ],
   },
   {
     meta: {
       slug: 'par-assist-building',
-      title: 'How We Built PAR Drafting Assistant: From Intern POC to Bank-Wide Product',
+      title: 'How We Built Prometheus: From Intern POC to Bank-Wide Product',
       subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind the bank\u2019s first true agentic AI platform.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '9 min read',
       abstract:
-        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 summer intern program became PAR Drafting Assistant, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea.',
+        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 summer intern program became Prometheus, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea.',
       status: 'published',
       projectId: 'par-assist',
       register: 'builder',
@@ -263,12 +263,12 @@ export const POSTS: BlogPost[] = [
       slug: 'astraeus-llm-as-router',
       title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
       subtitle:
-        'A builder-register companion to the formal CFO Analytics Engine architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
+        'A builder-register companion to the formal Astraeus architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
       date: '2026-04-18',
-      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'CFO Analytics Engine'],
+      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'Astraeus'],
       readingTime: '7 min read',
       abstract:
-        'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building CFO Analytics Engine \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
+        'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building Astraeus \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
       status: 'published',
       projectId: 'astraeus',
       register: 'builder',
@@ -286,12 +286,12 @@ export const POSTS: BlogPost[] = [
         description: 'The same architecture in practitioner register \u2014 four decisions as first-class structure with options considered, constraint cards, and decision rationale for each.',
       },
       {
-        title: 'How We Built PAR Drafting Assistant',
+        title: 'How We Built Prometheus',
         url: '/blog/par-assist-building',
         description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
       },
       {
-        title: 'CFO Analytics Engine \u2014 Case Study',
+        title: 'Astraeus \u2014 Case Study',
         url: '/projects/astraeus',
         description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
       },
@@ -302,12 +302,12 @@ export const POSTS: BlogPost[] = [
       slug: 'astraeus-llm-as-router-framework',
       title: 'LLM-as-Router in Practice \u2014 Four Decisions',
       subtitle:
-        'A practitioner-register rewrite of the CFO Analytics Engine architecture. Constraints, options considered, and decision rationale for each of the four calls that separate LLM-as-Router from the seductive monolithic pattern.',
+        'A practitioner-register rewrite of the Astraeus architecture. Constraints, options considered, and decision rationale for each of the four calls that separate LLM-as-Router from the seductive monolithic pattern.',
       date: '2026-04-23',
-      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'Entitlement', 'CFO Analytics Engine'],
+      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'Entitlement', 'Astraeus'],
       readingTime: '14 min read',
       abstract:
-        'CFO Analytics Engine ships on an architecture with two dashed walls: the LLM handles intent, the deterministic Cython-compiled Python layer handles compute, and LLM-as-Router links the two without the model ever touching operational data. This post lays the four architectural decisions as first-class structure \u2014 orchestration shape (LLM-as-Router over monolithic agent / chain / multi-agent), computation layer (Cython over pure Python / SQL / Rust), entitlement enforcement (permission-system passthrough pre-compute over post-filter / LLM-policy / RLS), and synthesis strategy (router-decides hybrid over always-single / always-parallel / template-render). Each decision gets its constraints, its alternatives with honest pros/cons, and the rationale that produced the call. The narrative behind those calls lives in the builder companion; the formal proofs of data-confidentiality and entitlement safety live in the formal post.',
+        'Astraeus ships on an architecture with two dashed walls: the LLM handles intent, the deterministic Cython-compiled Python layer handles compute, and LLM-as-Router links the two without the model ever touching operational data. This post lays the four architectural decisions as first-class structure \u2014 orchestration shape (LLM-as-Router over monolithic agent / chain / multi-agent), computation layer (Cython over pure Python / SQL / Rust), entitlement enforcement (permission-system passthrough pre-compute over post-filter / LLM-policy / RLS), and synthesis strategy (router-decides hybrid over always-single / always-parallel / template-render). Each decision gets its constraints, its alternatives with honest pros/cons, and the rationale that produced the call. The narrative behind those calls lives in the builder companion; the formal proofs of data-confidentiality and entitlement safety live in the formal post.',
       status: 'published',
       projectId: 'astraeus',
       register: 'practitioner',
@@ -325,9 +325,9 @@ export const POSTS: BlogPost[] = [
         description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
       },
       {
-        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (PAR Drafting Assistant)',
+        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (Prometheus)',
         url: '/blog/enterprise-agentic-ai-framework',
-        description: 'The same register applied to PAR Drafting Assistant \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
+        description: 'The same register applied to Prometheus \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
       },
       {
         title: 'LangGraph Documentation',
@@ -340,7 +340,7 @@ export const POSTS: BlogPost[] = [
         description: 'The compiled-Python toolchain behind the event-level ins-outs math.',
       },
       {
-        title: 'CFO Analytics Engine \u2014 Case Study',
+        title: 'Astraeus \u2014 Case Study',
         url: '/projects/astraeus',
         description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
       },
@@ -398,7 +398,7 @@ export const POSTS: BlogPost[] = [
         description: 'The case study page: insurance-specific context, OCR challenges, the hybrid pipeline, and how the lessons carried over to RAG design at RBC.',
       },
       {
-        title: 'How We Built PAR Drafting Assistant',
+        title: 'How We Built Prometheus',
         url: '/blog/par-assist-building',
         description: 'Where the document-structure insight resurfaced: chunking by structure (not fixed token windows) was the difference between useful and useless retrieval.',
       },
@@ -409,12 +409,12 @@ export const POSTS: BlogPost[] = [
       slug: 'aegis-v2-velocity',
       title: 'Two Weeks, One Product: What Velocity Looks Like When Architecture Is Right',
       subtitle:
-        'Benchmarking Engine v2 shipped in 2 weeks while CFO Analytics Engine was mid-flight and the summer intern program was running. A post about what makes that possible.',
+        'Aegis v2 shipped in 2 weeks while Astraeus was mid-flight and the summer intern program was running. A post about what makes that possible.',
       date: '2026-07-03',
-      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Benchmarking Engine'],
+      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Aegis'],
       readingTime: '6 min read',
       abstract:
-        'Benchmarking Engine v2 shipped in two weeks while CFO Analytics Engine was mid-flight and the summer intern program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the CFO Analytics Engine LLM-as-Router pattern \u2014 same family, tighter intent classification.',
+        'Aegis v2 shipped in two weeks while Astraeus was mid-flight and the summer intern program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the Astraeus LLM-as-Router pattern \u2014 same family, tighter intent classification.',
       status: 'draft',
       projectId: 'aegis',
       register: 'builder',
@@ -429,10 +429,10 @@ export const POSTS: BlogPost[] = [
       {
         title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
         url: '/blog/astraeus-llm-as-router',
-        description: 'The sister architectural call. Benchmarking Engine v2 is the same pattern with a tighter intent classification.',
+        description: 'The sister architectural call. Aegis v2 is the same pattern with a tighter intent classification.',
       },
       {
-        title: 'Benchmarking Engine v2 \u2014 Case Study',
+        title: 'Aegis v2 \u2014 Case Study',
         url: '/projects/aegis',
         description: 'The case study page: context, the five-stage architecture, and the production narrative.',
       },
@@ -448,7 +448,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Framework A/B', 'Stakeholder Management', 'PySpark', 'Tableau'],
       readingTime: '9 min read',
       abstract:
-        'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into Benchmarking Engine v1/v2, CFO Analytics Engine, PAR Drafting Assistant). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
+        'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into Aegis v1/v2, Astraeus, Prometheus). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'practitioner',
@@ -461,9 +461,9 @@ export const POSTS: BlogPost[] = [
         description: 'Same story, pure prose — no framework components. Read side-by-side to see what the framework adds.',
       },
       {
-        title: 'How We Built PAR Drafting Assistant (practitioner companion)',
+        title: 'How We Built Prometheus (practitioner companion)',
         url: '/blog/par-assist-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. The PAR Drafting Assistant story wouldn\u2019t have happened without the trust built here.',
+        description: 'The other builder-register post in this corpus — same voice, different system. Prometheus story wouldn\u2019t have happened without the trust built here.',
       },
       {
         title: 'Writing rewrite framework spec',
@@ -487,7 +487,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Stakeholder Management', 'PySpark', 'Tableau', 'Process Automation'],
       readingTime: '6 min read',
       abstract:
-        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the stakeholder dynamics of automating institutional knowledge, and the cascade of AI initiatives this first project underwrote: Benchmarking Engine v1, Benchmarking Engine v2, CFO Analytics Engine, PAR Drafting Assistant.',
+        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the stakeholder dynamics of automating institutional knowledge, and the cascade of AI initiatives this first project underwrote: Aegis v1, Aegis v2, Astraeus, Prometheus.',
       status: 'draft',
       projectId: 'commodity-tax',
       register: 'builder',
@@ -495,9 +495,9 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'How We Built PAR Drafting Assistant (practitioner companion)',
+        title: 'How We Built Prometheus (practitioner companion)',
         url: '/blog/par-assist-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. The PAR Drafting Assistant story wouldn\u2019t have happened without the trust built here.',
+        description: 'The other builder-register post in this corpus — same voice, different system. Prometheus story wouldn\u2019t have happened without the trust built here.',
       },
       {
         title: 'Closed-Loop Optimization as a Unifying Pattern',

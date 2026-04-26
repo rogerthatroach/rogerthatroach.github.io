@@ -113,7 +113,7 @@ The intent space is finite and enumerable, which is what makes the downstream ag
 
 The production system organizes LLM work into **up to six calls per query** arranged in three phases. The first two phases sit on the LLM *intent* side of the deterministic wall; the third phase sits on the LLM *synthesis* side.
 
-**Phase 1 — Parse and route (two LLM calls).** A parse call extracts structured intent from the natural-language query; a route call decides whether the query is in scope for the CFO Analytics Engine domain and, if so, which downstream phase to invoke. If the query is out of scope, execution terminates here — neither phase 2 nor the deterministic compute layer is touched.
+**Phase 1 — Parse and route (two LLM calls).** A parse call extracts structured intent from the natural-language query; a route call decides whether the query is in scope for Astraeus and, if so, which downstream phase to invoke. If the query is out of scope, execution terminates here — neither phase 2 nor the deterministic compute layer is touched.
 
 **Phase 2 — Metadata extraction (up to three parallel LLM calls, conditional).** When the routing decision warrants, one metadata-extract call fires per candidate domain (Headcount, HR Costs, Open Positions), in parallel. Each call returns a structured parameter set scoped to its domain — time range, organizational scope, comparison shape — *without* any data access. This is the final LLM touch before the first wall.
 
@@ -361,7 +361,7 @@ The system delivers financial insights through three channels: a production-grad
 
 ### 7.1 The "Impossible" Capability
 
-Before CFO Analytics Engine, dynamic *ins-outs* analysis — *"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"* — was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level events queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. CFO Analytics Engine reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in milliseconds.
+Before Astraeus, dynamic *ins-outs* analysis — *"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"* — was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level events queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in milliseconds.
 
 ## 8. Related Work
 

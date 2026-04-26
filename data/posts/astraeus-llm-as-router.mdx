@@ -7,9 +7,9 @@ import VisualizationContainer from '@/components/blog/VisualizationContainer'
 
 The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out.
 
-When I was designing CFO Analytics Engine &mdash; a production analytics platform for RBC&rsquo;s CFO Group &mdash; every instinct and every industry demo pattern said to build exactly that. A single LLM, connected to the financial data stores, answering natural-language questions by reasoning directly over the data. It&rsquo;s faster to build. It&rsquo;s easier to demo. It&rsquo;s what most teams ship when they&rsquo;re under pressure to show something.
+When I was designing Astraeus &mdash; a production analytics platform for RBC&rsquo;s CFO Group &mdash; every instinct and every industry demo pattern said to build exactly that. A single LLM, connected to the financial data stores, answering natural-language questions by reasoning directly over the data. It&rsquo;s faster to build. It&rsquo;s easier to demo. It&rsquo;s what most teams ship when they&rsquo;re under pressure to show something.
 
-I pushed back. CFO Analytics Engine ships today on a pattern I call LLM-as-Router: the LLM is strictly for intent classification. Deterministic code handles computation, data access, and output. No sensitive data ever touches the language model&rsquo;s context window.
+I pushed back. Astraeus ships today on a pattern I call LLM-as-Router: the LLM is strictly for intent classification. Deterministic code handles computation, data access, and output. No sensitive data ever touches the language model&rsquo;s context window.
 
 This is the story of why, and what it took to build.
 
@@ -59,9 +59,9 @@ Three things, in the order they mattered:
 
 1. **Refusing the monolithic agent when everyone else was building them.** The industry moved hard toward agent-does-everything architectures through 2024. The pressure to conform was real. Sticking to LLM-as-Router meant explaining to stakeholders why the &ldquo;cool&rdquo; pattern was the wrong pattern here &mdash; repeatedly, across multiple audiences, each with their own version of the question &ldquo;but why can&rsquo;t we just let the LLM do it?&rdquo;
 
-2. **Building the permission-to-SQL translation layer before writing a line of agent code.** Most of the interesting engineering in CFO Analytics Engine isn&rsquo;t the LLM integration. It&rsquo;s the entitlement model. Permissions have to be correct every time; the LLM doesn&rsquo;t get a vote. That translation layer is the load-bearing piece; everything else is scaffolding around it.
+2. **Building the permission-to-SQL translation layer before writing a line of agent code.** Most of the interesting engineering in Astraeus isn&rsquo;t the LLM integration. It&rsquo;s the entitlement model. Permissions have to be correct every time; the LLM doesn&rsquo;t get a vote. That translation layer is the load-bearing piece; everything else is scaffolding around it.
 
-3. **Cross-functional delivery with engineering services partner while staying hands-on.** I led this at 70% hands-on &mdash; architecture, code, review &mdash; while coordinating with front-end and infrastructure peers at the engineering services partner. The temptation when you&rsquo;re the AI lead is to hand the implementation off and move to the next project. I didn&rsquo;t, and CFO Analytics Engine is better for it.
+3. **Cross-functional delivery with engineering services partner while staying hands-on.** I led this at 70% hands-on &mdash; architecture, code, review &mdash; while coordinating with front-end and infrastructure peers at the engineering services partner. The temptation when you&rsquo;re the AI lead is to hand the implementation off and move to the next project. I didn&rsquo;t, and Astraeus is better for it.
 
 ## The result
 
@@ -81,6 +81,6 @@ LLM-as-Router is not a compromise. It&rsquo;s the correct architecture for any s
 - Permission enforcement must be provable, not probabilistic
 - The cost of a wrong answer is larger than the cost of a slightly less elegant architecture
 
-Every production AI system I build at RBC now starts from this principle. Benchmarking Engine v2&rsquo;s guardrailed text-to-SQL is LLM-as-Router with tighter intent classification. PAR Drafting Assistant&rsquo;s typed MCP tool contracts are LLM-as-Router with a richer action vocabulary. The pattern scales across system types.
+Every production AI system I build at RBC now starts from this principle. Aegis v2&rsquo;s guardrailed text-to-SQL is LLM-as-Router with tighter intent classification. Prometheus&rsquo;s typed MCP tool contracts are LLM-as-Router with a richer action vocabulary. The pattern scales across system types.
 
 The hardest part of enterprise AI isn&rsquo;t building the language-model-powered feature. It&rsquo;s knowing when *not* to let the language model touch the thing.

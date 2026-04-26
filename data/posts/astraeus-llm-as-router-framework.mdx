@@ -11,7 +11,7 @@ Finance leadership asks questions that cross three domains in one sentence: *"he
 
 There is one pattern the industry reaches for here: give the LLM full access and let it figure it out. One model, function-calling into the financial data store, iterating with a ReAct-style loop until it lands on an answer. Fast to prototype. Easy to demo. Impossible to ship inside regulated finance.
 
-CFO Analytics Engine went the other way. Up to six GPT-4.1 calls per query, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. A permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern — with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls — under pressure, across stakeholders — lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
+Astraeus went the other way. Up to six GPT-4.1 calls per query, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. A permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern — with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls — under pressure, across stakeholders — lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
 
 <VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (parse / route / up to three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and the event-level ins-outs math across ~40K employee-level events, Band 3 LLM synthesis (one call or three parallel subagents then combined). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
 {() => <AstraeusCascade />}
@@ -349,7 +349,7 @@ A concrete CFO query — *"show me headcount by division, crossed with open posi
     {
       title: 'Step 2 · Route (LLM 2)',
       caption: 'in-scope gate + path selection',
-      content: 'A second LLM call decides two things: is this query in scope for CFO Analytics Engine at all, and if so does it take path A (single synthesis) or path B (parallel subagents)? Cross-domain three-way query with reconciliation — path B. If the query were out of scope, execution terminates here.',
+      content: 'A second LLM call decides two things: is this query in scope for Astraeus at all, and if so does it take path A (single synthesis) or path B (parallel subagents)? Cross-domain three-way query with reconciliation — path B. If the query were out of scope, execution terminates here.',
     },
     {
       title: 'Step 3 · Metadata extract (LLM 3, 4, 5 — parallel)',
@@ -359,7 +359,7 @@ A concrete CFO query — *"show me headcount by division, crossed with open posi
     {
       title: 'Step 4 · Entitlement cascade',
       caption: 'domain → access → entities → events → SQL',
-      content: 'The user’s identity flows through the five-step permission cascade. Domain permissions: which CFO Analytics Engine domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Events: which ~40K subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged.',
+      content: 'The user’s identity flows through the five-step permission cascade. Domain permissions: which Astraeus domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Events: which ~40K subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged.',
     },
     {
       title: 'Step 5 · Compute (Cython, no LLM)',
@@ -392,14 +392,14 @@ The scale callout in the architecture diagram reads *"40K! factorial combination
 
 Cython's role in this is blunt: the event-level netting math inside the hot loop runs in C. The rest of the layer — IO, entitlement resolution, serialization — stays in idiomatic Python. Profiling showed the hot loop was responsible for the majority of runtime on cross-domain queries, so that's where the Cython annotations concentrate.
 
-The *previously impossible* framing is not marketing. Before CFO Analytics Engine, finance-leadership questions of the form "how does headcount cross with open positions by division, at Q2" either got answered with a multi-day analyst turnaround or did not get answered at all. The combinatorial size of the question space made interactive slicing infeasible. LLM-as-Router plus Cython-compiled compute turns the question space into an interactive one.
+The *previously impossible* framing is not marketing. Before Astraeus, finance-leadership questions of the form "how does headcount cross with open positions by division, at Q2" either got answered with a multi-day analyst turnaround or did not get answered at all. The combinatorial size of the question space made interactive slicing infeasible. LLM-as-Router plus Cython-compiled compute turns the question space into an interactive one.
 
 ## Before and after
 
 <BeforeAfterDiff
   heading="Finance leadership asks a cross-domain question"
   before={{
-    label: 'Before CFO Analytics Engine',
+    label: 'Before Astraeus',
     hint: 'days',
     content: (
       <>
@@ -408,7 +408,7 @@ The *previously impossible* framing is not marketing. Before CFO Analytics Engin
     ),
   }}
   after={{
-    label: 'With CFO Analytics Engine',
+    label: 'With Astraeus',
     hint: 'seconds',
     content: (
       <>
@@ -424,7 +424,7 @@ Three properties the architecture has to maintain under real queries — includi
 
 **What happens when the parse fails.** The LLM 1 call produces a structured intent object or an error. If the intent object is malformed — no domain class resolvable, no output shape — the system returns a clarification prompt rather than guessing. The route call (LLM 2) does not fire on a failed parse. No data access occurs. The failure mode is a visible refusal, not a silent wrong answer.
 
-**What happens when the route says out-of-scope.** The route call explicitly decides whether the query is inside the CFO Analytics Engine domain. Questions about payroll processing, HR performance reviews, benefits administration — all out of scope. On an out-of-scope route, execution terminates at the wall. Neither the deterministic compute layer nor the downstream synthesis runs. The user sees a scoped answer ("CFO Analytics Engine covers headcount, hiring, and cost — for payroll detail, see [other system]").
+**What happens when the route says out-of-scope.** The route call explicitly decides whether the query is inside Astraeus domain. Questions about payroll processing, HR performance reviews, benefits administration — all out of scope. On an out-of-scope route, execution terminates at the wall. Neither the deterministic compute layer nor the downstream synthesis runs. The user sees a scoped answer ("Astraeus covers headcount, hiring, and cost — for payroll detail, see [other system]").
 
 **How the walls actually prevent leakage.** Wall 1 (between LLM intent and deterministic compute) is enforced by code structure: the functions that call the LLM do not have an argument that could be operational data. The functions that call compute do not have an argument that could be an LLM. That separation is a property of the type signatures, not a convention. Wall 2 (between deterministic compute and LLM synthesis) is enforced the same way: synthesis functions receive aggregates, not events. A reviewer can audit the wall by looking at function signatures.
 
@@ -432,9 +432,9 @@ The single Postgres backbone underneath is the audit anchor — every LLM call, 
 
 ## Timeline + velocity
 
-CFO Analytics Engine went from the first architectural sketch to production in ~5 months, with v2 cycles continuing after. The architecture stabilized early; most of the engineering time after month two went into the permission cascade, the Cython-compiled compute layer, and the event-level ins-outs math. Stakeholder conversations — explaining, repeatedly, why LLM-as-Router was the right shape rather than the seductive monolithic pattern — ran in parallel through the first three months. The [builder companion](/blog/astraeus-llm-as-router) has the narrative of that stretch.
+Astraeus went from the first architectural sketch to production in ~5 months, with v2 cycles continuing after. The architecture stabilized early; most of the engineering time after month two went into the permission cascade, the Cython-compiled compute layer, and the event-level ins-outs math. Stakeholder conversations — explaining, repeatedly, why LLM-as-Router was the right shape rather than the seductive monolithic pattern — ran in parallel through the first three months. The [builder companion](/blog/astraeus-llm-as-router) has the narrative of that stretch.
 
-## What's next — CFO Analytics Engine v2
+## What's next — Astraeus v2
 
 The next evolution extends the pattern without changing its shape. Three directions on the table:
 
@@ -453,6 +453,6 @@ The LLM-as-Router pattern is not specific to CFO analytics. It applies anywhere:
 - Permission enforcement must be provable, not probabilistic
 - The cost of a wrong answer exceeds the cost of a slightly less elegant architecture
 
-CFO Analytics Engine was the first production shape this pattern took inside RBC; it now underlies other systems — PAR Drafting Assistant's agentic envelope is the same LLM-as-Router principle with a richer action vocabulary (see [the PAR practitioner post](/blog/enterprise-agentic-ai-framework) for the MCP-tools variant). Benchmarking Engine v2's text-to-SQL is LLM-as-Router with tighter intent classification and a guardrailed SQL surface.
+Astraeus was the first production shape this pattern took inside RBC; it now underlies other systems — Prometheus's agentic envelope is the same LLM-as-Router principle with a richer action vocabulary (see [the PAR practitioner post](/blog/enterprise-agentic-ai-framework) for the MCP-tools variant). Aegis v2's text-to-SQL is LLM-as-Router with tighter intent classification and a guardrailed SQL surface.
 
 The pattern scales across system types because the constraints are shared. The seductive option — give the LLM full access, let it figure it out — fails the same four tests in every regulated-enterprise setting. LLM-as-Router is the compact answer to those tests.
