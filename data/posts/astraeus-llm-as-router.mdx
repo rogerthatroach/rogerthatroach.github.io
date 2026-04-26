@@ -7,21 +7,21 @@ import VisualizationContainer from '@/components/blog/VisualizationContainer'
 
 The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out.
 
-When I was designing Astraeus &mdash; a production analytics platform for RBC&rsquo;s CFO Group &mdash; every instinct and every industry demo pattern said to build exactly that. A single LLM, connected to the financial data stores, answering natural-language questions by reasoning directly over the data. It&rsquo;s faster to build. It&rsquo;s easier to demo. It&rsquo;s what most teams ship when they&rsquo;re under pressure to show something.
+When I was designing CFO Analytics Engine &mdash; a production analytics platform for RBC&rsquo;s CFO Group &mdash; every instinct and every industry demo pattern said to build exactly that. A single LLM, connected to the financial data stores, answering natural-language questions by reasoning directly over the data. It&rsquo;s faster to build. It&rsquo;s easier to demo. It&rsquo;s what most teams ship when they&rsquo;re under pressure to show something.
 
-I pushed back. Astraeus ships today on a pattern I call LLM-as-Router: the LLM is strictly for intent classification. Deterministic code handles computation, data access, and output. No sensitive data ever touches the language model&rsquo;s context window.
+I pushed back. CFO Analytics Engine ships today on a pattern I call LLM-as-Router: the LLM is strictly for intent classification. Deterministic code handles computation, data access, and output. No sensitive data ever touches the language model&rsquo;s context window.
 
 This is the story of why, and what it took to build.
 
 ## The problem
 
-RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions &mdash; &ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo; &mdash; and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in an EPM (Enterprise Performance Management) system: ~40,000 employee transits (the leaf-level routing unit), ~9,000 parent rollups, an ~80,000-node business hierarchy, and a ~60,000-node geography hierarchy — with strict entitlement controls at every level.
+RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions &mdash; &ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo; &mdash; and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in an enterprise permission system (EPM): ~40,000 employee-level events (the leaf-level routing unit), ~9,000 parent rollups, an ~80,000-node business hierarchy, and a ~60,000-node geography hierarchy — with strict entitlement controls at every level.
 
 No interactive system could answer those questions in under a day. No off-the-shelf product understood the CFO Group&rsquo;s permission model. And every off-the-shelf AI tool that might have helped required giving the LLM full access to the data.
 
 ## The seductive option
 
-The prototype you can build in a week is this: one LLM, function-calling against the EPM API, answering natural-language queries by iteratively querying the data store. ReAct-style agent loop. Fast to demo. Looks magical.
+The prototype you can build in a week is this: one LLM, function-calling against the enterprise permission system API, answering natural-language queries by iteratively querying the data store. ReAct-style agent loop. Fast to demo. Looks magical.
 
 Every reason to build it that way is a reason I pushed back.
 
@@ -31,7 +31,7 @@ Every reason to build it that way is a reason I pushed back.
 
 3. **No audit trail worth the name.** When an LLM decides which rows to query and how to aggregate them, the decision trail is a chain-of-thought string in a log. Finance audit needs typed, logged actions with schemas. &ldquo;Trust me, the model picked the right filter&rdquo; doesn&rsquo;t survive regulatory review.
 
-4. **Non-determinism on permissions.** EPM entitlements &mdash; who&rsquo;s allowed to see which organizational rollup, at what grain &mdash; are not something you can explain to an LLM in a prompt and expect correct enforcement every time. Permission enforcement has to be a first-class property of the system, not an emergent behavior of a language model.
+4. **Non-determinism on permissions.** permission entitlements &mdash; who&rsquo;s allowed to see which organizational rollup, at what grain &mdash; are not something you can explain to an LLM in a prompt and expect correct enforcement every time. Permission enforcement has to be a first-class property of the system, not an emergent behavior of a language model.
 
 The seductive option fails all four.
 
@@ -40,18 +40,18 @@ The seductive option fails all four.
 The pattern I landed on is straightforward to describe and fiddly to build:
 
 - GPT-4.1 is used *strictly* for intent work: parse, route, and — if in scope — up to three parallel metadata extractions (one per candidate domain).
-- Between two dashed walls, a deterministic Cython-compiled Python layer does the real work: EPM entitlement chain (cube → security → employees → transits → SQL), then event-level ins-outs math over ~40K transits.
+- Between two dashed walls, a deterministic Cython-compiled Python layer does the real work: permission cascade (domain → access → entities → events → SQL), then event-level ins-outs math over ~40K leaf-level events.
 - Aggregates cross back up; a final LLM call (or up to three parallel sub-agents, then combined) synthesizes the answer.
 - The LLM never sees raw data. It sees classification decisions on the way down and aggregates on the way up.
 - Single Postgres backbone beneath everything — state, entitlements, hierarchies, audit log.
 
 This is LLM-as-Router. The LLM does what language models are good at (classify intent, disambiguate phrasing, handle synonyms). The deterministic layer does everything else. *[For the decision tree behind each of these — orchestration shape, computation layer, entitlement enforcement, synthesis strategy — see the [practitioner post](/blog/astraeus-llm-as-router-framework).]*
 
-<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: LLM intent (parse / route / metadata extract), deterministic Cython compute with EPM entitlement chain and event-level ins-outs math, LLM synthesis then combine. Only parsed metadata crosses down; only structured aggregates cross up.">
+<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: LLM intent (parse / route / metadata extract), deterministic Cython compute with permission cascade and event-level ins-outs math, LLM synthesis then combine. Only parsed metadata crosses down; only structured aggregates cross up.">
 {() => <AstraeusCascade />}
 </VisualizationContainer>
 
-The EPM-to-SQL entitlement modeling alone took weeks of domain immersion &mdash; cube permissions map to security groups, which map to employees, which map to transits (the atomic unit of the data model), which map to SQL WHERE clauses. That mapping had to be bulletproof, not best-effort. No prompt was going to get it right.
+The permission-to-SQL entitlement modeling alone took weeks of domain immersion &mdash; domain permissions map to access groups, which map to employees, which map to events (the atomic unit of the data model), which map to SQL WHERE clauses. That mapping had to be bulletproof, not best-effort. No prompt was going to get it right.
 
 ## What it took to build
 
@@ -59,13 +59,13 @@ Three things, in the order they mattered:
 
 1. **Refusing the monolithic agent when everyone else was building them.** The industry moved hard toward agent-does-everything architectures through 2024. The pressure to conform was real. Sticking to LLM-as-Router meant explaining to stakeholders why the &ldquo;cool&rdquo; pattern was the wrong pattern here &mdash; repeatedly, across multiple audiences, each with their own version of the question &ldquo;but why can&rsquo;t we just let the LLM do it?&rdquo;
 
-2. **Building the EPM-to-SQL translation layer before writing a line of agent code.** Most of the interesting engineering in Astraeus isn&rsquo;t the LLM integration. It&rsquo;s the entitlement model. Permissions have to be correct every time; the LLM doesn&rsquo;t get a vote. That translation layer is the load-bearing piece; everything else is scaffolding around it.
+2. **Building the permission-to-SQL translation layer before writing a line of agent code.** Most of the interesting engineering in CFO Analytics Engine isn&rsquo;t the LLM integration. It&rsquo;s the entitlement model. Permissions have to be correct every time; the LLM doesn&rsquo;t get a vote. That translation layer is the load-bearing piece; everything else is scaffolding around it.
 
-3. **Cross-functional delivery with GFT engineering while staying hands-on.** I led this at 70% hands-on &mdash; architecture, code, review &mdash; while coordinating with front-end and infrastructure peers at GFT. The temptation when you&rsquo;re the AI lead is to hand the implementation off and move to the next project. I didn&rsquo;t, and Astraeus is better for it.
+3. **Cross-functional delivery with engineering services partner while staying hands-on.** I led this at 70% hands-on &mdash; architecture, code, review &mdash; while coordinating with front-end and infrastructure peers at the engineering services partner. The temptation when you&rsquo;re the AI lead is to hand the implementation off and move to the next project. I didn&rsquo;t, and CFO Analytics Engine is better for it.
 
 ## The result
 
-- ~40K employee transits with ~9K parent rollups — sliced at millisecond backend latency across any cross-domain combination
+- ~40K employee-level events with ~9K parent rollups — sliced at millisecond backend latency across any cross-domain combination
 - Three delivery channels from a single architecture: dashboard, chatbot, and HTML reports generated for executive consumption
 - Days of email replaced by seconds-level answers
 - Zero sensitive data ever reaching the language model
@@ -81,6 +81,6 @@ LLM-as-Router is not a compromise. It&rsquo;s the correct architecture for any s
 - Permission enforcement must be provable, not probabilistic
 - The cost of a wrong answer is larger than the cost of a slightly less elegant architecture
 
-Every production AI system I build at RBC now starts from this principle. Aegis v2&rsquo;s guardrailed text-to-SQL is LLM-as-Router with tighter intent classification. PAR Assist&rsquo;s typed MCP tool contracts are LLM-as-Router with a richer action vocabulary. The pattern scales across system types.
+Every production AI system I build at RBC now starts from this principle. Benchmarking Engine v2&rsquo;s guardrailed text-to-SQL is LLM-as-Router with tighter intent classification. PAR Drafting Assistant&rsquo;s typed MCP tool contracts are LLM-as-Router with a richer action vocabulary. The pattern scales across system types.
 
 The hardest part of enterprise AI isn&rsquo;t building the language-model-powered feature. It&rsquo;s knowing when *not* to let the language model touch the thing.

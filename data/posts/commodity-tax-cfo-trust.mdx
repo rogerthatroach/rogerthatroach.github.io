@@ -1,6 +1,6 @@
 In September 2022, I joined RBC&rsquo;s CFO Group as a Senior Data Scientist. No one had asked me to build AI. I was hired to help automate the Commodity Tax return process &mdash; a manual workflow that consumed finance analysts for months per cycle.
 
-By Q4 2023, the process took 90 minutes. The metric earned a CFO Quarterly Team Award. And more importantly, it earned the credibility to propose Aegis, Astraeus, and eventually PAR Assist &mdash; a cascade that shaped my next three years at the bank.
+By Q4 2023, the process took 90 minutes. The metric earned a CFO Quarterly Team Award. And more importantly, it earned the credibility to propose Benchmarking Engine, CFO Analytics Engine, and eventually PAR Drafting Assistant &mdash; a cascade that shaped my next three years at the bank.
 
 This is the story of how automating a tax process became a stakeholder-trust project in disguise, and the architectural decision that made it land.
 
@@ -47,7 +47,7 @@ That confidence was the deliverable. The 90-minute metric was the side effect.
 
 ## What this opened
 
-By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Aegis v1 &mdash; a rules-based benchmarking engine for the Big 6 Canadian banks &mdash; and get the air cover to build it. When Aegis v1 shipped, I could propose Aegis v2, the AI-native rewrite, and deliver it in two weeks while the team was already scaling Astraeus. When Astraeus reached production scale, I had the credibility to conceive PAR Assist from an intern&rsquo;s proof-of-concept and scale it to a bank-wide platform.
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Benchmarking Engine v1 &mdash; a rules-based benchmarking engine for the Big 6 Canadian banks &mdash; and get the air cover to build it. When Benchmarking Engine v1 shipped, I could propose Benchmarking Engine v2, the AI-native rewrite, and deliver it in two weeks while the team was already scaling CFO Analytics Engine. When CFO Analytics Engine reached production scale, I had the credibility to conceive PAR Drafting Assistant from an intern&rsquo;s proof-of-concept and scale it to a bank-wide platform.
 
 Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. The Commodity Tax was underwriting every subsequent bet.
 
@@ -57,7 +57,7 @@ Your first project at a new organization isn&rsquo;t just a deliverable. It&rsqu
 
 The architectural decision I made &mdash; Tableau as a transparency layer, not an output &mdash; was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
 
-Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. PAR Assist&rsquo;s MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
+CFO Analytics Engine&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. PAR Drafting Assistant&rsquo;s MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
 
 Commodity Tax was where I learned that.
 

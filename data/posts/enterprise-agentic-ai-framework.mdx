@@ -16,7 +16,7 @@ Enterprise organizations run on structured processes. Project approvals, budget 
 
 Most teams throw a chatbot at this. But the user doesn't need a Q&A interface. They need a **collaborator** — something that understands where they are in a multi-step process, holds context across the session, pulls the right reference material at the right moment, and resolves contradictions between policy documents without the user knowing there was a conflict.
 
-That's not retrieval-augmented generation <CitationRef id={7} />. That's orchestration over a structured form. This post walks through the architecture at <Glossed>PAR Assist</Glossed> inside <Glossed>RBC CFO Group</Glossed> — the first true agentic system approved for production deployment at the bank.
+That's not retrieval-augmented generation <CitationRef id={7} />. That's orchestration over a structured form. This post walks through the architecture at <Glossed>PAR Drafting Assistant</Glossed> inside <Glossed>RBC CFO Group</Glossed> — the first true agentic system approved for production deployment at the bank.
 
 <VisualizationContainer minHeight={1040} caption="The envelope. The dashed boundary is the v1 governance scope — one agent, one approved surface. Inside: intake (pptx / docx / pdf / txt / image-OCR) → template MCP tool with decision-tree dialog → stage-1 groups hub → N parallel extraction lanes (one per relevant field group, each a Sonnet-4.5 call with ≤20 fields + compressed top-10 chunks) → dict-union merge → coverage analyzer with clarify-loop back to template. Everything reads and writes the Postgres rail beneath — checkpoints, logs, raw, mapped, embeddings, audit. The ghosted v2 pill is the skills-based multi-agent evolution.">
 {() => <AgenticArchitecturePAR />}
@@ -53,7 +53,7 @@ Four constraints shaped every decision below. One is governance, two are regulat
 
 ## The four architectural decisions
 
-Four calls separate PAR Assist from a clever chatbot. Each one mapped to an explicit options comparison before it landed.
+Four calls separate PAR Drafting Assistant from a clever chatbot. Each one mapped to an explicit options comparison before it landed.
 
 ### Decision 1 · Orchestration framework
 
@@ -344,7 +344,7 @@ One of the less-glamorous decisions that made a lot of the rest of the system ch
 
 That's not the default for a system like this — retrieval usually sits in a dedicated vector store, logs in a time-series database, state in Redis or similar. One-store is unusual.
 
-The reasons are pragmatic. pgvector is good enough for the retrieval scale PAR Assist operates at. Having state, logs, and embeddings in one transactional store means a single session's entire provenance is reconstructable with a handful of joins — which matters for audit. Backup, replication, and access control only need to be solved once. And when the graph's Postgres-backed checkpointer takes a snapshot, it captures the whole session atomically — no cross-store consistency window to worry about.
+The reasons are pragmatic. pgvector is good enough for the retrieval scale PAR Drafting Assistant operates at. Having state, logs, and embeddings in one transactional store means a single session's entire provenance is reconstructable with a handful of joins — which matters for audit. Backup, replication, and access control only need to be solved once. And when the graph's Postgres-backed checkpointer takes a snapshot, it captures the whole session atomically — no cross-store consistency window to worry about.
 
 Two cons, honestly stated: pgvector is not the fastest vector store at the high end, and a single Postgres instance is a single blast radius. Both are acceptable at current scale; both are revisitable if scale changes.
 
@@ -356,28 +356,28 @@ Three quality layers run through the system, each at a different node in the gra
 
 2. **Per-group few-shot good/bad examples** — small, curated libraries of real-world extracted values and why they're good or bad. These do more work than abstract rules because they show the LLM what "defensible" actually looks like for a given field.
 
-3. **Session-level coverage analyzer** — runs after the merge. Checks the full merged state against the guideline set. Produces a coverage report + a prioritized list of intelligent follow-ups. The follow-ups are what turn PAR Assist from a field extractor into a collaborator: "You haven't addressed regulatory exposure for this spend tier — here are three questions."
+3. **Session-level coverage analyzer** — runs after the merge. Checks the full merged state against the guideline set. Produces a coverage report + a prioritized list of intelligent follow-ups. The follow-ups are what turn PAR Drafting Assistant from a field extractor into a collaborator: "You haven't addressed regulatory exposure for this spend tier — here are three questions."
 
 ## Timeline and velocity
 
 <StepThrough
-  label="PAR Assist — from one-page plan to enterprise pilot"
+  label="PAR Drafting Assistant — from one-page plan to enterprise pilot"
   steps={[
     {
       title: 'Nov 2025 — the one-page plan',
-      caption: 'thesis: the Amplify proof-of-concept pattern generalizes',
+      caption: 'thesis: the summer intern proof-of-concept pattern generalizes',
       content: (
         <>
-          One page, written to frame the opportunity. The Amplify-intern proof-of-concept was evidence the pattern worked. What was missing was a production shape and a thesis for why the pattern extended across every PAR type and every business line.
+          One page, written to frame the opportunity. The summer intern program-intern proof-of-concept was evidence the pattern worked. What was missing was a production shape and a thesis for why the pattern extended across every PAR type and every business line.
         </>
       ),
     },
     {
       title: 'Feb 2026 — development begins',
-      caption: 'parallel to Astraeus productionization and Aegis v2 refactor',
+      caption: 'parallel to CFO Analytics Engine productionization and Benchmarking Engine v2 refactor',
       content: (
         <>
-          Real development started after holidays and team restructuring. PAR Assist ran in parallel with Astraeus productionization and the tail end of Aegis v2 refactor — three workstreams, one team, three different architectural registers.
+          Real development started after holidays and team restructuring. PAR Drafting Assistant ran in parallel with CFO Analytics Engine productionization and the tail end of Benchmarking Engine v2 refactor — three workstreams, one team, three different architectural registers.
         </>
       ),
     },
@@ -429,7 +429,7 @@ From the outside, it looks agentic: branching dialogs, multi-step reasoning, par
 
 The cost was design discipline. Every time we reached for a multi-agent pattern — persistent cross-agent memory, inter-agent negotiation, agent-on-agent reasoning — we had to ask whether that could be expressed as deterministic graph logic plus MCP tools, or whether it fundamentally required multi-agent primitives. In v1, everything that needed the latter got deferred to v2.
 
-**The lesson that generalizes:** in regulated environments, the first agentic deployment is not about maximum capability. It is about building the envelope in a way that the next envelope (larger) inherits without rewrite. PAR Assist v1 is single-agent. The groups, the parallel calls, the per-group guardrails, the coverage analyzer, the Postgres backbone, the MCP tool surface — all of these become the substrate v2 runs on. The LangGraph graph's next evolution is multi-agent *skills* composed over the same tool registry. We are not building v1 as a throwaway; we are building v1 as the part of v2 that already passed review.
+**The lesson that generalizes:** in regulated environments, the first agentic deployment is not about maximum capability. It is about building the envelope in a way that the next envelope (larger) inherits without rewrite. PAR Drafting Assistant v1 is single-agent. The groups, the parallel calls, the per-group guardrails, the coverage analyzer, the Postgres backbone, the MCP tool surface — all of these become the substrate v2 runs on. The LangGraph graph's next evolution is multi-agent *skills* composed over the same tool registry. We are not building v1 as a throwaway; we are building v1 as the part of v2 that already passed review.
 
 ## What's next — skills
 
@@ -437,7 +437,7 @@ v2 of the framework moves from single-agent to a LangGraph multi-agent compositi
 
 Skills are composable. A workflow is a graph over skills. A "draft-this-PAR" is no longer one agent with tools — it is a coordination of skills, each with its own approved scope, its own audit surface, its own testable contract. The single-agent envelope becomes one specialization inside the skill catalog.
 
-Crucially: because PAR Assist v1 built everything on MCP tools, the tool registry is already the substrate v2's skills compose over. No rewrite. The v1 architecture is the subgraph v2 extends.
+Crucially: because PAR Drafting Assistant v1 built everything on MCP tools, the tool registry is already the substrate v2's skills compose over. No rewrite. The v1 architecture is the subgraph v2 extends.
 
 ## What transfers
 

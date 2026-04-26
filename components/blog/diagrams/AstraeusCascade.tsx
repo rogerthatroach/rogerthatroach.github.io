@@ -39,7 +39,7 @@ import { useThemeColor } from '@/lib/useThemeColor';
 // Palette
 const LLM = '#8b5cf6';        // LLM calls
 const COMPUTE = '#3b82f6';     // deterministic / Cython compute
-const ENTITLE = '#f59e0b';     // EPM entitlement chain
+const ENTITLE = '#f59e0b';     // permission cascade (entitlement chain)
 const DATA = '#ea580c';        // Postgres rail
 const WALL = '#ef4444';        // wall barrier
 const HERO = '#d4a0a7';        // hero accent (same as site accent)
@@ -365,14 +365,14 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // EPM entitlement chain (horizontal, centered)
+  // Permission cascade (horizontal, centered)
   {
     id: 'entitle-chain',
     type: 'chain',
     position: { x: 185, y: 415 },
     data: {
-      label: 'EPM entitlement chain (applied before compute)',
-      steps: ['cube', 'security', 'employees', 'transits', 'SQL'],
+      label: 'permission cascade (applied before compute)',
+      steps: ['domain', 'access', 'entities', 'events', 'SQL'],
       color: ENTITLE,
     } satisfies ChainNodeData,
     draggable: false,
@@ -386,7 +386,7 @@ const initialNodes: Node[] = [
     data: {
       badge: 'Hero',
       label: 'Event-level ins-outs math',
-      sub: 'Cython · netting · ms over 40K transits',
+      sub: 'Cython · netting · ms over 40K events',
       color: COMPUTE,
       size: 'lg',
       glow: true,
@@ -401,7 +401,7 @@ const initialNodes: Node[] = [
     position: { x: 580, y: 525 },
     data: {
       text: '40K! factorial combinations',
-      sub: '~40K transits · ~9K rollups · ~80K business · ~60K geography',
+      sub: '~40K events · ~9K rollups · ~80K business · ~60K geography',
       color: HERO,
       size: 'sm',
       dashedBorder: true,
@@ -446,7 +446,7 @@ const initialNodes: Node[] = [
     data: { badge: 'path A', label: '1 call', sub: 'simple answer', color: LLM, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
-  { id: 'sub-epm',  type: 'pill', position: { x: 250, y: 695 }, data: { badge: 'path B', label: 'EPM',        color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'sub-epm',  type: 'pill', position: { x: 250, y: 695 }, data: { badge: 'path B', label: 'Cost',       color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
   { id: 'sub-hc',   type: 'pill', position: { x: 430, y: 695 }, data: { badge: 'path B', label: 'Headcount',  color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
   { id: 'sub-open', type: 'pill', position: { x: 620, y: 695 }, data: { badge: 'path B', label: 'Open pos.',  color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
 

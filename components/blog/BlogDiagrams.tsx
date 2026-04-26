@@ -11,7 +11,9 @@ const Spinner = () => (
 // Post 1: Agentic AI
 export const AgenticArchitecture = dynamic(() => import('./diagrams/AgenticArchitecture'), { ssr: false, loading: Spinner });
 export const SubAgentExecution = dynamic(() => import('./diagrams/SubAgentExecution'), { ssr: false, loading: Spinner });
-export const EPMTranslation = dynamic(() => import('./diagrams/EPMTranslation'), { ssr: false, loading: Spinner });
+export const PermissionCascade = dynamic(() => import('./diagrams/PermissionCascade'), { ssr: false, loading: Spinner });
+/** @deprecated alias — see PermissionCascade. */
+export const EPMTranslation = PermissionCascade;
 export const FullSystemArchitecture = dynamic(() => import('./diagrams/FullSystemArchitecture'), { ssr: false, loading: Spinner });
 export const EventModelAnimation = dynamic(() => import('./diagrams/EventModelAnimation'), { ssr: false, loading: Spinner });
 

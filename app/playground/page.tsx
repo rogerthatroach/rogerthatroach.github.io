@@ -181,7 +181,7 @@ export default function PlaygroundPage() {
                 href="/playground/diagrams"
                 className="group inline-flex items-center gap-2 text-text-primary transition-colors hover:text-accent"
               >
-                <span className="font-medium">Diagrams — PAR Assist × 4 levels, click-to-drill</span>
+                <span className="font-medium">Diagrams — PAR Drafting Assistant × 4 levels, click-to-drill</span>
                 <span className="text-text-tertiary group-hover:text-accent">
                   — Overview / System / Orchestration / Tool contract
                 </span>

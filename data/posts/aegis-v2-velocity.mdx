@@ -1,4 +1,4 @@
-Aegis v2 went from concept to production in two weeks. I was simultaneously running Astraeus development and the 2025 Amplify internship program. The product shipped anyway. It earned the 2025 CFO One RBC Team Award.
+Benchmarking Engine v2 went from concept to production in two weeks. I was simultaneously running CFO Analytics Engine development and the 2025 summer intern program. The product shipped anyway. It earned the 2025 CFO One RBC Team Award.
 
 This isn&rsquo;t a post about working harder. It&rsquo;s a post about what velocity actually looks like when the architecture is right.
 
@@ -6,9 +6,9 @@ This isn&rsquo;t a post about working harder. It&rsquo;s a post about what veloc
 
 RBC&rsquo;s CFO Group benchmarks financial KPIs against the Big 6 Canadian banks using the Supplementary Financial Packages each bank publishes with its quarterly earnings. Publicly available, but complex &mdash; every bank names and nests its KPIs differently, CET1 Ratios live in different tables, similar-sounding metrics mean subtly different things. Finance analysts did this benchmarking by hand: opening each bank&rsquo;s SFP PDF, hunting for the right number, transcribing into a spreadsheet, reconciling, repeating every quarter. Hours per query.
 
-Aegis v1 was a rules-based benchmarking engine I&rsquo;d already built and productionized. It handled a defined catalog of KPIs well, but it couldn&rsquo;t accept natural language. If an analyst wanted to ask "how does our cost-to-income ratio compare against the peer average this quarter?" they still had to translate that question into v1&rsquo;s query syntax, or go back to the spreadsheet.
+Benchmarking Engine v1 was a rules-based benchmarking engine I&rsquo;d already built and productionized. It handled a defined catalog of KPIs well, but it couldn&rsquo;t accept natural language. If an analyst wanted to ask "how does our cost-to-income ratio compare against the peer average this quarter?" they still had to translate that question into v1&rsquo;s query syntax, or go back to the spreadsheet.
 
-Aegis v2 was the AI-native evolution: natural language in, validated SQL out, with embedding-based KPI disambiguation and architectural safety guarantees the analysts could actually trust.
+Benchmarking Engine v2 was the AI-native evolution: natural language in, validated SQL out, with embedding-based KPI disambiguation and architectural safety guarantees the analysts could actually trust.
 
 ## The five-stage pipeline
 
@@ -34,14 +34,14 @@ The work happened in the months before. What happened during the sprint was crys
 
 3. **Scope was ruthlessly bounded.** v2 did not do a lot of things. It didn&rsquo;t try to be a universal financial QA system. It didn&rsquo;t support free-form numerical reasoning. It didn&rsquo;t rewrite the visualization layer. Every temptation to expand scope during the sprint got deferred to post-launch. "We&rsquo;ll see if they ask for it once it&rsquo;s in production" is a harder answer to give than "sure, I&rsquo;ll add that," but it&rsquo;s the answer that keeps the ship date real.
 
-Underneath all three, there was also capacity protection. Astraeus was mid-flight. The Amplify program had interns I was mentoring. Two weeks of Aegis v2 work was possible only because the architecture&rsquo;s clarity meant I didn&rsquo;t need to be in the room for most implementation decisions. I could move between workstreams without each one losing momentum.
+Underneath all three, there was also capacity protection. CFO Analytics Engine was mid-flight. The summer intern program had interns I was mentoring. Two weeks of Benchmarking Engine v2 work was possible only because the architecture&rsquo;s clarity meant I didn&rsquo;t need to be in the room for most implementation decisions. I could move between workstreams without each one losing momentum.
 
 ## The result
 
 - Shipped to production in 2 weeks
 - Natural-language KPI benchmarking replacing manual Supplementary Financial Package lookups
 - 2025 CFO One RBC Team Award
-- Aegis v1, the rules-based predecessor, continued running in production through the rewrite &mdash; zero downtime on the benchmarking function that analysts relied on
+- Benchmarking Engine v1, the rules-based predecessor, continued running in production through the rewrite &mdash; zero downtime on the benchmarking function that analysts relied on
 
 ## The pattern
 
@@ -51,6 +51,6 @@ Two ideas worth taking seriously:
 
 2. **Decomposable pipelines beat monoliths.** Not only for testability, not only for maintainability &mdash; also for speed. Clear stage contracts let you parallelize work in a way monolithic agent architectures cannot.
 
-Aegis v2 is structurally a descendant of Astraeus&rsquo;s LLM-as-Router &mdash; LLMs used surgically, deterministic code handling everything else, with the LLM&rsquo;s role bounded by schemas and confidence thresholds. The systems look different because they&rsquo;re in different domains. Architecturally they&rsquo;re the same family.
+Benchmarking Engine v2 is structurally a descendant of CFO Analytics Engine&rsquo;s LLM-as-Router &mdash; LLMs used surgically, deterministic code handling everything else, with the LLM&rsquo;s role bounded by schemas and confidence thresholds. The systems look different because they&rsquo;re in different domains. Architecturally they&rsquo;re the same family.
 
 The hardest part wasn&rsquo;t shipping fast. The hardest part was knowing what not to build.

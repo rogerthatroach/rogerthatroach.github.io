@@ -6,25 +6,25 @@ import { motion } from 'framer-motion';
 const PERMISSION_SETS = [
   {
     label: 'Manager A',
-    cubes: ['Risk × NA × FY25', 'Risk × EU × FY25'],
+    domains: ['Risk × NA × FY25', 'Risk × EU × FY25'],
     groups: ['Risk-NA-Mgrs', 'Risk-EU-Mgrs'],
-    employees: 842,
-    transits: 1247,
-    sql: "WHERE transit_id IN (\n  SELECT transit_id\n  FROM entitlements\n  WHERE user_id = 'mgr_a'\n  -- 2 cubes → 2 groups → 842 emp → 1,247 transits\n)",
+    entities: 842,
+    events: 1247,
+    sql: "WHERE event_id IN (\n  SELECT event_id\n  FROM entitlements\n  WHERE user_id = 'mgr_a'\n  -- 2 domains → 2 groups → 842 entities → 1,247 events\n)",
   },
   {
     label: 'Director B',
-    cubes: ['Risk × NA × FY25', 'Risk × EU × FY25', 'Risk × APAC × FY25', 'Ops × NA × FY25'],
+    domains: ['Risk × NA × FY25', 'Risk × EU × FY25', 'Risk × APAC × FY25', 'Ops × NA × FY25'],
     groups: ['Risk-NA-Mgrs', 'Risk-EU-Mgrs', 'Risk-APAC-All', 'Ops-NA-Dir'],
-    employees: 3214,
-    transits: 5891,
-    sql: "WHERE transit_id IN (\n  SELECT transit_id\n  FROM entitlements\n  WHERE user_id = 'dir_b'\n  -- 4 cubes → 4 groups → 3,214 emp → 5,891 transits\n)",
+    entities: 3214,
+    events: 5891,
+    sql: "WHERE event_id IN (\n  SELECT event_id\n  FROM entitlements\n  WHERE user_id = 'dir_b'\n  -- 4 domains → 4 groups → 3,214 entities → 5,891 events\n)",
   },
 ];
 
-const STAGES = ['EPM Cubes', 'Security Groups', 'Employees', 'Transits', 'SQL Filter'];
+const STAGES = ['Domains', 'Access Groups', 'Entities', 'Events', 'SQL Filter'];
 
-export default function EPMTranslation() {
+export default function PermissionCascade() {
   const [permIdx, setPermIdx] = useState(0);
   const perm = PERMISSION_SETS[permIdx];
 
@@ -51,10 +51,10 @@ export default function EPMTranslation() {
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
         {STAGES.map((stage, i) => {
           const counts = [
-            perm.cubes.length,
+            perm.domains.length,
             perm.groups.length,
-            perm.employees,
-            perm.transits,
+            perm.entities,
+            perm.events,
             1,
           ];
           const stageLabels = ['α', 'β', 'γ', 'δ'];
@@ -76,7 +76,7 @@ export default function EPMTranslation() {
                 </motion.p>
                 {i < 2 && (
                   <div className="mt-1 space-y-0.5">
-                    {(i === 0 ? perm.cubes : perm.groups).map((item) => (
+                    {(i === 0 ? perm.domains : perm.groups).map((item) => (
                       <p key={item} className="truncate text-[9px] text-text-tertiary">{item}</p>
                     ))}
                   </div>
