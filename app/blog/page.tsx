@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { POSTS, isPostPublic, type BlogPost } from '@/data/posts';
 import { PROJECTS } from '@/data/projects';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-import PostCard from '@/components/blog/PostCard';
+import BlogIndexClient from '@/components/blog/BlogIndexClient';
+import type { AccordionGroup } from '@/components/blog/ProjectAccordion';
 
 export const metadata: Metadata = {
   title: 'Writings — Harmilap Singh Dhaliwal',
@@ -41,14 +42,6 @@ const PROJECT_ERA: Record<ProjectId, { label: string; dark: string; light: strin
   'combustion-tuning':    { label: 'Foundation',            dark: '#fca5a5', light: '#991b1b' },
 };
 
-interface ProjectGroup {
-  projectId: ProjectId | null;  // null = cross-cutting patterns
-  title: string;
-  deepDivePath?: string;
-  era?: { label: string; dark: string; light: string };
-  posts: BlogPost[];
-}
-
 export default function BlogIndexPage() {
   // NB: wrap `isPostPublic` in an arrow; `.filter(isPostPublic)` would
   // pass (element, index, array) and the array index would clobber the
@@ -57,18 +50,21 @@ export default function BlogIndexPage() {
 
   // Group posts by projectId. PROJECTS is already newest-first (PAR
   // Assist → Combustion Tuning); pattern posts fall into a final group.
-  const groups: ProjectGroup[] = [];
+  // Pass only `meta` shapes through to the accordion (client component
+  // boundary — keep the payload JSON-friendly and minimal).
+  const groups: AccordionGroup[] = [];
   for (const project of PROJECTS) {
     const projectPosts = published
       .filter((p) => p.meta.projectId === project.id)
       .sort((a, b) => new Date(b.meta.date).getTime() - new Date(a.meta.date).getTime());
     if (projectPosts.length === 0) continue;
     groups.push({
-      projectId: project.id as ProjectId,
+      projectId: project.id,
       title: project.title,
+      description: project.caption,
       deepDivePath: project.deepDivePath,
       era: PROJECT_ERA[project.id as ProjectId],
-      posts: projectPosts,
+      posts: projectPosts.map((p) => p.meta),
     });
   }
 
@@ -79,7 +75,7 @@ export default function BlogIndexPage() {
     groups.push({
       projectId: null,
       title: 'Patterns',
-      posts: patternPosts,
+      posts: patternPosts.map((p) => p.meta),
     });
   }
 
@@ -95,130 +91,13 @@ export default function BlogIndexPage() {
           Home
         </Link>
 
-        {/* Sticky header: title + subtitle + register legend stay pinned
-            below the nav while the grouped cards scroll beneath. The
-            translucent background + soft bottom border give the surface
-            enough contrast to separate from scrolling content without
-            breaking the wabi-sabi restraint. */}
-        <div className="sticky top-16 z-20 -mx-6 border-b border-border-subtle/40 bg-background/85 px-6 pb-5 pt-3 backdrop-blur-md md:-mx-16 md:px-16">
-          <h1 className="font-display text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
-          <p className="mt-2 max-w-2xl text-base text-text-secondary">
-            Technical explorations — architecture patterns, formal guarantees, and the systems
-            thinking behind the work. Grouped by project so posts about the same system read as
-            a set.
-          </p>
-
-          {/* Register legend — quiet, single-line. The glyph + word beside
-              each card in its top-right mirrors these three marks. */}
-          <dl className="mt-5 flex flex-wrap items-baseline gap-x-6 gap-y-2 text-[11px] text-text-tertiary">
-            <div className="flex items-baseline gap-1.5">
-              <dt aria-hidden="true" className="font-display text-base leading-none">
-                §
-              </dt>
-              <dd className="font-mono uppercase tracking-[0.18em]">
-                formal
-                <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
-                  theorem · proof · math
-                </span>
-              </dd>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <dt aria-hidden="true" className="font-display text-base leading-none">
-                ¶
-              </dt>
-              <dd className="font-mono uppercase tracking-[0.18em]">
-                practitioner
-                <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
-                  decisions · options considered · rationale
-                </span>
-              </dd>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <dt aria-hidden="true" className="font-display text-base leading-none">
-                ◯
-              </dt>
-              <dd className="font-mono uppercase tracking-[0.18em]">
-                builder
-                <span className="ml-2 font-sans normal-case tracking-normal text-text-tertiary/70">
-                  story · lessons · leadership
-                </span>
-              </dd>
-            </div>
-          </dl>
-        </div>
-
         {groups.length === 0 ? (
           <p className="mt-16 text-center text-sm text-text-tertiary">Posts coming soon.</p>
         ) : (
-          <div className="mt-10 space-y-12">
-            {groups.map((group) => (
-              <ProjectSection key={group.projectId ?? 'patterns'} group={group} />
-            ))}
-          </div>
+          <BlogIndexClient groups={groups} />
         )}
       </main>
       <Footer />
     </>
-  );
-}
-
-function ProjectSection({ group }: { group: ProjectGroup }) {
-  const isPatterns = group.projectId === null;
-  const accent = group.era;
-
-  return (
-    <section
-      aria-labelledby={`group-${group.projectId ?? 'patterns'}`}
-      className="relative"
-    >
-      {/* Accent bar running down the left edge, era-coloured per group */}
-      {!isPatterns && accent && (
-        <div
-          aria-hidden="true"
-          className="absolute left-0 top-0 hidden h-full w-[3px] rounded-full sm:block"
-          style={{
-            background: `linear-gradient(to bottom, ${accent.dark}aa, ${accent.dark}00)`,
-          }}
-        />
-      )}
-
-      <header className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 sm:pl-6">
-        {accent && (
-          <p
-            className="font-mono text-[10px] font-semibold uppercase tracking-widest"
-            style={{ color: accent.dark }}
-          >
-            <span className="dark:hidden" style={{ color: accent.light }}>
-              {accent.label}
-            </span>
-            <span className="hidden dark:inline">{accent.label}</span>
-          </p>
-        )}
-        <h2
-          id={`group-${group.projectId ?? 'patterns'}`}
-          className="font-display text-xl font-bold tracking-tight text-text-primary sm:text-2xl"
-        >
-          {group.title}
-        </h2>
-        <span className="font-mono text-xs text-text-tertiary">
-          {group.posts.length} {group.posts.length === 1 ? 'post' : 'posts'}
-        </span>
-        {group.deepDivePath && (
-          <Link
-            href={group.deepDivePath}
-            className="ml-auto inline-flex items-center gap-1 text-xs font-medium text-text-tertiary transition-colors hover:text-accent"
-          >
-            Case study
-            <ArrowRight size={12} aria-hidden="true" />
-          </Link>
-        )}
-      </header>
-
-      <div className="grid gap-6 sm:grid-cols-2 sm:pl-6">
-        {group.posts.map((post, i) => (
-          <PostCard key={post.meta.slug} post={post.meta} index={i} />
-        ))}
-      </div>
-    </section>
   );
 }
