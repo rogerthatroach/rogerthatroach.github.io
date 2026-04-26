@@ -9,7 +9,7 @@ import Glossed from '@/components/resume/story/Glossed'
 
 In September 2022, I joined <Glossed>CFO Group</Glossed> at a major Canadian bank as a Senior Data Scientist. No one had asked me to build AI. I was hired to help automate the <Glossed>Commodity Tax</Glossed> return process — a manual workflow that consumed finance analysts for months per cycle.
 
-By Q4 2023, the process took **90 minutes**. The metric earned a CFO Quarterly Team Award. More importantly, it earned the credibility to propose Benchmarking Engine, CFO Analytics Engine, and eventually PAR Drafting Assistant — a cascade that shaped the next three years.
+By Q4 2023, the process took **90 minutes**. The metric earned a CFO Quarterly Team Award. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually Prometheus — a cascade that shaped the next three years.
 
 This post walks through the architectural decision that made it land, the constraints that shaped it, and what I&rsquo;d do differently.
 
@@ -277,7 +277,7 @@ That confidence was the deliverable. The 90-minute metric was the side effect.
 
 ## What this opened
 
-By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose <Glossed>Benchmarking Engine v1</Glossed> — a benchmarking engine for the Big 6 Canadian banks — and get the air cover to build it. When Benchmarking Engine v1 shipped (2025 CFO One RBC Team Award), I could propose <Glossed>Benchmarking Engine v2</Glossed>, the text-to-SQL refactor, and deliver it in a concurrent 2-week sprint while CFO Analytics Engine productionization was underway. When <Glossed>CFO Analytics Engine</Glossed> reached production scale, I had the credibility to conceive <Glossed>PAR Drafting Assistant</Glossed> from an intern&rsquo;s proof-of-concept and scale it bank-wide.
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose <Glossed>Aegis v1</Glossed> — a benchmarking engine for the Big 6 Canadian banks — and get the air cover to build it. When Aegis v1 shipped (2025 CFO One RBC Team Award), I could propose <Glossed>Aegis v2</Glossed>, the text-to-SQL refactor, and deliver it in a concurrent 2-week sprint while Astraeus productionization was underway. When <Glossed>Astraeus</Glossed> reached production scale, I had the credibility to conceive <Glossed>Prometheus</Glossed> from an intern&rsquo;s proof-of-concept and scale it bank-wide.
 
 Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. Commodity Tax was underwriting every subsequent bet.
 
@@ -293,7 +293,7 @@ Your first project at a new organization isn&rsquo;t just a deliverable. It&rsqu
 
 The architectural decision — Tableau as a transparency layer, not an output — was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
 
-CFO Analytics Engine&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. PAR Drafting Assistant&rsquo;s MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
+Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. Prometheus&rsquo;s MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
 
 Commodity Tax was where I learned that.
 

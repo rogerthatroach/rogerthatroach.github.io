@@ -35,7 +35,7 @@ export interface Project {
 /**
  * Projects defined in chronological order (oldest → newest) so the arc
  * narrative reads cleanly in source. Exported reversed at the end so
- * consumers see latest-first (PAR Drafting Assistant → Combustion Tuning), which is
+ * consumers see latest-first (Prometheus → Combustion Tuning), which is
  * what recruiters and skimmers expect.
  */
 const PROJECTS_CHRONOLOGICAL: Project[] = [
@@ -104,13 +104,13 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   // Arc 4: Intelligent Systems (2024-present)
   {
     id: 'aegis',
-    title: 'Benchmarking Engine v2',
+    title: 'Aegis v2',
     subtitle: 'Text-to-SQL Peer Benchmarking — RBC CFO Group',
     role: 'Refactored v1 → v2 in a concurrent 2-week sprint',
     stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
     heroMetric: { value: AEGIS_V2_BUILD_TIME, label: 'v1 → v2 refactor' },
     caption:
-      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 refactored in a concurrent 2-week sprint alongside CFO Analytics Engine productionization and the summer intern program.',
+      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 refactored in a concurrent 2-week sprint alongside Astraeus productionization and the summer intern program.',
     description:
       'Strategic benchmarking engine for the CFO Group. v1 derives KPIs from Big 6 Canadian banks\' Supplementary Financial Packages. v2 adds intent parsing, text-to-SQL, and embeddings-based KPI disambiguation.',
     highlights: [
@@ -124,7 +124,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   },
   {
     id: 'astraeus',
-    title: 'CFO Analytics Engine',
+    title: 'Astraeus',
     subtitle: 'Financial Insights & Analysis Suite — RBC CFO Group',
     role: 'Architect, lead developer, product visionary',
     stack: ['GPT-4.1', 'Custom Python router', 'Cython compute', 'Postgres', 'EPM'],
@@ -146,7 +146,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   },
   {
     id: 'par-assist',
-    title: 'PAR Drafting Assistant',
+    title: 'Prometheus',
     subtitle: 'Enterprise Agentic AI Platform — RBC Bank-wide',
     role: 'Conceived vision, led strategic + technical requirements',
     stack: ['LangGraph', 'MCP', 'PostgreSQL + pgvector', 'Sonnet 4.5', 'Field-group RAG'],

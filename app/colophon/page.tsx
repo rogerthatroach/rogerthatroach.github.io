@@ -70,7 +70,7 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
         bezier edges. Custom node types (hero hub, dot, rail, label) for
         non-rectangular shapes. Hand-authored SVG where layout is static.
         KaTeX pre-rendered at module scope for math (never pass LaTeX
-        through client-component props). The PAR Drafting Assistant{' '}
+        through client-component props). Prometheus{' '}
         <a
           href="/blog/enterprise-agentic-ai-framework"
           className="text-accent underline underline-offset-4 hover:text-text-primary"

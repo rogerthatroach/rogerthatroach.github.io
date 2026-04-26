@@ -9,7 +9,7 @@ import { PAR_ASSIST_LEVELS } from '@/data/playgroundDiagrams';
 export const metadata: Metadata = {
   title: 'Playground · Diagrams — multi-level architecture',
   description:
-    'Click-to-drill architecture of PAR Drafting Assistant across four abstraction levels: Overview → System → Orchestration → Tool contract. Test bed for the diagrams-within-diagrams pattern before promoting to the formal blog post.',
+    'Click-to-drill architecture of Prometheus across four abstraction levels: Overview → System → Orchestration → Tool contract. Test bed for the diagrams-within-diagrams pattern before promoting to the formal blog post.',
   robots: { index: false, follow: false },
 };
 
@@ -37,7 +37,7 @@ export default function DiagramsPlaygroundPage() {
             The experiment: can a single architecture be read usefully at
             multiple abstraction levels, with click-to-drill between them? If
             the pattern holds, the best level(s) get promoted to the formal
-            agentic blog post. PAR Drafting Assistant is the test subject because it has
+            agentic blog post. Prometheus is the test subject because it has
             the most surface area (LangGraph + MCP + 3 RAG scopes) and a
             working single-level baseline in{' '}
             <code className="font-mono text-xs">components/diagrams/PARAssistDiagram.tsx</code>.
@@ -57,7 +57,7 @@ export default function DiagramsPlaygroundPage() {
         </div>
 
         <h1 className="mb-3 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
-          PAR Drafting Assistant · multi-level
+          Prometheus · multi-level
         </h1>
         <p className="mb-10 max-w-2xl text-base text-text-secondary">
           Four levels, one system. Start at the Overview (L0) and drill by
@@ -78,7 +78,7 @@ export default function DiagramsPlaygroundPage() {
               <li>
                 <strong className="text-text-primary">L0 Overview</strong> —
                 what the system is in one sentence (four nodes). The answer to
-                "what does PAR Drafting Assistant do?"
+                "what does Prometheus do?"
               </li>
               <li>
                 <strong className="text-text-primary">L1 System</strong> — the
@@ -131,7 +131,7 @@ export default function DiagramsPlaygroundPage() {
           </p>
           <ul className="ml-5 list-disc space-y-1 text-sm">
             <li>Add L2 drill to the Responder node (formatting + citation pipeline)</li>
-            <li>Apply the multi-level treatment to CFO Analytics Engine (3 parallel sub-agents — cleaner drill shape)</li>
+            <li>Apply the multi-level treatment to Astraeus (3 parallel sub-agents — cleaner drill shape)</li>
             <li>Scrollytelling variant: scroll-through L0 → L1 → L2 → L3 instead of click-drill</li>
             <li>3D variant: isometric stacked planes per level (opt-in, lazy-loaded)</li>
           </ul>

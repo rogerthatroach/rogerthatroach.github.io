@@ -9,7 +9,7 @@ In November 2025, I wrote a one-page plan for an AI system that would transform 
 
 This is the story of how it happened, what I learned about scaling an intern&rsquo;s proof-of-concept into an enterprise product, and why the hardest part had nothing to do with technology.
 
-<VisualizationContainer minHeight={1040} caption="PAR Drafting Assistant at a glance: the dashed envelope is the v1 single-agent governance scope. Intake → template MCP tool with decision-tree dialog → stage-1 field-group hub → N parallel extraction lanes (top-10 chunks · custom compression · Sonnet-4.5 call per group) → dict-union merge → coverage + follow-ups loop. Postgres rail beneath carries everything. The rest of the post explains why each piece is shaped the way it is.">
+<VisualizationContainer minHeight={1040} caption="Prometheus at a glance: the dashed envelope is the v1 single-agent governance scope. Intake → template MCP tool with decision-tree dialog → stage-1 field-group hub → N parallel extraction lanes (top-10 chunks · custom compression · Sonnet-4.5 call per group) → dict-union merge → coverage + follow-ups loop. Postgres rail beneath carries everything. The rest of the post explains why each piece is shaped the way it is.">
 {() => <AgenticArchitecturePAR />}
 </VisualizationContainer>
 
@@ -27,7 +27,7 @@ I saw it could scale from a one-team prototype to a bank-wide platform. Not a ch
 
 ## The architecture decisions
 
-**The governance constraint that shaped everything.** PAR Drafting Assistant was the first true agentic system approved for production at the bank. The governance envelope for v1 was a single agent, one approved scope — no multi-agent orchestration. Every architectural decision below had to deliver agentic *behaviour* (branching dialog, parallel specialized work, multi-turn state) without crossing into multi-agent *shape*. That constraint is the spine of the system.
+**The governance constraint that shaped everything.** Prometheus was the first true agentic system approved for production at the bank. The governance envelope for v1 was a single agent, one approved scope — no multi-agent orchestration. Every architectural decision below had to deliver agentic *behaviour* (branching dialog, parallel specialized work, multi-turn state) without crossing into multi-agent *shape*. That constraint is the spine of the system.
 
 **Why LangGraph over CrewAI / AutoGen.** Two reasons, in that order. First: at evaluation time LangGraph was the most mature, stable graph-orchestration library — production-deployed elsewhere, active maintenance. In a regulated-finance first-deployment context, stable-and-maintained outranks elegant-on-paper. Second: the drafting session is shaped like a graph, not a pipeline — template selection, field-group retrieval, extraction, sometimes loop back to clarify open follow-ups. LangGraph&rsquo;s checkpointer wires directly into Postgres, so session durability comes for free. CrewAI and AutoGen were considered but not deeply evaluated — multi-agent primitives wouldn&rsquo;t have cleared the single-agent governance bar anyway.
 
@@ -47,13 +47,13 @@ The hardest part wasn&rsquo;t the architecture. It was three things.
 
 **Scoping.** The intern prototype tried to do everything. The production version does one thing exceptionally well: guide a user through a PAR draft, step by step, with the right context at the right moment. Saying no to features is harder than building them. Every &ldquo;what if we also&hellip;&rdquo; is a seductive detour. I learned to ask: does this serve the guided-drafting promise, or dilute it? The answers were usually no.
 
-**Parallel execution.** I was running PAR Drafting Assistant alongside CFO Analytics Engine (the production analytics platform) and the tail end of Benchmarking Engine v2. The only way it worked was because the architecture was clean enough that the work could be parallelized. Clean separation of concerns isn&rsquo;t just good engineering. It&rsquo;s a management strategy. When your components have narrow interfaces, multiple workstreams can progress independently without stepping on each other. I didn&rsquo;t appreciate this until I was trying to run three products with one direct report and a rotating cast of interns.
+**Parallel execution.** I was running Prometheus alongside Astraeus (the production analytics platform) and the tail end of Aegis v2. The only way it worked was because the architecture was clean enough that the work could be parallelized. Clean separation of concerns isn&rsquo;t just good engineering. It&rsquo;s a management strategy. When your components have narrow interfaces, multiple workstreams can progress independently without stepping on each other. I didn&rsquo;t appreciate this until I was trying to run three products with one direct report and a rotating cast of interns.
 
 **Trusting the origin.** An intern had the initial idea. Some leaders would have absorbed it, renamed it, and made it &ldquo;theirs.&rdquo; I think that&rsquo;s how you kill innovation. The best thing I did was resource the idea, scale the vision, and make sure everyone, including senior leadership, knew where it started. That&rsquo;s not generosity. It&rsquo;s how you build a team where people bring their best ideas to work. If the intern who sparks your next enterprise product gets a promotion, a reference, and visible credit, the next intern does too. And the one after that.
 
 ## The result
 
-PAR Drafting Assistant&rsquo;s pilot launched in April 2026, less than three months from when real development started after holidays and team restructuring. Enterprise rollout across RBC business lines continues through Q2 and Q3 2026. What was weeks of manual drafting becomes a guided interactive session — one that cites every extracted field back to a policy, guideline, or few-shot example. It targets key PAR authors: project sponsors, senior leaders, PMO teams, across all RBC business lines. And crucially, v1 is the substrate the v2 multi-agent &ldquo;skills&rdquo; framework is being built on — not a throwaway, but the part of v2 that already passed governance review.
+Prometheus&rsquo;s pilot launched in April 2026, less than three months from when real development started after holidays and team restructuring. Enterprise rollout across RBC business lines continues through Q2 and Q3 2026. What was weeks of manual drafting becomes a guided interactive session — one that cites every extracted field back to a policy, guideline, or few-shot example. It targets key PAR authors: project sponsors, senior leaders, PMO teams, across all RBC business lines. And crucially, v1 is the substrate the v2 multi-agent &ldquo;skills&rdquo; framework is being built on — not a throwaway, but the part of v2 that already passed governance review.
 
 ## What I&rsquo;d do differently
 
@@ -63,7 +63,7 @@ Involve end users (PAR authors) earlier in the design process. We built based on
 
 ## The pattern
 
-PAR Drafting Assistant follows the same closed-loop pattern as every system I&rsquo;ve built.
+Prometheus follows the same closed-loop pattern as every system I&rsquo;ve built.
 
 - **Sense.** Ingest uploaded material (pptx / docx / pdf / txt / images via GPT-4-turbo OCR); template MCP tool classifies the PAR type via decision-tree dialog.
 - **Model.** Stage-1 retrieval picks relevant field groups; stage-2 retrieves top-10 chunks per group; custom compression fits them into scoped prompts.
@@ -79,7 +79,7 @@ The technology is different from Particle Swarm Optimization on a 900MW coal pla
 ```bibtex
 @misc{dhaliwal2026parassist,
   author  = {Dhaliwal, Harmilap Singh},
-  title   = {How We Built PAR Drafting Assistant: From Intern POC to Bank-Wide Product},
+  title   = {How We Built Prometheus: From Intern POC to Bank-Wide Product},
   year    = {2026},
   month   = {April},
   url     = {https://rogerthatroach.github.io/blog/par-assist-building},
@@ -87,7 +87,7 @@ The technology is different from Particle Swarm Optimization on a 900MW coal pla
 }
 ```
 
-Or plain text: *Dhaliwal, Harmilap Singh. (April 2026). How We Built PAR Drafting Assistant: From Intern POC to Bank-Wide Product. https://rogerthatroach.github.io/blog/par-assist-building.*
+Or plain text: *Dhaliwal, Harmilap Singh. (April 2026). How We Built Prometheus: From Intern POC to Bank-Wide Product. https://rogerthatroach.github.io/blog/par-assist-building.*
 
 ---
 

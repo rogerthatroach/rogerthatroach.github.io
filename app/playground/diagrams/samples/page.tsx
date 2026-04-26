@@ -104,7 +104,7 @@ export default function DiagramSamplesPage() {
         <p className="mb-12 max-w-2xl text-base text-text-secondary">
           One diagram type per section. The caption under each explains{' '}
           <strong className="text-text-primary">when</strong> it&rsquo;s the
-          right tool. None of these are the PAR Drafting Assistant architecture — this is
+          right tool. None of these are Prometheus architecture — this is
           about the <em>shape</em> of the diagram, not the system it describes.
         </p>
 

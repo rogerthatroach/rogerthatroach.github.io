@@ -98,7 +98,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived PAR Drafting Assistant (pilot April 2026; enterprise rollout in progress). Productionized CFO Analytics Engine. Refactored Benchmarking Engine v1 → v2 in a concurrent 2-week sprint. Led the 2025 summer intern cohort. ~70% hands-on.',
+      'Architecting enterprise agentic AI. Conceived Prometheus (pilot April 2026; enterprise rollout in progress). Productionized Astraeus. Refactored Aegis v1 → v2 in a concurrent 2-week sprint. Led the 2025 summer intern cohort. ~70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
@@ -108,12 +108,12 @@ export const TIMELINE: TimelineNode[] = [
       label: 'Conceived + architected in 12 months',
     },
     transitionStory:
-      'Promoted internally from Senior Data Scientist after 2.5 years — Commodity Tax (months → 90 min), Benchmarking Engine v1 productionization, CFO Analytics Engine groundwork. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and ownership of net-new enterprise platforms (PAR Drafting Assistant originated post-promotion via the summer intern program).',
+      'Promoted internally from Senior Data Scientist after 2.5 years — Commodity Tax (months → 90 min), Aegis v1 productionization, Astraeus groundwork. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and ownership of net-new enterprise platforms (Prometheus originated post-promotion via the summer intern program).',
     teamContext:
-      'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (the 2025 summer intern cohort led the conversion of an intern POC → bank-wide product). Cross-functional leadership of engineering services partners (senior + junior) on CFO Analytics Engine. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
+      'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (the 2025 summer intern cohort led the conversion of an intern POC → bank-wide product). Cross-functional leadership of engineering services partners (senior + junior) on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
     projects: [
       {
-        name: 'PAR Drafting Assistant',
+        name: 'Prometheus',
         oneLiner:
           'Enterprise-wide agentic AI platform guiding PAR drafting across all RBC business lines. Pilot launched April 2026.',
         decisionRationale:
@@ -123,7 +123,7 @@ export const TIMELINE: TimelineNode[] = [
         blogLink: '/blog/par-assist-building',
       },
       {
-        name: 'CFO Analytics Engine',
+        name: 'Astraeus',
         oneLiner:
           'Production analytics platform for CFO Group — dynamic headcount, HR costs, open positions at bank scale with millisecond slicing. Production since Nov 2025.',
         decisionRationale:
@@ -132,9 +132,9 @@ export const TIMELINE: TimelineNode[] = [
         caseStudyLink: '/projects/astraeus',
       },
       {
-        name: 'Benchmarking Engine v2',
+        name: 'Aegis v2',
         oneLiner:
-          'Concurrent 2-week refactor of Benchmarking Engine v1 into a text-to-SQL-first architecture with KPI disambiguation and guardrails.',
+          'Concurrent 2-week refactor of Aegis v1 into a text-to-SQL-first architecture with KPI disambiguation and guardrails.',
         decisionRationale:
           'Guarded LLM disambiguation over pure semantic search for near-duplicate KPI names. Text-to-SQL with whitelisting + parameterization over free-form generation — schema safety is non-negotiable in regulated finance.',
         metric: { value: '2 weeks', label: 'v1 → v2 refactor sprint' },
@@ -151,8 +151,8 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'Senior Data Scientist — CFO Group',
     description:
-      'Overhauled the Commodity Tax process (months → 90 min). Productionized Benchmarking Engine v1. Built the data foundations for CFO Analytics Engine. Earned trust with CFO stakeholders.',
-    skills: ['PySpark', 'SQL', 'Tableau', 'Financial Modeling', 'Benchmarking Engine v1'],
+      'Overhauled the Commodity Tax process (months → 90 min). Productionized Aegis v1. Built the data foundations for Astraeus. Earned trust with CFO stakeholders.',
+    skills: ['PySpark', 'SQL', 'Tableau', 'Financial Modeling', 'Aegis v1'],
     milestone: COMMODITY_TAX_EFFICIENCY,
     accent: 'amber',
     logoPath: '/images/logos/rbc.svg',
@@ -161,9 +161,9 @@ export const TIMELINE: TimelineNode[] = [
       label: 'Tax allocation automated (months → 90 min)',
     },
     transitionStory:
-      'Joined RBC after Quantiphi seeking financial services depth and a bigger platform than consulting. The Senior DS role at CFO Group delivered C-suite stakeholder access, bank-scale data (Big 6 peer benchmarking, enterprise GL), and the chance to evolve from ML engineering into product-oriented data science. Promotion to Lead came from accumulated trust — Commodity Tax built credibility, Benchmarking Engine v1 proved product ownership, CFO Analytics Engine groundwork demonstrated vision.',
+      'Joined RBC after Quantiphi seeking financial services depth and a bigger platform than consulting. The Senior DS role at CFO Group delivered C-suite stakeholder access, bank-scale data (Big 6 peer benchmarking, enterprise GL), and the chance to evolve from ML engineering into product-oriented data science. Promotion to Lead came from accumulated trust — Commodity Tax built credibility, Aegis v1 proved product ownership, Astraeus groundwork demonstrated vision.',
     teamContext:
-      'Individual contributor progressing toward leadership. Partnered with CFO Group leadership, Commodity Tax team, and finance teams across the bank. Mentored junior data scientists. Built the stakeholder relationships that made CFO Analytics Engine possible.',
+      'Individual contributor progressing toward leadership. Partnered with CFO Group leadership, Commodity Tax team, and finance teams across the bank. Mentored junior data scientists. Built the stakeholder relationships that made Astraeus possible.',
     projects: [
       {
         name: 'Commodity Tax Automation',
@@ -175,7 +175,7 @@ export const TIMELINE: TimelineNode[] = [
         caseStudyLink: '/projects/commodity-tax',
       },
       {
-        name: 'Benchmarking Engine v1',
+        name: 'Aegis v1',
         oneLiner:
           'Canadian Supplementary Benchmarking engine — derives and compares peer KPIs from Big 6 Canadian banks\' SuppPack data.',
         decisionRationale:

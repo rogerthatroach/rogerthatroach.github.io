@@ -19,7 +19,7 @@ import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
 import { useThemeColor } from '@/lib/useThemeColor';
 
 /**
- * PAR Assist architecture — "the envelope" diagram.
+ * Prometheus architecture — "the envelope" diagram.
  *
  * One hero visual: a dashed governance envelope that says *this is one
  * agent* from the review side, wrapping a graph whose middle ring fans
@@ -560,16 +560,21 @@ export default function AgenticArchitecturePAR() {
   const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
-    <div className="relative h-[1020px] w-full">
-      {/* Dashed envelope overlay — visually wraps the single-agent region */}
+    <div
+      className="relative w-full"
+      style={{ aspectRatio: '820 / 1020' }}
+    >
+      {/* Dashed envelope overlay — wraps the single-agent region.
+          Percentage-based so it scales with the responsive aspect-ratio
+          box and doesn't overflow on narrow viewports. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute rounded-3xl border-2 border-dashed"
         style={{
-          left: 22,
-          top: 42,
-          width: 780,
-          height: 870,
+          left: '2.5%',
+          right: '2.5%',
+          top: '4%',
+          bottom: '10.5%',
           borderColor: `${ACCENT}77`,
           boxShadow: `inset 0 0 40px ${ACCENT}0c`,
           zIndex: 0,
