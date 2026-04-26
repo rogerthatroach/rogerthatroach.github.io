@@ -248,11 +248,12 @@ export const TIMELINE: TimelineNode[] = [
     milestone: `${DIGITAL_TWIN_SAVINGS}/year savings`,
     accent: 'emerald',
     logoPath: '/images/logos/tcs.svg',
-    // TCS source had ~80% blank vertical space (viewBox 2000x2000 around a
-    // 1800x480 mark). Cropped the SVG's viewBox to the tight bounds; mark
-    // is a ~3.75:1 wide wordmark now. Rendered ~20% under default height
-    // so it sits a notch smaller than RBC / Quantiphi headers.
-    logoClass: 'h-10 w-auto max-w-[156px] md:h-11',
+    // TCS wordmark is ~3.75:1 wide. Even cropped, the rendered width
+    // dominated the timeline card on mobile. Shrunk to ~75% of the
+    // default (h-8 / md:h-9 vs default h-11 / md:h-12) and capped at
+    // max-w-[120px] so it sits visibly smaller than the org name +
+    // role-title block alongside it.
+    logoClass: 'h-8 w-auto max-w-[120px] md:h-9 md:max-w-[132px]',
     // Logo already carries the "Tata Consultancy Services" wordmark — no
     // need to restate it in text next to it.
     hideOrgNameInHeader: true,
