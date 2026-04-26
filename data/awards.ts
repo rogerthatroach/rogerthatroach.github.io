@@ -21,7 +21,7 @@ export const AWARDS: Award[] = [
     detail: 'LLM/AI initiatives, esp. Aegis v1 productionization',
   },
   {
-    title: 'CFO Quarterly Team Award',
+    title: 'CFO Group RBC Quarterly Team Award',
     org: 'RBC',
     year: 'Q4 2023',
     detail: 'Automating Commodity Tax Return process',

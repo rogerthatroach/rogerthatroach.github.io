@@ -1,12 +1,15 @@
-In September 2022, I joined RBC&rsquo;s CFO Group as a Senior Data Scientist. No one had asked me to build AI. I was hired to help automate the Commodity Tax return process &mdash; a manual workflow that consumed finance analysts for months per cycle.
+import { CommodityTaxPipeline } from "@/components/blog/BlogDiagrams"
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
 
-By Q4 2023, the process took 90 minutes. The metric earned a CFO Quarterly Team Award. And more importantly, it earned the credibility to propose Aegis, Astraeus, and eventually Prometheus &mdash; a cascade that shaped my next three years at the bank.
+In September 2022 I joined RBC&rsquo;s CFO Group as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the Commodity Tax return process &mdash; a manual workflow that consumed finance analysts for months per cycle.
 
-This is the story of how automating a tax process became a stakeholder-trust project in disguise, and the architectural decision that made it land.
+By Q4 2023, the process took 90 minutes. The metric earned a CFO Group RBC Quarterly Team Award. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually Prometheus &mdash; a cascade that shaped the next three years.
+
+This is the story of how automating a tax process became a stakeholder-trust project in disguise, and the architectural decision that made it land. The post that captures the *idea* most precisely happened on a single afternoon in cycle 1 &mdash; an analyst flagged a number that looked wrong, we clicked through the dashboard together, and we found a real bug. That session was the whole strategy compressed into thirty minutes.
 
 ## The problem
 
-Commodity tax returns at a major Canadian bank are not a small piece of paperwork. Finance teams pull transactions from General Ledger journals &mdash; millions of rows per cycle &mdash; reconcile them against tax categories, and produce returns that reach CFO-level sign-off. The process had accumulated years of institutional knowledge: undocumented edge cases, manual overrides, tribal understanding of which GL accounts mapped to which tax buckets.
+Commodity tax returns at a major Canadian bank are not small paperwork. Finance teams pull transactions from General Ledger journals &mdash; ~10&ndash;50 million rows per cycle &mdash; reconcile them against tax categories, and produce returns that reach CFO-level sign-off. The total tax allocation runs to roughly $600M per cycle. The process had accumulated years of institutional knowledge: undocumented edge cases, manual overrides, tribal understanding of which GL accounts mapped to which tax buckets.
 
 Automating it wasn&rsquo;t &ldquo;wrap a Python script around Excel.&rdquo; It meant codifying tribal knowledge without breaking anyone&rsquo;s trust in the numbers.
 
@@ -20,7 +23,7 @@ That framing changed how I built.
 
 ## The architecture decision that mattered
 
-The obvious technical stack was straightforward: PySpark for the extraction (GL journals are too big for pandas at this scale), orchestration around the tax category mappings, output artifacts the finance team could hand off.
+The obvious technical stack was straightforward: PySpark on CDP for the extraction (GL journals are too big for pandas at this scale), orchestration around the tax category mappings, output artifacts the finance team could hand off.
 
 The decision that mattered wasn&rsquo;t technical. It was architectural-as-stakeholder-management.
 
@@ -30,24 +33,53 @@ Every step of the automation &mdash; the GL pull, the reconciliation, the catego
 
 This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation &mdash; even one with bugs in v1 &mdash; built a debuggable, auditable relationship between the analysts and the system.
 
-## The stakeholder story
+<VisualizationContainer
+  minHeight={500}
+  caption="Five-stage pipeline (Extract → Reconcile → Category map → Aggregate → Return) with a parallel Tableau dashboard rail. Each pipeline stage has a dashboard tap that lets analysts drill from a number back to the source GL row. Transparency runs alongside compute, not at the end."
+>
+  {() => <CommodityTaxPipeline />}
+</VisualizationContainer>
 
-The first few cycles, I sat with tax analysts as they ran the pipeline. They&rsquo;d question a number; we&rsquo;d click into the Tableau view together; we&rsquo;d trace it back to the source; we&rsquo;d either confirm the automation&rsquo;s logic or I&rsquo;d fix a mapping. Each of those sessions was simultaneously a bug-hunt and a trust-building ritual.
+## The afternoon that proved the thesis
 
-Within two cycles, analysts were running the pipeline themselves, bringing only the edge cases to me. Within four, they were suggesting new dashboards. By the time the Q4 2023 cycle finished in 90 minutes, the team&rsquo;s confidence in the system was greater than their confidence in the manual process it replaced.
+Cycle 1, sometime in Q1 2023. A senior tax analyst &mdash; the kind of person who&rsquo;d been doing this manually for years and had every reason to be suspicious of the new automation &mdash; flagged a number in the GST aggregation. Said it looked off. Couldn&rsquo;t articulate exactly why; just felt wrong against years of pattern recognition.
+
+In the old world, that&rsquo;s where adoption dies. Automation produces a number; expert says the number doesn&rsquo;t feel right; expert reverts to spreadsheets; trust is lost.
+
+In the new world, we clicked through together.
+
+We started at the aggregated number on the return-preview dashboard. Drilled into the pivot view to see which buckets had contributed. One bucket looked over-large. Drilled into the mapping audit to see which GL accounts had landed in that bucket. Two of them shouldn&rsquo;t have been there &mdash; the analyst recognized them immediately as accounts that had been re-categorized in a tax-law update three quarters earlier. The rule that mapped them was stale.
+
+We fixed the mapping in fifteen minutes. Re-ran the cycle. The number came right.
+
+That session did three things at once. It found a real bug. It demonstrated the pipeline could be inspected, not just used. And it made the analyst, for the first time, the pipeline&rsquo;s collaborator instead of its skeptic. By the end of the afternoon they were asking what other dashboards I could build.
+
+The 90-minute end-state was downstream of moments like this. The automation got faster because the trust got thicker.
+
+## The four-cycle ritual
+
+That cycle-1 session became a template. Every cycle, I sat with tax analysts as they ran the pipeline. They&rsquo;d question a number; we&rsquo;d click into the Tableau view together; we&rsquo;d trace it back to the source; we&rsquo;d either confirm the automation&rsquo;s logic or I&rsquo;d fix a mapping. Each of those sessions was simultaneously a bug-hunt and a trust-building ritual.
+
+Within two cycles, analysts were running the pipeline themselves, bringing only the edge cases to me. By cycle 3 they were suggesting new dashboards. By the time the Q4 2023 cycle finished in 90 minutes, the team&rsquo;s confidence in the system was greater than their confidence in the manual process it replaced.
 
 That confidence was the deliverable. The 90-minute metric was the side effect.
 
 ## The result
 
-- **Months to 90 minutes** per cycle
+- **Months → 90 minutes** per cycle
 - **CFO Group RBC Quarterly Team Award** (Q4 2023)
 - A production pipeline that&rsquo;s processed every cycle since, with Tableau dashboards still serving as the monitoring surface
 - A finance team that started bringing ideas to the AI team, not the other way around
 
+## What I&rsquo;d do differently
+
+One scope call I&rsquo;d revisit: the first dashboard set deliberately did not surface the category-mapping rule book. Analysts could drill from final number to journal row, but the *rules* that produced each mapping lived in Python code. When new categories emerged &mdash; a tax-law update, a re-categorized GL account, a one-off finance restructure &mdash; only I could add them. The mapping change was easy; the deploy was a real friction.
+
+In retrospect I&rsquo;d have built a *mapping-rules dashboard* from cycle 2 onward &mdash; letting analysts propose rule additions directly (still requiring code-review approval before production), turning the mapping layer from a single-person bottleneck into a shared surface. It would have cost about a week in v1 and saved much more than that across the next two years. The transparency-as-architecture principle worked for *outputs*; I should have applied it to the *rules* too.
+
 ## What this opened
 
-By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Aegis v1 &mdash; a rules-based benchmarking engine for the Big 6 Canadian banks &mdash; and get the air cover to build it. When Aegis v1 shipped, I could propose Aegis v2, the AI-native rewrite, and deliver it in two weeks while the team was already scaling Astraeus. When Astraeus reached production scale, I had the credibility to conceive Prometheus from an intern&rsquo;s proof-of-concept and scale it to a bank-wide platform.
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Aegis v1 &mdash; a rules-based benchmarking engine for the Big 6 Canadian banks &mdash; and get the air cover to build it. When Aegis v1 shipped, I could propose Aegis v2, the AI-native refactor, and deliver it in two weeks while Astraeus productionization was already underway. When Astraeus reached production scale, I had the credibility to conceive Prometheus from an intern&rsquo;s proof-of-concept and scale it to a bank-wide platform.
 
 Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. The Commodity Tax was underwriting every subsequent bet.
 
@@ -55,10 +87,10 @@ Every one of those projects was technically ambitious. None of them would have b
 
 Your first project at a new organization isn&rsquo;t just a deliverable. It&rsquo;s the audition that determines which doors open next.
 
-The architectural decision I made &mdash; Tableau as a transparency layer, not an output &mdash; was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
+The architectural decision &mdash; Tableau as a transparency layer, not an output &mdash; was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
 
-Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. Prometheus&rsquo;s MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
+Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. Aegis v2&rsquo;s confidence-thresholded clarification is a descendant of this idea &mdash; it would rather ask than confidently mis-resolve. Prometheus&rsquo;s typed MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
 
-Commodity Tax was where I learned that.
+Commodity Tax was where I learned that. Cycle 1 was where the lesson actually landed.
 
 The technology changes. The pattern doesn&rsquo;t.

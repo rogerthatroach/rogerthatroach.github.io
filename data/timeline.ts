@@ -157,7 +157,7 @@ export const TIMELINE: TimelineNode[] = [
     accent: 'amber',
     logoPath: '/images/logos/rbc.svg',
     headlineMetric: {
-      value: '$600M+',
+      value: '$600M',
       label: 'Tax allocation automated (months → 90 min)',
     },
     transitionStory:
@@ -168,9 +168,9 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: 'Commodity Tax Automation',
         oneLiner:
-          '~$250M GST + ~$350M PVAT allocated across the organization; processing time slashed from months to 90 minutes.',
+          '~$600M tax allocation per cycle; processing time slashed from months to 90 minutes.',
         decisionRationale:
-          'PySpark over pandas/plain SQL — General Ledger data is bank-scale (hundreds of millions of rows per tax period). Tableau over custom dashboards — CFO Group muscle memory is Tableau; adoption friction matters more than framework novelty.',
+          'PySpark over pandas/plain SQL — General Ledger data is bank-scale (~10–50M rows per cycle, full-period scans needed). Tableau over custom dashboards — CFO Group muscle memory is Tableau; adoption friction matters more than framework novelty.',
         metric: { value: COMMODITY_TAX_EFFICIENCY, label: 'Processing time' },
         caseStudyLink: '/projects/commodity-tax',
       },
