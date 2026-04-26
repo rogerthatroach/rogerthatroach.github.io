@@ -72,7 +72,7 @@ export default function FontCard({
         </div>
 
         <p className={`${monoClass} pt-2 text-[11px] text-text-tertiary`}>
-          Nov 2025 · 40,000 transits · 99.95% accuracy · $3M/yr
+          Nov 2025 · 40,000 events · 99.95% accuracy · $3M/yr
         </p>
       </div>
     </div>

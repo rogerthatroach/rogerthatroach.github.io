@@ -32,13 +32,16 @@ export const AWARDS_COUNT = AWARDS.length;
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * RBC production AI systems (3):
- *   1. PAR Assist  — pilot launched April 2026; enterprise rollout in progress
- *   2. Astraeus    — production since Nov 2025
- *   3. Aegis       — v1 shipped, v2 is a concurrent refactor of v1 (one product, two revisions)
+ * RBC production AI systems (3). Display names are functional descriptors
+ * (per 2026-04-25 confidentiality scrub); internal codenames are the
+ * "formerly:" trail kept in glossary cross-references.
  *
- * Per 2026-04-21 audit: do NOT present Aegis v2 as an independent 4th product.
- * v2 was a 2-week focused refactor of v1 done alongside PAR Assist + Astraeus work.
+ *   1. PAR Drafting Assistant     (formerly PAR Assist) — pilot launched April 2026; enterprise rollout in progress
+ *   2. CFO Analytics Engine       (formerly Astraeus)   — production since Nov 2025
+ *   3. Benchmarking Engine        (formerly Aegis)      — v1 shipped, v2 is a concurrent 2-week refactor of v1 (one product, two revisions)
+ *
+ * Per 2026-04-21 audit: do NOT present the v2 refactor as an independent 4th product.
+ * v2 was a 2-week focused refactor of v1 done alongside PAR + CFO Analytics Engine work.
  */
 export const PRODUCTION_SYSTEMS_COUNT = 3;
 
@@ -65,21 +68,36 @@ export const COMMODITY_TAX_EFFICIENCY = 'Months → 90 min';
 export const COMMODITY_TAX_EFFICIENCY_COMPACT = '90 min';
 
 /**
- * Aegis v2 refactor sprint length. NOT an independent concept-to-production
- * timeline — v2 is a 2-week refactor of v1 done alongside other primary work.
- * Display label should read "v1 → v2 refactor" or similar, NOT "Concept → Production".
+ * Benchmarking Engine v2 refactor sprint length. NOT an independent
+ * concept-to-production timeline — v2 is a 2-week refactor of v1 done
+ * alongside other primary work. Display label should read
+ * "v1 → v2 refactor" or similar, NOT "Concept → Production".
+ *
+ * Formerly: "Aegis v2 build time".
  */
-export const AEGIS_V2_BUILD_TIME = '2 weeks';
+export const BENCHMARKING_V2_BUILD_TIME = '2 weeks';
+/** @deprecated alias kept for legacy import sites — see BENCHMARKING_V2_BUILD_TIME. */
+export const AEGIS_V2_BUILD_TIME = BENCHMARKING_V2_BUILD_TIME;
 
-/** Transits: leaf-level routing / cost-centre units in Astraeus. */
-export const ASTRAEUS_FACTORIAL_COMBINATIONS = '~40,000';
-/** Rollups: intermediate aggregation levels above transits. */
-export const ASTRAEUS_ROLLUPS = '~9,000';
-/** Geography hierarchy size: total nodes in RBC's cost-centre geography tree (hierarchy, not transits). */
-export const ASTRAEUS_GEOGRAPHIES = '~60,000';
+/** Events: leaf-level routing / cost-centre records in the CFO Analytics Engine. (Formerly: "transits".) */
+export const CFO_ANALYTICS_FACTORIAL_COMBINATIONS = '~40,000';
+/** @deprecated alias kept for legacy imports — see CFO_ANALYTICS_FACTORIAL_COMBINATIONS. */
+export const ASTRAEUS_FACTORIAL_COMBINATIONS = CFO_ANALYTICS_FACTORIAL_COMBINATIONS;
 
-/** PAR Assist pilot launched April 2026; bank-wide rollout in progress through Q2/Q3 2026. */
-export const PAR_ASSIST_SCALE = 'Bank-wide';
+/** Rollups: intermediate aggregation levels above leaf-level events. */
+export const CFO_ANALYTICS_ROLLUPS = '~9,000';
+/** @deprecated alias — see CFO_ANALYTICS_ROLLUPS. */
+export const ASTRAEUS_ROLLUPS = CFO_ANALYTICS_ROLLUPS;
+
+/** Geography hierarchy size: total nodes in RBC's cost-centre geography tree (hierarchy, not events). */
+export const CFO_ANALYTICS_GEOGRAPHIES = '~60,000';
+/** @deprecated alias — see CFO_ANALYTICS_GEOGRAPHIES. */
+export const ASTRAEUS_GEOGRAPHIES = CFO_ANALYTICS_GEOGRAPHIES;
+
+/** PAR Drafting Assistant pilot launched April 2026; bank-wide rollout in progress through Q2/Q3 2026. */
+export const PAR_DRAFTING_SCALE = 'Bank-wide';
+/** @deprecated alias — see PAR_DRAFTING_SCALE. */
+export const PAR_ASSIST_SCALE = PAR_DRAFTING_SCALE;
 
 // ═══════════════════════════════════════════════════════════════════
 // TEAM

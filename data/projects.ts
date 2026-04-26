@@ -35,7 +35,7 @@ export interface Project {
 /**
  * Projects defined in chronological order (oldest → newest) so the arc
  * narrative reads cleanly in source. Exported reversed at the end so
- * consumers see latest-first (PAR Assist → Combustion Tuning), which is
+ * consumers see latest-first (PAR Drafting Assistant → Combustion Tuning), which is
  * what recruiters and skimmers expect.
  */
 const PROJECTS_CHRONOLOGICAL: Project[] = [
@@ -104,13 +104,13 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   // Arc 4: Intelligent Systems (2024-present)
   {
     id: 'aegis',
-    title: 'Aegis v2',
-    subtitle: 'Text-to-SQL Benchmarking Engine — RBC CFO Group',
+    title: 'Benchmarking Engine v2',
+    subtitle: 'Text-to-SQL Peer Benchmarking — RBC CFO Group',
     role: 'Refactored v1 → v2 in a concurrent 2-week sprint',
     stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
     heroMetric: { value: AEGIS_V2_BUILD_TIME, label: 'v1 → v2 refactor' },
     caption:
-      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 refactored in a concurrent 2-week sprint alongside Astraeus productionization and the Amplify program.',
+      'AI-native benchmarking engine for CFO Group. Natural language to validated SQL via intent parsing, KPI disambiguation, and embeddings. v1 benchmarked Big 6 banks; v2 refactored in a concurrent 2-week sprint alongside CFO Analytics Engine productionization and the summer intern program.',
     description:
       'Strategic benchmarking engine for the CFO Group. v1 derives KPIs from Big 6 Canadian banks\' Supplementary Financial Packages. v2 adds intent parsing, text-to-SQL, and embeddings-based KPI disambiguation.',
     highlights: [
@@ -124,21 +124,21 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   },
   {
     id: 'astraeus',
-    title: 'ASTRAEUS',
+    title: 'CFO Analytics Engine',
     subtitle: 'Financial Insights & Analysis Suite — RBC CFO Group',
     role: 'Architect, lead developer, product visionary',
-    stack: ['GPT-4.1', 'Custom Python router', 'Cython compute', 'Postgres', 'EPM entitlement'],
+    stack: ['GPT-4.1', 'Custom Python router', 'Cython compute', 'Postgres', 'enterprise permission system'],
     heroMetric: { value: ASTRAEUS_FACTORIAL_COMBINATIONS, label: 'Factorial Combinations' },
     caption:
-      'Production analytics platform for RBC\'s CFO Group. Days of email back-and-forth replaced by seconds-level answers — across headcount, HR costs, and open positions at bank scale. LLM never touches operational data by construction; event-level ins-outs math runs in Cython-compiled Python, milliseconds over ~40K transits.',
+      'Production analytics platform for RBC\'s CFO Group. Days of email back-and-forth replaced by seconds-level answers — across headcount, HR costs, and open positions at bank scale. LLM never touches operational data by construction; event-level ins-outs math runs in Cython-compiled Python, milliseconds over ~40K leaf-level events.',
     description:
       'Production-grade platform for CFO-level financial insights — headcount analytics, HR costs, open positions — delivered via dashboard, chatbot, and inbox-ready reports.',
     highlights: [
       'Two-wall architecture: GPT-4.1 handles parse / route / metadata extraction / synthesis; deterministic Cython-compiled Python handles entitlement + compute. LLM never sees operational data.',
-      'Up to 6 LLM calls per query (1 parse + 1 route + up to 3 metadata + 1–3 synthesis) — all on schemas and aggregates, never on rows. In-scope queries fan out to up to 3 final parallel subagents (EPM / Headcount / Open Positions) then combined.',
+      'Up to 6 LLM calls per query (1 parse + 1 route + up to 3 metadata + 1–3 synthesis) — all on schemas and aggregates, never on rows. In-scope queries fan out to up to 3 final parallel subagents (entitlement / Headcount / Open Positions) then combined.',
       'Event-level ins-outs math: employees modeled as join / leave / transfer events, netting semantics fold intra-rollup moves to net-zero. Enables dynamic arbitrary-combination analysis previously deemed impossible at this scale.',
-      'EPM-to-SQL entitlement chain (cube permissions → security groups → employees → transits → SQL tables) applied before compute — users see only what they\'re authorized to see, structurally.',
-      '~40K transits (leaves), ~9K parent rollups, ~80K business-hierarchy nodes, ~60K geography-hierarchy nodes — milliseconds per query.',
+      'Permission cascade (domain permissions → access groups → employees → leaf-level events → SQL tables) applied before compute — users see only what they\'re authorized to see, structurally.',
+      '~40K leaf-level events, ~9K parent rollups, ~80K business-hierarchy nodes, ~60K geography-hierarchy nodes — milliseconds per query.',
       'Single Postgres backbone for event log, entitlement catalog, hierarchies, and audit trail.',
     ],
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
@@ -146,7 +146,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   },
   {
     id: 'par-assist',
-    title: 'PAR Assist',
+    title: 'PAR Drafting Assistant',
     subtitle: 'Enterprise Agentic AI Platform — RBC Bank-wide',
     role: 'Conceived vision, led strategic + technical requirements',
     stack: ['LangGraph', 'MCP', 'PostgreSQL + pgvector', 'Sonnet 4.5', 'Field-group RAG'],
@@ -160,7 +160,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
       'Two-stage field-group retrieval: stage-1 picks relevant field groups, stage-2 retrieves top-10 chunks per group, custom compression feeds Sonnet-4.5 calls',
       'N parallel extraction calls (one per relevant group, ≤20 fields + guardrails + few-shot good/bad per prompt) merging as a deterministic dict-union',
       'Every action is a typed MCP tool dispatched through LangGraph — auditability structural, not aspirational. One Postgres store for state, logs, embeddings, and audit trail.',
-      'Originated from the Amplify internship program — scaled from intern POC to bank-wide initiative',
+      'Originated from the summer intern program — scaled from intern POC to bank-wide initiative',
     ],
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
     deepDivePath: '/projects/par-assist',

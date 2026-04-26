@@ -7,7 +7,7 @@ const LINKS = [
     icon: FileText,
     title: 'Engineering blog',
     summary:
-      'Deep-dives: PAR Assist architecture, Astraeus LLM-as-router, commodity-tax CFO trust, combustion tuning with operators, text-to-SQL.',
+      'Deep-dives: PAR Drafting Assistant architecture, CFO Analytics Engine LLM-as-Router, commodity-tax CFO trust, combustion tuning with operators, text-to-SQL.',
   },
   {
     href: '/papers',

@@ -41,7 +41,7 @@ A date in the header of a claim form is a submission date. A date in the body is
 
 We built the extraction layer to tag every field with its structural context: which section it came from, which column it lives in, whether it sits in a form-field bounding box or free-text. That context became an input feature downstream. Extraction accuracy improved; routing accuracy improved more.
 
-This insight carried directly into my later work at RBC. When I built the RAG pipelines for PAR Assist &mdash; chunking PDFs, PPTX decks, DOCX files &mdash; the instinct to chunk by structure (sections, headings) rather than by fixed token windows came straight from Humana. Retrieval quality depends on whether the chunks are semantically coherent. Structure-aware chunking produces coherent chunks. Fixed-window chunking produces decontextualized fragments. The difference between useful and useless retrieval is whether you respect the document&rsquo;s own organization.
+This insight carried directly into my later work at RBC. When I built the RAG pipelines for PAR Drafting Assistant &mdash; chunking PDFs, PPTX decks, DOCX files &mdash; the instinct to chunk by structure (sections, headings) rather than by fixed token windows came straight from Humana. Retrieval quality depends on whether the chunks are semantically coherent. Structure-aware chunking produces coherent chunks. Fixed-window chunking produces decontextualized fragments. The difference between useful and useless retrieval is whether you respect the document&rsquo;s own organization.
 
 ## The result
 

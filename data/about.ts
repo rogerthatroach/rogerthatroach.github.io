@@ -11,11 +11,11 @@ export const ABOUT = {
     },
     {
       lead: 'Second, the best ideas come from everywhere.',
-      body: "PAR Assist started as an intern's proof-of-concept during the Amplify program. I saw it could scale from a one-team prototype to a bank-wide platform, resourced it, and led the productionization. Today it's the pilot for the bank's first true agentic AI deployment. My job as a leader isn't to have the best ideas. It's to recognize them, clear the path to production, and make sure everyone knows where they started.",
+      body: "PAR Drafting Assistant started as an intern's proof-of-concept during the summer intern program. I saw it could scale from a one-team prototype to a bank-wide platform, resourced it, and led the productionization. Today it's the pilot for the bank's first true agentic AI deployment. My job as a leader isn't to have the best ideas. It's to recognize them, clear the path to production, and make sure everyone knows where they started.",
     },
     {
       lead: 'Third, trust beats accuracy in regulated AI.',
-      body: "The hardest thing in production AI at a regulated institution isn\u2019t getting the answer right \u2014 it\u2019s getting the humans who own the decision to trust the system that produced it. Commodity Tax\u2019s Tableau transparency layer, Astraeus\u2019s EPM entitlement modeling, PAR Assist\u2019s MCP-tool audit trail: at every stage the architecture has to survive stakeholder audit. That\u2019s the job.",
+      body: "The hardest thing in production AI at a regulated institution isn\u2019t getting the answer right \u2014 it\u2019s getting the humans who own the decision to trust the system that produced it. Commodity Tax\u2019s Tableau transparency layer, CFO Analytics Engine\u2019s permission entitlement modeling, PAR Drafting Assistant\u2019s MCP-tool audit trail: at every stage the architecture has to survive stakeholder audit. That\u2019s the job.",
     },
   ],
   closer:

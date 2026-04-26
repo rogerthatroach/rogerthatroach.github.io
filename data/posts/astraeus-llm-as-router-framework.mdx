@@ -11,9 +11,9 @@ Finance leadership asks questions that cross three domains in one sentence: *"he
 
 There is one pattern the industry reaches for here: give the LLM full access and let it figure it out. One model, function-calling into the financial data store, iterating with a ReAct-style loop until it lands on an answer. Fast to prototype. Easy to demo. Impossible to ship inside regulated finance.
 
-Astraeus went the other way. Up to six GPT-4.1 calls per query, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. An EPM-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern — with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls — under pressure, across stakeholders — lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
+CFO Analytics Engine went the other way. Up to six GPT-4.1 calls per query, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. An permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern — with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls — under pressure, across stakeholders — lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
 
-<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (parse / route / up to three parallel metadata extractions), Band 2 deterministic Cython compute with the EPM entitlement chain and the event-level ins-outs math across ~40K employee transits, Band 3 LLM synthesis (one call or three parallel subagents then combined). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
+<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (parse / route / up to three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and the event-level ins-outs math across ~40K employee-level events, Band 3 LLM synthesis (one call or three parallel subagents then combined). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
 {() => <AstraeusCascade />}
 </VisualizationContainer>
 
@@ -35,13 +35,13 @@ Four constraints shaped every decision below. Two regulatory, one hard-technical
     },
     {
       kind: 'hard',
-      label: 'Millisecond latency across 40K+ transits',
-      detail: 'The interactive experience only works if arbitrary cross-domain slices return in under a second — ~40K employee transits as the leaf-level routing unit, ~9K parent rollups, an ~80K-node business hierarchy, a ~60K-node geography hierarchy. The combinatorics are factorial. Any path that touches a slow aggregation query blows the experience.',
+      label: 'Millisecond latency across 40K+ events',
+      detail: 'The interactive experience only works if arbitrary cross-domain slices return in under a second — ~40K employee-level events as the leaf-level routing unit, ~9K parent rollups, an ~80K-node business hierarchy, a ~60K-node geography hierarchy. The combinatorics are factorial. Any path that touches a slow aggregation query blows the experience.',
     },
     {
       kind: 'soft',
       label: 'Entitlement catalogs already live in EPM',
-      detail: 'The bank already runs an Enterprise Performance Management system where cube permissions, security groups, employee assignments, and transits are maintained. Rebuilding that model outside EPM would fork the source of truth. The solution has to enforce entitlement by reusing the catalog, not by re-implementing it.',
+      detail: 'The bank already runs an Enterprise Performance Management system where domain permissions, access groups, employee assignments, and events are maintained. Rebuilding that model outside the enterprise permission system would fork the source of truth. The solution has to enforce entitlement by reusing the catalog, not by re-implementing it.',
     },
   ]}
 />
@@ -119,14 +119,14 @@ Three reasons, in order. First — **confidentiality by construction**. Every al
 
 Second — **determinism as a pre-condition for use.** Finance cannot accept two different numbers for the same question. The compute layer has to be deterministic. Once you accept that, the question becomes: do I want the LLM upstream of determinism (it routes requests into deterministic compute) or downstream (it reads the deterministic output to *interpret* it)? Upstream is safer for audit: routing errors are visible and recoverable; interpretation errors contaminate the answer.
 
-Third — **entitlement becomes enforceable before compute runs.** Because deterministic code owns the data path, the EPM-to-SQL entitlement cascade gets to run *before* the compute step, not woven into an LLM prompt. The audit story is short: *here is the user, here is the cube-permission lookup, here is the security group, here is the employee set, here are the transits they can see, here is the SQL WHERE clause.* Every step is a function call, logged, typed, replayable.
+Third — **entitlement becomes enforceable before compute runs.** Because deterministic code owns the data path, the permission-to-SQL entitlement cascade gets to run *before* the compute step, not woven into an LLM prompt. The audit story is short: *here is the user, here is the cube-permission lookup, here is the security group, here is the employee set, here are the events they can see, here is the SQL WHERE clause.* Every step is a function call, logged, typed, replayable.
 
 The cost of this shape is that the deterministic compute layer has to be built and maintained. That cost was obviously the right trade, but it was the part that took real engineering.
 </DecisionRationale>
 
 ### Decision 2 · Computation layer
 
-Once the LLM is out of the compute path, *what* does compute? Event-level ins-outs math across ~40K transits with factorial cross-combinations — every candidate answer needs netting semantics applied over events, not aggregates over snapshots. The compute layer is the place where a millisecond answer lives or dies.
+Once the LLM is out of the compute path, *what* does compute? Event-level ins-outs math across ~40K leaf-level events with factorial cross-combinations — every candidate answer needs netting semantics applied over events, not aggregates over snapshots. The compute layer is the place where a millisecond answer lives or dies.
 
 <OptionsConsidered
   decision="What technology implements event-level ins-outs math at millisecond latency?"
@@ -137,7 +137,7 @@ Once the LLM is out of the compute path, *what* does compute? Event-level ins-ou
       chosen: true,
       pros: [
         'Team muscle memory is Python — authorship, review, debugging, and on-call all land in the same language',
-        'Cython gives C-level speed on the hot paths (transit enumeration, netting, aggregation) without rewriting the system',
+        'Cython gives C-level speed on the hot paths (event enumeration, netting, aggregation) without rewriting the system',
         'Interop is trivial — the Cython modules drop into the same Python process that does routing, ORM, serialization',
         'Profiling is a first-class workflow — cProfile + line_profiler + Cython annotation show exactly where the time goes',
       ],
@@ -154,7 +154,7 @@ Once the LLM is out of the compute path, *what* does compute? Event-level ins-ou
         'Battle-tested for analytical workloads',
       ],
       cons: [
-        'Event-level netting does not vectorize cleanly — the dependency between sequential transits breaks DataFrame primitives',
+        'Event-level netting does not vectorize cleanly — the dependency between sequential events breaks DataFrame primitives',
         'Profiling showed pure Python / pandas blew the sub-second budget on cross-domain queries at production scale',
       ],
     },
@@ -197,23 +197,23 @@ The SQL-only path was genuinely considered and ruled out during implementation �
 
 ### Decision 3 · Entitlement enforcement shape
 
-Who is allowed to see which slice? The answer was already encoded, across years, in the EPM system: cube permissions → security groups → employee assignments → transits → SQL. The question was *where* to apply it.
+Who is allowed to see which slice? The answer was already encoded, across years, in the enterprise permission system system: domain permissions → security groups → employee assignments → events → SQL. The question was *where* to apply it.
 
 <OptionsConsidered
   decision="Where in the pipeline does the entitlement check run?"
   options={[
     {
-      name: 'EPM passthrough, pre-compute',
-      summary: 'The full EPM cascade runs as a deterministic Python pipeline before any compute step. The user id maps through cube → security → employees → transits → SQL WHERE clause. Compute only ever sees the filtered event set.',
+      name: 'enterprise permission system passthrough, pre-compute',
+      summary: 'The full enterprise permission system cascade runs as a deterministic Python pipeline before any compute step. The user id maps through domain → access → entities → events → SQL WHERE clause. Compute only ever sees the filtered event set.',
       chosen: true,
       pros: [
         'Compliance is structural — compute physically cannot see a row the user is not entitled to, because no code path delivers one',
-        'Reuses the EPM catalog as the source of truth; no parallel permission model to drift',
+        'Reuses the enterprise permission system catalog as the source of truth; no parallel permission model to drift',
         'Audit story is mechanical — every permission resolution is a logged function call with inputs and outputs',
         'The cascade is testable in isolation — each of the five steps gets its own unit tests and integration tests',
       ],
       cons: [
-        'The cascade has to be built and kept in sync with EPM changes — active maintenance, not set-and-forget',
+        'The cascade has to be built and kept in sync with enterprise permission system changes — active maintenance, not set-and-forget',
         'Some queries resolve into large SQL WHERE clauses; indexes and query plans need attention',
       ],
     },
@@ -250,20 +250,20 @@ Who is allowed to see which slice? The answer was already encoded, across years,
         'Applies to every query path, not just the application',
       ],
       cons: [
-        'EPM permission logic is a five-step cascade with business-rule layers that do not map cleanly to RLS policies',
-        'Would force duplicating the EPM model into database policies, drifting from the catalog',
+        'enterprise permission system permission logic is a five-step cascade with business-rule layers that do not map cleanly to RLS policies',
+        'Would force duplicating the enterprise permission system model into database policies, drifting from the catalog',
         'Debugging a denied query becomes a database-administration task, not a development task',
       ],
     },
   ]}
 />
 
-<DecisionRationale option="EPM passthrough, pre-compute">
-The deciding property was **reuse of the source of truth**. The bank had spent years curating the EPM catalog — cube permissions, security groups, employee assignments, transits — with a review and change-management process that already satisfied auditors. Any entitlement model that did not reuse that catalog forked the source of truth and introduced a drift risk that regulated finance will not accept.
+<DecisionRationale option="enterprise permission system passthrough, pre-compute">
+The deciding property was **reuse of the source of truth**. The bank had spent years curating the enterprise permission system catalog — domain permissions, security groups, employee assignments, events — with a review and change-management process that already satisfied auditors. Any entitlement model that did not reuse that catalog forked the source of truth and introduced a drift risk that regulated finance will not accept.
 
 Pre-compute placement came from a narrower argument: *least privilege.* A query result that was post-filtered from a larger computation means the computation briefly ran over data the user was not entitled to — and the audit story has to either explain that away or prove that no information leaked through the differential. Pre-compute filtering makes the audit trivial: the computation input itself is the entitled set.
 
-The five-step cascade (cube → security → employees → transits → SQL) was the real engineering. Each step is a function call with typed inputs and outputs; each is tested; each writes to the Postgres audit log. Any question of the form "could user X ever have seen value Y?" reduces to replaying the cascade.
+The five-step cascade (domain → access → entities → events → SQL) was the real engineering. Each step is a function call with typed inputs and outputs; each is tested; each writes to the Postgres audit log. Any question of the form "could user X ever have seen value Y?" reduces to replaying the cascade.
 </DecisionRationale>
 
 ### Decision 4 · Synthesis strategy
@@ -349,7 +349,7 @@ A concrete CFO query — *"show me headcount by division, crossed with open posi
     {
       title: 'Step 2 · Route (LLM 2)',
       caption: 'in-scope gate + path selection',
-      content: 'A second LLM call decides two things: is this query in scope for Astraeus at all, and if so does it take path A (single synthesis) or path B (parallel subagents)? Cross-domain three-way query with reconciliation — path B. If the query were out of scope, execution terminates here.',
+      content: 'A second LLM call decides two things: is this query in scope for CFO Analytics Engine at all, and if so does it take path A (single synthesis) or path B (parallel subagents)? Cross-domain three-way query with reconciliation — path B. If the query were out of scope, execution terminates here.',
     },
     {
       title: 'Step 3 · Metadata extract (LLM 3, 4, 5 — parallel)',
@@ -358,13 +358,13 @@ A concrete CFO query — *"show me headcount by division, crossed with open posi
     },
     {
       title: 'Step 4 · Entitlement cascade',
-      caption: 'cube → security → employees → transits → SQL',
-      content: 'The user’s identity flows through the five-step EPM cascade. Cube permissions: which Astraeus cubes can this user touch? Security groups: which of those cubes is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Transits: which ~40K-transit subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged.',
+      caption: 'domain → access → entities → events → SQL',
+      content: 'The user’s identity flows through the five-step enterprise permission system cascade. Cube permissions: which CFO Analytics Engine cubes can this user touch? Security groups: which of those cubes is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Transits: which ~40K-event subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged.',
     },
     {
       title: 'Step 5 · Compute (Cython, no LLM)',
-      caption: 'event-level ins-outs over filtered transits',
-      content: 'Cython-compiled event-level netting math runs over the entitled transit set. For headcount: transit-in / transit-out events resolve to point-in-time counts at each requested grain. For open positions: posted / filled / expired events resolve similarly. For tenure: event dates produce averages. All three aggregates land as structured outputs. Milliseconds.',
+      caption: 'event-level ins-outs over filtered events',
+      content: 'Cython-compiled event-level netting math runs over the entitled event set. For headcount: event-in / event-out events resolve to point-in-time counts at each requested grain. For open positions: posted / filled / expired events resolve similarly. For tenure: event dates produce averages. All three aggregates land as structured outputs. Milliseconds.',
     },
     {
       title: 'Step 6 · Synthesis (LLM 6 — path B fan-out, then combine)',
@@ -374,41 +374,41 @@ A concrete CFO query — *"show me headcount by division, crossed with open posi
   ]}
 />
 
-## The EPM entitlement chain in detail
+## The permission cascade in detail
 
 The five-step cascade is the engineering that made this architecture shippable inside governance. Each step is a deterministic function with typed inputs and outputs, logged to Postgres, replayable from the audit log.
 
-1. **Cube permissions.** EPM organizes data into cubes; the user identity resolves to a set of cube permissions. This is a direct lookup against the EPM permission catalog.
-2. **Security groups.** Cube permissions map to security groups with finer-grained scope — business line, geography, grain. The mapping is maintained in EPM and pulled via a periodic catalog sync.
+1. **Cube permissions.** enterprise permission system organizes data into cubes; the user identity resolves to a set of domain permissions. This is a direct lookup against the enterprise permission system permission catalog.
+2. **Security groups.** Cube permissions map to security groups with finer-grained scope — business line, geography, grain. The mapping is maintained in enterprise permission system and pulled via a periodic catalog sync.
 3. **Employee assignments.** Security groups map to the employee records the user is entitled to see — visible headcount, visible organizational rollups.
-4. **Transits.** The atomic routing unit. Employee assignments resolve to the ~40K-transit subset — the leaf-level units that event-level math operates on.
-5. **SQL WHERE clause.** The transit set materializes into a SQL predicate that Postgres enforces at query time. Every compute query carries this predicate; no path exists that computes over a larger scope and filters later.
+4. **Transits.** The atomic routing unit. Employee assignments resolve to the ~40K-event subset — the leaf-level units that event-level math operates on.
+5. **SQL WHERE clause.** The event set materializes into a SQL predicate that Postgres enforces at query time. Every compute query carries this predicate; no path exists that computes over a larger scope and filters later.
 
-The decision to reuse EPM rather than build a parallel model is what let this ship. The bank had years of governance process around the EPM catalog — review, change management, auditor sign-off. Forking the permission model outside EPM would have triggered a separate governance review on the new system, and the new system would have drifted from the old one the moment EPM changed.
+The decision to reuse enterprise permission system rather than build a parallel model is what let this ship. The bank had years of governance process around the enterprise permission system catalog — review, change management, auditor sign-off. Forking the permission model outside the enterprise permission system would have triggered a separate governance review on the new system, and the new system would have drifted from the old one the moment enterprise permission system changed.
 
 ## Why 40K is a factorial number
 
-The scale callout in the architecture diagram reads *"40K! factorial combinations."* The exclamation mark is not emphasis — it is the factorial operator. Any cross-domain query can, in the limit, slice the ~40K transit set in any permutation consistent with the entitlement filter. Previously the finance organization could not ask those questions interactively at all; the analyst time to produce one such slice was measured in days of spreadsheet work.
+The scale callout in the architecture diagram reads *"40K! factorial combinations."* The exclamation mark is not emphasis — it is the factorial operator. Any cross-domain query can, in the limit, slice the ~40K leaf-level event set in any permutation consistent with the entitlement filter. Previously the finance organization could not ask those questions interactively at all; the analyst time to produce one such slice was measured in days of spreadsheet work.
 
 Cython's role in this is blunt: the event-level netting math inside the hot loop runs in C. The rest of the layer — IO, entitlement resolution, serialization — stays in idiomatic Python. Profiling showed the hot loop was responsible for the majority of runtime on cross-domain queries, so that's where the Cython annotations concentrate.
 
-The *previously impossible* framing is not marketing. Before Astraeus, finance-leadership questions of the form "how does headcount cross with open positions by division, at Q2" either got answered with a multi-day analyst turnaround or did not get answered at all. The combinatorial size of the question space made interactive slicing infeasible. LLM-as-Router plus Cython-compiled compute turns the question space into an interactive one.
+The *previously impossible* framing is not marketing. Before CFO Analytics Engine, finance-leadership questions of the form "how does headcount cross with open positions by division, at Q2" either got answered with a multi-day analyst turnaround or did not get answered at all. The combinatorial size of the question space made interactive slicing infeasible. LLM-as-Router plus Cython-compiled compute turns the question space into an interactive one.
 
 ## Before and after
 
 <BeforeAfterDiff
   heading="Finance leadership asks a cross-domain question"
   before={{
-    label: 'Before Astraeus',
+    label: 'Before CFO Analytics Engine',
     hint: 'days',
     content: (
       <>
-        Email to the analytics team. Analyst pulls three extracts from EPM — one per domain. Joins them in Excel. Checks entitlement manually against the employee directory. Reconciles rollup differences between cubes. Emails back a spreadsheet. The CFO asks a follow-up; cycle repeats. The question exchanges take days, and new cross-domain slices are always bespoke.
+        Email to the analytics team. Analyst pulls three extracts from enterprise permission system — one per domain. Joins them in Excel. Checks entitlement manually against the employee directory. Reconciles rollup differences between cubes. Emails back a spreadsheet. The CFO asks a follow-up; cycle repeats. The question exchanges take days, and new cross-domain slices are always bespoke.
       </>
     ),
   }}
   after={{
-    label: 'With Astraeus',
+    label: 'With CFO Analytics Engine',
     hint: 'seconds',
     content: (
       <>
@@ -424,7 +424,7 @@ Three properties the architecture has to maintain under real queries — includi
 
 **What happens when the parse fails.** The LLM 1 call produces a structured intent object or an error. If the intent object is malformed — no domain class resolvable, no output shape — the system returns a clarification prompt rather than guessing. The route call (LLM 2) does not fire on a failed parse. No data access occurs. The failure mode is a visible refusal, not a silent wrong answer.
 
-**What happens when the route says out-of-scope.** The route call explicitly decides whether the query is inside the Astraeus domain. Questions about payroll processing, HR performance reviews, benefits administration — all out of scope. On an out-of-scope route, execution terminates at the wall. Neither the deterministic compute layer nor the downstream synthesis runs. The user sees a scoped answer ("Astraeus covers headcount, hiring, and cost — for payroll detail, see [other system]").
+**What happens when the route says out-of-scope.** The route call explicitly decides whether the query is inside the CFO Analytics Engine domain. Questions about payroll processing, HR performance reviews, benefits administration — all out of scope. On an out-of-scope route, execution terminates at the wall. Neither the deterministic compute layer nor the downstream synthesis runs. The user sees a scoped answer ("CFO Analytics Engine covers headcount, hiring, and cost — for payroll detail, see [other system]").
 
 **How the walls actually prevent leakage.** Wall 1 (between LLM intent and deterministic compute) is enforced by code structure: the functions that call the LLM do not have an argument that could be operational data. The functions that call compute do not have an argument that could be an LLM. That separation is a property of the type signatures, not a convention. Wall 2 (between deterministic compute and LLM synthesis) is enforced the same way: synthesis functions receive aggregates, not events. A reviewer can audit the wall by looking at function signatures.
 
@@ -432,9 +432,9 @@ The single Postgres backbone underneath is the audit anchor — every LLM call, 
 
 ## Timeline + velocity
 
-Astraeus went from the first architectural sketch to production in ~5 months, with v2 cycles continuing after. The architecture stabilized early; most of the engineering time after month two went into the EPM entitlement chain, the Cython-compiled compute layer, and the event-level ins-outs math. Stakeholder conversations — explaining, repeatedly, why LLM-as-Router was the right shape rather than the seductive monolithic pattern — ran in parallel through the first three months. The [builder companion](/blog/astraeus-llm-as-router) has the narrative of that stretch.
+CFO Analytics Engine went from the first architectural sketch to production in ~5 months, with v2 cycles continuing after. The architecture stabilized early; most of the engineering time after month two went into the permission cascade, the Cython-compiled compute layer, and the event-level ins-outs math. Stakeholder conversations — explaining, repeatedly, why LLM-as-Router was the right shape rather than the seductive monolithic pattern — ran in parallel through the first three months. The [builder companion](/blog/astraeus-llm-as-router) has the narrative of that stretch.
 
-## What's next — Astraeus v2
+## What's next — CFO Analytics Engine v2
 
 The next evolution extends the pattern without changing its shape. Three directions on the table:
 
@@ -453,6 +453,6 @@ The LLM-as-Router pattern is not specific to CFO analytics. It applies anywhere:
 - Permission enforcement must be provable, not probabilistic
 - The cost of a wrong answer exceeds the cost of a slightly less elegant architecture
 
-Astraeus was the first production shape this pattern took inside RBC; it now underlies other systems — PAR Assist's agentic envelope is the same LLM-as-Router principle with a richer action vocabulary (see [the PAR practitioner post](/blog/enterprise-agentic-ai-framework) for the MCP-tools variant). Aegis v2's text-to-SQL is LLM-as-Router with tighter intent classification and a guardrailed SQL surface.
+CFO Analytics Engine was the first production shape this pattern took inside RBC; it now underlies other systems — PAR Drafting Assistant's agentic envelope is the same LLM-as-Router principle with a richer action vocabulary (see [the PAR practitioner post](/blog/enterprise-agentic-ai-framework) for the MCP-tools variant). Benchmarking Engine v2's text-to-SQL is LLM-as-Router with tighter intent classification and a guardrailed SQL surface.
 
 The pattern scales across system types because the constraints are shared. The seductive option — give the LLM full access, let it figure it out — fails the same four tests in every regulated-enterprise setting. LLM-as-Router is the compact answer to those tests.
