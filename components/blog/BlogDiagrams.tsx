@@ -32,3 +32,6 @@ export const AbstractionLadder = dynamic(() => import('./diagrams/AbstractionLad
 
 // Post 4: Enterprise Agentic AI
 export const AgenticArchitecturePAR = dynamic(() => import('./diagrams/AgenticArchitecturePAR'), { ssr: false, loading: Spinner });
+
+// Post 5: Commodity Tax
+export const CommodityTaxPipeline = dynamic(() => import('./diagrams/CommodityTaxPipeline'), { ssr: false, loading: Spinner });

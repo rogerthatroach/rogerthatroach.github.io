@@ -22,7 +22,7 @@ export const GLOSSARY: Record<string, string> = {
   'Aegis':
     'AI-native benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 productionized 2024 (rules-based). v2 (2025) is a concurrent 2-week refactor — text-to-SQL first with KPI disambiguation, done alongside Prometheus + Astraeus work. 2025 CFO One RBC Team Award.',
   'Commodity Tax':
-    '~$250M GST + ~$350M PVAT allocated across the bank. Processing time slashed from months to 90 minutes. Q4 2023 CFO Group Quarterly Team Award.',
+    '~$600M tax allocation per cycle. Processing time slashed from months to 90 minutes. Q4 2023 CFO Group RBC Quarterly Team Award.',
   'External Data Service automation':
     'Actual-vs-planned financial comparison system using a dynamic RAG over finance documents. Widely adopted across the finance team. (Internally: "EDS Automation".)',
 

@@ -163,11 +163,12 @@ export const CASE_STUDIES: CaseStudy[] = [
       decision:
         'PySpark pipeline for GL data extraction paired with Tableau dashboards — not as output, but as the transparency layer that let skeptical finance analysts audit every step.',
       impact:
-        'Months → 90 minutes per cycle. CFO Quarterly Team Award (Q4 2023). The stakeholder-trust win that opened the door to every subsequent AI initiative at the CFO Group.',
+        'Months → 90 minutes per cycle on ~$600M tax allocation. CFO Group RBC Quarterly Team Award (Q4 2023). The stakeholder-trust win that opened the door to every subsequent AI initiative at the CFO Group.',
     },
     sequencing:
       'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with dashboards the CFO could audit, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then Aegis v2 (AI-native rewrite, 2 weeks, 2024), then Astraeus (production 2025), then conceive Prometheus from an intern POC (shipped April 2026). Each project underwrote the next one\'s scope. The Commodity Tax wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
-    blogPostSlug: 'commodity-tax-cfo-trust',
+    blogPostSlug: 'commodity-tax-provenance',
+    companionBlogPostSlug: 'commodity-tax-cfo-trust',
     leadershipCallout:
       'This was my first project at RBC — and I treated it as an audition. By choosing Tableau as the transparency layer (not just an output), I gave skeptical finance stakeholders visibility into every step of the automation. The resulting trust didn\'t just deliver Commodity Tax — it opened the door for Aegis, Astraeus, and every AI initiative that followed. The months-to-90-minutes metric became the team\'s calling card with CFO leadership.',
     sections: {

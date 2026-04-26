@@ -518,16 +518,63 @@ export const POSTS: BlogPost[] = [
   },
   {
     meta: {
+      slug: 'commodity-tax-provenance',
+      title: 'Pipeline as Graph Rewrite — A Provenance Algebra for Auditable Process Automation',
+      subtitle:
+        'Formalizing the architecture behind a regulated-finance automation: five-stage pipeline as composed graph rewrites, Tableau dashboards as a parallel presentation layer derived from the same provenance relation.',
+      date: '2026-04-26',
+      tags: ['Provenance', 'Process Automation', 'Auditability', 'Graph Rewrites', 'Regulated Finance'],
+      readingTime: '15 min read',
+      abstract:
+        'A formal treatment of the architecture used to automate the Commodity Tax return process at a major Canadian bank. We model the five-stage pipeline (extract → reconcile → category map → aggregate → return) as a sequence of typed graph rewrites, each preserving a provenance relation. We prove provenance preservation under composition, characterize the Tableau transparency layer as a parallel presentation surface derived from the same provenance algebra, and develop a quantitative model of stakeholder trust as a function of provenance-latency. The architectural punchline: transparency is not a feature appended to compute — it is a structural property derivable into a parallel surface, and the cost of building both surfaces from one substrate is lower than either alone.',
+      status: 'published',
+      projectId: 'commodity-tax',
+      register: 'formal',
+    },
+    references: [
+      { id: 1, authors: 'Kimball, R. & Caserta, J.', title: 'The Data Warehouse ETL Toolkit', venue: 'Wiley', year: 2004 },
+      { id: 2, authors: 'Ehrig, H. et al.', title: 'Fundamentals of Algebraic Graph Transformation', venue: 'Springer', year: 2006 },
+      { id: 3, authors: 'PCAOB', title: 'Auditing Standard No. 5 — An Audit of Internal Control Over Financial Reporting', venue: 'Public Company Accounting Oversight Board', year: 2007 },
+      { id: 4, authors: 'Cui, Y., Widom, J. & Wiener, J. L.', title: 'Tracing the Lineage of View Data in a Warehousing Environment', venue: 'ACM Transactions on Database Systems', year: 2000 },
+      { id: 5, authors: 'Cheney, J., Chiticariu, L. & Tan, W. C.', title: 'Provenance in Databases: Why, How, and Where', venue: 'Foundations and Trends in Databases', year: 2009 },
+      { id: 6, authors: 'COSO', title: 'Internal Control — Integrated Framework', venue: 'Committee of Sponsoring Organizations of the Treadway Commission', year: 2013 },
+      { id: 7, authors: 'Lee, J. D. & See, K. A.', title: 'Trust in Automation: Designing for Appropriate Reliance', venue: 'Human Factors', year: 2004 },
+    ],
+    furtherReading: [
+      {
+        title: 'How Commodity Tax Built CFO Trust (the builder companion)',
+        url: '/blog/commodity-tax-cfo-trust',
+        description: 'The narrative of when those decisions landed — the cycle-1 afternoon when an analyst flagged a number, we drilled together, and found a real bug. The trust-architecture story compressed into thirty minutes.',
+      },
+      {
+        title: 'How Commodity Tax Built CFO Trust — Framework A/B (the practitioner companion)',
+        url: '/blog/commodity-tax-cfo-trust-framework',
+        description: 'The practitioner-register version with explicit constraints, options considered, and decision rationale callouts.',
+      },
+      {
+        title: 'Closed-Loop Optimization as a Unifying Pattern',
+        url: '/blog/closed-loop',
+        description: 'The underlying sense-model-act pattern across industrial PSO, cloud pipelines, enterprise finance, and agentic AI.',
+      },
+      {
+        title: 'Commodity Tax — Case Study',
+        url: '/projects/commodity-tax',
+        description: 'Project case study: context, the pipeline + transparency rail, the four-cycle stakeholder-trust ritual.',
+      },
+    ],
+  },
+  {
+    meta: {
       slug: 'commodity-tax-cfo-trust',
       title: 'How Commodity Tax Built CFO Trust',
       subtitle:
         'First project at RBC, first audition — and the architectural decision that turned a months-long manual process into a 90-minute automated one, and a skeptical finance team into the AI team\u2019s strongest sponsors.',
-      date: '2026-05-15',
+      date: '2026-04-26',
       tags: ['Leadership', 'Stakeholder Management', 'PySpark', 'Tableau', 'Process Automation'],
-      readingTime: '6 min read',
+      readingTime: '7 min read',
       abstract:
-        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the stakeholder dynamics of automating institutional knowledge, and the cascade of AI initiatives this first project underwrote: Aegis v1, Aegis v2, Astraeus, Prometheus.',
-      status: 'draft',
+        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes on the ~$600M-per-cycle tax allocation \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Anchored on a single cycle-1 afternoon when an analyst flagged a number, we drilled the dashboard together, and found a real bug from a stale tax-law mapping. That session compressed the whole strategy into thirty minutes. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the four-cycle stakeholder-trust ritual, and the cascade of AI initiatives this first project underwrote: Aegis v1, Aegis v2, Astraeus, Prometheus.',
+      status: 'published',
       projectId: 'commodity-tax',
       register: 'builder',
     },
