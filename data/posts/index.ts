@@ -304,7 +304,7 @@ export const POSTS: BlogPost[] = [
       subtitle:
         'A practitioner-register rewrite of the CFO Analytics Engine architecture. Constraints, options considered, and decision rationale for each of the four calls that separate LLM-as-Router from the seductive monolithic pattern.',
       date: '2026-04-23',
-      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'EPM', 'Entitlement', 'CFO Analytics Engine'],
+      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'Entitlement', 'CFO Analytics Engine'],
       readingTime: '14 min read',
       abstract:
         'CFO Analytics Engine ships on an architecture with two dashed walls: the LLM handles intent, the deterministic Cython-compiled Python layer handles compute, and LLM-as-Router links the two without the model ever touching operational data. This post lays the four architectural decisions as first-class structure \u2014 orchestration shape (LLM-as-Router over monolithic agent / chain / multi-agent), computation layer (Cython over pure Python / SQL / Rust), entitlement enforcement (permission-system passthrough pre-compute over post-filter / LLM-policy / RLS), and synthesis strategy (router-decides hybrid over always-single / always-parallel / template-render). Each decision gets its constraints, its alternatives with honest pros/cons, and the rationale that produced the call. The narrative behind those calls lives in the builder companion; the formal proofs of data-confidentiality and entitlement safety live in the formal post.',

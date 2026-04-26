@@ -117,13 +117,13 @@ The production system organizes LLM work into **up to six calls per query** arra
 
 **Phase 2 — Metadata extraction (up to three parallel LLM calls, conditional).** When the routing decision warrants, one metadata-extract call fires per candidate domain (Headcount, HR Costs, Open Positions), in parallel. Each call returns a structured parameter set scoped to its domain — time range, organizational scope, comparison shape — *without* any data access. This is the final LLM touch before the first wall.
 
-**Phase 3 — Synthesis (one call, or up to three parallel final sub-agents then combined).** After the deterministic layer returns aggregates, the system either (path A) issues a single synthesis call to compose the answer, or (path B) fans out to up to three parallel final sub-agents — one for EPM/cost, one for headcount, one for open positions — whose outputs are combined deterministically into the user-facing response. The choice between path A and path B is made by the phase-1 router based on the cross-domain structure of the query.
+**Phase 3 — Synthesis (one call, or up to three parallel final sub-agents then combined).** After the deterministic layer returns aggregates, the system either (path A) issues a single synthesis call to compose the answer, or (path B) fans out to up to three parallel final sub-agents — one for cost, one for headcount, one for open positions — whose outputs are combined deterministically into the user-facing response. The choice between path A and path B is made by the phase-1 router based on the cross-domain structure of the query.
 
 Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
 
 <MathBlock html={tex("\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})", true)} />
 
-In the production system <InlineEquation html={tex("k = 3")} />: an EPM/cost agent, a headcount agent, and an open positions agent. These execute in parallel:
+In the production system <InlineEquation html={tex("k = 3")} />: a cost agent, a headcount agent, and an open positions agent. These execute in parallel:
 
 <MathBlock html={tex("\\mathcal{A}_{\\text{compute}} = A_1 \\| A_2 \\| A_3", true)} />
 
@@ -196,9 +196,9 @@ Enterprise Performance Management (EPM) systems enforce access control through m
 
 ### 5.2 Formal Model
 
-<TheoremBlock variant="definition" number={4} title="enterprise permission system Permission Structure">
+<TheoremBlock variant="definition" number={4} title="EPM Permission Structure">
   <div>
-    An enterprise permission system permission set for user <InlineEquation html={tex("u")} /> is a set of authorized dimension intersections:
+    An enterprise permission set for user <InlineEquation html={tex("u")} /> is a set of authorized dimension intersections:
   </div>
   <MathBlock html={tex("P(u) = \\{(d_1^{(j)}, d_2^{(j)}, \\ldots, d_n^{(j)})\\}_{j=1}^{m}", true)} />
   <div>
@@ -220,11 +220,11 @@ Enterprise Performance Management (EPM) systems enforce access control through m
 
 The production system implements this translation as a four-stage pipeline:
 
-<MathBlock html={tex("\\text{enterprise permission system Cubes} \\xrightarrow{\\alpha} \\text{Security Groups} \\xrightarrow{\\beta} \\text{Employee Sets} \\xrightarrow{\\gamma} \\text{Transit Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
+<MathBlock html={tex("\\text{Domains} \\xrightarrow{\\alpha} \\text{Access Groups} \\xrightarrow{\\beta} \\text{Entity Sets} \\xrightarrow{\\gamma} \\text{Event Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
 
-**Stage <InlineEquation html={tex("\\alpha")} />:** Extract permission grants from the enterprise permission system system as structured tuples <InlineEquation html={tex("(u, D_1, D_2, \\ldots, D_n)")} />.
+**Stage <InlineEquation html={tex("\\alpha")} />:** Extract permission grants from EPM as structured tuples <InlineEquation html={tex("(u, D_1, D_2, \\ldots, D_n)")} />.
 
-**Stage <InlineEquation html={tex("\\beta")} />:** Map permission grants to security group memberships. Security groups represent natural organizational boundaries (e.g., "Division A Managers") and serve as a caching layer — permissions change slowly, so pre-computing group-to-employee mappings avoids runtime enterprise permission system queries.
+**Stage <InlineEquation html={tex("\\beta")} />:** Map permission grants to security group memberships. Security groups represent natural organizational boundaries (e.g., "Division A Managers") and serve as a caching layer — permissions change slowly, so pre-computing group-to-employee mappings avoids runtime entitlement queries.
 
 **Stage <InlineEquation html={tex("\\gamma")} />:** Expand security groups to employee-level event sets. A event is the fundamental unit of the data model (see Section 6), representing an employee's assignment to an organizational position.
 
@@ -238,7 +238,7 @@ The production system implements this translation as a four-stage pipeline:
 
 <TheoremBlock variant="proposition" number={2} title="Entitlement Preservation">
   <div>
-    The translation pipeline preserves the lattice structure of enterprise permission system permissions: if user <InlineEquation html={tex("u_1")} /> has a subset of <InlineEquation html={tex("u_2")} />'s permissions in EPM, then <InlineEquation html={tex("u_1")} /> sees a subset of <InlineEquation html={tex("u_2")} />'s data in SQL:
+    The translation pipeline preserves the lattice structure of enterprise permissions: if user <InlineEquation html={tex("u_1")} /> has a subset of <InlineEquation html={tex("u_2")} />'s permissions in the entitlement system, then <InlineEquation html={tex("u_1")} /> sees a subset of <InlineEquation html={tex("u_2")} />'s data in SQL:
   </div>
   <MathBlock html={tex("P(u_1) \\subseteq P(u_2) \\implies \\mathcal{D}|_{P(u_1)} \\subseteq \\mathcal{D}|_{P(u_2)}", true)} />
 </TheoremBlock>
@@ -339,7 +339,7 @@ The architecture has been deployed in production at a major bank's CFO Group sin
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">Final sub-agent count (synthesis side)</td>
-        <td className="py-2 font-mono">3 (enterprise permission system / Headcount / Open Positions), parallel</td>
+        <td className="py-2 font-mono">3 (Cost / Headcount / Open Positions), parallel</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">LLM data exposure</td>
