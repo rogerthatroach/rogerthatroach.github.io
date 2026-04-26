@@ -1,94 +1,93 @@
 'use client';
 
 import Link from 'next/link';
-import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
+import { Github, Linkedin, Mail } from 'lucide-react';
 import { HERO } from '@/data/hero';
 
+/**
+ * Footer — two rows.
+ *
+ *   Row 1: socials (left) · meta nav + ⌘K (center) · location (right)
+ *   Row 2: © year · full name (centered alone)
+ *
+ * Mirrors the Nav's compact aesthetic. The copyright sits on its own
+ * row as a quiet trust signal — separated visually but not by a hard
+ * border.
+ */
 export default function Footer() {
   return (
-    <footer className="border-t border-border-subtle px-6 py-16 md:px-16">
-      <div className="mx-auto flex max-w-content flex-col items-center gap-6 sm:flex-row sm:justify-between">
-        <div className="flex items-center gap-6">
-          <a
-            href={HERO.links.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="LinkedIn"
-            className="text-text-tertiary transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
+    <footer className="border-t border-border-subtle px-6 py-5 md:px-16">
+      <div className="mx-auto max-w-content">
+        {/* Row 1 — socials · meta · location */}
+        <div className="flex flex-col items-center gap-3 text-[11px] text-text-tertiary sm:flex-row sm:justify-between sm:gap-6">
+          {/* Left — socials */}
+          <div className="flex items-center gap-4">
+            <a
+              href={HERO.links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              className="transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
+            >
+              <Linkedin size={16} />
+            </a>
+            <a
+              href={HERO.links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              className="transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
+            >
+              <Github size={16} />
+            </a>
+            <a
+              href={`mailto:${HERO.links.email}`}
+              aria-label="Email"
+              className="transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
+            >
+              <Mail size={16} />
+            </a>
+          </div>
+
+          {/* Centre — meta links + ⌘K. Same mono cap-style as Nav. */}
+          <nav
+            aria-label="Meta"
+            className="flex items-center gap-4 font-mono uppercase tracking-widest"
           >
-            <Linkedin size={20} />
-          </a>
-          <a
-            href={HERO.links.github}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="GitHub"
-            className="text-text-tertiary transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
-          >
-            <Github size={20} />
-          </a>
-          <a
-            href={`mailto:${HERO.links.email}`}
-            aria-label="Email"
-            className="text-text-tertiary transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
-          >
-            <Mail size={20} />
-          </a>
+            <Link href="/now" className="transition-colors hover:text-accent">
+              Now
+            </Link>
+            <Link href="/papers" className="transition-colors hover:text-accent">
+              Papers
+            </Link>
+            <Link href="/colophon" className="transition-colors hover:text-accent">
+              Colophon
+            </Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof document !== 'undefined') {
+                  document.dispatchEvent(new Event('cmdk:open'));
+                }
+              }}
+              className="hidden items-center gap-1.5 normal-case tracking-normal transition-colors hover:text-accent sm:inline-flex"
+              aria-label="Open search (Cmd or Ctrl K)"
+            >
+              <kbd className="rounded border border-border-subtle bg-surface/50 px-1.5 py-0.5 text-[10px] tracking-normal">
+                ⌘K
+              </kbd>
+              <span className="text-[11px]">Search</span>
+            </button>
+          </nav>
+
+          {/* Right — location */}
+          <div>{HERO.location}</div>
         </div>
 
-        {/* Secondary footer links — /now · /colophon · ⌘K search hint.
-            Ghost-weight so they stay polite. */}
-        <nav
-          aria-label="Meta"
-          className="flex items-center gap-5 font-mono text-[11px] uppercase tracking-widest text-text-tertiary"
-        >
-          <Link
-            href="/now"
-            className="transition-colors hover:text-accent"
-          >
-            Now
-          </Link>
-          <Link
-            href="/papers"
-            className="transition-colors hover:text-accent"
-          >
-            Papers
-          </Link>
-          <Link
-            href="/colophon"
-            className="transition-colors hover:text-accent"
-          >
-            Colophon
-          </Link>
-          {/* ⌘K hint — keyboard shortcut discoverability. Clickable: fires
-              cmdk:open event so mouse users can trigger the palette too. */}
-          <button
-            type="button"
-            onClick={() => {
-              if (typeof document !== 'undefined') {
-                document.dispatchEvent(new Event('cmdk:open'));
-              }
-            }}
-            className="hidden items-center gap-1.5 transition-colors hover:text-accent sm:inline-flex"
-            aria-label="Open search (Cmd or Ctrl K)"
-          >
-            <kbd className="rounded border border-border-subtle bg-surface/50 px-1.5 py-0.5 text-[10px]">
-              ⌘K
-            </kbd>
-            Search
-          </button>
-        </nav>
-
-        <div className="flex items-center gap-1.5 text-sm text-text-tertiary">
-          <MapPin size={14} />
-          <span>{HERO.location}</span>
+        {/* Row 2 — copyright, centered alone */}
+        <div className="mt-3 text-center text-[11px] text-text-tertiary/80">
+          © {new Date().getFullYear()} {HERO.name}
         </div>
-      </div>
-
-      {/* Copyright — trust signal: "this site is maintained". Year is
-          rendered via new Date() so it never goes stale on Jan 1. */}
-      <div className="mx-auto mt-8 flex max-w-content items-center justify-center border-t border-border-subtle/60 pt-6 text-[11px] text-text-tertiary">
-        <span>© {new Date().getFullYear()} {HERO.name}. Built in the open — see <Link href="/colophon" className="transition-colors hover:text-accent">colophon</Link>.</span>
       </div>
     </footer>
   );
