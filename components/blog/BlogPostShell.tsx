@@ -49,6 +49,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'financial-benchmarking-refactor-velocity': dynamic(() => import('@/data/posts/financial-benchmarking-refactor-velocity.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'financial-benchmarking-decomposition-framework': dynamic(() => import('@/data/posts/financial-benchmarking-decomposition-framework.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
 };
 
 function PostSkeleton() {
