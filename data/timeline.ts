@@ -98,7 +98,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived PAR Drafting Assistant (pilot April 2026; enterprise rollout in progress). Productionized CFO Analytics Engine. Refactored Benchmarking Engine v1 → v2 in a concurrent 2-week sprint. Led 2025 summer intern program intern program. ~70% hands-on.',
+      'Architecting enterprise agentic AI. Conceived PAR Drafting Assistant (pilot April 2026; enterprise rollout in progress). Productionized CFO Analytics Engine. Refactored Benchmarking Engine v1 → v2 in a concurrent 2-week sprint. Led the 2025 summer intern cohort. ~70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',

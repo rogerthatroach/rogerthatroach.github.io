@@ -15,13 +15,13 @@ This is the story of why, and what it took to build.
 
 ## The problem
 
-RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions &mdash; &ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo; &mdash; and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in an enterprise permission system (EPM): ~40,000 employee-level events (the leaf-level routing unit), ~9,000 parent rollups, an ~80,000-node business hierarchy, and a ~60,000-node geography hierarchy — with strict entitlement controls at every level.
+RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions &mdash; &ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo; &mdash; and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (EPM): ~40,000 employee-level events (the leaf-level routing unit), ~9,000 parent rollups, an ~80,000-node business hierarchy, and a ~60,000-node geography hierarchy — with strict entitlement controls at every level.
 
 No interactive system could answer those questions in under a day. No off-the-shelf product understood the CFO Group&rsquo;s permission model. And every off-the-shelf AI tool that might have helped required giving the LLM full access to the data.
 
 ## The seductive option
 
-The prototype you can build in a week is this: one LLM, function-calling against the enterprise permission system API, answering natural-language queries by iteratively querying the data store. ReAct-style agent loop. Fast to demo. Looks magical.
+The prototype you can build in a week is this: one LLM, function-calling against EPM API, answering natural-language queries by iteratively querying the data store. ReAct-style agent loop. Fast to demo. Looks magical.
 
 Every reason to build it that way is a reason I pushed back.
 

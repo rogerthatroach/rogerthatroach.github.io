@@ -11,7 +11,7 @@ Finance leadership asks questions that cross three domains in one sentence: *"he
 
 There is one pattern the industry reaches for here: give the LLM full access and let it figure it out. One model, function-calling into the financial data store, iterating with a ReAct-style loop until it lands on an answer. Fast to prototype. Easy to demo. Impossible to ship inside regulated finance.
 
-CFO Analytics Engine went the other way. Up to six GPT-4.1 calls per query, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. An permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern — with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls — under pressure, across stakeholders — lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
+CFO Analytics Engine went the other way. Up to six GPT-4.1 calls per query, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. A permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern — with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls — under pressure, across stakeholders — lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
 
 <VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (parse / route / up to three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and the event-level ins-outs math across ~40K employee-level events, Band 3 LLM synthesis (one call or three parallel subagents then combined). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
 {() => <AstraeusCascade />}
@@ -41,7 +41,7 @@ Four constraints shaped every decision below. Two regulatory, one hard-technical
     {
       kind: 'soft',
       label: 'Entitlement catalogs already live in EPM',
-      detail: 'The bank already runs an Enterprise Performance Management system where domain permissions, access groups, employee assignments, and events are maintained. Rebuilding that model outside the enterprise permission system would fork the source of truth. The solution has to enforce entitlement by reusing the catalog, not by re-implementing it.',
+      detail: 'The bank already runs an Enterprise Performance Management system where domain permissions, access groups, employee assignments, and events are maintained. Rebuilding that model outside EPM would fork the source of truth. The solution has to enforce entitlement by reusing the catalog, not by re-implementing it.',
     },
   ]}
 />
@@ -197,23 +197,23 @@ The SQL-only path was genuinely considered and ruled out during implementation �
 
 ### Decision 3 · Entitlement enforcement shape
 
-Who is allowed to see which slice? The answer was already encoded, across years, in the enterprise permission system system: domain permissions → security groups → employee assignments → events → SQL. The question was *where* to apply it.
+Who is allowed to see which slice? The answer was already encoded, across years, in EPM: domain permissions → access groups → entities → events → SQL. The question was *where* to apply it.
 
 <OptionsConsidered
   decision="Where in the pipeline does the entitlement check run?"
   options={[
     {
-      name: 'enterprise permission system passthrough, pre-compute',
-      summary: 'The full enterprise permission system cascade runs as a deterministic Python pipeline before any compute step. The user id maps through domain → access → entities → events → SQL WHERE clause. Compute only ever sees the filtered event set.',
+      name: 'EPM passthrough, pre-compute',
+      summary: 'The full EPM-derived permission cascade runs as a deterministic Python pipeline before any compute step. The user id maps through domain → access → entities → events → SQL WHERE clause. Compute only ever sees the filtered event set.',
       chosen: true,
       pros: [
         'Compliance is structural — compute physically cannot see a row the user is not entitled to, because no code path delivers one',
-        'Reuses the enterprise permission system catalog as the source of truth; no parallel permission model to drift',
+        'Reuses the EPM catalog as the source of truth; no parallel permission model to drift',
         'Audit story is mechanical — every permission resolution is a logged function call with inputs and outputs',
         'The cascade is testable in isolation — each of the five steps gets its own unit tests and integration tests',
       ],
       cons: [
-        'The cascade has to be built and kept in sync with enterprise permission system changes — active maintenance, not set-and-forget',
+        'The cascade has to be built and kept in sync with EPM changes — active maintenance, not set-and-forget',
         'Some queries resolve into large SQL WHERE clauses; indexes and query plans need attention',
       ],
     },
@@ -250,16 +250,16 @@ Who is allowed to see which slice? The answer was already encoded, across years,
         'Applies to every query path, not just the application',
       ],
       cons: [
-        'enterprise permission system permission logic is a five-step cascade with business-rule layers that do not map cleanly to RLS policies',
-        'Would force duplicating the enterprise permission system model into database policies, drifting from the catalog',
+        'enterprise permission logic is a five-step cascade with business-rule layers that do not map cleanly to RLS policies',
+        'Would force duplicating EPM model into database policies, drifting from the catalog',
         'Debugging a denied query becomes a database-administration task, not a development task',
       ],
     },
   ]}
 />
 
-<DecisionRationale option="enterprise permission system passthrough, pre-compute">
-The deciding property was **reuse of the source of truth**. The bank had spent years curating the enterprise permission system catalog — domain permissions, security groups, employee assignments, events — with a review and change-management process that already satisfied auditors. Any entitlement model that did not reuse that catalog forked the source of truth and introduced a drift risk that regulated finance will not accept.
+<DecisionRationale option="EPM passthrough, pre-compute">
+The deciding property was **reuse of the source of truth**. The bank had spent years curating the EPM catalog — domain permissions, security groups, employee assignments, events — with a review and change-management process that already satisfied auditors. Any entitlement model that did not reuse that catalog forked the source of truth and introduced a drift risk that regulated finance will not accept.
 
 Pre-compute placement came from a narrower argument: *least privilege.* A query result that was post-filtered from a larger computation means the computation briefly ran over data the user was not entitled to — and the audit story has to either explain that away or prove that no information leaked through the differential. Pre-compute filtering makes the audit trivial: the computation input itself is the entitled set.
 
@@ -359,7 +359,7 @@ A concrete CFO query — *"show me headcount by division, crossed with open posi
     {
       title: 'Step 4 · Entitlement cascade',
       caption: 'domain → access → entities → events → SQL',
-      content: 'The user’s identity flows through the five-step enterprise permission system cascade. Cube permissions: which CFO Analytics Engine cubes can this user touch? Security groups: which of those cubes is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Transits: which ~40K-event subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged.',
+      content: 'The user’s identity flows through the five-step permission cascade. Domain permissions: which CFO Analytics Engine domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Events: which ~40K subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged.',
     },
     {
       title: 'Step 5 · Compute (Cython, no LLM)',
@@ -378,13 +378,13 @@ A concrete CFO query — *"show me headcount by division, crossed with open posi
 
 The five-step cascade is the engineering that made this architecture shippable inside governance. Each step is a deterministic function with typed inputs and outputs, logged to Postgres, replayable from the audit log.
 
-1. **Cube permissions.** enterprise permission system organizes data into cubes; the user identity resolves to a set of domain permissions. This is a direct lookup against the enterprise permission system permission catalog.
-2. **Security groups.** Cube permissions map to security groups with finer-grained scope — business line, geography, grain. The mapping is maintained in enterprise permission system and pulled via a periodic catalog sync.
-3. **Employee assignments.** Security groups map to the employee records the user is entitled to see — visible headcount, visible organizational rollups.
-4. **Transits.** The atomic routing unit. Employee assignments resolve to the ~40K-event subset — the leaf-level units that event-level math operates on.
+1. **Domain permissions.** The EPM organizes data into domains; the user identity resolves to a set of domain permissions. This is a direct lookup against the entitlement catalog.
+2. **Access groups.** Domain permissions map to access groups with finer-grained scope — business line, geography, grain. The mapping is maintained in EPM and pulled via a periodic catalog sync.
+3. **Entities.** Access groups map to the employee records the user is entitled to see — visible headcount, visible organizational rollups.
+4. **Events.** The atomic routing unit (the leaf-level routing record). Employee assignments resolve to the ~40K-event subset — the leaf-level units that event-level math operates on.
 5. **SQL WHERE clause.** The event set materializes into a SQL predicate that Postgres enforces at query time. Every compute query carries this predicate; no path exists that computes over a larger scope and filters later.
 
-The decision to reuse enterprise permission system rather than build a parallel model is what let this ship. The bank had years of governance process around the enterprise permission system catalog — review, change management, auditor sign-off. Forking the permission model outside the enterprise permission system would have triggered a separate governance review on the new system, and the new system would have drifted from the old one the moment enterprise permission system changed.
+The decision to reuse EPM rather than build a parallel model is what let this ship. The bank had years of governance process around the EPM catalog — review, change management, auditor sign-off. Forking the permission model outside EPM would have triggered a separate governance review on the new system, and the new system would have drifted from the old one the moment EPM changed.
 
 ## Why 40K is a factorial number
 
@@ -403,7 +403,7 @@ The *previously impossible* framing is not marketing. Before CFO Analytics Engin
     hint: 'days',
     content: (
       <>
-        Email to the analytics team. Analyst pulls three extracts from enterprise permission system — one per domain. Joins them in Excel. Checks entitlement manually against the employee directory. Reconciles rollup differences between cubes. Emails back a spreadsheet. The CFO asks a follow-up; cycle repeats. The question exchanges take days, and new cross-domain slices are always bespoke.
+        Email to the analytics team. Analyst pulls three extracts from EPM — one per domain. Joins them in Excel. Checks entitlement manually against the employee directory. Reconciles rollup differences between cubes. Emails back a spreadsheet. The CFO asks a follow-up; cycle repeats. The question exchanges take days, and new cross-domain slices are always bespoke.
       </>
     ),
   }}
