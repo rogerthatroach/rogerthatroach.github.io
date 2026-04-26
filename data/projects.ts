@@ -127,7 +127,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     title: 'CFO Analytics Engine',
     subtitle: 'Financial Insights & Analysis Suite — RBC CFO Group',
     role: 'Architect, lead developer, product visionary',
-    stack: ['GPT-4.1', 'Custom Python router', 'Cython compute', 'Postgres', 'enterprise permission system'],
+    stack: ['GPT-4.1', 'Custom Python router', 'Cython compute', 'Postgres', 'EPM'],
     heroMetric: { value: ASTRAEUS_FACTORIAL_COMBINATIONS, label: 'Factorial Combinations' },
     caption:
       'Production analytics platform for RBC\'s CFO Group. Days of email back-and-forth replaced by seconds-level answers — across headcount, HR costs, and open positions at bank scale. LLM never touches operational data by construction; event-level ins-outs math runs in Cython-compiled Python, milliseconds over ~40K leaf-level events.',
