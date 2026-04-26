@@ -37,51 +37,51 @@ export default function PostCard({ post, index }: PostCardProps) {
     >
       <Link
         href={`/blog/${post.slug}`}
-        className="group relative flex min-h-[280px] flex-col rounded-xl border border-border-subtle bg-surface/50 p-6 transition-colors hover:bg-surface-hover"
+        className="group relative flex min-h-[160px] flex-col rounded-lg border border-border-subtle bg-surface/50 p-4 transition-colors hover:bg-surface-hover"
       >
         {post.register && (
           <div
             aria-label={`Register: ${REGISTER_MARK[post.register].label}`}
-            className="pointer-events-none absolute right-5 top-5 flex items-baseline gap-1.5 text-text-tertiary/70 transition-colors group-hover:text-text-tertiary"
+            className="pointer-events-none absolute right-3 top-3 flex items-baseline gap-1 text-text-tertiary/70 transition-colors group-hover:text-text-tertiary"
           >
-            <span className="font-display text-base leading-none" aria-hidden="true">
+            <span className="font-display text-sm leading-none" aria-hidden="true">
               {REGISTER_MARK[post.register].glyph}
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em]">
+            <span className="font-mono text-[8px] uppercase tracking-[0.16em]">
               {REGISTER_MARK[post.register].label}
             </span>
           </div>
         )}
 
-        <h2 className="line-clamp-2 pr-20 text-lg font-semibold text-text-primary transition-colors group-hover:text-accent">
+        <h2 className="line-clamp-2 pr-16 text-sm font-semibold text-text-primary transition-colors group-hover:text-accent sm:text-base">
           {post.title}
         </h2>
-        <p className="mt-1 line-clamp-2 text-sm text-text-secondary">{post.subtitle}</p>
+        <p className="mt-1 line-clamp-2 text-xs text-text-secondary">{post.subtitle}</p>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {post.tags.slice(0, 3).map((tag) => (
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {post.tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-accent-muted px-2.5 py-0.5 text-xs text-accent"
+              className="rounded-full bg-accent-muted px-2 py-0.5 text-[10px] text-accent"
             >
               {tag}
             </span>
           ))}
         </div>
 
-        <div className="mt-auto flex items-center justify-between pt-4 text-xs text-text-tertiary">
-          <div className="flex items-center gap-3">
+        <div className="mt-auto flex items-center justify-between pt-3 text-[11px] text-text-tertiary">
+          <div className="flex items-center gap-2.5">
             <span className="flex items-center gap-1">
-              <Calendar size={12} />
+              <Calendar size={11} />
               {new Date(post.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric', timeZone: 'UTC' })}
             </span>
             <span className="flex items-center gap-1">
-              <Clock size={12} />
+              <Clock size={11} />
               {post.readingTime}
             </span>
           </div>
           <span className="flex items-center gap-1 text-accent opacity-0 transition-opacity group-hover:opacity-100">
-            Read <ArrowRight size={12} />
+            <ArrowRight size={11} />
           </span>
         </div>
       </Link>
