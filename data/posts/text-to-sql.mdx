@@ -1,4 +1,4 @@
-import { FiveStagePipeline, EmbeddingSpace, GuardrailValidator, FullPipelineFlow } from "@/components/blog/BlogDiagrams"
+import { AegisCascade, FiveStagePipeline, EmbeddingSpace, GuardrailValidator, FullPipelineFlow } from "@/components/blog/BlogDiagrams"
 import MathBlock from '@/components/blog/MathBlock';
 import { tex } from '@/lib/katex';
 import InlineEquation from '@/components/blog/InlineEquation';
@@ -136,10 +136,10 @@ where:
 </div>
 
 <VisualizationContainer
-  minHeight={350}
-  caption="Figure 1: Five-stage decomposed pipeline — blue stages use LLM, green stages are fully deterministic"
+  minHeight={500}
+  caption="Figure 1: Five-stage pipeline plus two walls. LLM use is bounded to Stages 1 (intent) and 3 (disambiguation, conditional on the confidence gate). Wall 1: no raw data crosses — the LLM intent stages never see KPI values. Wall 2: no free-form SQL emits — only template + parameter binds reach the database. The pipeline + walls are the architectural punchline: decomposition is itself the guardrail."
 >
-  {() => <FiveStagePipeline />}
+  {() => <AegisCascade />}
 </VisualizationContainer>
 
 ## 4. Stage 1: Intent Parsing
@@ -300,6 +300,39 @@ The LLM outputs a selection <InlineEquation html={tex("\\hat{k} \\in \\mathcal{K
 In practice, LLM confidence scores are not perfectly calibrated <CitationRef id={6} />, so we set <InlineEquation html={tex("\\epsilon")} /> conservatively (we use <InlineEquation html={tex("\\epsilon = 0.05")} />) and validate calibration empirically on
 a held-out query set.
 
+### 6.4 Model Readiness as a Precondition
+
+The disambiguation safety property in Proposition 4 is *conditional on
+calibration* — and calibration is an empirical property of the underlying LLM,
+not of the architecture. The same five-stage pipeline executed against a less-
+calibrated model fails Requirement 3 even though it satisfies the architecture
+specification.
+
+This is not theoretical. An earlier prototype of this system, executed against
+GPT-4o, exhibited two pathological failure modes on the disambiguation step:
+
+1. **Over-confident misselection.** Near-duplicate KPI candidates (e.g.
+   *Net Interest Margin* vs. *Net Interest Margin — Adjusted*) elicited high
+   confidence scores even when the wrong candidate was selected.
+   <InlineEquation html={tex("P(\\hat{k} = k^* \\mid p)")} /> diverged from <InlineEquation html={tex("p")} /> on the catalog clusters that mattered most.
+1. **Pathological caution.** Across other clusters, the model returned
+   uniformly low confidence for unambiguous candidates, triggering clarification
+   requests where none should have been needed.
+
+Either failure violates the disambiguation safety property. The architecture
+was structurally correct; the model was not yet a fit. We deferred production
+deployment of v2 until a model with sufficient calibration on this catalog
+domain became available.
+
+GPT-4.1 closed both gaps to within tolerance on a held-out evaluation set of
+~200 disambiguation queries (calibration ECE below 0.05; over-confidence on
+near-duplicate clusters within margin of <InlineEquation html={tex("\\epsilon")} />).
+
+The general lesson is that an architecture with formal safety properties still
+inherits one empirical dependency: the calibration of any LLM used in a
+disambiguation-or-clarify decision. Architecture specifies the *form* of safety;
+the model has to clear the *bar* the form requires.
+
 ## 7. Stage 4: Guardrailed SQL Generation
 
 ### 7.1 Template-Based Generation
@@ -363,13 +396,14 @@ provides the structural skeleton, and parameterization fills in the specific val
 
 Even with template-based generation, a validation layer provides defense-in-depth:
 
-1. **Whitelist check:** Parse the generated SQL AST and verify all table and column references against <InlineEquation html={tex("T_{\\text{allowed}}")} /> and <InlineEquation html={tex("C_{\\text{allowed}}")} />
+1. **Whitelist check (allow-list):** Parse the generated SQL AST and verify all table and column references against <InlineEquation html={tex("T_{\\text{allowed}}")} /> and <InlineEquation html={tex("C_{\\text{allowed}}")} />
 1. **Operation check:** Verify the top-level operation is SELECT (no INSERT, UPDATE, DELETE, DROP)
 1. **Structure check:** Compare the generated SQL structure against the expected template structure using tree edit distance on the AST
 1. **Parameter type check:** Verify each bound parameter matches the expected type from the template definition
+1. **Forbidden-keyword filter (deny-list):** Reject SQL containing operations or schema mutations the allow-list might miss (e.g. `CREATE`, `GRANT`, `EXEC`). Defense-in-depth — redundant with the whitelist by design
 
 If any check fails, the query is rejected and logged for review — it never reaches
-the database.
+the database. The validation layer is intentionally redundant: an allow-list defines what is permitted; a deny-list catches what slipped past the allow-list. Either alone is sufficient in theory; both together is what gets shipped to production.
 
 <VisualizationContainer
   minHeight={400}
@@ -394,10 +428,10 @@ The second version of this system was designed and deployed in two weeks. This
 timeline merits explanation because it appears to contradict the depth of
 engineering described above.
 
-Three factors made this possible:
+Four factors made this possible:
 
 **Factor 1: Domain maturity.** Version 1 had been in production for
-months. The KPI catalog, data layer, entitlement model, and deployment
+several months. The KPI catalog, data layer, entitlement model, and deployment
 infrastructure were stable. The rewrite replaced the query interface, not the
 foundation.
 
@@ -406,7 +440,14 @@ decomposition, the embedding approach, the confidence thresholding protocol, and
 guardrail layers had been explored and decided during months of research preceding
 the build. The architecture was ready; it needed to be written, not discovered.
 
-**Factor 3: Framework standardization.** The codebase was built within
+**Factor 3: Model readiness.** An earlier prototype with GPT-4o had
+demonstrated the architecture but failed the calibration bar Requirement 3
+demands (see §6.4). When GPT-4.1 cleared that bar on a held-out evaluation,
+the shelved design became viable as-is. The cost of having prototyped early
+was almost zero; the value when calibration crossed threshold was several
+months of ramp-up that did not have to be repeated.
+
+**Factor 4: Framework standardization.** The codebase was built within
 an internal platform that handled authentication, entitlements, and deployment.
 Infrastructure was not in scope.
 

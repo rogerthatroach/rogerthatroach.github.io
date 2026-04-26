@@ -49,6 +49,9 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
   'aegis-v2-velocity': dynamic(() => import('@/data/posts/aegis-v2-velocity.mdx'), {
     loading: () => <PostSkeleton />,
   }),
+  'aegis-decomposition-framework': dynamic(() => import('@/data/posts/aegis-decomposition-framework.mdx'), {
+    loading: () => <PostSkeleton />,
+  }),
 };
 
 function PostSkeleton() {

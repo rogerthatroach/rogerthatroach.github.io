@@ -1,56 +1,79 @@
-Aegis v2 went from concept to production in two weeks. I was simultaneously running Astraeus development and the 2025 summer intern program. The product shipped anyway. It earned the 2025 CFO One RBC Team Award.
+import { AegisCascade } from "@/components/blog/BlogDiagrams"
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
 
-This isn&rsquo;t a post about working harder. It&rsquo;s a post about what velocity actually looks like when the architecture is right.
+Aegis v2 went from concept to production in two weeks. I was simultaneously running Astraeus development and the 2025 summer intern program. The product shipped anyway.
 
-## The problem
+This isn&rsquo;t a post about working harder. It&rsquo;s a post about what velocity actually looks like when two preconditions land at the same time: an architecture you&rsquo;ve already rehearsed, and a model that finally clears the bar.
 
-RBC&rsquo;s CFO Group benchmarks financial KPIs against the Big 6 Canadian banks using the Supplementary Financial Packages each bank publishes with its quarterly earnings. Publicly available, but complex &mdash; every bank names and nests its KPIs differently, CET1 Ratios live in different tables, similar-sounding metrics mean subtly different things. Finance analysts did this benchmarking by hand: opening each bank&rsquo;s SFP PDF, hunting for the right number, transcribing into a spreadsheet, reconciling, repeating every quarter. Hours per query.
+## What v1 was, and what broke
 
-Aegis v1 was a rules-based benchmarking engine I&rsquo;d already built and productionized. It handled a defined catalog of KPIs well, but it couldn&rsquo;t accept natural language. If an analyst wanted to ask "how does our cost-to-income ratio compare against the peer average this quarter?" they still had to translate that question into v1&rsquo;s query syntax, or go back to the spreadsheet.
+RBC&rsquo;s CFO Group benchmarks financial KPIs against the Big 6 Canadian banks using the Supplementary Financial Packages each bank publishes with its quarterly earnings. Publicly available, but complex &mdash; every bank names and nests its KPIs differently, CET1 ratios live in different tables, similar-sounding metrics mean subtly different things.
 
-Aegis v2 was the AI-native evolution: natural language in, validated SQL out, with embedding-based KPI disambiguation and architectural safety guarantees the analysts could actually trust.
+Aegis v1 was a rules-based benchmarking engine I&rsquo;d already built and productionized. It worked. It earned the 2025 CFO One RBC Team Award &mdash; the trust that made the v2 sprint possible was the trust v1 had already earned.
+
+What broke was the catalog. As the KPI catalog grew, the rules engine&rsquo;s coverage stopped scaling with it. Adding a new KPI meant a new rule. Adding a near-duplicate KPI (e.g. a new bank&rsquo;s &ldquo;NIM &mdash; Adjusted&rdquo; alongside the existing &ldquo;Net Interest Margin&rdquo;) meant a new rule *and* a disambiguation patch to keep v1 from confusing the two. The rule surface area was growing super-linearly with the data.
+
+Natural-language input was the obvious cure. If analysts could just type the question they actually meant, the disambiguation problem moves into the model.
+
+## Why I waited
+
+I tried this earlier with GPT-4o. The architecture worked at demo scale. It didn&rsquo;t hold up under the catalog. Calibrated confidence wasn&rsquo;t reliable enough &mdash; the model was either over-confident on near-duplicates (silently picking the wrong KPI) or so cautious it refused to commit. Neither failure mode is acceptable in CFO-grade analytics, where a confidently wrong number is worse than no number.
+
+So I shelved the text-to-SQL rewrite and kept v1 in production. The catalog kept growing; the rule surface kept growing; the gap between v1&rsquo;s coverage and analyst demand kept widening. I lived with it.
+
+GPT-4.1 closed the gap. The model was reliable enough on the disambiguation prompt to make the confidence-thresholded decision function actually work &mdash; accept above the threshold, request clarification below it. The architecture I&rsquo;d already designed and shelved became viable.
+
+That&rsquo;s the unlock that made the two-week sprint possible. Not architecture clarity in isolation. Architecture clarity *plus* a model that crossed the reliability bar.
 
 ## The five-stage pipeline
 
 The spine of v2 is a decomposed pipeline where each stage owns one concern:
 
-1. **Intent parsing** &mdash; rule-based. Decomposes the natural-language query into structured components: which KPIs, which banks, which time window, which comparison operator.
-2. **KPI detection** &mdash; deterministic. Maps query terms to a metadata-rich KPI catalog derived from the SFPs.
-3. **Disambiguation** &mdash; embeddings-based similarity search, LLM-assisted only when confidence thresholds say the deterministic match is ambiguous. "CET1 Ratio" and "Common Equity Tier 1 Capital Ratio" resolve to the same thing; "Operating Leverage" across two banks might resolve to different underlying calculations, and the system has to know when to ask.
-4. **SQL generation** &mdash; guardrailed. Whitelisted schema, parameterized queries, forbidden-keyword filter. SQL injection is impossible by construction, not "unlikely in practice."
-5. **Deterministic formatting** &mdash; output is structured and identical for identical inputs.
+1. **Intent parsing** &mdash; LLM (GPT-4.1) with constrained generation against a JSON schema. Returns a typed intent tuple: which KPI, which time window, which comparison shape, which output format. Validation retries on schema violation; clarification request on persistent failure.
+2. **KPI detection** &mdash; deterministic embedding similarity search over the catalog. Returns a candidate set <em>K<sub>c</sub></em>.
+3. **Disambiguation gate** &mdash; if the top candidate dominates by a clear margin, accept it. If candidates cluster (the near-duplicate problem), the LLM gets the candidate names + definitions (no values) and chooses, with a calibrated confidence score. If confidence drops below 1&minus;&epsilon;, the system asks the user.
+4. **SQL generation** &mdash; template-based with parameter binding. Templates are pre-authored, schema-whitelisted SQL with typed placeholders. A defense-in-depth validation layer runs whitelist checks (allowed tables/columns), AST checks (SELECT-only, no DDL), parameter type checks, and a deny-list of forbidden keywords as a safety net.
+5. **Result formatting** &mdash; deterministic. Output shape (table / chart / narrative / single value) was fixed in the intent tuple at Stage 1.
 
-The formal paper proves the safety properties. What matters here is that each stage is independently testable and each stage fails in a way the next stage can handle. No stage is load-bearing on LLM magic. The LLM does what language models do well (disambiguation under uncertainty), bounded by confidence thresholds. Everything else is code.
+<VisualizationContainer
+  minHeight={500}
+  caption="Figure 1: The pipeline + two walls. LLM use is bounded to stages 1 and 3. Wall 1: no raw data crosses (LLM intent never sees KPI values). Wall 2: no free-form SQL emits (only template + parameter binds reach the database). Decomposition is itself the guardrail."
+>
+  {() => <AegisCascade />}
+</VisualizationContainer>
+
+The formal paper proves the safety properties &mdash; injection impossibility by construction, schema compliance, bounded disambiguation. What matters here is that each stage is independently testable and each stage fails in a way the next stage can handle. No stage is load-bearing on LLM magic. The LLM does the two things language models do well (parsing structured intent, picking among ambiguous candidates), bounded by schemas and confidence thresholds. Everything else is code.
 
 ## What two weeks actually requires
 
-The "two weeks" metric is real. What&rsquo;s misleading about it is the framing that implies the work happened in that window.
+The &ldquo;two weeks&rdquo; metric is real. What&rsquo;s misleading about it is the framing that implies the work happened in that window.
 
 The work happened in the months before. What happened during the sprint was crystallization, not improvisation.
 
-1. **The architecture was already rehearsed.** I&rsquo;d been living with v1 in production for a year. I knew its failure modes: where the rules engine broke, which KPI categories were most ambiguous, what analysts actually asked for vs. what v1 could answer. That dataset-of-one-year-of-operating-knowledge was the specification for v2. When the sprint started, I wasn&rsquo;t designing. I was implementing a design I&rsquo;d already committed to in principle.
+1. **The architecture was already rehearsed.** I&rsquo;d been living with v1 in production for several months. I knew its failure modes &mdash; where the rules engine broke, which KPI categories were most ambiguous, what analysts actually asked for vs. what v1 could answer. I&rsquo;d also already prototyped the text-to-SQL rewrite with 4o and watched it fail under load. That dataset of one-product-year of operating knowledge plus one shelved prototype was the specification for v2. When the sprint started, I wasn&rsquo;t designing. I was implementing a design I&rsquo;d already committed to and validated against a real model upgrade.
 
-2. **The pipeline was decomposable.** Five stages with clear contracts meant I could build and test each one independently. Intent parsing on day one. KPI catalog loading on day two. Disambiguation harness on day three. Etc. No single stage needed to be right before the next could start. At any given moment, two or three stages were in flight in parallel in my head. That kind of decomposition is an architectural property; it&rsquo;s also an execution property. It makes speed possible because it makes work parallelizable.
+2. **The pipeline was decomposable.** Five stages with clear contracts meant I could build and test each one independently. Intent parsing on day one. KPI catalog + embedding load on day two. Disambiguation harness on day three. Template library + validation layer on days four-five. Formatting + integration testing on the second week. No single stage needed to be right before the next could start. At any given moment two or three stages were in flight in parallel in my head. That kind of decomposition is an architectural property; it&rsquo;s also an execution property. It makes speed possible because it makes work parallelizable.
 
-3. **Scope was ruthlessly bounded.** v2 did not do a lot of things. It didn&rsquo;t try to be a universal financial QA system. It didn&rsquo;t support free-form numerical reasoning. It didn&rsquo;t rewrite the visualization layer. Every temptation to expand scope during the sprint got deferred to post-launch. "We&rsquo;ll see if they ask for it once it&rsquo;s in production" is a harder answer to give than "sure, I&rsquo;ll add that," but it&rsquo;s the answer that keeps the ship date real.
+3. **Scope was ruthlessly bounded.** v2 did not do a lot of things. It didn&rsquo;t try to be a universal financial QA system. It didn&rsquo;t support free-form numerical reasoning. It didn&rsquo;t rewrite the visualization layer. Every temptation to expand scope during the sprint got deferred to post-launch. &ldquo;We&rsquo;ll see if they ask for it once it&rsquo;s in production&rdquo; is a harder answer to give than &ldquo;sure, I&rsquo;ll add that,&rdquo; but it&rsquo;s the answer that keeps the ship date real.
 
-Underneath all three, there was also capacity protection. Astraeus was mid-flight. The summer intern program had interns I was mentoring. Two weeks of Aegis v2 work was possible only because the architecture&rsquo;s clarity meant I didn&rsquo;t need to be in the room for most implementation decisions. I could move between workstreams without each one losing momentum.
+Underneath all three, there was capacity protection. Astraeus was mid-flight. The 2025 summer intern cohort had interns I was mentoring. Two weeks of Aegis v2 work was possible only because the architecture&rsquo;s clarity meant I didn&rsquo;t need to be in the room for most implementation decisions. I could move between workstreams without each one losing momentum.
 
 ## The result
 
 - Shipped to production in 2 weeks
-- Natural-language KPI benchmarking replacing manual Supplementary Financial Package lookups
-- 2025 CFO One RBC Team Award
+- Natural-language KPI benchmarking replacing manual Supplementary Financial Package lookups *and* v1&rsquo;s rigid query syntax
 - Aegis v1, the rules-based predecessor, continued running in production through the rewrite &mdash; zero downtime on the benchmarking function that analysts relied on
 
 ## The pattern
 
-Two ideas worth taking seriously:
+Three ideas worth taking seriously:
 
-1. **Velocity is a downstream effect of clarity.** The work that makes a two-week sprint possible is the research, prototyping, and operational exposure that preceded it. If you&rsquo;re trying to compress novel architectural work into two weeks, you&rsquo;re not doing it in two weeks. If you&rsquo;re implementing a design you&rsquo;ve already validated in production, two weeks is realistic.
+1. **Velocity is downstream of clarity *and* model readiness.** The work that makes a two-week sprint possible is the research, prototyping, and operational exposure that preceded it. But also: the model has to actually clear the reliability bar your architecture demands. The 4o prototype was a real cost &mdash; weeks of design work &mdash; that paid off only because a 4.1 unlocked the same architecture months later. If you&rsquo;re trying to compress novel architectural work into two weeks against an unreliable model, you&rsquo;re not doing it in two weeks.
 
-2. **Decomposable pipelines beat monoliths.** Not only for testability, not only for maintainability &mdash; also for speed. Clear stage contracts let you parallelize work in a way monolithic agent architectures cannot.
+2. **A shelved prototype is not a wasted prototype.** I built the v2 architecture once and put it on the shelf. When 4.1 landed, the architecture came back off the shelf intact. The cost of having tried earlier was almost zero; the value when the model crossed the threshold was several months of ramp-up I didn&rsquo;t have to repeat. Build it before you can ship it; let model progress catch up to your design.
+
+3. **Decomposable pipelines beat monoliths.** Not only for testability, not only for maintainability &mdash; also for speed. Clear stage contracts let you parallelize work in a way monolithic agent architectures cannot.
 
 Aegis v2 is structurally a descendant of Astraeus&rsquo;s LLM-as-Router &mdash; LLMs used surgically, deterministic code handling everything else, with the LLM&rsquo;s role bounded by schemas and confidence thresholds. The systems look different because they&rsquo;re in different domains. Architecturally they&rsquo;re the same family.
 
-The hardest part wasn&rsquo;t shipping fast. The hardest part was knowing what not to build.
+The hardest part wasn&rsquo;t shipping fast. The hardest part was knowing what not to build &mdash; and knowing when to wait.

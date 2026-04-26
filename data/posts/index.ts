@@ -406,16 +406,55 @@ export const POSTS: BlogPost[] = [
   },
   {
     meta: {
-      slug: 'aegis-v2-velocity',
-      title: 'Two Weeks, One Product: What Velocity Looks Like When Architecture Is Right',
+      slug: 'aegis-decomposition-framework',
+      title: 'Decomposition as Guardrail — Four Decisions',
       subtitle:
-        'Aegis v2 shipped in 2 weeks while Astraeus was mid-flight and the summer intern program was running. A post about what makes that possible.',
-      date: '2026-07-03',
-      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Aegis'],
-      readingTime: '6 min read',
+        'A practitioner-register rewrite of the Aegis architecture. Constraints, options considered, and decision rationale for each of the four calls that separate decomposition-as-guardrail from the single-prompt text-to-SQL pattern.',
+      date: '2026-04-26',
+      tags: ['Text-to-SQL', 'Decomposition', 'SQL Safety', 'Embeddings', 'Calibration', 'Aegis'],
+      readingTime: '13 min read',
       abstract:
-        'Aegis v2 shipped in two weeks while Astraeus was mid-flight and the summer intern program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the Astraeus LLM-as-Router pattern \u2014 same family, tighter intent classification.',
-      status: 'draft',
+        'A practitioner-register companion to the formal text-to-SQL paper and the builder-register velocity story. Four explicit OptionsConsidered + DecisionRationale pairs: orchestration shape (decomposed pipeline vs single-prompt LLM); KPI detection method (embeddings vs keywords vs LLM lookup); SQL generation safety (template + parameter binds vs LLM-emitted SQL); disambiguation contract (confidence-thresholded clarify vs always-answer). Includes a six-step end-to-end production query StepThrough and a v1 → v2 BeforeAfterDiff. The thesis: bound the LLM to intent and judgment-under-uncertainty; let decomposition be the guardrail.',
+      status: 'published',
+      projectId: 'aegis',
+      register: 'practitioner',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Guardrailed Text-to-SQL (the formal companion)',
+        url: '/blog/text-to-sql',
+        description: 'The formal paper on the five-stage pipeline with safety theorems: injection impossibility by construction, schema compliance, bounded disambiguation, model-readiness as a precondition.',
+      },
+      {
+        title: 'Two Weeks, One Product (the builder companion)',
+        url: '/blog/aegis-v2-velocity',
+        description: 'The narrative of when those calls landed — and the role GPT-4.1’s calibration played in unlocking a shelved design.',
+      },
+      {
+        title: 'LLM-as-Router in Practice (the sister practitioner post)',
+        url: '/blog/astraeus-llm-as-router-framework',
+        description: 'The same family of architectural decisions applied to cross-domain analytics. Aegis and Astraeus share the family resemblance; the load-bearing piece differs.',
+      },
+      {
+        title: 'Aegis — Case Study',
+        url: '/projects/aegis',
+        description: 'Project case study: context, the cascade architecture, the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: {
+      slug: 'aegis-v2-velocity',
+      title: 'Two Weeks, One Product: Velocity, Clarity, and a Model That Finally Cleared the Bar',
+      subtitle:
+        'Aegis v2 shipped in 2 weeks while Astraeus was mid-flight and the summer intern program was running. The architecture had been on the shelf for months. What unlocked it was GPT-4.1.',
+      date: '2026-04-26',
+      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Model Readiness', 'Aegis'],
+      readingTime: '7 min read',
+      abstract:
+        'Aegis v2 shipped in two weeks while Astraeus was mid-flight and the 2025 summer intern cohort was running. The metric is real; the framing that the work happened in that window is misleading. The architecture had been designed and prototyped earlier with GPT-4o \u2014 and shelved, because 4o\u2019s calibrated confidence wasn\u2019t reliable enough for CFO-grade analytics. GPT-4.1 closed the gap. The shelved design came back off the shelf intact. Velocity is downstream of clarity *and* model readiness. The 2025 CFO One RBC Team Award was for v1\u2019s productionization \u2014 the trust v1 earned was the precondition that made v2\u2019s sprint possible.',
+      status: 'published',
       projectId: 'aegis',
       register: 'builder',
     },
