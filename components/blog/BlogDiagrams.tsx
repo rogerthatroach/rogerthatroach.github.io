@@ -17,11 +17,12 @@ export const EPMTranslation = PermissionCascade;
 export const FullSystemArchitecture = dynamic(() => import('./diagrams/FullSystemArchitecture'), { ssr: false, loading: Spinner });
 export const EventModelAnimation = dynamic(() => import('./diagrams/EventModelAnimation'), { ssr: false, loading: Spinner });
 
-// Post 2: Text-to-SQL
+// Post 2: Text-to-SQL / Aegis
 export const FiveStagePipeline = dynamic(() => import('./diagrams/FiveStagePipeline'), { ssr: false, loading: Spinner });
 export const EmbeddingSpace = dynamic(() => import('./diagrams/EmbeddingSpace'), { ssr: false, loading: Spinner });
 export const GuardrailValidator = dynamic(() => import('./diagrams/GuardrailValidator'), { ssr: false, loading: Spinner });
 export const FullPipelineFlow = dynamic(() => import('./diagrams/FullPipelineFlow'), { ssr: false, loading: Spinner });
+export const AegisCascade = dynamic(() => import('./diagrams/AegisCascade'), { ssr: false, loading: Spinner });
 
 // Post 3: Closed-Loop / PSO
 export const ClosedLoopCycle = dynamic(() => import('./diagrams/ClosedLoopCycle'), { ssr: false, loading: Spinner });

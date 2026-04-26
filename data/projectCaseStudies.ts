@@ -213,7 +213,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       decision:
         'Five-stage pipeline: intent parsing, embeddings-based KPI detection, LLM-assisted disambiguation, guardrailed SQL generation, deterministic formatting. SQL injection impossible by construction.',
       impact:
-        'Shipped to production in 2 weeks — while simultaneously running Astraeus development and the summer intern program. 2025 CFO One RBC Team Award.',
+        'Shipped to production in 2 weeks — while simultaneously running Astraeus development and the summer intern program. v1 had earned the 2025 CFO One RBC Team Award; v2 inherited the trust that made the sprint possible.',
     },
     sections: {
       context:
@@ -239,9 +239,9 @@ export const CASE_STUDIES: CaseStudy[] = [
       decision:
         'The five-stage decomposed pipeline (intent parsing → KPI detection → LLM-assisted disambiguation → guardrailed SQL generation → deterministic formatting) let each stage own a specific concern. Rule-based stages handle the deterministic parts; LLM-assisted stages handle ambiguity — but with confidence thresholds and guardrails. This architecture makes the system auditable and testable despite using LLMs.',
       implementation:
-        'Stage 1: Rule-based intent parsing decomposes natural language into structured query components. Stage 2: KPI detection maps query terms to a metadata-rich KPI catalog. Stage 3: Embeddings-based similarity search + LLM-assisted disambiguation resolves ambiguous KPI references with confidence thresholds. Stage 4: Guardrailed SQL generation with whitelisting, parameterization, and forbidden keyword filtering. Stage 5: Deterministic formatting ensures consistent output.',
+        'Stage 1: GPT-4.1 with constrained JSON-schema generation parses natural language into a typed intent tuple (metric, time, comparison, output format). Stage 2: deterministic embedding similarity search returns a candidate set from the KPI catalog. Stage 3: confidence gate \u2014 if the top candidate dominates by margin, accept; otherwise an LLM disambiguator (with names + definitions only, no values) selects, with a calibrated confidence score, falling back to a clarification request below threshold. Stage 4: SQL generation via pre-authored, schema-whitelisted templates with parameterized binding; defense-in-depth validation (whitelist + AST + SELECT-only + parameter type + deny-list) before execution. Stage 5: deterministic formatting in the output shape fixed at intent-parse time.',
       impact:
-        'Shipped a production-grade text-to-SQL benchmarking engine in two weeks. The system provides formal safety guarantees: SQL injection is impossible by construction (parameterized queries + whitelisted schema), disambiguation is bounded by confidence thresholds, and every stage is independently testable. Two weeks, delivered concurrently with Astraeus productionization and the summer intern program — the speed came from crystallizing months of v1 learnings into a decomposed architecture, not from shortcuts.',
+        'Shipped a production-grade text-to-SQL benchmarking engine in two weeks. The system provides formal safety guarantees: SQL injection is impossible by construction (parameterized queries + whitelisted schema), disambiguation is bounded by confidence thresholds, and every stage is independently testable. Two weeks, delivered concurrently with Astraeus productionization and the summer intern program — the speed came from a shelved-and-resumed architecture (an earlier prototype against GPT-4o had failed the calibration bar; GPT-4.1 cleared it) plus the operational trust v1 had already earned. The 2025 CFO One RBC Team Award recognized v1\u2019s productionization \u2014 the precondition that made v2\u2019s mandate possible.',
       inProduction:
         'Running in production within the CFO Group as the primary benchmarking tool. Finance analysts use natural language to query cross-bank KPI comparisons, replacing manual spreadsheet lookups.',
       lessonsLearned:
