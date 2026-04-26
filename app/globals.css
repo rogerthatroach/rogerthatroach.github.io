@@ -229,6 +229,26 @@ html.dark .palette-border-l {
   margin: 1em 0 !important;
   overflow-x: auto;
   overflow-y: hidden;
+  /* Soft right-edge fade hint — when content overflows horizontally,
+   * the gradient cues "more content, scroll right." Doesn't appear on
+   * equations that fit the container (mask is on the wrapper, not the
+   * scrollbox content itself). */
+  -webkit-mask-image: linear-gradient(to right, black 0, black calc(100% - 24px), transparent 100%);
+          mask-image: linear-gradient(to right, black 0, black calc(100% - 24px), transparent 100%);
+}
+
+/* Mobile: scale KaTeX font down so most equations fit without scroll.
+ * 0.82 fits set-notation expressions and short cases-environments at
+ * iPhone-15-class widths (~390pt CSS px); slightly tighter at 0.78 on
+ * the smallest viewports. Long equations still scroll within their
+ * .katex-display wrapper. */
+@media (max-width: 640px) {
+  .katex { font-size: 0.92em; }
+  .katex-display .katex { font-size: 0.82em; }
+}
+@media (max-width: 400px) {
+  .katex { font-size: 0.88em; }
+  .katex-display .katex { font-size: 0.78em; }
 }
 
 /* Ensure KaTeX's visually-hidden MathML stays hidden */
