@@ -15,31 +15,27 @@
 
 export const GLOSSARY: Record<string, string> = {
   // ── Products / systems ──
-  'AI/LLM Drafting Platform':
-    'Enterprise-wide agentic AI platform guiding project funding request drafting. Bank-wide pilot launched April 2026; rollout through Q2/Q3 2026.',
-  WorkforceAnalytics:
-    'Production analytics platform for CFO Group — millisecond slicing across ~40K transits with event-level ins-outs math (Cython-compiled). approved foundation model used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
-  'FinancialBenchmarking v1':
-    'Canadian Supplementary Benchmarking engine for peer-bank KPI comparisons (Big 6). Productionized 2024. 2025 CFO One RBC Team Award.',
-  'FinancialBenchmarking v2':
-    'Concurrent 2-week refactor of v1 — text-to-SQL first with KPI disambiguation. Done alongside AI/LLM Drafting Platform + WorkforceAnalytics work; not an independent delivery.',
+  'PAR Drafting Assistant':
+    'Enterprise-wide agentic AI platform guiding project funding request (PAR) drafting at RBC. Bank-wide pilot launched April 2026; rollout through Q2/Q3 2026. (Internally: "AI/LLM Drafting Platform".)',
+  'CFO Analytics Engine':
+    'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level events with event-level ins-outs math (Cython-compiled). approved foundation model used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction. (Internally: "WorkforceAnalytics".)',
+  'Benchmarking Engine':
+    'Canadian Supplementary Benchmarking engine for peer-bank KPI comparisons (Big 6). v1 productionized 2024 (rules-based). v2 (2025) is a concurrent 2-week refactor — text-to-SQL first with KPI disambiguation, done alongside PAR + CFO Analytics work. 2025 CFO One RBC Team Award. (Internally: "FinancialBenchmarking v1 / v2".)',
   'Commodity Tax':
     '~$250M GST + ~$350M PVAT allocated across the bank. Processing time slashed from months to 90 minutes. Q4 2023 CFO Group Quarterly Team Award.',
-  'EDS Automation':
-    'PAR actual-vs-planned financial comparison system using a dynamic RAG over finance documents. Widely adopted across the finance team.',
+  'External Data Service automation':
+    'Actual-vs-planned financial comparison system using a dynamic RAG over finance documents. Widely adopted across the finance team. (Internally: "EDS Automation".)',
 
   // ── Programs ──
-  'Amplify program':
-    'RBC internal innovation program. I led Amplify 2025 end-to-end: 4 interns across AI/LLM Drafting Platform and adjacent projects. The program is what converted the intern PAR POC into a bank-wide initiative.',
-  'Amplify 2025':
-    'The 2025 cohort of RBC\'s Amplify internship program — 4 interns, led end-to-end. Career guidance → requirement gathering → problem scoping → solution design → implementation → presentation.',
+  'summer intern program':
+    'RBC internal innovation / intern program. I led the 2025 cohort end-to-end: 4 interns across PAR drafting and adjacent projects. The program is what converted the intern PAR POC into a bank-wide initiative.',
 
   // ── Organizations ──
-  GFT: 'Global Functions Technology — RBC-internal tech arm. I lead cross-functional GFT senior + junior peers on WorkforceAnalytics delivery.',
+  'engineering services partner': 'Cross-functional engineering peers — senior + junior — on the CFO Analytics Engine delivery.',
   'CFO Group':
     'Chief Financial Officer\'s Group at RBC — the enterprise finance organization. My home org since joining RBC in 2022.',
   'CFO One RBC Team Award':
-    'RBC enterprise-level recognition for LLM/AI impact. Received 2025 for FinancialBenchmarking v1 productionization.',
+    'RBC enterprise-level recognition for LLM/AI impact. Received 2025 for the Benchmarking Engine v1 productionization.',
 
   // ── Clients / client systems ──
   Humana:
@@ -60,16 +56,18 @@ export const GLOSSARY: Record<string, string> = {
 
   // ── Technical concepts ──
   LangGraph:
-    'Graph-based LLM orchestration library. Picked for AI/LLM Drafting Platform for maturity (most stable orchestrator at evaluation time) and because PAR drafting is a conditional-branching workflow — template selection → field-group retrieval → extraction → coverage loops back on open follow-ups.',
-  MCP: 'Model Context Protocol — emerging standard for typed, logged tool contracts. In AI/LLM Drafting Platform every action (template selection, retrieval, compression, extraction, merge, coverage) is an MCP tool dispatched through the graph engine, so auditability is structural, not aspirational.',
+    'Graph-based LLM orchestration library. Picked for the PAR drafting assistant for maturity (most stable orchestrator at evaluation time) and because PAR drafting is a conditional-branching workflow — template selection → field-group retrieval → extraction → coverage loops back on open follow-ups.',
+  MCP: 'Model Context Protocol — emerging standard for typed, logged tool contracts. In the PAR drafting assistant every action (template selection, retrieval, compression, extraction, merge, coverage) is an MCP tool dispatched through the graph engine, so auditability is structural, not aspirational.',
   pgvector:
-    'PostgreSQL vector-similarity extension. AI/LLM Drafting Platform uses pgvector alongside LangGraph checkpoints + logs + raw/mapped content + audit trail — one Postgres store holds every layer of the session, so the full provenance for any draft is one query away.',
+    'PostgreSQL vector-similarity extension. The PAR drafting assistant uses pgvector alongside LangGraph checkpoints + logs + raw/mapped content + audit trail — one Postgres store holds every layer of the session, so the full provenance for any draft is one query away.',
   'field-group retrieval':
-    'AI/LLM Drafting Platform\'s two-stage retrieval pattern. Stage 1 picks which logically-related field groups are relevant to the session. Stage 2 runs similarity search within each group for top-10 chunks, then custom compression fits them into a approved foundation model prompt with up to 20 fields of rich metadata per call.',
+    'The PAR drafting assistant\'s two-stage retrieval pattern. Stage 1 picks which logically-related field groups are relevant to the session. Stage 2 runs similarity search within each group for top-10 chunks, then custom compression fits them into a approved foundation model prompt with up to 20 fields of rich metadata per call.',
   'single-agent envelope':
-    'The governance constraint behind AI/LLM Drafting Platform v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
+    'The governance constraint behind the PAR drafting assistant v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
   'approved foundation model':
-    'The model used in WorkforceAnalytics for all LLM calls (parse, route, metadata extract, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
+    'The model used in the CFO Analytics Engine for all LLM calls (parse, route, metadata extract, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
+  event:
+    'Leaf-level routing record in the CFO Analytics Engine — the atomic unit the entitlement cascade resolves down to (~40K of them). Event-level ins-outs math (in/out transitions through cost-centre or organizational rollups) is what makes the cross-domain factorial space tractable in milliseconds. (Internally: "transit".)',
   PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS for closed-loop boiler control.',
   'closed-loop':
     'Sense → model → optimize → act. The pattern that repeats across every role in my career, at progressively higher abstraction levels.',

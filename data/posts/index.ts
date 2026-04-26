@@ -78,7 +78,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Agentic AI', 'LLM Routing', 'Enterprise Security', 'Entitlement Modeling'],
       readingTime: '20 min read',
       abstract:
-        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee transits across ~9,000 organizational rollups with millisecond-level response times, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
+        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee-level events across ~9,000 organizational rollups with millisecond-level response times, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
       status: 'published',
       projectId: 'workforceAnalytics',
       register: 'formal',
@@ -209,12 +209,12 @@ export const POSTS: BlogPost[] = [
       slug: 'enterprise-agentic-ai-framework',
       title: 'Enterprise Agentic AI Architecture — Practitioner Rewrite',
       subtitle:
-        'The same AI/LLM Drafting Platform system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
+        'The same PAR Drafting Assistant system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
       date: '2026-04-22',
       tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Single-Agent Envelope'],
       readingTime: '10 min read',
       abstract:
-        'AI/LLM Drafting Platform — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel approved foundation model extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
+        'PAR Drafting Assistant — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel approved foundation model extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
       status: 'published',
       projectId: 'funding-request-drafting',
       register: 'practitioner',
@@ -231,20 +231,20 @@ export const POSTS: BlogPost[] = [
     ],
     furtherReading: [
       { title: 'Enterprise Agentic AI Architecture (original formal post)', url: '/blog/enterprise-agentic-ai-architecture', description: 'The sibling post — same system, formal register, theorem/proof structure throughout. Compare with this rewrite to see the register swap.' },
-      { title: 'How We Built AI/LLM Drafting Platform (builder story)', url: '/blog/funding-request-drafting-platform-building', description: 'The third register — conversational builder story, same architecture.' },
+      { title: 'How We Built PAR Drafting Assistant (builder story)', url: '/blog/funding-request-drafting-platform-building', description: 'The third register — conversational builder story, same architecture.' },
       { title: 'Writing rewrite framework spec', url: 'https://github.com/rogerthatroach/rogerthatroach.github.io', description: 'Canonical deep-post structure, reader-level targeting, component palette. Lives in docs/specs/ — see repo.' },
     ],
   },
   {
     meta: {
       slug: 'funding-request-drafting-platform-building',
-      title: 'How We Built AI/LLM Drafting Platform: From Intern POC to Bank-Wide Product',
+      title: 'How We Built PAR Drafting Assistant: From Intern POC to Bank-Wide Product',
       subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind the bank\u2019s first true agentic AI platform.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '9 min read',
       abstract:
-        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 Amplify program became AI/LLM Drafting Platform, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea.',
+        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 summer intern program became PAR Drafting Assistant, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea.',
       status: 'published',
       projectId: 'funding-request-drafting',
       register: 'builder',
@@ -263,12 +263,12 @@ export const POSTS: BlogPost[] = [
       slug: 'workforce-analytics-llm-as-router',
       title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
       subtitle:
-        'A builder-register companion to the formal WorkforceAnalytics architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
+        'A builder-register companion to the formal CFO Analytics Engine architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
       date: '2026-04-18',
-      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'WorkforceAnalytics'],
+      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'CFO Analytics Engine'],
       readingTime: '7 min read',
       abstract:
-        'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building WorkforceAnalytics \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
+        'The most common architectural mistake in enterprise agentic AI is the one nobody calls a mistake: giving the LLM full access and letting it figure it out. This is the story of pushing back against that pattern when building CFO Analytics Engine \u2014 RBC\u2019s production analytics platform for the CFO Group \u2014 and what LLM-as-Router actually requires to build at enterprise scale. Four reasons the seductive option fails (non-determinism, data leakage, no audit trail, permission correctness), the entitlement-modeling work that was the real engineering, and why the pattern now underlies every AI system I build at the bank.',
       status: 'published',
       projectId: 'workforceAnalytics',
       register: 'builder',
@@ -286,12 +286,12 @@ export const POSTS: BlogPost[] = [
         description: 'The same architecture in practitioner register \u2014 four decisions as first-class structure with options considered, constraint cards, and decision rationale for each.',
       },
       {
-        title: 'How We Built AI/LLM Drafting Platform',
+        title: 'How We Built PAR Drafting Assistant',
         url: '/blog/funding-request-drafting-platform-building',
         description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
       },
       {
-        title: 'WorkforceAnalytics \u2014 Case Study',
+        title: 'CFO Analytics Engine \u2014 Case Study',
         url: '/projects/workforceAnalytics',
         description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
       },
@@ -302,12 +302,12 @@ export const POSTS: BlogPost[] = [
       slug: 'workforce-analytics-routing-framework',
       title: 'LLM-as-Router in Practice \u2014 Four Decisions',
       subtitle:
-        'A practitioner-register rewrite of the WorkforceAnalytics architecture. Constraints, options considered, and decision rationale for each of the four calls that separate LLM-as-Router from the seductive monolithic pattern.',
+        'A practitioner-register rewrite of the CFO Analytics Engine architecture. Constraints, options considered, and decision rationale for each of the four calls that separate LLM-as-Router from the seductive monolithic pattern.',
       date: '2026-04-23',
-      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'EPM', 'Entitlement', 'WorkforceAnalytics'],
+      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'EPM', 'Entitlement', 'CFO Analytics Engine'],
       readingTime: '14 min read',
       abstract:
-        'WorkforceAnalytics ships on an architecture with two dashed walls: the LLM handles intent, the deterministic Cython-compiled Python layer handles compute, and LLM-as-Router links the two without the model ever touching operational data. This post lays the four architectural decisions as first-class structure \u2014 orchestration shape (LLM-as-Router over monolithic agent / chain / multi-agent), computation layer (Cython over pure Python / SQL / Rust), entitlement enforcement (EPM passthrough pre-compute over post-filter / LLM-policy / RLS), and synthesis strategy (router-decides hybrid over always-single / always-parallel / template-render). Each decision gets its constraints, its alternatives with honest pros/cons, and the rationale that produced the call. The narrative behind those calls lives in the builder companion; the formal proofs of data-confidentiality and entitlement safety live in the formal post.',
+        'CFO Analytics Engine ships on an architecture with two dashed walls: the LLM handles intent, the deterministic Cython-compiled Python layer handles compute, and LLM-as-Router links the two without the model ever touching operational data. This post lays the four architectural decisions as first-class structure \u2014 orchestration shape (LLM-as-Router over monolithic agent / chain / multi-agent), computation layer (Cython over pure Python / SQL / Rust), entitlement enforcement (permission-system passthrough pre-compute over post-filter / LLM-policy / RLS), and synthesis strategy (router-decides hybrid over always-single / always-parallel / template-render). Each decision gets its constraints, its alternatives with honest pros/cons, and the rationale that produced the call. The narrative behind those calls lives in the builder companion; the formal proofs of data-confidentiality and entitlement safety live in the formal post.',
       status: 'published',
       projectId: 'workforceAnalytics',
       register: 'practitioner',
@@ -325,9 +325,9 @@ export const POSTS: BlogPost[] = [
         description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
       },
       {
-        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (AI/LLM Drafting Platform)',
+        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (PAR Drafting Assistant)',
         url: '/blog/enterprise-agentic-ai-framework',
-        description: 'The same register applied to AI/LLM Drafting Platform \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
+        description: 'The same register applied to PAR Drafting Assistant \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
       },
       {
         title: 'LangGraph Documentation',
@@ -340,7 +340,7 @@ export const POSTS: BlogPost[] = [
         description: 'The compiled-Python toolchain behind the event-level ins-outs math.',
       },
       {
-        title: 'WorkforceAnalytics \u2014 Case Study',
+        title: 'CFO Analytics Engine \u2014 Case Study',
         url: '/projects/workforceAnalytics',
         description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
       },
@@ -372,7 +372,7 @@ export const POSTS: BlogPost[] = [
         description: 'The case study page: insurance-specific context, OCR challenges, the hybrid pipeline, and how the lessons carried over to RAG design at RBC.',
       },
       {
-        title: 'How We Built AI/LLM Drafting Platform',
+        title: 'How We Built PAR Drafting Assistant',
         url: '/blog/funding-request-drafting-platform-building',
         description: 'Where the document-structure insight resurfaced: chunking by structure (not fixed token windows) was the difference between useful and useless retrieval.',
       },
@@ -383,12 +383,12 @@ export const POSTS: BlogPost[] = [
       slug: 'financial-benchmarking-refactor-velocity',
       title: 'Two Weeks, One Product: What Velocity Looks Like When Architecture Is Right',
       subtitle:
-        'FinancialBenchmarking v2 shipped in 2 weeks while WorkforceAnalytics was mid-flight and the Amplify program was running. A post about what makes that possible.',
+        'Benchmarking Engine v2 shipped in 2 weeks while CFO Analytics Engine was mid-flight and the summer intern program was running. A post about what makes that possible.',
       date: '2026-07-03',
-      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'FinancialBenchmarking'],
+      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Benchmarking Engine'],
       readingTime: '6 min read',
       abstract:
-        'FinancialBenchmarking v2 shipped in two weeks while WorkforceAnalytics was mid-flight and the Amplify program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the WorkforceAnalytics LLM-as-Router pattern \u2014 same family, tighter intent classification.',
+        'Benchmarking Engine v2 shipped in two weeks while CFO Analytics Engine was mid-flight and the summer intern program was running. The metric is real; the framing that implies the work happened in that window is misleading. The real work happened in the months before. Three preconditions that made the sprint possible: rehearsed architecture, decomposable pipeline, ruthlessly bounded scope. Structurally a descendant of the CFO Analytics Engine LLM-as-Router pattern \u2014 same family, tighter intent classification.',
       status: 'draft',
       projectId: 'financialBenchmarking',
       register: 'builder',
@@ -403,10 +403,10 @@ export const POSTS: BlogPost[] = [
       {
         title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
         url: '/blog/workforce-analytics-llm-as-router',
-        description: 'The sister architectural call. FinancialBenchmarking v2 is the same pattern with a tighter intent classification.',
+        description: 'The sister architectural call. Benchmarking Engine v2 is the same pattern with a tighter intent classification.',
       },
       {
-        title: 'FinancialBenchmarking v2 \u2014 Case Study',
+        title: 'Benchmarking Engine v2 \u2014 Case Study',
         url: '/projects/financialBenchmarking',
         description: 'The case study page: context, the five-stage architecture, and the production narrative.',
       },
@@ -422,7 +422,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Framework A/B', 'Stakeholder Management', 'PySpark', 'Tableau'],
       readingTime: '9 min read',
       abstract:
-        'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into FinancialBenchmarking v1/v2, WorkforceAnalytics, AI/LLM Drafting Platform). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
+        'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into Benchmarking Engine v1/v2, CFO Analytics Engine, PAR Drafting Assistant). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'practitioner',
@@ -435,9 +435,9 @@ export const POSTS: BlogPost[] = [
         description: 'Same story, pure prose — no framework components. Read side-by-side to see what the framework adds.',
       },
       {
-        title: 'How We Built AI/LLM Drafting Platform (practitioner companion)',
+        title: 'How We Built PAR Drafting Assistant (practitioner companion)',
         url: '/blog/funding-request-drafting-platform-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. The AI/LLM Drafting Platform story wouldn\u2019t have happened without the trust built here.',
+        description: 'The other builder-register post in this corpus — same voice, different system. The PAR Drafting Assistant story wouldn\u2019t have happened without the trust built here.',
       },
       {
         title: 'Writing rewrite framework spec',
@@ -461,7 +461,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Stakeholder Management', 'PySpark', 'Tableau', 'Process Automation'],
       readingTime: '6 min read',
       abstract:
-        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the stakeholder dynamics of automating institutional knowledge, and the cascade of AI initiatives this first project underwrote: FinancialBenchmarking v1, FinancialBenchmarking v2, WorkforceAnalytics, AI/LLM Drafting Platform.',
+        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the stakeholder dynamics of automating institutional knowledge, and the cascade of AI initiatives this first project underwrote: Benchmarking Engine v1, Benchmarking Engine v2, CFO Analytics Engine, PAR Drafting Assistant.',
       status: 'draft',
       projectId: 'commodity-tax',
       register: 'builder',
@@ -469,9 +469,9 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'How We Built AI/LLM Drafting Platform (practitioner companion)',
+        title: 'How We Built PAR Drafting Assistant (practitioner companion)',
         url: '/blog/funding-request-drafting-platform-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. The AI/LLM Drafting Platform story wouldn\u2019t have happened without the trust built here.',
+        description: 'The other builder-register post in this corpus — same voice, different system. The PAR Drafting Assistant story wouldn\u2019t have happened without the trust built here.',
       },
       {
         title: 'Closed-Loop Optimization as a Unifying Pattern',
