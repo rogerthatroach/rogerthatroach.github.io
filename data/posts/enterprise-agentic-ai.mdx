@@ -198,3 +198,12 @@ The five-piece pattern — LangGraph <CitationRef id={6} />, MCP tool boundary <
 
 That separation is what makes agentic AI viable in regulated environments <CitationRef id={3} /><CitationRef id={13} /> — structural guarantees, not prompt engineering tricks, and a single-agent envelope that trades maximum capability today for an approved substrate that v2 skills already sit on top of.
 </TheoremBlock>
+
+
+---
+
+### Reference implementation
+
+Working code, synthetic data, and reproducible plots: [`rogerthatroach/prometheus-multi-agent-retrieval`](https://github.com/rogerthatroach/prometheus-multi-agent-retrieval).
+
+The two-stage retrieval + parallel extraction + coverage-loop architecture this post describes runs end-to-end on 50 synthetic PAR docs. The pytest suite asserts that `N=1/2/4` extraction agents yield identical merged results, that coverage is monotone non-decreasing across passes, and that flagged-for-review docs are correctly identified when convergence fails.

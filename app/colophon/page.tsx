@@ -154,7 +154,7 @@ const REFERENCE_IMPLEMENTATIONS: {
     name: 'prometheus-multi-agent-retrieval',
     url: 'https://github.com/rogerthatroach/prometheus-multi-agent-retrieval',
     backs: 'Prometheus multi-agent retrieval — three registers',
-    status: 'queued',
+    status: 'live',
   },
 ];
 

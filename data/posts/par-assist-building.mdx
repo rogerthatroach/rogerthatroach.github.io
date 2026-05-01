@@ -92,3 +92,10 @@ Or plain text: *Dhaliwal, Harmilap Singh. (April 2026). How We Built Prometheus:
 ---
 
 *This post describes architectural patterns and engineering decisions at a level of abstraction that does not reveal proprietary code, data, model outputs, or internal screenshots. Concrete RBC-internal details (system names, team composition, specific metrics) appear only where they have already been shared publicly. Everything else is generalized to the pattern.*
+
+
+---
+
+### Reference implementation
+
+The two-stage retrieval and N parallel agents pattern at [`rogerthatroach/prometheus-multi-agent-retrieval`](https://github.com/rogerthatroach/prometheus-multi-agent-retrieval). The repo's coverage-loop demo shows convergence behaviour visible in plots (coverage heatmap, convergence curve, per-group extraction rates) — the public reference shape of the production system this post describes.
