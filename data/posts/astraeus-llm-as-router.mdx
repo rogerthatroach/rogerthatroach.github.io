@@ -84,3 +84,10 @@ LLM-as-Router is not a compromise. It&rsquo;s the correct architecture for any s
 Every production AI system I build at RBC now starts from this principle. Aegis v2&rsquo;s guardrailed text-to-SQL is LLM-as-Router with tighter intent classification. Prometheus&rsquo;s typed MCP tool contracts are LLM-as-Router with a richer action vocabulary. The pattern scales across system types.
 
 The hardest part of enterprise AI isn&rsquo;t building the language-model-powered feature. It&rsquo;s knowing when *not* to let the language model touch the thing.
+
+
+---
+
+### Reference implementation
+
+The cascade described above runs end-to-end in [`rogerthatroach/astraeus-llm-as-router`](https://github.com/rogerthatroach/astraeus-llm-as-router). The LLM is confined to a single classify call; the validator does the work. With `hallucination_rate=1.0` the validator still catches every fake entity — that's the load-bearing claim, made operational.

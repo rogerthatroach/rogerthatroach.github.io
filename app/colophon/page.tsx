@@ -148,7 +148,7 @@ const REFERENCE_IMPLEMENTATIONS: {
     name: 'astraeus-llm-as-router',
     url: 'https://github.com/rogerthatroach/astraeus-llm-as-router',
     backs: 'Astraeus LLM-as-router — three registers',
-    status: 'queued',
+    status: 'live',
   },
   {
     name: 'prometheus-multi-agent-retrieval',
