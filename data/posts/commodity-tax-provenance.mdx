@@ -245,3 +245,12 @@ Process automation in regulated finance has a property that ordinary ETL does no
 The architecture above &mdash; a five-stage pipeline whose graph rewrites preserve provenance, paired with a parallel Tableau presentation layer whose drill-throughs are formally traversals of the provenance edge set &mdash; produces both. The cost of building the transparency layer alongside the pipeline is the cost of dashboard authoring, not data plumbing; the structure makes both surfaces composable from the same provenance algebra.
 
 The deeper claim is that *transparency is not a feature*. It is a structural property of any architecture that takes auditability seriously. In a regulated context, the architecture that survives stakeholder review is the architecture that surfaces its own derivations &mdash; and the architecture that surfaces its own derivations is the only architecture that earns the trust required for an automation to actually replace the manual process it sits next to.
+
+
+---
+
+### Reference implementation
+
+Working code, synthetic data, and reproducible plots: [`rogerthatroach/commodity-tax-provenance`](https://github.com/rogerthatroach/commodity-tax-provenance).
+
+The 5-stage pipeline runs end-to-end on 1,000 synthetic GL rows; drill-through is implemented as a backward BFS over the provenance edge set; the parallel-presentation invariant is asserted in tests (`test_dashboard_view_matches_return_lines`). A stale GST rule injected for one quarter surfaces in the drill lineage but stays out of every other quarter — verifying both the staleness-detection claim and the rule-isolation property formally.

@@ -307,3 +307,10 @@ The architectural decision — Tableau as a transparency layer, not an output �
 Astraeus&rsquo;s LLM-as-Router separation is a descendant of this idea. Aegis v2&rsquo;s confidence-thresholded clarification is a descendant of this idea. Prometheus&rsquo;s typed MCP tool contracts that log every field assignment are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
 
 Commodity Tax was where I learned that. Cycle 1 was where the lesson actually landed. The technology changes. The pattern doesn&rsquo;t.
+
+
+---
+
+### Reference implementation
+
+The 5-stage pipeline + provenance graph + drill API are implemented as a working Python repo at [`rogerthatroach/commodity-tax-provenance`](https://github.com/rogerthatroach/commodity-tax-provenance). 29 tests assert the load-bearing invariants — provenance preservation across composition, drill correctness, stale-rule isolation per quarter, dashboard ⇔ return-form consistency. Useful as a worked example when adapting this framework to other regulated-output pipelines.

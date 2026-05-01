@@ -142,7 +142,7 @@ const REFERENCE_IMPLEMENTATIONS: {
     name: 'commodity-tax-provenance',
     url: 'https://github.com/rogerthatroach/commodity-tax-provenance',
     backs: 'Commodity Tax provenance algebra — three registers',
-    status: 'queued',
+    status: 'live',
   },
   {
     name: 'astraeus-llm-as-router',

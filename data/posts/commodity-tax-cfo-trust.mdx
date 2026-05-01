@@ -94,3 +94,10 @@ Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation
 Commodity Tax was where I learned that. Cycle 1 was where the lesson actually landed.
 
 The technology changes. The pattern doesn&rsquo;t.
+
+
+---
+
+### Reference implementation
+
+The drill-through mechanism this post anchors on — analyst lands on a flagged aggregate, drills back to source rows, sees the stale rule version — runs end-to-end in [`rogerthatroach/commodity-tax-provenance`](https://github.com/rogerthatroach/commodity-tax-provenance). The repo injects a stale GST rule for one quarter; running the demo surfaces it in the drill lineage exactly as described above.
