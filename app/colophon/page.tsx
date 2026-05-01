@@ -148,7 +148,7 @@ const REFERENCE_IMPLEMENTATIONS: {
     name: 'workforce-analytics-llm-as-router',
     url: 'https://github.com/rogerthatroach/workforce-analytics-llm-as-router',
     backs: 'WorkforceAnalytics LLM-as-router — three registers',
-    status: 'queued',
+    status: 'live',
   },
   {
     name: 'funding-request-drafting-multi-agent-retrieval',
