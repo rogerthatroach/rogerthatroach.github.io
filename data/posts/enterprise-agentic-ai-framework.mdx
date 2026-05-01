@@ -490,3 +490,10 @@ That separation is what makes agentic AI viable in regulated environments<Citati
 ---
 
 *This post describes architectural patterns and engineering decisions at a level of abstraction that does not reveal proprietary code, data, or internal screenshots. Specific metrics (drafting time before/after, revision-cycle reduction) are directional pending user approval of precise numbers. Custom compression details and specific system-prompt shapes will be covered in a follow-up post.*
+
+
+---
+
+### Reference implementation
+
+The orchestrator + retriever + extractor + coverage loop are implemented at [`rogerthatroach/prometheus-multi-agent-retrieval`](https://github.com/rogerthatroach/prometheus-multi-agent-retrieval) — useful as a worked example when adapting this framework to other domains (claims, KYC, contract extraction). 25 tests assert the convergence + determinism + flag-for-review invariants.
