@@ -154,7 +154,7 @@ const REFERENCE_IMPLEMENTATIONS: {
     name: 'funding-request-drafting-multi-agent-retrieval',
     url: 'https://github.com/rogerthatroach/funding-request-drafting-multi-agent-retrieval',
     backs: 'FundingRequest multi-agent retrieval — three registers',
-    status: 'queued',
+    status: 'live',
   },
 ];
 
