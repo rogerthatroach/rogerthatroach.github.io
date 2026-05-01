@@ -126,6 +126,38 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
   },
 ];
 
+const REFERENCE_IMPLEMENTATIONS: {
+  name: string;
+  url: string;
+  backs: string;
+  status: 'live' | 'queued';
+}[] = [
+  {
+    name: 'aegis-guarded-text-to-sql',
+    url: 'https://github.com/rogerthatroach/aegis-guarded-text-to-sql',
+    backs: 'Aegis text-to-SQL — formal · builder · practitioner',
+    status: 'live',
+  },
+  {
+    name: 'commodity-tax-provenance',
+    url: 'https://github.com/rogerthatroach/commodity-tax-provenance',
+    backs: 'Commodity Tax provenance algebra — three registers',
+    status: 'queued',
+  },
+  {
+    name: 'astraeus-llm-as-router',
+    url: 'https://github.com/rogerthatroach/astraeus-llm-as-router',
+    backs: 'Astraeus LLM-as-router — three registers',
+    status: 'queued',
+  },
+  {
+    name: 'prometheus-multi-agent-retrieval',
+    url: 'https://github.com/rogerthatroach/prometheus-multi-agent-retrieval',
+    backs: 'Prometheus multi-agent retrieval — three registers',
+    status: 'queued',
+  },
+];
+
 const PRINCIPLES: { heading: string; body: string }[] = [
   {
     heading: 'First principles',
@@ -197,6 +229,58 @@ export default function ColophonPage() {
               </div>
             ))}
           </dl>
+
+          {/* Reference implementations */}
+          <h2 className="mt-12 text-xl font-semibold text-text-primary">
+            Reference implementations
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-text-secondary">
+            Public Python repos backing the technical posts — working code,
+            synthetic data, reproducible plots. Each one is the public
+            skeleton of one production system, kept small enough to read
+            end-to-end in an hour.
+          </p>
+          <ul className="mt-5 space-y-3">
+            {REFERENCE_IMPLEMENTATIONS.map((r) => (
+              <li
+                key={r.name}
+                className="rounded-lg border border-border-subtle bg-surface/30 p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    {r.status === 'live' ? (
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-mono text-sm text-accent underline underline-offset-4 hover:text-text-primary"
+                      >
+                        <Github size={13} />
+                        {r.name}
+                      </a>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 font-mono text-sm text-text-tertiary">
+                        <Github size={13} />
+                        {r.name}
+                      </span>
+                    )}
+                    <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+                      {r.backs}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
+                      r.status === 'live'
+                        ? 'bg-accent/10 text-accent'
+                        : 'bg-surface text-text-tertiary'
+                    }`}
+                  >
+                    {r.status}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
 
           {/* Principles */}
           <h2 className="mt-12 text-xl font-semibold text-text-primary">
