@@ -362,3 +362,10 @@ The *family* this architecture belongs to is the LLM-as-Router pattern (see [Ast
 What transfers across instances of the family is the *shape* &mdash; the bounded LLM surface area, the confidence gates where uncertainty triggers clarification, the deterministic compute or generation backbone. What does *not* transfer is the specific load-bearing piece: in Astraeus it is event-level ins-outs math across 40K leaf-level events; in Aegis it is the template library plus parameterized binding. Each system is built around the part that has to be most precise. The LLM does what LLMs do well, in the narrowest possible surface area, behind walls that hold by construction.
 
 The hardest engineering is not the LLM integration. It is figuring out which one piece is load-bearing &mdash; and refusing to let the LLM near it.
+
+
+---
+
+### Reference implementation
+
+The five-stage decomposition is implemented in [`rogerthatroach/aegis-guarded-text-to-sql`](https://github.com/rogerthatroach/aegis-guarded-text-to-sql) — `sqlglot` for AST validation, regex-trigger templates with parameter type-checking, temperature-scaling calibrator, and a `GuardedRouter` that composes them. 39 tests assert the safety properties this post argues for.

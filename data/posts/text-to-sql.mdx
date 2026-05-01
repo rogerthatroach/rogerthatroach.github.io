@@ -495,3 +495,12 @@ without risking the others.
 >
   {() => <FullPipelineFlow />}
 </VisualizationContainer>
+
+
+---
+
+### Reference implementation
+
+Working code, synthetic data, and reproducible plots: [`rogerthatroach/aegis-guarded-text-to-sql`](https://github.com/rogerthatroach/aegis-guarded-text-to-sql).
+
+A 500-query synthetic eval, a deterministic LLM stub, the calibration / AST-validation / template-bank gates composed end-to-end, and the reliability diagram showing ECE drop after temperature scaling. Runs in 30 seconds with `make demo`.
