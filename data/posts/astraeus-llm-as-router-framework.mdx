@@ -456,3 +456,10 @@ The LLM-as-Router pattern is not specific to CFO analytics. It applies anywhere:
 Astraeus was the first production shape this pattern took inside RBC; it now underlies other systems — Prometheus's agentic envelope is the same LLM-as-Router principle with a richer action vocabulary (see [the PAR practitioner post](/blog/enterprise-agentic-ai-framework) for the MCP-tools variant). Aegis v2's text-to-SQL is LLM-as-Router with tighter intent classification and a guardrailed SQL surface.
 
 The pattern scales across system types because the constraints are shared. The seductive option — give the LLM full access, let it figure it out — fails the same four tests in every regulated-enterprise setting. LLM-as-Router is the compact answer to those tests.
+
+
+---
+
+### Reference implementation
+
+The 5-stage cascade with the `User -> AccessGroup -> Domain -> Entity -> Event` permission graph is implemented at [`rogerthatroach/astraeus-llm-as-router`](https://github.com/rogerthatroach/astraeus-llm-as-router) — useful as a worked example when adapting this pattern to other domains. 27 tests cover the framework's safety invariants explicitly.

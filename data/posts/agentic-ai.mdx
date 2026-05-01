@@ -382,3 +382,12 @@ The LLM-as-Router pattern resolves the intelligence-correctness-security trilemm
 The key insight is simple but consequential: **use LLMs for what they're good at (understanding language), and use deterministic systems for what they're good at (computing answers).** The architectural boundary between these two capabilities is where trust is built.
 
 {/* References and Further Reading rendered by PostLayout from data/posts/index.ts */}
+
+
+---
+
+### Reference implementation
+
+Working code, synthetic data, and reproducible plots: [`rogerthatroach/astraeus-llm-as-router`](https://github.com/rogerthatroach/astraeus-llm-as-router).
+
+A 100-query synthetic eval, 4 users with varied access scopes, and the 5-stage cascade composed end-to-end. The pytest suite asserts that hallucinated entities are caught at the entity stage and cross-domain leak attempts are caught at the domain stage — independently of the LLM, which is exactly the point.
