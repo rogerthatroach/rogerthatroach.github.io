@@ -207,10 +207,10 @@ function renderField(
   setParField: (key: string, value: string | number | boolean, provenance?: FieldProvenance) => void,
 ) {
   const baseClass = cn(
-    'w-full rounded-lg border bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-none transition-colors focus:border-[var(--themis-primary)] focus:ring-2 focus:ring-[var(--themis-primary)]/20',
+    'w-full rounded-lg border px-2.5 py-1.5 text-[13px] text-text-primary outline-none transition-colors focus:border-[var(--themis-primary)] focus:ring-2 focus:ring-[var(--themis-primary)]/20',
     isDiane
-      ? 'border-dashed border-[#F59E0B]/40 bg-[rgba(245,158,11,0.04)]'
-      : 'border-border-subtle',
+      ? 'border-dashed bg-[var(--themis-sakura-bg)] border-[var(--themis-sakura-border)]'
+      : 'border-border-subtle bg-surface/70',
   );
 
   if (field.kind === 'longtext') {
