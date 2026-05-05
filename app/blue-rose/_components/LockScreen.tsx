@@ -1,10 +1,11 @@
 'use client';
 
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { decryptBlob, type EncryptedBlob } from '../_lib/crypto';
 import type { ThemisSeed } from '@/data/themis/types';
 import OwlGlyph from './OwlGlyph';
+import { hashSeed, mulberry32 } from '../_lib/prng';
 import { cn } from '@/lib/utils';
 
 interface LockScreenProps {
@@ -74,6 +75,8 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
 
   return (
     <div className="themis-lock-veil relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
+      {/* Faint subtle rounded circles scattered across the background. */}
+      <BackgroundCircles />
       <motion.div
         initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -83,18 +86,47 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
           shaking && 'themis-shake',
         )}
       >
-        {/* Owl — quiet scale-only breath, no halo, no drop-shadow */}
-        <motion.span
-          style={{ color: 'var(--themis-primary)' }}
-          animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.025, 1] }}
-          transition={
-            reduceMotion
-              ? { duration: 0 }
-              : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
-          }
-        >
-          <OwlGlyph size={88} />
-        </motion.span>
+        {/* Owl + offset echo — a faint static copy in the geometric
+            middle, with the focal owl drifted slightly to the side and
+            carrying the breath. Twin Peaks doppelganger framing. */}
+        <div className="relative h-[100px] w-[120px]">
+          {/* Ghost — centered, static, faint */}
+          <span
+            aria-hidden="true"
+            className="absolute"
+            style={{
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              color: 'var(--themis-primary)',
+              opacity: 0.22,
+            }}
+          >
+            <OwlGlyph size={88} />
+          </span>
+          {/* Focal — offset right, breathes */}
+          <div
+            className="absolute"
+            style={{
+              top: '50%',
+              left: 'calc(50% + 22px)',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <motion.span
+              className="block"
+              style={{ color: 'var(--themis-primary)' }}
+              animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.025, 1] }}
+              transition={
+                reduceMotion
+                  ? { duration: 0 }
+                  : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
+              }
+            >
+              <OwlGlyph size={88} />
+            </motion.span>
+          </div>
+        </div>
 
         {/* Wordmark — ceremonial */}
         <h1
@@ -142,5 +174,47 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
         </div>
       </motion.div>
     </div>
+  );
+}
+
+/**
+ * BackgroundCircles — faint, deterministic, rounded shapes scattered
+ * across the lock screen veil. No animation; the eye treats these as
+ * texture, not motion. Layered behind everything (z-0, pointer-events
+ * none). Uses --themis-primary so they pick up the active theme.
+ *
+ * Density tuning: 24 circles, radius 4–28px, opacity 0.03–0.09. Seeded
+ * via mulberry32 so positions are stable across renders + reloads.
+ */
+function BackgroundCircles() {
+  const circles = useMemo(() => {
+    const rng = mulberry32(hashSeed('white-lodge-circles-v1'));
+    return Array.from({ length: 24 }, (_, i) => ({
+      id: i,
+      cx: rng() * 100, // viewport %
+      cy: rng() * 100,
+      r: 4 + rng() * 24, // px
+      opacity: 0.03 + rng() * 0.06,
+    }));
+  }, []);
+
+  return (
+    <svg
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      preserveAspectRatio="none"
+      style={{ color: 'var(--themis-primary)' }}
+    >
+      {circles.map((c) => (
+        <circle
+          key={c.id}
+          cx={`${c.cx}%`}
+          cy={`${c.cy}%`}
+          r={c.r}
+          fill="currentColor"
+          opacity={c.opacity}
+        />
+      ))}
+    </svg>
   );
 }
