@@ -42,7 +42,7 @@ export interface DashboardFilters {
 }
 
 export const EMPTY_DASHBOARD_FILTERS: DashboardFilters = {
-  timeRange: '90d',
+  timeRange: 'all',
   businessUnits: [],
   kinds: [],
   severities: [],
