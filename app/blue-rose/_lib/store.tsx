@@ -38,6 +38,7 @@ import { EMPTY_FILTERS, type QueueFilters } from './filters';
 
 const PERSONA_KEY = 'themis:persona';
 const FILTERS_KEY = 'themis:queue-filters:v1';
+const SPLIT_KEY = 'themis:submission-split:v1';
 
 export type SubmissionTab = 'document' | 'thread' | 'context' | 'diane';
 /** @deprecated alias kept for any callsite still using the old name */
@@ -52,6 +53,12 @@ interface ThemisState {
   threads: ThemisSeed['threads'];
   notifications: Notification[];
   submissionTab: SubmissionTab;
+  /** Right-pane active tab; null when split mode is off. */
+  submissionTabRight: SubmissionTab | null;
+  /** Whether the SubmissionPage is split into two side-by-side panes. */
+  splitMode: boolean;
+  /** Width ratio of the left pane in split mode (0..1). Persisted. */
+  splitRatio: number;
   queueFilters: QueueFilters;
 }
 
@@ -63,7 +70,10 @@ type ThemisAction =
   | { type: 'MARK_THREAD_READ'; threadId: string; personaId: string }
   | { type: 'MARK_NOTIFICATION_READ'; id: string }
   | { type: 'MARK_ALL_NOTIFICATIONS_READ'; personaId: string }
-  | { type: 'SET_SUBMISSION_TAB'; tab: SubmissionTab }
+  | { type: 'SET_SUBMISSION_TAB'; tab: SubmissionTab; pane?: 'left' | 'right' }
+  | { type: 'TOGGLE_SPLIT_MODE' }
+  | { type: 'SET_SPLIT_RATIO'; ratio: number }
+  | { type: 'SWAP_PANE_CONTENT' }
   | { type: 'PATCH_FILTERS'; patch: Partial<QueueFilters> }
   | { type: 'CLEAR_FILTERS' };
 
@@ -75,7 +85,30 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
       // Reset to document tab when switching submissions
       return { ...state, selectedSubmissionId: action.id, submissionTab: 'document' };
     case 'SET_SUBMISSION_TAB':
+      if (action.pane === 'right') {
+        return { ...state, submissionTabRight: action.tab };
+      }
       return { ...state, submissionTab: action.tab };
+    case 'TOGGLE_SPLIT_MODE': {
+      const next = !state.splitMode;
+      return {
+        ...state,
+        splitMode: next,
+        // Entering split: pick a sensible default for the right pane
+        submissionTabRight: next
+          ? state.submissionTabRight ??
+            (state.submissionTab === 'document' ? 'diane' : 'document')
+          : null,
+      };
+    }
+    case 'SET_SPLIT_RATIO':
+      return { ...state, splitRatio: Math.max(0.25, Math.min(0.75, action.ratio)) };
+    case 'SWAP_PANE_CONTENT':
+      return {
+        ...state,
+        submissionTab: state.submissionTabRight ?? state.submissionTab,
+        submissionTabRight: state.submissionTab,
+      };
     case 'ADD_MESSAGE':
       return {
         ...state,
@@ -132,7 +165,10 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
 interface ThemisContextValue extends ThemisState {
   setCurrentPersonaId: (id: string) => void;
   selectSubmission: (id: string | null) => void;
-  setSubmissionTab: (tab: SubmissionTab) => void;
+  setSubmissionTab: (tab: SubmissionTab, pane?: 'left' | 'right') => void;
+  toggleSplitMode: () => void;
+  setSplitRatio: (ratio: number) => void;
+  swapPaneContent: () => void;
   patchFilters: (patch: Partial<QueueFilters>) => void;
   clearFilters: () => void;
   addMessage: (
@@ -174,6 +210,9 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     threads: seed.threads.map((t) => ({ ...t, unreadByPersonaId: { ...t.unreadByPersonaId } })),
     notifications: [...seed.notifications],
     submissionTab: 'document' as SubmissionTab,
+    submissionTabRight: null as SubmissionTab | null,
+    splitMode: false,
+    splitRatio: 0.5,
     queueFilters: EMPTY_FILTERS,
   }));
 
@@ -189,6 +228,31 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       if (storedFilters) {
         const parsed = JSON.parse(storedFilters) as Partial<QueueFilters>;
         dispatch({ type: 'PATCH_FILTERS', patch: parsed });
+      }
+      const storedSplit = localStorage.getItem(SPLIT_KEY);
+      if (storedSplit) {
+        try {
+          const parsed = JSON.parse(storedSplit) as {
+            splitMode?: boolean;
+            splitRatio?: number;
+            submissionTabRight?: SubmissionTab | null;
+          };
+          if (typeof parsed.splitRatio === 'number') {
+            dispatch({ type: 'SET_SPLIT_RATIO', ratio: parsed.splitRatio });
+          }
+          if (parsed.splitMode) {
+            dispatch({ type: 'TOGGLE_SPLIT_MODE' });
+            if (parsed.submissionTabRight) {
+              dispatch({
+                type: 'SET_SUBMISSION_TAB',
+                tab: parsed.submissionTabRight,
+                pane: 'right',
+              });
+            }
+          }
+        } catch {
+          /* ignore */
+        }
       }
     } catch {
       /* noop */
@@ -214,6 +278,22 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     }
   }, [hydrated, state.queueFilters]);
 
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(
+        SPLIT_KEY,
+        JSON.stringify({
+          splitMode: state.splitMode,
+          splitRatio: state.splitRatio,
+          submissionTabRight: state.submissionTabRight,
+        }),
+      );
+    } catch {
+      /* noop */
+    }
+  }, [hydrated, state.splitMode, state.splitRatio, state.submissionTabRight]);
+
   const setCurrentPersonaId = useCallback((id: string) => {
     dispatch({ type: 'SET_PERSONA', id });
   }, []);
@@ -222,8 +302,23 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     dispatch({ type: 'SELECT_SUBMISSION', id });
   }, []);
 
-  const setSubmissionTab = useCallback((tab: SubmissionTab) => {
-    dispatch({ type: 'SET_SUBMISSION_TAB', tab });
+  const setSubmissionTab = useCallback(
+    (tab: SubmissionTab, pane?: 'left' | 'right') => {
+      dispatch({ type: 'SET_SUBMISSION_TAB', tab, pane });
+    },
+    [],
+  );
+
+  const toggleSplitMode = useCallback(() => {
+    dispatch({ type: 'TOGGLE_SPLIT_MODE' });
+  }, []);
+
+  const setSplitRatio = useCallback((ratio: number) => {
+    dispatch({ type: 'SET_SPLIT_RATIO', ratio });
+  }, []);
+
+  const swapPaneContent = useCallback(() => {
+    dispatch({ type: 'SWAP_PANE_CONTENT' });
   }, []);
 
   const patchFilters = useCallback((patch: Partial<QueueFilters>) => {
@@ -294,6 +389,9 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       setCurrentPersonaId,
       selectSubmission,
       setSubmissionTab,
+      toggleSplitMode,
+      setSplitRatio,
+      swapPaneContent,
       patchFilters,
       clearFilters,
       addMessage,
@@ -307,6 +405,9 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       setCurrentPersonaId,
       selectSubmission,
       setSubmissionTab,
+      toggleSplitMode,
+      setSplitRatio,
+      swapPaneContent,
       patchFilters,
       clearFilters,
       addMessage,
