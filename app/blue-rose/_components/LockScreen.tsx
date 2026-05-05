@@ -86,25 +86,36 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
           shaking && 'themis-shake',
         )}
       >
-        {/* Owl + offset echo — a faint static copy in the geometric
-            middle, with the focal owl drifted slightly to the side and
-            carrying the breath. Twin Peaks doppelganger framing. */}
+        {/* Owl pair — focal offset right of center, faint ghost in the
+            geometric middle. Opposing breath: as the focal grows the
+            ghost diminishes, and vice versa. Same 3.6s tempo, inverted
+            scale + opacity. */}
         <div className="relative h-[100px] w-[120px]">
-          {/* Ghost — centered, static, faint */}
-          <span
+          {/* Ghost — centered, very faint, breathes inversely */}
+          <motion.span
             aria-hidden="true"
-            className="absolute"
+            className="absolute block"
             style={{
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
               color: 'var(--themis-primary)',
-              opacity: 0.22,
+              opacity: 0.14,
             }}
+            animate={
+              reduceMotion
+                ? { scale: 1, opacity: 0.14 }
+                : { scale: [1, 0.97, 1], opacity: [0.14, 0.08, 0.14] }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
+            }
           >
             <OwlGlyph size={88} />
-          </span>
-          {/* Focal — offset right, breathes */}
+          </motion.span>
+          {/* Focal — offset right, grows as ghost diminishes */}
           <div
             className="absolute"
             style={{
@@ -178,41 +189,69 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
 }
 
 /**
- * BackgroundCircles — faint, deterministic, rounded shapes scattered
- * across the lock screen veil. No animation; the eye treats these as
- * texture, not motion. Layered behind everything (z-0, pointer-events
- * none). Uses --themis-primary so they pick up the active theme.
+ * BackgroundCircles — long sweeping curved lines that enter the viewport
+ * from one edge and exit through another, passing across the lock veil.
+ * No fill; thin stroke; very low opacity. Static — the eye reads them
+ * as engraved atmosphere, not motion.
  *
- * Density tuning: 24 circles, radius 4–28px, opacity 0.03–0.09. Seeded
- * via mulberry32 so positions are stable across renders + reloads.
+ * Each curve is a cubic bezier with start + end points planted just
+ * outside the 100×100 viewBox (overshoot 18%) and two interior control
+ * points pulled with random sway, so curves bend across the canvas
+ * organically. Seeded so positions are stable across reloads.
+ *
+ * preserveAspectRatio="none" stretches the viewBox to fill the viewport,
+ * which is what we want for atmospheric texture.
  */
 function BackgroundCircles() {
-  const circles = useMemo(() => {
-    const rng = mulberry32(hashSeed('white-lodge-circles-v1'));
-    return Array.from({ length: 24 }, (_, i) => ({
-      id: i,
-      cx: rng() * 100, // viewport %
-      cy: rng() * 100,
-      r: 4 + rng() * 24, // px
-      opacity: 0.03 + rng() * 0.06,
-    }));
+  const curves = useMemo(() => {
+    const rng = mulberry32(hashSeed('white-lodge-curves-v1'));
+    const OVERSHOOT = 18;
+    const sideToPoint = (side: number, t: number) => {
+      switch (side) {
+        case 0: return { x: t * 100, y: -OVERSHOOT };           // top
+        case 1: return { x: 100 + OVERSHOOT, y: t * 100 };      // right
+        case 2: return { x: t * 100, y: 100 + OVERSHOOT };      // bottom
+        default: return { x: -OVERSHOOT, y: t * 100 };          // left
+      }
+    };
+    return Array.from({ length: 9 }, (_, i) => {
+      const startSide = Math.floor(rng() * 4);
+      // Bias the end side away from the start side so curves cross the
+      // canvas (rather than barely-grazing one corner).
+      let endSide = (startSide + 1 + Math.floor(rng() * 3)) % 4;
+      const start = sideToPoint(startSide, rng());
+      const end = sideToPoint(endSide, rng());
+      const sway = 80;
+      const c1x = start.x + (end.x - start.x) * 0.33 + (rng() - 0.5) * sway;
+      const c1y = start.y + (end.y - start.y) * 0.33 + (rng() - 0.5) * sway;
+      const c2x = start.x + (end.x - start.x) * 0.66 + (rng() - 0.5) * sway;
+      const c2y = start.y + (end.y - start.y) * 0.66 + (rng() - 0.5) * sway;
+      return {
+        id: i,
+        d: `M ${start.x.toFixed(1)} ${start.y.toFixed(1)} C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${end.x.toFixed(1)} ${end.y.toFixed(1)}`,
+        strokeWidth: 0.18 + rng() * 0.32, // thin
+        opacity: 0.04 + rng() * 0.06,
+      };
+    });
   }, []);
 
   return (
     <svg
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox="0 0 100 100"
       preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 h-full w-full"
       style={{ color: 'var(--themis-primary)' }}
     >
-      {circles.map((c) => (
-        <circle
+      {curves.map((c) => (
+        <path
           key={c.id}
-          cx={`${c.cx}%`}
-          cy={`${c.cy}%`}
-          r={c.r}
-          fill="currentColor"
+          d={c.d}
+          stroke="currentColor"
+          strokeWidth={c.strokeWidth}
+          fill="none"
           opacity={c.opacity}
+          strokeLinecap="round"
         />
       ))}
     </svg>
