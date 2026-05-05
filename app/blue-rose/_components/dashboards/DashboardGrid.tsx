@@ -74,26 +74,45 @@ export default function DashboardGrid({
     [filtered, seed.audit],
   );
 
+  // Drag-reorder is gated on `editing` — keeps view-mode immutable.
+  // The fix here addresses two real bugs in the prior implementation:
+  //  1. The whole `<header>` was `draggable={true}` AND contained child
+  //     `<button>`s — buttons inherited the draggable, causing click-vs-
+  //     drag contention. Now only the GripVertical is draggable; the
+  //     header is not. Buttons get `draggable={false}` explicitly.
+  //  2. The drop target lacked visual feedback — added `hoverDropId`
+  //     state with an amethyst ring on dragover.
+  const [hoverDropId, setHoverDropId] = useState<string | null>(null);
+
   const onDragStart = (e: DragEvent<HTMLElement>, id: string) => {
     if (!editing) return;
     e.dataTransfer.setData(DRAG_MIME, id);
     e.dataTransfer.effectAllowed = 'move';
     setDraggedId(id);
   };
-  const onDragEnd = () => setDraggedId(null);
+  const onDragEnd = () => {
+    setDraggedId(null);
+    setHoverDropId(null);
+  };
   const onDrop = (e: DragEvent<HTMLElement>, toId: string) => {
     if (!editing) return;
     e.preventDefault();
     const fromId = e.dataTransfer.getData(DRAG_MIME);
+    setDraggedId(null);
+    setHoverDropId(null);
     if (!fromId || fromId === toId) return;
     onWidgetsChange(reorderWidgets(widgets, fromId, toId));
   };
-  const onDragOver = (e: DragEvent<HTMLElement>) => {
+  const onDragOver = (e: DragEvent<HTMLElement>, toId: string) => {
     if (!editing) return;
     if (Array.from(e.dataTransfer.types).includes(DRAG_MIME)) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
+      if (toId !== hoverDropId) setHoverDropId(toId);
     }
+  };
+  const onDragLeave = (toId: string) => {
+    if (hoverDropId === toId) setHoverDropId(null);
   };
 
   const setCols = (id: string, cols: WidgetCols) => {
@@ -128,41 +147,49 @@ export default function DashboardGrid({
           style={{ gridColumn: `span ${w.cols} / span ${w.cols}` }}
           className={cn(
             'group relative flex min-h-[140px] flex-col rounded-2xl border bg-surface/40 transition-all',
-            draggedId === w.id ? 'border-[var(--themis-primary)]/60 opacity-60' : 'border-border-subtle',
-            editing && 'hover:border-[var(--themis-primary)]/40',
+            draggedId === w.id && 'opacity-50',
+            hoverDropId === w.id && draggedId && draggedId !== w.id
+              ? 'border-[var(--themis-primary)]/70 ring-2 ring-[var(--themis-primary)]/30'
+              : 'border-border-subtle',
+            editing && hoverDropId !== w.id && 'hover:border-[var(--themis-primary)]/40',
           )}
-          onDragOver={onDragOver}
+          onDragOver={(e) => onDragOver(e, w.id)}
+          onDragLeave={() => onDragLeave(w.id)}
           onDrop={(e) => onDrop(e, w.id)}
         >
-          {/* Chrome header */}
-          <header
-            className={cn(
-              'flex items-center gap-2 border-b border-border-subtle/60 px-3 py-2',
-              editing && 'cursor-move',
-            )}
-            draggable={editing}
-            onDragStart={(e) => onDragStart(e, w.id)}
-            onDragEnd={onDragEnd}
-          >
+          {/* Chrome header — only the grip is draggable in edit mode. Header
+              itself is not draggable, so clicking title / chips / buttons
+              never gets confused for a drag. */}
+          <header className="flex items-center gap-2 border-b border-border-subtle/60 px-3 py-2">
             {editing && (
-              <GripVertical
-                size={12}
-                className="shrink-0 text-text-tertiary"
-                aria-hidden="true"
-              />
+              <span
+                role="button"
+                aria-label="Drag to reorder"
+                title="Drag to reorder"
+                draggable
+                onDragStart={(e) => onDragStart(e, w.id)}
+                onDragEnd={onDragEnd}
+                className="flex h-5 w-5 shrink-0 cursor-grab items-center justify-center rounded text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary active:cursor-grabbing"
+              >
+                <GripVertical size={12} aria-hidden="true" />
+              </span>
             )}
             <h3 className="min-w-0 flex-1 truncate font-display text-[13px] font-medium text-text-primary">
               {w.title}
             </h3>
             {editing && (
               <>
-                <div className="flex items-center gap-0.5 rounded-md border border-border-subtle bg-surface/70 px-0.5 py-0.5">
+                <div
+                  className="flex items-center gap-0.5 rounded-md border border-border-subtle bg-surface/70 px-0.5 py-0.5"
+                  draggable={false}
+                >
                   {WIDGET_WIDTHS.map((preset) => {
                     const active = w.cols === preset.cols;
                     return (
                       <button
                         key={preset.cols}
                         type="button"
+                        draggable={false}
                         onClick={() => setCols(w.id, preset.cols)}
                         aria-pressed={active}
                         title={`${preset.cols} columns`}
@@ -180,6 +207,7 @@ export default function DashboardGrid({
                 </div>
                 <button
                   type="button"
+                  draggable={false}
                   onClick={() => onEditWidget(w.id)}
                   className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
                   title="Configure widget"
@@ -189,6 +217,7 @@ export default function DashboardGrid({
                 </button>
                 <button
                   type="button"
+                  draggable={false}
                   onClick={() => remove(w.id)}
                   className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-[var(--themis-rejected-bg)] hover:text-[var(--themis-rejected)]"
                   title="Remove widget"
