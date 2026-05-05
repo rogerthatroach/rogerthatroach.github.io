@@ -11,12 +11,15 @@ import {
   type ReactNode,
 } from 'react';
 import type {
+  AuditEvent,
   FieldComment,
   Message,
   Notification,
+  Submission,
   ThemisSeed,
 } from '@/data/themis/types';
 import { EMPTY_FILTERS, type QueueFilters } from './filters';
+import { synthesizeSubmissionFromDraft, type SynthesisOutcome } from './par-synthesize';
 
 /**
  * Themis runtime store — Tier 0.5 minimal reducer.
@@ -95,7 +98,8 @@ type ThemisAction =
   | { type: 'CLEAR_FILTERS' }
   | { type: 'SET_PAR_FIELD'; key: string; value: string | number | boolean; provenance: FieldProvenance }
   | { type: 'BATCH_SET_PAR_FIELDS'; values: Record<string, string | number | boolean>; provenance: FieldProvenance }
-  | { type: 'RESET_PAR_DRAFT' };
+  | { type: 'RESET_PAR_DRAFT' }
+  | { type: 'COMMIT_SYNTHESIZED_SUBMISSION'; submission: Submission; audit: AuditEvent[] };
 
 function reducer(state: ThemisState, action: ThemisAction): ThemisState {
   switch (action.type) {
@@ -196,6 +200,50 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
     }
     case 'RESET_PAR_DRAFT':
       return { ...state, parDraft: {}, parProvenance: {} };
+    case 'COMMIT_SYNTHESIZED_SUBMISSION': {
+      // Append the freshly synthesized submission + its audit trail to the
+      // in-memory seed; create a thread shell so the existing surfaces (chat
+      // tab, ContextTab) don't break; reset the draft.
+      const newThread = {
+        id: action.submission.threadId,
+        submissionId: action.submission.id,
+        participantIds: [
+          action.submission.submittedBy,
+          ...action.submission.assignees,
+        ],
+        lastMessageAt: action.submission.createdAt,
+        unreadByPersonaId: Object.fromEntries(
+          action.submission.assignees.map((id) => [id, 1]),
+        ),
+      };
+      // Notifications for each assignee — "you've been routed a new
+      // submission". The notifications drawer surfaces these.
+      const newNotifications: Notification[] = action.submission.assignees.map(
+        (assigneeId, i) => ({
+          id: `n_local_${action.submission.id}_${i}`,
+          forPersonaId: assigneeId,
+          kind: 'submission_new' as const,
+          title: `Routed: ${action.submission.title}`,
+          body: `Diane proposes a ${action.submission.diane?.routingPreview.steps.length ?? 1}-step chain. Coverage ${Math.round((action.submission.diane?.coverage ?? 0) * 100)}%.`,
+          createdAt: action.submission.createdAt,
+          read: false,
+          linkTo: action.submission.id,
+        }),
+      );
+      return {
+        ...state,
+        seed: {
+          ...state.seed,
+          submissions: [...state.seed.submissions, action.submission],
+          audit: [...state.seed.audit, ...action.audit],
+        },
+        threads: [...state.threads, newThread],
+        notifications: [...state.notifications, ...newNotifications],
+        selectedSubmissionId: action.submission.id,
+        parDraft: {},
+        parProvenance: {},
+      };
+    }
     default:
       return state;
   }
@@ -228,6 +276,13 @@ interface ThemisContextValue extends ThemisState {
   setParField: (key: string, value: string | number | boolean, provenance?: FieldProvenance) => void;
   batchSetParFields: (values: Record<string, string | number | boolean>, provenance?: FieldProvenance) => void;
   resetParDraft: () => void;
+  /**
+   * Synthesize the current parDraft into a Submission with full
+   * DianeAnnotation, commit it to the in-memory seed, and return the
+   * synthesis outcome (so the caller can drive the SubmittingOverlay
+   * sequence + navigation).
+   */
+  submitParDraft: () => SynthesisOutcome | null;
 }
 
 const ThemisContext = createContext<ThemisContextValue | null>(null);
@@ -491,6 +546,24 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     dispatch({ type: 'RESET_PAR_DRAFT' });
   }, []);
 
+  const submitParDraft = useCallback((): SynthesisOutcome | null => {
+    const submitter = state.seed.personas.find((p) => p.id === state.currentPersonaId);
+    if (!submitter) return null;
+    if (Object.keys(state.parDraft).length === 0) return null;
+    const outcome = synthesizeSubmissionFromDraft({
+      values: state.parDraft,
+      provenance: state.parProvenance,
+      submitter,
+      allSubmissions: state.seed.submissions,
+    });
+    dispatch({
+      type: 'COMMIT_SYNTHESIZED_SUBMISSION',
+      submission: outcome.submission,
+      audit: outcome.audit,
+    });
+    return outcome;
+  }, [state.seed, state.parDraft, state.parProvenance, state.currentPersonaId]);
+
   const value = useMemo<ThemisContextValue>(
     () => ({
       ...state,
@@ -510,6 +583,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       setParField,
       batchSetParFields,
       resetParDraft,
+      submitParDraft,
     }),
     [
       state,
@@ -529,6 +603,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       setParField,
       batchSetParFields,
       resetParDraft,
+      submitParDraft,
     ],
   );
 
