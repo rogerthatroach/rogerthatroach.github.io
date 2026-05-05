@@ -83,19 +83,41 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
           shaking && 'themis-shake',
         )}
       >
-        {/* Pulsing halo + owl */}
-        <div className="relative h-28 w-28">
+        {/* Pulsing halo + owl — two layered halos (outer faint, inner brighter)
+            and a slightly larger owl to give the symbol more presence
+            without losing the restraint of the rest of the screen. */}
+        <div className="relative h-32 w-32">
+          {/* Outer halo — wider, fainter */}
           <motion.span
             aria-hidden="true"
-            className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            className="absolute left-1/2 top-1/2 h-52 w-52 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background:
+                'radial-gradient(circle, var(--themis-primary) 0%, transparent 60%)',
+            }}
+            animate={
+              reduceMotion
+                ? { opacity: 0.10 }
+                : { opacity: [0.06, 0.18, 0.06] }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 5.4, repeat: Infinity, ease: 'easeInOut' }
+            }
+          />
+          {/* Inner halo — tighter, brighter */}
+          <motion.span
+            aria-hidden="true"
+            className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
               background:
                 'radial-gradient(circle, var(--themis-primary) 0%, transparent 65%)',
             }}
             animate={
               reduceMotion
-                ? { opacity: 0.18 }
-                : { opacity: [0.10, 0.26, 0.10] }
+                ? { opacity: 0.20 }
+                : { opacity: [0.12, 0.34, 0.12] }
             }
             transition={
               reduceMotion
@@ -105,11 +127,14 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
           />
           <motion.span
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{ color: 'var(--themis-primary)' }}
+            style={{
+              color: 'var(--themis-primary)',
+              filter: 'drop-shadow(0 0 8px rgba(126, 106, 168, 0.25))',
+            }}
             animate={
               reduceMotion
                 ? { scale: 1 }
-                : { scale: [1, 1.025, 1] }
+                : { scale: [1, 1.03, 1] }
             }
             transition={
               reduceMotion
@@ -117,7 +142,7 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
                 : { duration: 4.2, repeat: Infinity, ease: 'easeInOut' }
             }
           >
-            <OwlGlyph size={88} />
+            <OwlGlyph size={100} />
           </motion.span>
         </div>
 
