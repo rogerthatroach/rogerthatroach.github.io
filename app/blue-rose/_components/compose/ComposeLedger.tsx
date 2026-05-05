@@ -9,6 +9,7 @@ import {
   type FieldSpec,
   type SectionSpec,
 } from '../../_lib/par-schema';
+import type { ExtractionResult } from '../../_lib/par-extract';
 import { useThemis, type FieldProvenance } from '../../_lib/store';
 import RingCluster from './RingCluster';
 import { cn } from '@/lib/utils';
@@ -20,6 +21,10 @@ interface ComposeLedgerProps {
   cut: 'all' | 'financial';
   /** When the user clicks a field row, Diane focuses on that field. */
   onFocusField: (section: SectionSpec, field: FieldSpec) => void;
+  /** The most-recent extraction (last attached file) — drives source-highlight click-throughs. */
+  lastExtraction: ExtractionResult | null;
+  /** Called when user clicks a Diane-drafted field that has a source passage. */
+  onSourceClick: (field: FieldSpec) => void;
 }
 
 const ROMAN = [
@@ -47,6 +52,8 @@ export default function ComposeLedger({
   provenance,
   cut,
   onFocusField,
+  lastExtraction,
+  onSourceClick,
 }: ComposeLedgerProps) {
   const [openSectionId, setOpenSectionId] = useState<string | null>(null);
   const sections =
@@ -125,7 +132,12 @@ export default function ComposeLedger({
                             field={field}
                             value={values[field.key]}
                             isDiane={provenance[field.key] === 'diane'}
-                            onClick={() => onFocusField(section, field)}
+                            hasSource={
+                              !!lastExtraction &&
+                              !!lastExtraction.fields[field.key]
+                            }
+                            onAskDiane={() => onFocusField(section, field)}
+                            onSourceClick={() => onSourceClick(field)}
                           />
                         ))}
                       </ul>
@@ -145,12 +157,16 @@ function FieldRow({
   field,
   value,
   isDiane,
-  onClick,
+  hasSource,
+  onAskDiane,
+  onSourceClick,
 }: {
   field: FieldSpec;
   value: string | number | boolean | undefined;
   isDiane: boolean;
-  onClick: () => void;
+  hasSource: boolean;
+  onAskDiane: () => void;
+  onSourceClick: () => void;
 }) {
   const { setParField } = useThemis();
   const [editing, setEditing] = useState(false);
@@ -227,6 +243,8 @@ function FieldRow({
     );
   }
 
+  const sourceClickable = isDiane && filled && hasSource;
+
   return (
     <li>
       <div className="group flex items-baseline gap-2 py-0.5">
@@ -235,19 +253,34 @@ function FieldRow({
           <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-text-tertiary">
             {field.label}
           </span>
-          <span
-            className={cn(
-              'block truncate font-display text-[12.5px] leading-snug',
-              filled ? 'text-text-primary' : 'italic text-text-tertiary',
-            )}
-            style={
-              isDiane && filled
-                ? { borderBottom: '1px dashed var(--themis-sakura-border)' }
-                : undefined
-            }
-          >
-            {filled ? display : '—'}
-          </span>
+          {sourceClickable ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSourceClick();
+              }}
+              title="View source passage"
+              className="block w-full truncate text-left font-display text-[12.5px] leading-snug text-text-primary transition-colors hover:text-[var(--themis-sakura)]"
+              style={{ borderBottom: '1px dashed var(--themis-sakura-border)' }}
+            >
+              {display}
+            </button>
+          ) : (
+            <span
+              className={cn(
+                'block truncate font-display text-[12.5px] leading-snug',
+                filled ? 'text-text-primary' : 'italic text-text-tertiary',
+              )}
+              style={
+                isDiane && filled
+                  ? { borderBottom: '1px dashed var(--themis-sakura-border)' }
+                  : undefined
+              }
+            >
+              {filled ? display : '—'}
+            </span>
+          )}
         </span>
         {isDiane && filled && (
           <Sparkles
@@ -272,12 +305,28 @@ function FieldRow({
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onClick();
+              onAskDiane();
             }}
             className="font-mono text-[9px] uppercase tracking-widest text-[var(--themis-primary)] hover:text-text-primary"
           >
             ask Diane
           </button>
+          {sourceClickable && (
+            <>
+              <span className="mx-1 text-text-tertiary">·</span>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSourceClick();
+                }}
+                className="font-mono text-[9px] uppercase tracking-widest hover:text-text-primary"
+                style={{ color: 'var(--themis-sakura)' }}
+              >
+                source
+              </button>
+            </>
+          )}
         </span>
       </div>
     </li>
