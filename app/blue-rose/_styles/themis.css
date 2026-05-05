@@ -1,0 +1,94 @@
+/*
+ * Themis — native accent palette.
+ *
+ * Scoped under [data-themis="true"] so these tokens only apply within
+ * the /blue-rose route. Inherits the parent portfolio's --color-bg,
+ * --color-surface, --color-text-* — any active theme pack flows through.
+ *
+ * Dual-mode: defaults are tuned for warm-paper light surfaces; the
+ * `html.dark [data-themis="true"]` block swaps to brighter values for
+ * dark-base themes. WCAG AA-cleared on both.
+ */
+
+[data-themis='true'] {
+  /* ── Brand ─────────────────────────────────────────────────────── */
+  --themis-primary: #7e6aa8;       /* amethyst, light-mode-tuned */
+  --themis-secondary: #5f7184;     /* cool slate */
+  --themis-glass-tint: rgba(126, 106, 168, 0.04);
+  --themis-glass-border: rgba(126, 106, 168, 0.18);
+
+  /* ── Status palette ────────────────────────────────────────────── */
+  --themis-pending: #6c7585;       /* warm slate */
+  --themis-in-review: #a8784a;     /* amber */
+  --themis-needs-info: #b66c52;    /* soft coral */
+  --themis-approved: #5d8870;      /* sage */
+  --themis-rejected: #a85d6a;      /* muted rose */
+  --themis-draft: #8a8181;         /* neutral */
+
+  /* Status muted backgrounds — 12% alpha versions of the above */
+  --themis-pending-bg: rgba(108, 117, 133, 0.12);
+  --themis-in-review-bg: rgba(168, 120, 74, 0.12);
+  --themis-needs-info-bg: rgba(182, 108, 82, 0.12);
+  --themis-approved-bg: rgba(93, 136, 112, 0.12);
+  --themis-rejected-bg: rgba(168, 93, 106, 0.12);
+  --themis-draft-bg: rgba(138, 129, 129, 0.10);
+}
+
+html.dark [data-themis='true'] {
+  --themis-primary: #b9a8d6;
+  --themis-secondary: #9aabbf;
+  --themis-glass-tint: rgba(185, 168, 214, 0.06);
+  --themis-glass-border: rgba(185, 168, 214, 0.22);
+
+  --themis-pending: #8b94a3;
+  --themis-in-review: #d4a574;
+  --themis-needs-info: #d4866c;
+  --themis-approved: #8fb09a;
+  --themis-rejected: #c08a90;
+  --themis-draft: #a89e9b;
+
+  --themis-pending-bg: rgba(139, 148, 163, 0.14);
+  --themis-in-review-bg: rgba(212, 165, 116, 0.14);
+  --themis-needs-info-bg: rgba(212, 134, 108, 0.14);
+  --themis-approved-bg: rgba(143, 176, 154, 0.14);
+  --themis-rejected-bg: rgba(192, 138, 144, 0.14);
+  --themis-draft-bg: rgba(168, 158, 155, 0.12);
+}
+
+/* The "Themis" pack as a site-wide theme lives in app/globals.css under
+   html[data-theme='themis'] / html.dark[data-theme='themis'] so the
+   tokens apply on every route, not just /blue-rose. */
+
+/* ── Layout-level glass surface ──────────────────────────────────── */
+[data-themis='true'] .themis-glass {
+  background:
+    linear-gradient(180deg, var(--themis-glass-tint), transparent 60%),
+    rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  border: 1px solid var(--themis-glass-border);
+}
+html.dark [data-themis='true'] .themis-glass {
+  background:
+    linear-gradient(180deg, var(--themis-glass-tint), transparent 60%),
+    rgba(21, 18, 29, 0.55);
+}
+
+/* ── Subtle soft-vignette backdrop for the lock screen ───────────── */
+[data-themis='true'] .themis-vignette {
+  background:
+    radial-gradient(ellipse at 50% 30%, var(--themis-glass-tint), transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(95, 113, 132, 0.04), transparent 60%);
+}
+
+/* Shake animation for failed unlock */
+@keyframes themis-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+[data-themis='true'] .themis-shake {
+  animation: themis-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
