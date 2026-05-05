@@ -30,6 +30,7 @@ import PoliciesModal from './PoliciesModal';
 import RingCluster from './RingCluster';
 import SourceHighlightModal from './SourceHighlightModal';
 import SubmittingOverlay from './SubmittingOverlay';
+import { markFreshlySubmitted } from '../PersonaShiftAnnounce';
 import { cn } from '@/lib/utils';
 
 const DRAFT_ID = 'hsd-v003';
@@ -132,6 +133,9 @@ export default function ComposeShell() {
   const onSubmittingComplete = (submissionId: string) => {
     setSynthesizing(null);
     selectSubmission(submissionId);
+    // Drop a sessionStorage marker so SubmissionView shows the persona-
+    // shift announce on the freshly-submitted submission.
+    markFreshlySubmitted(submissionId);
     router.push('/blue-rose/submission');
   };
 

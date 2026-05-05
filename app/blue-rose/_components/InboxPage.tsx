@@ -3,6 +3,7 @@
 import { useThemis } from '../_lib/store';
 import QueueFilters from './QueueFilters';
 import QueuePreview from './QueuePreview';
+import InboxDianeSummary from './InboxDianeSummary';
 
 /**
  * InboxPage — full-width queue + filters, no detail pane.
@@ -29,6 +30,7 @@ export default function InboxPage() {
       </header>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 md:px-8">
         <div className="mx-auto max-w-4xl">
+          <InboxDianeSummary />
           <QueuePreview />
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   Activity,
@@ -237,8 +238,108 @@ export default function HomeDashboard() {
             })}
           </ul>
         </motion.section>
+
+        {/* Things to try — seeded scenarios that cross-cut compose + approver */}
+        <ThingsToTry />
       </motion.div>
     </div>
+  );
+}
+
+function ThingsToTry() {
+  const { seed, selectSubmission, setCurrentPersonaId } = useThemis();
+  const router = useRouter();
+
+  const scenarios = useMemo(() => {
+    const out: Array<{
+      label: string;
+      personaId: string;
+      submissionId: string;
+      tone: 'capex' | 'cross-border';
+    }> = [];
+    // Capex flagship — s_001 (threshold breach) — Bob equivalent is whoever
+    // is in the assignee chain, prefer p_marcus (VP Compliance) as he's
+    // the secondary in the seeded chain
+    const capex = seed.submissions.find((s) => s.id === 's_001');
+    if (capex) {
+      out.push({
+        label: 'Approve a $14M threshold breach as Tammy',
+        personaId: capex.assignees[0] ?? 'p_priya',
+        submissionId: capex.id,
+        tone: 'capex',
+      });
+    }
+    // Cross-border — s_002 (data residency) — Phyllis (General Counsel)
+    const xb = seed.submissions.find((s) => s.id === 's_002');
+    if (xb) {
+      out.push({
+        label: 'Read a cross-border data exception as Phyllis',
+        personaId:
+          xb.assignees.find((id) => id === 'p_legal') ??
+          xb.assignees[0] ??
+          'p_legal',
+        submissionId: xb.id,
+        tone: 'cross-border',
+      });
+    }
+    return out;
+  }, [seed.submissions]);
+
+  if (scenarios.length === 0) return null;
+
+  return (
+    <motion.section variants={fadeUp} className="mt-10">
+      <h2 className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.3em] text-text-tertiary">
+        <Sparkles size={10} style={{ color: 'var(--themis-sakura)' }} aria-hidden="true" />
+        <span>Things to try</span>
+      </h2>
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        {scenarios.map((s) => {
+          const persona = seed.personas.find((p) => p.id === s.personaId);
+          return (
+            <li key={s.submissionId}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (persona) setCurrentPersonaId(persona.id);
+                  selectSubmission(s.submissionId);
+                  router.push('/blue-rose/submission');
+                }}
+                className="group flex w-full items-start gap-3 rounded-2xl border bg-surface/40 px-4 py-3 text-left transition-all hover:border-[var(--themis-sakura-border)] hover:bg-[var(--themis-sakura-bg)]"
+                style={{ borderColor: 'rgba(176, 122, 130, 0.18)' }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+                  style={{
+                    background: 'var(--themis-sakura-bg)',
+                    color: 'var(--themis-sakura)',
+                    boxShadow: '0 0 0 1px var(--themis-sakura-border)',
+                  }}
+                >
+                  <Sparkles size={11} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-display text-[14px] italic leading-snug text-text-primary">
+                    {s.label}
+                  </span>
+                  {persona && (
+                    <span className="mt-1 block font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                      switches you to {persona.displayName} · {persona.title ?? persona.role}
+                    </span>
+                  )}
+                </span>
+                <ArrowRight
+                  size={12}
+                  className="mt-1 shrink-0 text-text-tertiary transition-transform group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </motion.section>
   );
 }
 
