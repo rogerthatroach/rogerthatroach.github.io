@@ -9,6 +9,7 @@ import QueuePreview from './QueuePreview';
 import QueueFilters from './QueueFilters';
 import SubmissionView from './SubmissionView';
 import RightPane from './RightPane';
+import OwlGlyph from './OwlGlyph';
 import { blurIn } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
@@ -55,9 +56,16 @@ export default function Shell({ onLock }: ShellProps) {
     >
       <header className="sticky top-0 z-30 border-b border-border-subtle bg-background/70 backdrop-blur-md">
         <div className="mx-auto flex w-full items-center gap-3 px-4 py-3 md:px-6">
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-center gap-2">
+            <span
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)]"
+              style={{ color: 'var(--themis-primary)' }}
+              aria-hidden="true"
+            >
+              <OwlGlyph size={18} />
+            </span>
             <span className="font-display text-lg font-medium tracking-tight text-text-primary">
-              Themis
+              Bookhouse
             </span>
             <span className="hidden font-mono text-[10px] uppercase tracking-widest text-text-tertiary sm:inline">
               · Concept · Phase 2 prototype
