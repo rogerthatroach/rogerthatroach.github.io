@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Inbox, Paperclip, AtSign } from 'lucide-react';
+import { Inbox, Paperclip, AtSign, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useThemis, useCurrentPersona } from '../_lib/store';
 import FloatingAvatar from './FloatingAvatar';
@@ -11,12 +11,18 @@ import { fadeUp, staggerContainer } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 /**
- * QueuePreview — Tier 0 read-only render of submissions filtered for the
- * current persona. Tier 1 expands this into the live left-pane Queue with
- * filters, unread badges, keyboard nav, etc.
+ * QueuePreview — left-pane queue list. Click a card to open the thread
+ * in the right pane (or full-screen on mobile).
  */
 export default function QueuePreview() {
-  const { seed } = useThemis();
+  const {
+    seed,
+    messages,
+    threads,
+    selectedSubmissionId,
+    selectSubmission,
+    fieldComments,
+  } = useThemis();
   const persona = useCurrentPersona();
 
   const filtered = useMemo(() => {
@@ -28,33 +34,37 @@ export default function QueuePreview() {
         if (persona.role === 'approver' || persona.role === 'admin') {
           return s.assignees.includes(persona.id) || s.submittedBy === persona.id;
         }
-        return true; // observer sees all
+        return true;
       })
       .sort((a, b) => b.updatedAt - a.updatedAt);
   }, [seed, persona]);
 
-  const submissionsById = useMemo(
-    () => new Map(seed.submissions.map((s) => [s.id, s])),
-    [seed.submissions],
-  );
   const personasById = useMemo(
     () => new Map(seed.personas.map((p) => [p.id, p])),
     [seed.personas],
   );
   const unread = useMemo(() => {
     const map = new Map<string, number>();
-    for (const t of seed.threads) map.set(t.id, t.unreadByPersonaId[persona.id] ?? 0);
+    for (const t of threads) map.set(t.id, t.unreadByPersonaId[persona.id] ?? 0);
     return map;
-  }, [seed.threads, persona.id]);
+  }, [threads, persona.id]);
 
   const lastMessageByThread = useMemo(() => {
-    const map = new Map<string, (typeof seed.messages)[number]>();
-    for (const m of seed.messages) {
+    const map = new Map<string, (typeof messages)[number]>();
+    for (const m of messages) {
       const cur = map.get(m.threadId);
       if (!cur || m.createdAt > cur.createdAt) map.set(m.threadId, m);
     }
     return map;
-  }, [seed.messages]);
+  }, [messages]);
+
+  const fieldCommentCountBySubmission = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const c of fieldComments) {
+      map.set(c.submissionId, (map.get(c.submissionId) ?? 0) + 1);
+    }
+    return map;
+  }, [fieldComments]);
 
   if (filtered.length === 0) {
     return (
@@ -78,18 +88,24 @@ export default function QueuePreview() {
         const submittedBy = personasById.get(s.submittedBy);
         const unreadCount = unread.get(s.threadId) ?? 0;
         const hasMention = (lastMsg?.mentions ?? []).includes(persona.id);
-        const hasAttachments = (submissionsById.get(s.id)?.attachmentIds.length ?? 0) > 0;
+        const hasAttachments = s.attachmentIds.length > 0;
+        const fieldCommentCount = fieldCommentCountBySubmission.get(s.id) ?? 0;
+        const isActive = s.id === selectedSubmissionId;
 
         return (
           <motion.li key={s.id} variants={fadeUp}>
-            <div
+            <button
+              type="button"
+              onClick={() => selectSubmission(s.id)}
+              aria-pressed={isActive}
               className={cn(
-                'group relative flex items-start gap-3 px-4 py-3.5 transition-colors',
+                'group relative flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors',
                 'hover:bg-surface-hover/60',
-                unreadCount > 0 && 'bg-[var(--themis-glass-tint)]',
+                unreadCount > 0 && !isActive && 'bg-[var(--themis-glass-tint)]',
+                isActive && 'bg-[var(--themis-glass-tint)]',
               )}
             >
-              {unreadCount > 0 && (
+              {(unreadCount > 0 || isActive) && (
                 <span
                   aria-hidden="true"
                   className="absolute left-0 top-0 h-full w-[2px]"
@@ -112,6 +128,16 @@ export default function QueuePreview() {
                   )}
                   {hasMention && <AtSign size={11} className="text-accent" aria-label="mentioned" />}
                   {hasAttachments && <Paperclip size={11} className="text-text-tertiary" aria-label="has attachments" />}
+                  {fieldCommentCount > 0 && (
+                    <span
+                      className="flex items-center gap-0.5 font-mono text-[10px]"
+                      style={{ color: 'var(--themis-primary)' }}
+                      aria-label={`${fieldCommentCount} field comments`}
+                    >
+                      <MessageCircle size={10} aria-hidden="true" />
+                      {fieldCommentCount}
+                    </span>
+                  )}
                   <span className="ml-auto shrink-0 font-mono text-[10px] tracking-wider text-text-tertiary">
                     {relativeTime(s.updatedAt)}
                   </span>
@@ -149,7 +175,7 @@ export default function QueuePreview() {
                   {unreadCount}
                 </span>
               )}
-            </div>
+            </button>
           </motion.li>
         );
       })}
