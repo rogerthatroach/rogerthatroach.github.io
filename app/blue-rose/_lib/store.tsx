@@ -36,6 +36,8 @@ import type {
 
 const PERSONA_KEY = 'themis:persona';
 
+export type RightPaneTab = 'context' | 'thread' | 'diane';
+
 interface ThemisState {
   seed: ThemisSeed;
   currentPersonaId: string;
@@ -43,6 +45,7 @@ interface ThemisState {
   messages: Message[];
   fieldComments: FieldComment[];
   threads: ThemisSeed['threads'];
+  rightPaneTab: RightPaneTab;
 }
 
 type ThemisAction =
@@ -50,14 +53,18 @@ type ThemisAction =
   | { type: 'SELECT_SUBMISSION'; id: string | null }
   | { type: 'ADD_MESSAGE'; message: Message }
   | { type: 'ADD_FIELD_COMMENT'; comment: FieldComment }
-  | { type: 'MARK_THREAD_READ'; threadId: string; personaId: string };
+  | { type: 'MARK_THREAD_READ'; threadId: string; personaId: string }
+  | { type: 'SET_RIGHT_PANE_TAB'; tab: RightPaneTab };
 
 function reducer(state: ThemisState, action: ThemisAction): ThemisState {
   switch (action.type) {
     case 'SET_PERSONA':
       return { ...state, currentPersonaId: action.id };
     case 'SELECT_SUBMISSION':
-      return { ...state, selectedSubmissionId: action.id };
+      // Reset to context tab when switching submissions
+      return { ...state, selectedSubmissionId: action.id, rightPaneTab: 'context' };
+    case 'SET_RIGHT_PANE_TAB':
+      return { ...state, rightPaneTab: action.tab };
     case 'ADD_MESSAGE':
       return {
         ...state,
@@ -96,6 +103,7 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
 interface ThemisContextValue extends ThemisState {
   setCurrentPersonaId: (id: string) => void;
   selectSubmission: (id: string | null) => void;
+  setRightPaneTab: (tab: RightPaneTab) => void;
   addMessage: (
     threadId: string,
     body: string,
@@ -131,6 +139,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     messages: [...seed.messages],
     fieldComments: [...(seed.fieldComments ?? [])],
     threads: seed.threads.map((t) => ({ ...t, unreadByPersonaId: { ...t.unreadByPersonaId } })),
+    rightPaneTab: 'context' as RightPaneTab,
   }));
 
   const [hydrated, setHydrated] = useState(false);
@@ -162,6 +171,10 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
 
   const selectSubmission = useCallback((id: string | null) => {
     dispatch({ type: 'SELECT_SUBMISSION', id });
+  }, []);
+
+  const setRightPaneTab = useCallback((tab: RightPaneTab) => {
+    dispatch({ type: 'SET_RIGHT_PANE_TAB', tab });
   }, []);
 
   const addMessage = useCallback(
@@ -215,11 +228,20 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       ...state,
       setCurrentPersonaId,
       selectSubmission,
+      setRightPaneTab,
       addMessage,
       addFieldComment,
       markThreadRead,
     }),
-    [state, setCurrentPersonaId, selectSubmission, addMessage, addFieldComment, markThreadRead],
+    [
+      state,
+      setCurrentPersonaId,
+      selectSubmission,
+      setRightPaneTab,
+      addMessage,
+      addFieldComment,
+      markThreadRead,
+    ],
   );
 
   return <ThemisContext.Provider value={value}>{children}</ThemisContext.Provider>;
