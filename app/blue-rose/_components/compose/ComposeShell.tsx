@@ -1,54 +1,77 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronsDown,
-  ChevronsUp,
+  ArrowLeft,
+  ChevronLeft,
+  Coins,
   Download,
   Eye,
+  EyeOff,
   FileText,
+  Send,
 } from 'lucide-react';
 import { useThemis } from '../../_lib/store';
 import {
   PAR_SECTIONS,
   SAMPLE_PAR_VALUES,
+  isFieldFilled,
   overallCoverage,
 } from '../../_lib/par-schema';
-import ComposeChatPane from './ComposeChatPane';
-import ComposeFormPane from './ComposeFormPane';
-import { fadeUp } from '@/lib/motion';
+import ComposeManuscript from './ComposeManuscript';
+import DianeRibbon from './DianeRibbon';
+import DocumentPreviewPanel from './DocumentPreviewPanel';
+import PoliciesModal from './PoliciesModal';
+import RingCluster from './RingCluster';
 import { cn } from '@/lib/utils';
 
-type Tab = 'draft' | 'financial';
-
 const DRAFT_ID = 'hsd-v003';
+const TOTAL_FIELD_COUNT = PAR_SECTIONS.reduce((acc, s) => acc + s.fields.length, 0);
+
+type Cut = 'all' | 'financial';
 
 /**
- * ComposeShell — top-level layout for `/compose`.
+ * ComposeShell — White Lodge ceremonial reimagining.
  *
- *  ┌──────────────────────────────────────────────────────────┐
- *  │ [chat pane: Diane assistant + composer]  │  Project PAR ⏵│
- *  │                                          │  78% Completed│
- *  │                                          │  Draft / Fin… │
- *  │                                          │ ▾ Section …   │
- *  └──────────────────────────────────────────┴───────────────┘
+ *  ┌── slim top atmosphere strip ─────────────────────────────────┐
+ *  │ ‹  drafting hsd-v003                  ◯◯◯◯◯  preview · policies · submit │
+ *  ├──────────────────────────────────────────────────────────────┤
+ *  │                                                                │
+ *  │              [single-column scrolling manuscript]              │
+ *  │                  Project PAR (mono caption)                    │
+ *  │                  Sales CRM Modernization (Fraunces title)      │
+ *  │                  ── sakura divider ──                          │
+ *  │                                                                │
+ *  │                  I.  HEADERS INFORMATION   ◉ ◉ ◉ ◯ ◯           │
+ *  │                  Core metadata that…                            │
+ *  │                                                                │
+ *  │                  Request Title                                 │
+ *  │                  Sales CRM Modernization                       │
+ *  │                  ──────────────────                            │
+ *  │                  ✦ Diane drafted              23 / 400         │
+ *  │                                                                │
+ *  │                  …                                              │
+ *  │                                                                │
+ *  └──────────────────────────────────────────────────────────────┘
+ *                                            ┌─ DianeRibbon ─┐
+ *                                            │ ✦  4 fields   │
+ *                                            │    remain to  │
+ *                                            │    be drafted │
+ *                                            └───────────────┘
  *
- * Phase A scope: structure + 11 accordion sections + status pills +
- * Expand-All/Collapse-All + Draft/Financial tabs + Preview/Policies/
- * Export buttons (stubbed). Phase B/C/D layer modals + drafting chain
- * + submit bridge.
+ * Form is the document. Underline-only inputs, Roman numerals, ring-
+ * cluster status indicators, sakura dividers. Diane is voice via the
+ * floating ribbon, never a panel.
  */
 export default function ComposeShell() {
   const { parDraft, parProvenance, batchSetParFields } = useThemis();
-  const [activeTab, setActiveTab] = useState<Tab>('draft');
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(
-    () => new Set(['headers']),
-  );
   const [seeded, setSeeded] = useState(false);
+  const [openSectionId, setOpenSectionId] = useState<string | null>('headers');
+  const [cut, setCut] = useState<Cut>('all');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [policiesOpen, setPoliciesOpen] = useState(false);
 
-  // First-run: seed the sample CRM Modernization values so the demo lands
-  // at "78% Completed" matching the Phase 1 reference screenshots.
   useEffect(() => {
     if (seeded) return;
     if (Object.keys(parDraft).length > 0) {
@@ -59,151 +82,188 @@ export default function ComposeShell() {
     setSeeded(true);
   }, [parDraft, batchSetParFields, seeded]);
 
+  const sections = useMemo(
+    () => (cut === 'financial' ? PAR_SECTIONS.filter((s) => s.financial) : PAR_SECTIONS),
+    [cut],
+  );
+
+  const filledTotal = useMemo(
+    () =>
+      PAR_SECTIONS.reduce(
+        (acc, s) =>
+          acc + s.fields.filter((f) => isFieldFilled(parDraft[f.key])).length,
+        0,
+      ),
+    [parDraft],
+  );
   const coverage = overallCoverage(parDraft);
   const percent = Math.round(coverage * 100);
 
-  const visibleSections =
-    activeTab === 'financial'
-      ? PAR_SECTIONS.filter((s) => s.financial)
-      : PAR_SECTIONS;
+  const requestTitle = (parDraft.request_title as string | undefined) ?? 'Untitled request';
 
-  const toggleSection = (id: string) => {
-    setExpandedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const onExport = () => {
+    if (typeof window !== 'undefined') window.print();
+  };
+  const onSubmit = () => {
+    // Phase D wires the real submission → /submission bridge.
+    if (typeof window !== 'undefined') {
+      window.alert('Submit wires up in Phase D — routes to approver review with WhyCard populated.');
+    }
   };
 
-  const expandAll = () =>
-    setExpandedIds(new Set(visibleSections.map((s) => s.id)));
-  const collapseAll = () => setExpandedIds(new Set());
-
   return (
-    <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[minmax(360px,_42%)_1fr]">
-      {/* Left — chat */}
-      <ComposeChatPane
-        draftId={DRAFT_ID}
-        state="Assigning"
-        values={parDraft}
-      />
-
-      {/* Right — form */}
-      <section className="flex h-full min-h-0 flex-col bg-surface/20">
-        {/* Top chrome */}
-        <header className="shrink-0 border-b border-border-subtle/60 px-5 pt-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-[18px] font-medium text-text-primary">
-              Project PAR
-            </h1>
-            <button
-              type="button"
-              className="flex items-center gap-1 rounded-md border border-border-subtle bg-surface/60 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
-              title="Preview as document (Phase B)"
-            >
-              <Eye size={10} aria-hidden="true" />
-              <span>Preview</span>
-            </button>
-
-            {/* Draft / Financial tab pills (right side) */}
-            <nav role="tablist" aria-label="View" className="ml-auto flex gap-1">
-              {(['draft', 'financial'] as Tab[]).map((t) => {
-                const active = activeTab === t;
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => setActiveTab(t)}
-                    className={cn(
-                      'rounded-md px-3 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors',
-                      active
-                        ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
-                        : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
-                    )}
-                  >
-                    {t === 'draft' ? 'Draft' : 'Financial'}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-
-          {/* Progress bar + dirty indicator */}
-          <div className="mt-3 flex items-baseline justify-between font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-            <span>{percent}% Completed</span>
-            <span>No changes yet</span>
-          </div>
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface/60">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${percent}%` }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="h-full rounded-full"
-              style={{
-                background:
-                  'linear-gradient(90deg, var(--themis-in-review), var(--themis-primary))',
-              }}
-            />
-          </div>
-
-          {/* Action row */}
-          <div className="mt-3 flex flex-wrap items-center gap-2 pb-3">
-            <button
-              type="button"
-              className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
-              title="Policies and guidelines (Phase B)"
-            >
-              <FileText size={11} aria-hidden="true" />
-              <span>Policies</span>
-            </button>
-            <button
-              type="button"
-              className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
-              title="Export draft (Phase B)"
-            >
-              <Download size={11} aria-hidden="true" />
-              <span>Export</span>
-            </button>
-            <span className="ml-auto flex gap-1">
-              <button
-                type="button"
-                onClick={expandAll}
-                className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
-              >
-                <ChevronsDown size={11} aria-hidden="true" />
-                <span>Expand all</span>
-              </button>
-              <button
-                type="button"
-                onClick={collapseAll}
-                className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/60 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
-              >
-                <ChevronsUp size={11} aria-hidden="true" />
-                <span>Collapse all</span>
-              </button>
-            </span>
-          </div>
-        </header>
-
-        {/* Scrollable form body */}
-        <motion.div
-          variants={fadeUp}
-          initial="initial"
-          animate="animate"
-          className="min-h-0 flex-1 overflow-y-auto px-5 py-5"
+    <div className="relative h-full overflow-hidden">
+      {/* Top atmosphere strip */}
+      <header className="relative z-10 flex shrink-0 items-center gap-4 border-b border-border-subtle/40 px-5 py-3 backdrop-blur-sm">
+        <button
+          type="button"
+          aria-label="Back"
+          onClick={() => history.back()}
+          className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
         >
-          <ComposeFormPane
+          <ChevronLeft size={14} aria-hidden="true" />
+        </button>
+        <div className="flex items-baseline gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-text-tertiary">
+            Drafting
+          </span>
+          <span className="font-mono text-[12px] tracking-wider text-text-secondary">
+            {DRAFT_ID}
+          </span>
+        </div>
+
+        {/* Coverage ring-cluster centerpiece */}
+        <div className="flex items-baseline gap-2">
+          <RingCluster total={5} filled={Math.round((percent / 100) * 5)} current size={7} />
+          <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-text-tertiary">
+            {percent}% drafted · {filledTotal}/{TOTAL_FIELD_COUNT} fields
+          </span>
+        </div>
+
+        {/* Cut toggle (Draft/Financial collapsed to a single inline pair) */}
+        <nav role="tablist" aria-label="Cut" className="ml-auto flex items-center gap-3 text-[11px] uppercase tracking-wider">
+          {([
+            { key: 'all', label: 'Full draft' },
+            { key: 'financial', label: 'Financial' },
+          ] as { key: Cut; label: string }[]).map(({ key, label }) => {
+            const active = cut === key;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setCut(key)}
+                className={cn(
+                  'font-mono transition-colors',
+                  active ? 'text-text-primary' : 'text-text-tertiary hover:text-text-secondary',
+                )}
+              >
+                <span
+                  className={cn(
+                    'border-b border-transparent pb-0.5',
+                    active && 'border-[var(--themis-primary)]',
+                  )}
+                >
+                  {label}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Mono-caption action row — barely-there */}
+        <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider">
+          <ChromeAction
+            label={previewOpen ? 'edit' : 'preview'}
+            icon={previewOpen ? EyeOff : Eye}
+            onClick={() => setPreviewOpen((v) => !v)}
+            active={previewOpen}
+          />
+          <ChromeAction
+            label="policies"
+            icon={FileText}
+            onClick={() => setPoliciesOpen(true)}
+          />
+          <ChromeAction
+            label="export"
+            icon={Download}
+            onClick={onExport}
+          />
+          <ChromeAction
+            label="submit"
+            icon={Send}
+            onClick={onSubmit}
+            primary
+          />
+        </div>
+      </header>
+
+      {/* Body — manuscript or preview */}
+      <div className="relative h-[calc(100%-56px)] overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          <ComposeManuscript
             values={parDraft}
             provenance={parProvenance}
-            expandedIds={expandedIds}
-            onToggleSection={toggleSection}
-            activeTab={activeTab}
+            sections={sections}
+            openSectionId={openSectionId}
+            onToggleSection={(id) =>
+              setOpenSectionId((prev) => (prev === id ? null : id))
+            }
+            title={requestTitle}
           />
-        </motion.div>
-      </section>
+        </div>
+
+        <DocumentPreviewPanel
+          open={previewOpen}
+          values={parDraft}
+          draftId={DRAFT_ID}
+          onClose={() => setPreviewOpen(false)}
+          onDownload={onExport}
+        />
+      </div>
+
+      <PoliciesModal open={policiesOpen} onClose={() => setPoliciesOpen(false)} />
+      <DianeRibbon values={parDraft} />
     </div>
+  );
+}
+
+function ChromeAction({
+  label,
+  icon: Icon,
+  onClick,
+  active,
+  primary,
+}: {
+  label: string;
+  icon: typeof Eye;
+  onClick: () => void;
+  active?: boolean;
+  primary?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex items-center gap-1 font-mono transition-colors',
+        primary
+          ? 'text-[var(--themis-primary)] hover:text-text-primary'
+          : active
+            ? 'text-text-primary'
+            : 'text-text-tertiary hover:text-text-secondary',
+      )}
+    >
+      <Icon size={11} aria-hidden="true" />
+      <span
+        className={cn(
+          'border-b border-transparent pb-0.5',
+          active && 'border-[var(--themis-primary)]',
+        )}
+      >
+        {label}
+      </span>
+    </button>
   );
 }
