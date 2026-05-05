@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, CheckCircle2, FileText, MessageCircleWarning, Paperclip, XCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, FileText, MessageCircleWarning, Paperclip, PanelRight, XCircle } from 'lucide-react';
 import { useThemis, useCurrentPersona, usePersonaMap } from '../_lib/store';
 import StatusPill from './StatusPill';
 import MessageBubble from './MessageBubble';
@@ -11,15 +11,21 @@ import DraftFormView from './DraftFormView';
 import { fadeUp, staggerContainer } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
+interface ThreadViewProps {
+  /** Open the Context drawer (visible on <xl widths only). */
+  onOpenDetails?: () => void;
+}
+
 /**
- * ThreadView — right pane.
+ * ThreadView — middle pane.
  *
- * Header: submission title, status, primary actions (role-gated).
+ * Header: submission title, status, primary actions (role-gated), Details
+ * trigger (only visible on <xl widths where the Context pane is hidden).
  * Body: messages (system + chat), then composer.
  * Drafts: render the form fields with floating per-field threads instead
  * of a chat. The header stays the same.
  */
-export default function ThreadView() {
+export default function ThreadView({ onOpenDetails }: ThreadViewProps = {}) {
   const {
     seed,
     selectedSubmissionId,
@@ -107,6 +113,18 @@ export default function ThreadView() {
           )}
         </div>
         <div className="hidden shrink-0 items-center gap-1.5 sm:flex">
+          {onOpenDetails && (
+            <button
+              type="button"
+              onClick={onOpenDetails}
+              aria-label="Open context panel"
+              title="Details, attachments, audit, insights"
+              className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-2.5 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary xl:hidden"
+            >
+              <PanelRight size={12} aria-hidden="true" />
+              <span>Details</span>
+            </button>
+          )}
           {canApprove && submission.status !== 'approved' && submission.status !== 'rejected' && (
             <>
               <ActionButton
