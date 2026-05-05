@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { Inbox, Paperclip, AtSign, MessageCircle, FilterX } from 'lucide-react';
+import { Inbox, Paperclip, AtSign, MessageCircle, FilterX, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useThemis, useCurrentPersona } from '../_lib/store';
 import { applyFilters, activeFilterCount } from '../_lib/filters';
@@ -103,8 +103,8 @@ export default function QueuePreview() {
         ) : (
           <>
             <Inbox size={24} className="text-text-tertiary" aria-hidden="true" />
-            <p className="text-[12.5px] text-text-secondary">
-              Nothing in the queue for this persona.
+            <p className="font-display text-[13px] italic leading-relaxed text-text-secondary">
+              All quiet here. Diane is watching.
             </p>
           </>
         )}
@@ -182,6 +182,21 @@ export default function QueuePreview() {
                 <h3 className="truncate text-[13.5px] font-medium leading-snug text-text-primary">
                   {s.title}
                 </h3>
+                {s.diane?.summary && (
+                  <p
+                    className="mt-1 line-clamp-1 flex items-baseline gap-1 text-[11.5px] italic leading-snug"
+                    style={{ color: 'var(--themis-sakura)' }}
+                  >
+                    <Sparkles
+                      size={9}
+                      aria-hidden="true"
+                      className="shrink-0 translate-y-[1px]"
+                    />
+                    <span className="min-w-0 truncate text-text-secondary">
+                      {s.diane.summary}
+                    </span>
+                  </p>
+                )}
                 {lastMsg && (
                   <p className="mt-0.5 line-clamp-2 text-[12px] leading-snug text-text-secondary">
                     <span className="font-medium text-text-primary/90">

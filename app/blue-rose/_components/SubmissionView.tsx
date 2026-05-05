@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -15,7 +15,9 @@ import {
 import { useThemis, useCurrentPersona, usePersonaMap } from '../_lib/store';
 import StatusPill from './StatusPill';
 import DocumentBody from './DocumentBody';
-import WhyCard from './WhyCard';
+import WhyCard, { dianeRecommendation } from './WhyCard';
+import UndoToast from './UndoToast';
+import PersonaShiftAnnounce from './PersonaShiftAnnounce';
 import { fadeUp } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
@@ -43,6 +45,7 @@ export default function SubmissionView({ onOpenDetails }: SubmissionViewProps = 
     selectSubmission,
     setSubmissionTab,
     addMessage,
+    setCurrentPersonaId,
   } = useThemis();
   const persona = useCurrentPersona();
   const personaMap = usePersonaMap();
@@ -69,9 +72,27 @@ export default function SubmissionView({ onOpenDetails }: SubmissionViewProps = 
   const isApproverInReview =
     canApprove && submission.status === 'in_review';
 
-  const postAction = (body: string) => {
-    addMessage(submission.threadId, body, [], []);
+  const recommended = submission.diane
+    ? dianeRecommendation(submission.diane)
+    : 'unclear';
+
+  const [pendingAction, setPendingAction] = useState<{
+    label: string;
+    body: string;
+  } | null>(null);
+
+  const postAction = (label: string, body: string) => {
+    // Stage the action — it commits when the 5s undo window closes.
+    setPendingAction({ label, body });
+  };
+  const commitPendingAction = () => {
+    if (!pendingAction) return;
+    addMessage(submission.threadId, pendingAction.body, [], []);
     setSubmissionTab('thread');
+    setPendingAction(null);
+  };
+  const undoPendingAction = () => {
+    setPendingAction(null);
   };
 
   return (
@@ -148,21 +169,27 @@ export default function SubmissionView({ onOpenDetails }: SubmissionViewProps = 
                   icon={CheckCircle2}
                   color="var(--themis-approved)"
                   label="Approve"
-                  onClick={() => postAction('Approved.')}
+                  pulsing={recommended === 'approve'}
+                  onClick={() => postAction('Approved.', 'Approved.')}
                 />
                 <ActionButton
                   icon={MessageCircleWarning}
                   color="var(--themis-needs-info)"
                   label="Request info"
+                  pulsing={recommended === 'question'}
                   onClick={() =>
-                    postAction('Requesting more information before I can move forward.')
+                    postAction(
+                      'Information requested.',
+                      'Requesting more information before I can move forward.',
+                    )
                   }
                 />
                 <ActionButton
                   icon={XCircle}
                   color="var(--themis-rejected)"
                   label="Reject"
-                  onClick={() => postAction('Rejecting at this time.')}
+                  pulsing={recommended === 'reject'}
+                  onClick={() => postAction('Rejected.', 'Rejecting at this time.')}
                 />
               </>
             )}
@@ -173,6 +200,23 @@ export default function SubmissionView({ onOpenDetails }: SubmissionViewProps = 
         {isApproverInReview && <WhyCard submission={submission} />}
         <DocumentBody submission={submission} />
       </div>
+
+      <UndoToast
+        label={pendingAction?.label ?? null}
+        onUndo={undoPendingAction}
+        onCommit={commitPendingAction}
+      />
+
+      <PersonaShiftAnnounce
+        submission={submission}
+        currentPersona={persona}
+        recommendedPersona={
+          submission.assignees.length > 0
+            ? personaMap.get(submission.assignees[0]) ?? null
+            : null
+        }
+        onSwitch={(id) => setCurrentPersonaId(id)}
+      />
     </motion.div>
   );
 }
@@ -182,23 +226,46 @@ function ActionButton({
   color,
   label,
   onClick,
+  pulsing,
 }: {
   icon: typeof CheckCircle2;
   color: string;
   label: string;
   onClick: () => void;
+  /** True when this is Diane's recommended action — gets a subtle ring pulse + tinted bg. */
+  pulsing?: boolean;
 }) {
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
       className={cn(
-        'flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-2.5 py-1 text-[11px] font-medium transition-colors hover:bg-surface-hover',
+        'relative flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors',
+        pulsing
+          ? 'hover:brightness-105'
+          : 'border-border-subtle bg-surface/70 hover:bg-surface-hover',
       )}
-      style={{ color }}
+      style={
+        pulsing
+          ? {
+              color,
+              borderColor: `${color}80`,
+              background: `${color}14`,
+            }
+          : { color }
+      }
     >
+      {pulsing && (
+        <motion.span
+          aria-hidden="true"
+          className="absolute inset-0 rounded-md"
+          style={{ border: `1px solid ${color}` }}
+          animate={{ opacity: [0.5, 0, 0], scale: [1, 1.15, 1.15] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+        />
+      )}
       <Icon size={12} aria-hidden="true" />
       <span>{label}</span>
-    </button>
+    </motion.button>
   );
 }

@@ -2,10 +2,40 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Minus, Plus, Sparkles } from 'lucide-react';
+import { ChevronDown, Minus, Plus, Sparkles, ThumbsUp, AlertCircle, ThumbsDown } from 'lucide-react';
 import type { Confidence, DianeAnnotation, DianeCitation, Submission } from '@/data/themis/types';
 import { riskBand } from '../_lib/insights';
 import { cn } from '@/lib/utils';
+
+/**
+ * Diane's recommended action, derived from the annotation. Used by the
+ * verdict line + (in T2.H.2) the SubmissionView decision-button pulse.
+ */
+export type DianeRecommendation = 'approve' | 'question' | 'reject' | 'unclear';
+
+export function dianeRecommendation(diane: DianeAnnotation): DianeRecommendation {
+  const forCount = diane.reasonsFor.length;
+  const againstCount = diane.reasonsAgainst.length;
+  if (diane.confidence === 'low') return 'unclear';
+  if (forCount > againstCount && diane.confidence === 'high') return 'approve';
+  if (againstCount > forCount + 1) return 'reject';
+  if (againstCount >= forCount) return 'question';
+  return 'approve';
+}
+
+const VERDICT_LABEL: Record<DianeRecommendation, string> = {
+  approve: 'recommends approval',
+  question: 'recommends asking for clarification',
+  reject: 'recommends declining',
+  unclear: 'cannot recommend confidently',
+};
+
+const VERDICT_COLOR: Record<DianeRecommendation, string> = {
+  approve: 'var(--themis-approved)',
+  question: 'var(--themis-in-review)',
+  reject: 'var(--themis-rejected)',
+  unclear: 'var(--themis-needs-info)',
+};
 
 interface WhyCardProps {
   submission: Submission;
@@ -63,46 +93,103 @@ function WhyCardPopulated({
   diane: DianeAnnotation;
 }) {
   const band = riskBand(submission);
-  const [expanded, setExpanded] = useState(false);
+  const [detailExpanded, setDetailExpanded] = useState(false);
+  const [whyExpanded, setWhyExpanded] = useState(false);
   const fieldGroupsCount = diane.fieldGroupsRetrieved.length;
+  const recommendation = dianeRecommendation(diane);
+  const verdictColor = VERDICT_COLOR[recommendation];
+  const VerdictIcon =
+    recommendation === 'approve'
+      ? ThumbsUp
+      : recommendation === 'reject'
+        ? ThumbsDown
+        : AlertCircle;
 
   return (
     <div
       className="mb-4 rounded-2xl border bg-[var(--themis-glass-tint)] px-4 py-3.5 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)]"
       style={{ borderColor: 'rgba(185,168,214,0.28)' }}
     >
-      <header className="mb-2.5 flex flex-wrap items-center gap-2">
-        <Sparkles size={12} style={{ color: 'var(--themis-primary)' }} aria-hidden="true" />
+      {/* Verdict line — the always-visible default. Click to expand details. */}
+      <button
+        type="button"
+        onClick={() => setDetailExpanded((v) => !v)}
+        aria-expanded={detailExpanded}
+        className="group flex w-full items-start gap-3 text-left"
+      >
         <span
-          className="font-mono text-[10px] uppercase tracking-widest"
-          style={{ color: 'var(--themis-primary)' }}
+          className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+          style={{
+            background: `${verdictColor}1f`,
+            color: verdictColor,
+          }}
+          aria-hidden="true"
         >
-          Why is this in front of me?
+          <VerdictIcon size={13} />
         </span>
-        <span className="ml-auto flex items-center gap-1.5">
-          <span
-            className="rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
-            style={{
-              background: `${CONFIDENCE_COLOR[diane.confidence]}1f`,
-              color: CONFIDENCE_COLOR[diane.confidence],
-            }}
-          >
-            {CONFIDENCE_LABEL[diane.confidence]} confidence
+        <span className="min-w-0 flex-1">
+          <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <span
+              className="font-mono text-[10px] uppercase tracking-[0.25em]"
+              style={{ color: 'var(--themis-primary)' }}
+            >
+              <Sparkles
+                size={10}
+                aria-hidden="true"
+                className="mr-1 inline-block align-baseline"
+                style={{ color: 'var(--themis-primary)' }}
+              />
+              Diane
+            </span>
+            <span
+              className="font-display text-[14px] font-medium leading-snug"
+              style={{ color: verdictColor }}
+            >
+              {VERDICT_LABEL[recommendation]}
+            </span>
+            <span
+              className="rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+              style={{
+                background: `${CONFIDENCE_COLOR[diane.confidence]}1f`,
+                color: CONFIDENCE_COLOR[diane.confidence],
+              }}
+            >
+              {CONFIDENCE_LABEL[diane.confidence]} confidence
+            </span>
+            <span
+              className="rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest"
+              style={{ background: `${RISK_COLOR[band]}1f`, color: RISK_COLOR[band] }}
+            >
+              Risk · {RISK_LABEL[band]}
+            </span>
           </span>
-          <span
-            className="rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
-            style={{ background: `${RISK_COLOR[band]}1f`, color: RISK_COLOR[band] }}
-          >
-            Risk · {RISK_LABEL[band]}
-          </span>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-text-primary">
+            {diane.summary}
+          </p>
         </span>
-      </header>
+        <ChevronDown
+          size={13}
+          aria-hidden="true"
+          className={cn(
+            'mt-1 shrink-0 text-text-tertiary transition-transform',
+            detailExpanded && 'rotate-180',
+          )}
+        />
+      </button>
 
-      <p className="text-[13px] leading-relaxed text-text-primary">{diane.summary}</p>
-
+      <AnimatePresence initial={false}>
+        {detailExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="pt-3">
       {/* Reasons grid */}
       {(diane.reasonsFor.length > 0 || diane.reasonsAgainst.length > 0) && (
-        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {diane.reasonsFor.length > 0 && (
             <ReasonColumn
               label="Reasons to approve"
@@ -141,22 +228,22 @@ function WhyCardPopulated({
         </span>
       </p>
 
-      {/* "Why did Diane do this?" disclosure */}
+      {/* "Why did Diane do this?" disclosure (nested inside details) */}
       <button
         type="button"
-        onClick={() => setExpanded((v) => !v)}
-        aria-expanded={expanded}
+        onClick={() => setWhyExpanded((v) => !v)}
+        aria-expanded={whyExpanded}
         className="mt-2.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-text-tertiary transition-colors hover:text-text-primary"
       >
         <ChevronDown
           size={11}
           aria-hidden="true"
-          className={cn('transition-transform', expanded && 'rotate-180')}
+          className={cn('transition-transform', whyExpanded && 'rotate-180')}
         />
         <span>Why did Diane do this?</span>
       </button>
       <AnimatePresence initial={false}>
-        {expanded && (
+        {whyExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -216,6 +303,10 @@ function WhyCardPopulated({
                   </p>
                 </>
               )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
             </div>
           </motion.div>
         )}
