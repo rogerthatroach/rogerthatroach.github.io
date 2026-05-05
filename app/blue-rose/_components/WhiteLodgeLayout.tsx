@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Bell, LogOut, Search } from 'lucide-react';
@@ -7,6 +8,7 @@ import { useThemis } from '../_lib/store';
 import PersonaPill from './PersonaPill';
 import OwlGlyph from './OwlGlyph';
 import Breadcrumb from './Breadcrumb';
+import NotificationsDrawer from './NotificationsDrawer';
 import { blurIn } from '@/lib/motion';
 
 interface WhiteLodgeLayoutProps {
@@ -30,7 +32,14 @@ interface WhiteLodgeLayoutProps {
  * controls its own scrolling internally (per-pane scroll discipline).
  */
 export default function WhiteLodgeLayout({ children, onLock }: WhiteLodgeLayoutProps) {
-  const { seed, currentPersonaId, setCurrentPersonaId } = useThemis();
+  const { seed, currentPersonaId, setCurrentPersonaId, notifications } = useThemis();
+  const [notifsOpen, setNotifsOpen] = useState(false);
+
+  const unreadCount = useMemo(
+    () =>
+      notifications.filter((n) => n.forPersonaId === currentPersonaId && !n.read).length,
+    [notifications, currentPersonaId],
+  );
 
   return (
     <motion.div
@@ -85,10 +94,24 @@ export default function WhiteLodgeLayout({ children, onLock }: WhiteLodgeLayoutP
             </button>
             <button
               type="button"
-              aria-label="Notifications (Tier 3)"
-              className="hidden h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface/70 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary sm:flex"
+              aria-label={
+                unreadCount > 0
+                  ? `Notifications (${unreadCount} unread)`
+                  : 'Notifications'
+              }
+              onClick={() => setNotifsOpen(true)}
+              className="relative hidden h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface/70 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary sm:flex"
             >
               <Bell size={14} aria-hidden="true" />
+              {unreadCount > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 font-mono text-[9px] font-medium leading-none ring-2 ring-background"
+                  style={{ background: 'var(--themis-primary)', color: 'var(--color-bg)' }}
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
             <button
               type="button"
@@ -103,6 +126,8 @@ export default function WhiteLodgeLayout({ children, onLock }: WhiteLodgeLayoutP
       </header>
 
       <main className="min-h-0 flex-1 overflow-hidden">{children}</main>
+
+      <NotificationsDrawer open={notifsOpen} onClose={() => setNotifsOpen(false)} />
     </motion.div>
   );
 }
