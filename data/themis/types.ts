@@ -15,7 +15,9 @@ export type SubmissionStatus =
 
 export type Priority = 'low' | 'normal' | 'high';
 
-export type PersonaRole = 'submitter' | 'approver' | 'observer' | 'admin';
+export type PersonaRole = 'submitter' | 'approver' | 'observer' | 'admin' | 'agent';
+
+export type Confidence = 'low' | 'medium' | 'high';
 
 export interface User {
   id: string;
@@ -28,6 +30,11 @@ export interface Persona extends User {
   role: PersonaRole;
   accentHex: string;
   title?: string;
+  /**
+   * Visual classification per GitHub Primer rule. Default: humans = 'circle';
+   * AI agents = 'squircle'; Diane gets 'glyph' (squircle + scale-of-justice).
+   */
+  avatarKind?: 'circle' | 'squircle' | 'glyph';
 }
 
 export interface Attachment {
@@ -61,6 +68,64 @@ export interface Submission {
   priority: Priority;
   /** Free-form labels — feed the queue filters and chip rendering. */
   tags: string[];
+  /**
+   * Diane's analysis of this submission. Present only on submissions Diane
+   * has been invoked on (per the single-agent governance envelope from PAR
+   * Assist Phase 1: Diane runs only where she's invoked, not over everything).
+   * Absence renders as the "Diane was not invoked" empty state.
+   */
+  diane?: DianeAnnotation;
+}
+
+/**
+ * Diane's per-submission annotation. Vocabulary echoes public PAR Assist
+ * (Prometheus) Phase 1 architecture so stakeholders recognize the same
+ * patterns: MCP tool boundary, two-stage field-group retrieval, coverage
+ * analyzer, structural guarantees.
+ */
+export interface DianeAnnotation {
+  /** 1-paragraph plain-language framing rendered at top of WhyCard. */
+  summary: string;
+  /** Top 3 reasons to approve. */
+  reasonsFor: string[];
+  /** Top 3 reasons to question. */
+  reasonsAgainst: string[];
+  /** 3-6 cited policy clauses, chip-renderable inline as [1], [2], [3]. */
+  citations: DianeCitation[];
+  /** Predicted approver chain with rule-id provenance. */
+  routingPreview: {
+    steps: {
+      approverId: string;
+      role: string;
+      rationale: string;
+      ruleId: string;
+    }[];
+    estimatedDays: number;
+  };
+  /** 0..1 — % of expected field-groups populated (echoes PAR coverage analyzer). */
+  coverage: number;
+  confidence: Confidence;
+  /** e.g. ['policy_lookup@v3', 'vendor_history@v2'] — visible in audit + WhyCard. */
+  mcpToolsUsed: string[];
+  /** e.g. ['financial_impact', 'jurisdiction', 'vendor_record']. */
+  fieldGroupsRetrieved: string[];
+  /** Optional questions Diane suggests the approver consider (T3 surfaces these). */
+  questionsWorthAsking?: string[];
+  /** Per-field flags (info / warning / block) — render as small chevrons. */
+  flags?: { fieldKey: string; severity: 'info' | 'warning' | 'block'; rationale: string }[];
+}
+
+export interface DianeCitation {
+  /** Numeric chip id, [1] / [2] / [3]…, referenced inline from prose. */
+  id: number;
+  /** e.g. 'POL-RM-2024-07'. */
+  policyId: string;
+  /** e.g. '§7.2'. */
+  clauseRef: string;
+  /** 1-2 sentence policy excerpt — shows in hover preview. */
+  quote: string;
+  /** POC: hash-route into a stub policy viewer. */
+  deepLink: string;
 }
 
 export interface Thread {
@@ -110,6 +175,20 @@ export interface AuditEvent {
   at: number;
   before?: unknown;
   after?: unknown;
+  /**
+   * For AI-actor events, the typed reasoning trace that surfaces in the
+   * "Why did Diane do this?" expandable. Vocabulary echoes PAR Assist
+   * Phase 1 (MCP tool boundary, field-group taxonomy, coverage analyzer).
+   */
+  dianeReasoning?: {
+    /** e.g. "policy_lookup@v3 returned 7 clauses; coverage analyzer flagged 1 missing field-group → recommended jurisdiction_check@v2" */
+    rationale: string;
+    mcpTool: string;
+    fieldGroup?: string;
+    confidence: Confidence;
+    /** Citation ids referencing entries in submission.diane.citations. */
+    citations: number[];
+  };
 }
 
 export type ScheduledEventKind =

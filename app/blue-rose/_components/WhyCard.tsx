@@ -1,8 +1,11 @@
 'use client';
 
-import { ChevronRight, Sparkles } from 'lucide-react';
-import type { Submission } from '@/data/themis/types';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronDown, Minus, Plus, Sparkles } from 'lucide-react';
+import type { Confidence, DianeAnnotation, DianeCitation, Submission } from '@/data/themis/types';
 import { riskBand } from '../_lib/insights';
+import { cn } from '@/lib/utils';
 
 interface WhyCardProps {
   submission: Submission;
@@ -22,27 +25,53 @@ const RISK_COLOR: Record<ReturnType<typeof riskBand>, string> = {
   critical: 'var(--themis-rejected)',
 };
 
+const CONFIDENCE_LABEL: Record<Confidence, string> = {
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+};
+
+const CONFIDENCE_COLOR: Record<Confidence, string> = {
+  low: 'var(--themis-needs-info)',
+  medium: 'var(--themis-in-review)',
+  high: 'var(--themis-approved)',
+};
+
 /**
  * WhyCard — "Why is this in front of me?" pinned at the top of the
- * approver's SubmissionView. Tier 1 stub: surfaces basic context derived
- * from the submission. Tier 3 will populate with `submission.diane`
- * (one-paragraph summary, top reasons for/against, cited policy clauses,
- * confidence badge).
+ * approver's SubmissionView. Two render modes:
  *
- * Stays visible at all times for approver + in-review combinations so
- * the approver always lands oriented, never has to hunt.
+ *  • `submission.diane` present → full render: summary, reasons-for/against,
+ *    citation chips, MCP-tool footer caption, "Why did Diane do this?"
+ *    disclosure. Vocabulary echoes PAR Assist Phase 1 (field-group retrieval,
+ *    coverage analyzer, MCP tool boundary, structural guarantees).
+ *  • `submission.diane` absent → modeling-the-governance-envelope empty state:
+ *    "Diane was not invoked on this submission." Diane only runs where
+ *    explicitly invoked, mirroring the single-agent governance envelope.
  */
 export default function WhyCard({ submission }: WhyCardProps) {
+  const { diane } = submission;
+  if (!diane) return <WhyCardEmpty submission={submission} />;
+  return <WhyCardPopulated submission={submission} diane={diane} />;
+}
+
+function WhyCardPopulated({
+  submission,
+  diane,
+}: {
+  submission: Submission;
+  diane: DianeAnnotation;
+}) {
   const band = riskBand(submission);
-  const sevField = submission.fields.find((f) => f.key === 'severity');
-  const buField = submission.fields.find((f) => f.key === 'business_unit');
+  const [expanded, setExpanded] = useState(false);
+  const fieldGroupsCount = diane.fieldGroupsRetrieved.length;
 
   return (
     <div
       className="mb-4 rounded-2xl border bg-[var(--themis-glass-tint)] px-4 py-3.5 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)]"
       style={{ borderColor: 'rgba(185,168,214,0.28)' }}
     >
-      <div className="mb-2 flex items-center gap-2">
+      <header className="mb-2.5 flex flex-wrap items-center gap-2">
         <Sparkles size={12} style={{ color: 'var(--themis-primary)' }} aria-hidden="true" />
         <span
           className="font-mono text-[10px] uppercase tracking-widest"
@@ -50,24 +79,254 @@ export default function WhyCard({ submission }: WhyCardProps) {
         >
           Why is this in front of me?
         </span>
+        <span className="ml-auto flex items-center gap-1.5">
+          <span
+            className="rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+            style={{
+              background: `${CONFIDENCE_COLOR[diane.confidence]}1f`,
+              color: CONFIDENCE_COLOR[diane.confidence],
+            }}
+          >
+            {CONFIDENCE_LABEL[diane.confidence]} confidence
+          </span>
+          <span
+            className="rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+            style={{ background: `${RISK_COLOR[band]}1f`, color: RISK_COLOR[band] }}
+          >
+            Risk · {RISK_LABEL[band]}
+          </span>
+        </span>
+      </header>
+
+      <p className="text-[13px] leading-relaxed text-text-primary">{diane.summary}</p>
+
+      {/* Reasons grid */}
+      {(diane.reasonsFor.length > 0 || diane.reasonsAgainst.length > 0) && (
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {diane.reasonsFor.length > 0 && (
+            <ReasonColumn
+              label="Reasons to approve"
+              tone="approve"
+              reasons={diane.reasonsFor}
+            />
+          )}
+          {diane.reasonsAgainst.length > 0 && (
+            <ReasonColumn
+              label="Reasons to question"
+              tone="question"
+              reasons={diane.reasonsAgainst}
+            />
+          )}
+        </div>
+      )}
+
+      {/* Citation chips */}
+      {diane.citations.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+            Cited
+          </span>
+          {diane.citations.map((c) => (
+            <CitationChip key={c.id} citation={c} />
+          ))}
+        </div>
+      )}
+
+      {/* MCP-tool / field-group / coverage footer caption */}
+      <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-text-tertiary">
+        field-groups retrieved: {fieldGroupsCount}/{fieldGroupsCount} · coverage{' '}
+        {Math.round(diane.coverage * 100)}% · MCP tools:{' '}
+        <span className="normal-case tracking-normal text-text-secondary">
+          {diane.mcpToolsUsed.map((t) => t.replace(/@.*/, '')).join(', ')}
+        </span>
+      </p>
+
+      {/* "Why did Diane do this?" disclosure */}
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        aria-expanded={expanded}
+        className="mt-2.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-text-tertiary transition-colors hover:text-text-primary"
+      >
+        <ChevronDown
+          size={11}
+          aria-hidden="true"
+          className={cn('transition-transform', expanded && 'rotate-180')}
+        />
+        <span>Why did Diane do this?</span>
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-2 rounded-xl border border-border-subtle/60 bg-surface/50 px-3 py-2.5">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-tertiary">
+                Field-groups retrieved
+              </p>
+              <ul className="mt-1 mb-3 flex flex-wrap gap-1">
+                {diane.fieldGroupsRetrieved.map((g) => (
+                  <li
+                    key={g}
+                    className="rounded-md border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[10px] text-text-secondary"
+                  >
+                    {g}
+                  </li>
+                ))}
+              </ul>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-tertiary">
+                MCP tool calls
+              </p>
+              <ul className="mt-1 mb-3 flex flex-wrap gap-1">
+                {diane.mcpToolsUsed.map((t) => (
+                  <li
+                    key={t}
+                    className="rounded-md border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[10px] text-text-secondary"
+                  >
+                    {t}
+                  </li>
+                ))}
+              </ul>
+              {diane.routingPreview.steps.length > 0 && (
+                <>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-text-tertiary">
+                    Routing chain
+                  </p>
+                  <ol className="mt-1 space-y-1">
+                    {diane.routingPreview.steps.map((step, i) => (
+                      <li key={i} className="text-[12px] text-text-secondary">
+                        <span className="font-mono text-[10px] text-text-tertiary">
+                          {i + 1}.
+                        </span>{' '}
+                        <span className="text-text-primary">{step.role}</span>
+                        <span className="text-text-tertiary"> · {step.rationale}</span>{' '}
+                        <span className="font-mono text-[10px] text-text-tertiary">
+                          ({step.ruleId})
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                    Estimated decision: {diane.routingPreview.estimatedDays} business{' '}
+                    {diane.routingPreview.estimatedDays === 1 ? 'day' : 'days'}
+                  </p>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ReasonColumn({
+  label,
+  tone,
+  reasons,
+}: {
+  label: string;
+  tone: 'approve' | 'question';
+  reasons: string[];
+}) {
+  const Icon = tone === 'approve' ? Plus : Minus;
+  const color = tone === 'approve' ? 'var(--themis-approved)' : 'var(--themis-needs-info)';
+  return (
+    <section>
+      <p
+        className="mb-1 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.25em]"
+        style={{ color }}
+      >
+        <Icon size={10} aria-hidden="true" />
+        <span>{label}</span>
+      </p>
+      <ul className="space-y-1">
+        {reasons.map((r, i) => (
+          <li key={i} className="flex gap-2 text-[12.5px] leading-snug text-text-primary">
+            <span aria-hidden="true" style={{ color }}>
+              ·
+            </span>
+            <span>{r}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function CitationChip({ citation }: { citation: DianeCitation }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <span
+      className="relative inline-flex"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <a
+        href={citation.deepLink}
+        className="rounded border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[10px] text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:text-text-primary"
+        aria-label={`Citation ${citation.id}: ${citation.policyId} ${citation.clauseRef}`}
+      >
+        [{citation.id}]
+      </a>
+      <AnimatePresence>
+        {hovered && (
+          <motion.span
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.12 }}
+            role="tooltip"
+            className="themis-glass-pop pointer-events-none absolute left-0 top-full z-30 mt-1 w-72 rounded-lg border border-border-subtle bg-surface/95 px-2.5 py-2 text-left shadow-lg"
+          >
+            <span className="block font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+              {citation.policyId} {citation.clauseRef}
+            </span>
+            <span className="mt-1 block text-[12px] leading-snug text-text-primary">
+              &ldquo;{citation.quote}&rdquo;
+            </span>
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </span>
+  );
+}
+
+function WhyCardEmpty({ submission }: { submission: Submission }) {
+  const band = riskBand(submission);
+  const sevField = submission.fields.find((f) => f.key === 'severity');
+  const buField = submission.fields.find((f) => f.key === 'business_unit');
+
+  return (
+    <div
+      className="mb-4 rounded-2xl border bg-surface/40 px-4 py-3.5"
+      style={{ borderColor: 'rgba(185,168,214,0.18)' }}
+    >
+      <header className="mb-2 flex flex-wrap items-center gap-2">
+        <Sparkles size={12} className="text-text-tertiary" aria-hidden="true" />
+        <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+          Diane was not invoked on this submission
+        </span>
         <span
           className="ml-auto rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
           style={{ background: `${RISK_COLOR[band]}1f`, color: RISK_COLOR[band] }}
         >
           Risk · {RISK_LABEL[band]}
         </span>
-      </div>
+      </header>
       <p className="text-[13px] leading-relaxed text-text-primary">
         You&apos;re assigned as an approver on this {submission.kind.replace(/-/g, ' ')}
         {sevField ? ` (severity: ${String(sevField.value).toLowerCase()})` : ''}
         {buField ? ` from ${String(buField.value)}` : ''}. Open the document below to review
         the submitter&apos;s justification, attachments, and any field-level discussion.
       </p>
-      <div className="mt-2 flex items-center gap-2 text-[11px] text-text-tertiary">
-        <span className="font-mono uppercase tracking-widest">Tier 3 will populate</span>
-        <ChevronRight size={11} aria-hidden="true" />
-        <span>AI summary · top reasons for/against · cited policy · questions worth asking</span>
-      </div>
+      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-text-tertiary">
+        Diane runs only where she&apos;s invoked. Single-agent governance envelope.
+      </p>
     </div>
   );
 }

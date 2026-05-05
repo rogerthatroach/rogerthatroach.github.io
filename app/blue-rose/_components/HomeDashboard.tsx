@@ -147,9 +147,8 @@ export default function HomeDashboard() {
             href="/blue-rose/compose"
             icon={PenLine}
             label="Start a request"
-            value="—"
-            hint="New submission · arrives Tier 2"
-            disabled
+            value="↗"
+            hint="Routing preview · full flow Tier 2"
           />
           {isAdmin && (
             <>
@@ -157,17 +156,15 @@ export default function HomeDashboard() {
                 href="/blue-rose/workflows"
                 icon={Workflow}
                 label="Workflows"
-                value="—"
-                hint="Routing rules · Tier 4"
-                disabled
+                value="8"
+                hint="Routing rules · read-only"
               />
               <Tile
                 href="/blue-rose/audit"
                 icon={Eye}
                 label="Audit log"
-                value="—"
-                hint="Org-wide activity · Tier 4"
-                disabled
+                value={stats.totalMentions > 0 ? '↗' : '—'}
+                hint="Cross-submission timeline"
               />
             </>
           )}
@@ -182,10 +179,9 @@ export default function HomeDashboard() {
             href="/blue-rose/diane"
             icon={Sparkles}
             label="Diane"
-            value="—"
-            hint={`${stats.fieldCommentsTotal} field comment${stats.fieldCommentsTotal === 1 ? '' : 's'} · Tier 5`}
+            value="↗"
+            hint="Decision Ledger · LLMOps"
             accent="#F59E0B"
-            disabled
           />
         </motion.div>
 
