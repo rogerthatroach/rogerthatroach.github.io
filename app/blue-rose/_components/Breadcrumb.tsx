@@ -49,6 +49,13 @@ export default function Breadcrumb() {
       return items;
     }
 
+    // Special case: /insights/custom
+    if (parts[0] === 'insights' && parts[1] === 'custom') {
+      items.push({ label: 'Insights', href: '/blue-rose/insights' });
+      items.push({ label: 'Custom dashboards' });
+      return items;
+    }
+
     const segLabel = ROUTE_LABEL[parts[0]] ?? parts[0];
     items.push({ label: segLabel });
     return items;
