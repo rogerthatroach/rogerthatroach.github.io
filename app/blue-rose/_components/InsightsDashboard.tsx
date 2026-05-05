@@ -16,6 +16,8 @@ import {
   type DashboardFilters,
   type ScenarioOverrides,
 } from '../_lib/dashboard';
+import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 import InsightsHeader from './InsightsHeader';
 import KPIStrip from './KPIStrip';
 import WhatIfPanel from './WhatIfPanel';
@@ -103,17 +105,26 @@ export default function InsightsDashboard() {
         className="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-10"
       >
         {/* Page title */}
-        <motion.div variants={fadeUp} className="mb-6">
-          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-text-tertiary">
-            Insights
-          </p>
-          <h1 className="mt-1 font-display text-2xl font-medium tracking-tight text-text-primary md:text-3xl">
-            What&rsquo;s already moved
-          </h1>
-          <p className="mt-1 text-[13px] text-text-secondary">
-            Track approved spend, decision velocity, anomalies, and what-if
-            scenarios across initiatives.
-          </p>
+        <motion.div variants={fadeUp} className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-text-tertiary">
+              Insights
+            </p>
+            <h1 className="mt-1 font-display text-2xl font-medium tracking-tight text-text-primary md:text-3xl">
+              What&rsquo;s already moved
+            </h1>
+            <p className="mt-1 text-[13px] text-text-secondary">
+              Track approved spend, decision velocity, anomalies, and what-if
+              scenarios across initiatives.
+            </p>
+          </div>
+          <Link
+            href="/blue-rose/insights/custom"
+            className="hidden shrink-0 items-center gap-1.5 rounded-md border border-border-subtle bg-surface/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:text-text-primary md:inline-flex"
+          >
+            <span>Build your own</span>
+            <ArrowUpRight size={11} aria-hidden="true" />
+          </Link>
         </motion.div>
 
         {/* Filter chips */}
