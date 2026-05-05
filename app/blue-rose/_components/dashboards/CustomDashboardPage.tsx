@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Check, Pencil, Plus } from 'lucide-react';
+import { Check, Pencil, Plus } from 'lucide-react';
 import { useCurrentPersona } from '../../_lib/store';
 import {
   EMPTY_DASHBOARD_FILTERS,
@@ -21,6 +20,7 @@ import {
   type WidgetKind,
 } from '../../_lib/dashboard-grid';
 import DashboardGrid from './DashboardGrid';
+import DashboardSwitcher from './DashboardSwitcher';
 import InsightsHeader from '../InsightsHeader';
 import SavedDashboardsList from './SavedDashboardsList';
 import ShareDashboardButton from './ShareDashboardButton';
@@ -184,15 +184,11 @@ export default function CustomDashboardPage() {
         className="mx-auto max-w-7xl px-4 py-8 md:px-8 md:py-10"
       >
         {/* Page heading */}
-        <motion.div variants={fadeUp} className="mb-6 flex items-end justify-between gap-4">
+        <motion.div variants={fadeUp} className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <Link
-              href="/blue-rose/insights"
-              className="mb-1 inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.3em] text-text-tertiary transition-colors hover:text-text-primary"
-            >
-              <ArrowLeft size={10} aria-hidden="true" />
-              <span>Insights</span>
-            </Link>
+            <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.3em] text-text-tertiary">
+              Insights
+            </p>
             <h1 className="font-display text-2xl font-medium tracking-tight text-text-primary md:text-3xl">
               Custom dashboards
             </h1>
@@ -200,6 +196,14 @@ export default function CustomDashboardPage() {
               Build your own view. Drag to reorder · width via the chips · share by URL.
             </p>
           </div>
+        </motion.div>
+
+        {/* Dashboard switcher — toggle Holistic ↔ saved custom boards */}
+        <motion.div variants={fadeUp} className="mb-6">
+          <DashboardSwitcher
+            active={activeId ?? 'holistic'}
+            onSelectCustom={(id) => setActiveId(id)}
+          />
         </motion.div>
 
         {/* Import banner */}
