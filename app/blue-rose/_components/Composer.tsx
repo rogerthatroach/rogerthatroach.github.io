@@ -23,6 +23,8 @@ interface ComposerProps {
   /** Compact variant for floating field threads. */
   compact?: boolean;
   autoFocus?: boolean;
+  /** Optional initial body — used by selection-to-comment to seed a quote. */
+  initialBody?: string;
 }
 
 /**
@@ -42,9 +44,10 @@ export default function Composer({
   onSubmit,
   compact = false,
   autoFocus = false,
+  initialBody = '',
 }: ComposerProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState(initialBody);
   const [menu, setMenu] = useState<{ kind: 'mention' | 'tag'; query: string; from: number } | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
   // mention persona ids accumulated from picks (re-resolved on submit too)

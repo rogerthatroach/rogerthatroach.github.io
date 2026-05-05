@@ -15,24 +15,44 @@ interface FieldThreadProps {
   submissionId: string;
   fieldKey: string;
   fieldLabel: string;
+  /** Open immediately on mount (used by selection-to-comment). */
+  autoOpen?: boolean;
+  /** Pre-quote a passage in the composer (selection-to-comment). */
+  quotedSelection?: string;
+  /** Called when the popover closes. Lets the parent clear selection state. */
+  onClose?: () => void;
 }
 
 /**
  * FieldThread — floating popover anchored to a specific form field.
  *
- * Trigger renders as an inline chip showing the comment count. Click
- * opens a glass card just below the field with the existing comments
- * (rendered as compact cards) and a small composer to add a new one.
+ * Two modes:
+ *   1. Trigger chip in the field header (default) — click to open
+ *   2. autoOpen + quotedSelection (selection-to-comment) — opens
+ *      immediately with the highlighted passage quoted as a blockquote
+ *      in the composer, no chip rendered
  *
- * Used inside DraftFormView to make per-field discussion concrete:
- * "comment on this field, not the whole submission."
+ * Both modes share the same glass-card body: comments list + compact
+ * composer for new comments.
  */
-export default function FieldThread({ submissionId, fieldKey, fieldLabel }: FieldThreadProps) {
+export default function FieldThread({
+  submissionId,
+  fieldKey,
+  fieldLabel,
+  autoOpen = false,
+  quotedSelection,
+  onClose,
+}: FieldThreadProps) {
   const { fieldComments, addFieldComment, seed } = useThemis();
   const persona = useCurrentPersona();
   const personaMap = usePersonaMap();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(autoOpen);
   const ref = useRef<HTMLDivElement>(null);
+
+  const close = () => {
+    setOpen(false);
+    onClose?.();
+  };
 
   const comments = fieldComments
     .filter((c) => c.submissionId === submissionId && c.fieldKey === fieldKey)
@@ -42,10 +62,10 @@ export default function FieldThread({ submissionId, fieldKey, fieldLabel }: Fiel
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') close();
     };
     const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) close();
     };
     document.addEventListener('keydown', onKey);
     document.addEventListener('mousedown', onClick);
@@ -53,6 +73,7 @@ export default function FieldThread({ submissionId, fieldKey, fieldLabel }: Fiel
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('mousedown', onClick);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   const count = comments.length;
@@ -60,21 +81,25 @@ export default function FieldThread({ submissionId, fieldKey, fieldLabel }: Fiel
 
   return (
     <div ref={ref} className="relative inline-flex">
-      <button
-        type="button"
-        onClick={() => setOpen((s) => !s)}
-        className={cn(
-          'flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
-          has
-            ? 'border-[var(--themis-primary)]/40 text-[var(--themis-primary)] hover:bg-[var(--themis-glass-tint)]'
-            : 'border-border-subtle text-text-tertiary hover:bg-surface-hover',
-        )}
-        aria-label={has ? `${count} comment${count > 1 ? 's' : ''} on ${fieldLabel}` : `Add comment on ${fieldLabel}`}
-        aria-expanded={open}
-      >
-        {has ? <MessageCircle size={10} aria-hidden="true" /> : <MessageSquarePlus size={10} aria-hidden="true" />}
-        <span>{has ? count : 'comment'}</span>
-      </button>
+      {!autoOpen && (
+        <button
+          type="button"
+          onClick={() => setOpen((s) => !s)}
+          className={cn(
+            'flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
+            has
+              ? 'border-[var(--themis-primary)]/40 text-[var(--themis-primary)] hover:bg-[var(--themis-glass-tint)]'
+              : 'border-border-subtle text-text-tertiary hover:bg-surface-hover',
+          )}
+          aria-label={
+            has ? `${count} comment${count > 1 ? 's' : ''} on ${fieldLabel}` : `Add comment on ${fieldLabel}`
+          }
+          aria-expanded={open}
+        >
+          {has ? <MessageCircle size={10} aria-hidden="true" /> : <MessageSquarePlus size={10} aria-hidden="true" />}
+          <span>{has ? count : 'comment'}</span>
+        </button>
+      )}
 
       <AnimatePresence>
         {open && (
@@ -96,7 +121,7 @@ export default function FieldThread({ submissionId, fieldKey, fieldLabel }: Fiel
               </div>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={close}
                 aria-label="Close"
                 className="flex h-7 w-7 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
               >
@@ -121,14 +146,27 @@ export default function FieldThread({ submissionId, fieldKey, fieldLabel }: Fiel
               ))}
             </div>
             <div className="border-t border-border-subtle bg-background/40">
+              {quotedSelection && (
+                <div className="px-3 pt-2">
+                  <p className="rounded-md border-l-2 border-[var(--themis-primary)]/50 bg-surface-hover/40 px-2 py-1 text-[11px] italic text-text-secondary">
+                    &ldquo;{quotedSelection}&rdquo;
+                  </p>
+                </div>
+              )}
               <Composer
                 personas={seed.personas}
                 excludePersonaIds={[persona.id]}
                 compact
                 autoFocus
-                placeholder={`Comment as ${persona.displayName}…`}
+                placeholder={
+                  quotedSelection
+                    ? `Comment on the highlighted passage…`
+                    : `Comment as ${persona.displayName}…`
+                }
+                initialBody={quotedSelection ? `> "${quotedSelection}"\n\n` : ''}
                 onSubmit={(body, mentions) => {
                   addFieldComment(submissionId, fieldKey, body, mentions);
+                  close();
                 }}
               />
             </div>
