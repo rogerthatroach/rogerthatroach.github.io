@@ -1,9 +1,10 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Inbox, Paperclip, AtSign, MessageCircle } from 'lucide-react';
+import { Inbox, Paperclip, AtSign, MessageCircle, FilterX } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useThemis, useCurrentPersona } from '../_lib/store';
+import { applyFilters, activeFilterCount } from '../_lib/filters';
 import FloatingAvatar from './FloatingAvatar';
 import StatusPill from './StatusPill';
 import { relativeTime } from '../_lib/format';
@@ -13,6 +14,12 @@ import { cn } from '@/lib/utils';
 /**
  * QueuePreview — left-pane queue list. Click a card to open the thread
  * in the right pane (or full-screen on mobile).
+ *
+ * Filtering pipeline:
+ *   1. Persona-scoped subset (submitter sees own + assigned; approver
+ *      sees assigned + own; observer sees all)
+ *   2. User-applied filters from the queue header (status, submitter,
+ *      business unit, severity, kind, amount, has-attachments, unread)
  */
 export default function QueuePreview() {
   const {
@@ -22,32 +29,39 @@ export default function QueuePreview() {
     selectedSubmissionId,
     selectSubmission,
     fieldComments,
+    queueFilters,
+    clearFilters,
   } = useThemis();
   const persona = useCurrentPersona();
 
-  const filtered = useMemo(() => {
-    return seed.submissions
-      .filter((s) => {
-        if (persona.role === 'submitter') {
-          return s.submittedBy === persona.id || s.assignees.includes(persona.id);
-        }
-        if (persona.role === 'approver' || persona.role === 'admin') {
-          return s.assignees.includes(persona.id) || s.submittedBy === persona.id;
-        }
-        return true;
-      })
-      .sort((a, b) => b.updatedAt - a.updatedAt);
+  const personaScoped = useMemo(() => {
+    return seed.submissions.filter((s) => {
+      if (persona.role === 'submitter') {
+        return s.submittedBy === persona.id || s.assignees.includes(persona.id);
+      }
+      if (persona.role === 'approver' || persona.role === 'admin') {
+        return s.assignees.includes(persona.id) || s.submittedBy === persona.id;
+      }
+      return true;
+    });
   }, [seed, persona]);
+
+  const unreadByThread = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const t of threads) map.set(t.id, t.unreadByPersonaId[persona.id] ?? 0);
+    return map;
+  }, [threads, persona.id]);
+
+  const filtered = useMemo(() => {
+    return applyFilters(personaScoped, queueFilters, { unreadByThread }).sort(
+      (a, b) => b.updatedAt - a.updatedAt,
+    );
+  }, [personaScoped, queueFilters, unreadByThread]);
 
   const personasById = useMemo(
     () => new Map(seed.personas.map((p) => [p.id, p])),
     [seed.personas],
   );
-  const unread = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const t of threads) map.set(t.id, t.unreadByPersonaId[persona.id] ?? 0);
-    return map;
-  }, [threads, persona.id]);
 
   const lastMessageByThread = useMemo(() => {
     const map = new Map<string, (typeof messages)[number]>();
@@ -67,10 +81,32 @@ export default function QueuePreview() {
   }, [fieldComments]);
 
   if (filtered.length === 0) {
+    const filtersActive = activeFilterCount(queueFilters) > 0;
     return (
-      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border-subtle bg-surface/40 px-6 py-16 text-center">
-        <Inbox size={28} className="text-text-tertiary" aria-hidden="true" />
-        <p className="text-sm text-text-secondary">Nothing in the queue for this persona.</p>
+      <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-border-subtle bg-surface/40 px-6 py-12 text-center">
+        {filtersActive ? (
+          <>
+            <FilterX size={24} className="text-text-tertiary" aria-hidden="true" />
+            <p className="text-[12.5px] text-text-secondary">
+              No submissions match the active filters.
+            </p>
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="rounded-md border border-[var(--themis-primary)]/30 bg-[var(--themis-glass-tint)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors hover:bg-[var(--themis-primary)]/15"
+              style={{ color: 'var(--themis-primary)' }}
+            >
+              Clear filters
+            </button>
+          </>
+        ) : (
+          <>
+            <Inbox size={24} className="text-text-tertiary" aria-hidden="true" />
+            <p className="text-[12.5px] text-text-secondary">
+              Nothing in the queue for this persona.
+            </p>
+          </>
+        )}
       </div>
     );
   }
@@ -86,7 +122,7 @@ export default function QueuePreview() {
         const lastMsg = lastMessageByThread.get(s.threadId);
         const lastAuthor = lastMsg ? personasById.get(lastMsg.authorPersonaId) : undefined;
         const submittedBy = personasById.get(s.submittedBy);
-        const unreadCount = unread.get(s.threadId) ?? 0;
+        const unreadCount = unreadByThread.get(s.threadId) ?? 0;
         const hasMention = (lastMsg?.mentions ?? []).includes(persona.id);
         const hasAttachments = s.attachmentIds.length > 0;
         const fieldCommentCount = fieldCommentCountBySubmission.get(s.id) ?? 0;

@@ -6,6 +6,7 @@ import { Bell, LogOut, Search } from 'lucide-react';
 import { useThemis } from '../_lib/store';
 import PersonaPill from './PersonaPill';
 import QueuePreview from './QueuePreview';
+import QueueFilters from './QueueFilters';
 import SubmissionView from './SubmissionView';
 import RightPane from './RightPane';
 import { blurIn } from '@/lib/motion';
@@ -111,6 +112,9 @@ export default function Shell({ onLock }: ShellProps) {
               <span className="font-mono text-[9px] uppercase tracking-widest text-text-tertiary">
                 {seed.submissions.length}
               </span>
+            </div>
+            <div className="mb-3">
+              <QueueFilters />
             </div>
             <QueuePreview />
           </div>
