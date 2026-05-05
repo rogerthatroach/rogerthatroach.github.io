@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  ArrowLeft,
   ChevronLeft,
-  Coins,
   Download,
   Eye,
   EyeOff,
@@ -18,9 +16,11 @@ import {
   SAMPLE_PAR_VALUES,
   isFieldFilled,
   overallCoverage,
+  type FieldSpec,
+  type SectionSpec,
 } from '../../_lib/par-schema';
-import ComposeManuscript from './ComposeManuscript';
-import DianeRibbon from './DianeRibbon';
+import ComposeLedger from './ComposeLedger';
+import DianePresence from './DianePresence';
 import DocumentPreviewPanel from './DocumentPreviewPanel';
 import PoliciesModal from './PoliciesModal';
 import RingCluster from './RingCluster';
@@ -32,45 +32,48 @@ const TOTAL_FIELD_COUNT = PAR_SECTIONS.reduce((acc, s) => acc + s.fields.length,
 type Cut = 'all' | 'financial';
 
 /**
- * ComposeShell — White Lodge ceremonial reimagining.
+ * ComposeShell — White Lodge ceremonial reimagining (v3).
  *
- *  ┌── slim top atmosphere strip ─────────────────────────────────┐
- *  │ ‹  drafting hsd-v003                  ◯◯◯◯◯  preview · policies · submit │
- *  ├──────────────────────────────────────────────────────────────┤
- *  │                                                                │
- *  │              [single-column scrolling manuscript]              │
- *  │                  Project PAR (mono caption)                    │
- *  │                  Sales CRM Modernization (Fraunces title)      │
- *  │                  ── sakura divider ──                          │
- *  │                                                                │
- *  │                  I.  HEADERS INFORMATION   ◉ ◉ ◉ ◯ ◯           │
- *  │                  Core metadata that…                            │
- *  │                                                                │
- *  │                  Request Title                                 │
- *  │                  Sales CRM Modernization                       │
- *  │                  ──────────────────                            │
- *  │                  ✦ Diane drafted              23 / 400         │
- *  │                                                                │
- *  │                  …                                              │
- *  │                                                                │
- *  └──────────────────────────────────────────────────────────────┘
- *                                            ┌─ DianeRibbon ─┐
- *                                            │ ✦  4 fields   │
- *                                            │    remain to  │
- *                                            │    be drafted │
- *                                            └───────────────┘
+ *  ┌── slim atmosphere strip ───────────────────────────────────────────────┐
+ *  │ ‹  drafting hsd-v003   ◯◯◯◯◯  78% · 18/38   Full · Financial    preview│
+ *  │                                                                · policies │
+ *  │                                                                · export   │
+ *  │                                                                · submit   │
+ *  ├──────────────────────────────────────────┬─────────────────────────────┤
+ *  │                                            │ Ledger                       │
+ *  │                ✦ (pulsing rings)           │ what we've drafted together  │
+ *  │                                            │                              │
+ *  │             DRAFTING                       │ I.   Headers      ●●●◯◯ 3/5  │
+ *  │     Sales CRM Modernization                │ II.  Exec Sum    ●●  done    │
+ *  │                                            │ III. Description ●   1/3     │
+ *  │  I've drafted what I could from the        │ IV.  Benefits   ●●  2/3     │
+ *  │  material you uploaded earlier. The        │ V.   Alternatives●   1/3     │
+ *  │  request sits at 78%…                      │ …                            │
+ *  │                                            │                              │
+ *  │  What remains: Sponsor Delegate,           │                              │
+ *  │  EDS Contact, In Plan…                     │                              │
+ *  │                                            │                              │
+ *  │  Where would you like to begin?            │                              │
+ *  │                                            │                              │
+ *  │  [walk me through]  [review drafted]       │                              │
+ *  │  [show preview]     [attach a memo]        │                              │
+ *  │                                            │                              │
+ *  │ ─────────────                              │                              │
+ *  │ ✎  Speak to Diane…                ⏎        │                              │
+ *  │ Speak through gaps · attach · or pick      │                              │
+ *  └──────────────────────────────────────────┴─────────────────────────────┘
  *
- * Form is the document. Underline-only inputs, Roman numerals, ring-
- * cluster status indicators, sakura dividers. Diane is voice via the
- * floating ribbon, never a panel.
+ * Diane is the dominant column (~62%), large and ceremonial. The Ledger
+ * (~38%) is a calm record of what's been drafted, click-to-focus.
+ * DocumentPreview slides over both columns when invoked.
  */
 export default function ComposeShell() {
   const { parDraft, parProvenance, batchSetParFields } = useThemis();
   const [seeded, setSeeded] = useState(false);
-  const [openSectionId, setOpenSectionId] = useState<string | null>('headers');
   const [cut, setCut] = useState<Cut>('all');
   const [previewOpen, setPreviewOpen] = useState(false);
   const [policiesOpen, setPoliciesOpen] = useState(false);
+  const [focusField, setFocusField] = useState<{ section: SectionSpec; field: FieldSpec } | null>(null);
 
   useEffect(() => {
     if (seeded) return;
@@ -81,11 +84,6 @@ export default function ComposeShell() {
     batchSetParFields(SAMPLE_PAR_VALUES, 'diane');
     setSeeded(true);
   }, [parDraft, batchSetParFields, seeded]);
-
-  const sections = useMemo(
-    () => (cut === 'financial' ? PAR_SECTIONS.filter((s) => s.financial) : PAR_SECTIONS),
-    [cut],
-  );
 
   const filledTotal = useMemo(
     () =>
@@ -104,10 +102,30 @@ export default function ComposeShell() {
   const onExport = () => {
     if (typeof window !== 'undefined') window.print();
   };
-  const onSubmit = () => {
-    // Phase D wires the real submission → /submission bridge.
+  const onSubmitDraft = () => {
     if (typeof window !== 'undefined') {
-      window.alert('Submit wires up in Phase D — routes to approver review with WhyCard populated.');
+      window.alert(
+        'Submit wires up in Phase D — routes to approver review with WhyCard populated from this draft.',
+      );
+    }
+  };
+
+  const onChipPress = (intent: string) => {
+    if (intent === 'preview') setPreviewOpen(true);
+    else if (intent === 'attach') {
+      if (typeof window !== 'undefined') {
+        window.alert('File-attach + Diane drafting chain wires up in Phase C.');
+      }
+    } else if (intent === 'walk_remaining') {
+      // Pick the first unfilled required field and focus on it
+      for (const section of PAR_SECTIONS) {
+        for (const field of section.fields) {
+          if (field.required && !isFieldFilled(parDraft[field.key])) {
+            setFocusField({ section, field });
+            return;
+          }
+        }
+      }
     }
   };
 
@@ -132,7 +150,7 @@ export default function ComposeShell() {
           </span>
         </div>
 
-        {/* Coverage ring-cluster centerpiece */}
+        {/* Coverage centerpiece */}
         <div className="flex items-baseline gap-2">
           <RingCluster total={5} filled={Math.round((percent / 100) * 5)} current size={7} />
           <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-text-tertiary">
@@ -140,7 +158,7 @@ export default function ComposeShell() {
           </span>
         </div>
 
-        {/* Cut toggle (Draft/Financial collapsed to a single inline pair) */}
+        {/* Cut toggle */}
         <nav role="tablist" aria-label="Cut" className="ml-auto flex items-center gap-3 text-[11px] uppercase tracking-wider">
           {([
             { key: 'all', label: 'Full draft' },
@@ -172,7 +190,7 @@ export default function ComposeShell() {
           })}
         </nav>
 
-        {/* Mono-caption action row — barely-there */}
+        {/* Mono-caption action row */}
         <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider">
           <ChromeAction
             label={previewOpen ? 'edit' : 'preview'}
@@ -193,27 +211,34 @@ export default function ComposeShell() {
           <ChromeAction
             label="submit"
             icon={Send}
-            onClick={onSubmit}
+            onClick={onSubmitDraft}
             primary
           />
         </div>
       </header>
 
-      {/* Body — manuscript or preview */}
+      {/* Body — Diane (left/wide) + Ledger (right/slim) */}
       <div className="relative h-[calc(100%-56px)] overflow-hidden">
-        <div className="h-full overflow-y-auto">
-          <ComposeManuscript
+        <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[1fr_minmax(320px,_38%)]">
+          <DianePresence
+            draftTitle={requestTitle}
+            values={parDraft}
+            focusField={focusField}
+            onClearFocus={() => setFocusField(null)}
+            onChipPress={onChipPress}
+            onAttachClick={() => onChipPress('attach')}
+          />
+          <ComposeLedger
             values={parDraft}
             provenance={parProvenance}
-            sections={sections}
-            openSectionId={openSectionId}
-            onToggleSection={(id) =>
-              setOpenSectionId((prev) => (prev === id ? null : id))
+            cut={cut}
+            onFocusField={(section, field) =>
+              setFocusField({ section, field })
             }
-            title={requestTitle}
           />
         </div>
 
+        {/* Document Preview slides over both columns */}
         <DocumentPreviewPanel
           open={previewOpen}
           values={parDraft}
@@ -224,7 +249,6 @@ export default function ComposeShell() {
       </div>
 
       <PoliciesModal open={policiesOpen} onClose={() => setPoliciesOpen(false)} />
-      <DianeRibbon values={parDraft} />
     </div>
   );
 }
