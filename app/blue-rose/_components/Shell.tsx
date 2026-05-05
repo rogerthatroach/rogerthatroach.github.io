@@ -98,45 +98,45 @@ export default function Shell({ onLock }: ShellProps) {
         </div>
       </header>
 
-      <main className="grid w-full flex-1 grid-cols-1 lg:grid-cols-[320px_1fr] xl:grid-cols-[320px_1fr_380px]">
+      <main className="grid w-full flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[320px_1fr] xl:grid-cols-[320px_1fr_380px]">
         <section
           aria-label="Queue"
           className={cn(
-            'border-r border-border-subtle/60 lg:overflow-y-auto',
-            showSubmissionOnMobile && 'hidden lg:block',
+            'flex h-[calc(100vh-57px)] min-h-0 flex-col overflow-hidden border-r border-border-subtle/60',
+            showSubmissionOnMobile && 'hidden lg:flex',
           )}
         >
-          <div className="px-3 py-3 md:px-4">
+          {/* Non-scrolling header: title + filters + active chips */}
+          <div className="shrink-0 border-b border-border-subtle/40 bg-background/40 px-3 pt-3 backdrop-blur-sm md:px-4">
             <div className="mb-2 flex items-baseline justify-between px-1">
               <h2 className="font-display text-[15px] font-medium text-text-primary">Queue</h2>
               <span className="font-mono text-[9px] uppercase tracking-widest text-text-tertiary">
                 {seed.submissions.length}
               </span>
             </div>
-            <div className="mb-3">
+            <div className="pb-3">
               <QueueFilters />
             </div>
+          </div>
+          {/* Scrolling list */}
+          <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3 md:px-4">
             <QueuePreview />
           </div>
         </section>
         <section
           aria-label="Submission"
           className={cn(
-            'min-h-0 lg:overflow-y-auto',
+            'h-[calc(100vh-57px)] min-h-0 overflow-hidden',
             !showSubmissionOnMobile && 'hidden lg:block',
           )}
         >
-          <div className="lg:h-[calc(100vh-57px)]">
-            <SubmissionView onOpenDetails={() => setDrawerOpen(true)} />
-          </div>
+          <SubmissionView onOpenDetails={() => setDrawerOpen(true)} />
         </section>
         <aside
           aria-label="Right pane"
-          className="hidden border-l border-border-subtle/60 xl:block xl:overflow-hidden"
+          className="hidden h-[calc(100vh-57px)] overflow-hidden border-l border-border-subtle/60 xl:block"
         >
-          <div className="xl:h-[calc(100vh-57px)]">
-            <RightPane />
-          </div>
+          <RightPane />
         </aside>
       </main>
 
