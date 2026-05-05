@@ -45,6 +45,7 @@
   --themis-sakura: #b07a82;            /* portfolio sakura particle */
   --themis-sakura-bg: rgba(176, 122, 130, 0.06);
   --themis-sakura-border: rgba(176, 122, 130, 0.34);
+  --themis-sakura-pill: rgba(176, 122, 130, 0.14);
 }
 
 html.dark [data-themis='true'] {
@@ -73,6 +74,7 @@ html.dark [data-themis='true'] {
   --themis-sakura: #d4a0a7;
   --themis-sakura-bg: rgba(212, 160, 167, 0.08);
   --themis-sakura-border: rgba(212, 160, 167, 0.36);
+  --themis-sakura-pill: rgba(212, 160, 167, 0.18);
 }
 
 /* The "Themis" pack as a site-wide theme lives in app/globals.css under
