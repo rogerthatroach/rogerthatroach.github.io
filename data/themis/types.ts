@@ -134,6 +134,21 @@ export interface Draft {
   updatedAt: number;
 }
 
+/**
+ * Field-anchored comment — a "floating thread" attached to a single form
+ * field on a submission. Used to discuss specifics of a draft inline,
+ * Google-Docs-comment style. Lives on the submission, not the thread.
+ */
+export interface FieldComment {
+  id: string;
+  submissionId: string;
+  fieldKey: string;
+  authorPersonaId: string;
+  body: string;
+  createdAt: number;
+  mentions: string[];
+}
+
 /** Top-level shape of the seeded JSON (and the runtime store before UI state). */
 export interface ThemisSeed {
   personas: Persona[];
@@ -144,4 +159,6 @@ export interface ThemisSeed {
   attachments: Attachment[];
   notifications: Notification[];
   audit: AuditEvent[];
+  /** Optional in seed v1; default to [] when missing. */
+  fieldComments?: FieldComment[];
 }
