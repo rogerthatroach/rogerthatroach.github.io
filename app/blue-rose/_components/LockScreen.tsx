@@ -2,26 +2,43 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
 import { decryptBlob, type EncryptedBlob } from '../_lib/crypto';
 import type { ThemisSeed } from '@/data/themis/types';
-import GlassCard from './GlassCard';
 import OwlGlyph from './OwlGlyph';
+import { cn } from '@/lib/utils';
 
 interface LockScreenProps {
   onUnlock: (seed: ThemisSeed, passphrase: string) => void;
-  /** Pre-fetched ciphertext blob, if available. */
   blob: EncryptedBlob | null;
   blobError: string | null;
-  /** Optional initial passphrase (from sessionStorage) — auto-tried on mount. */
   cachedPassphrase: string | null;
 }
 
+/**
+ * LockScreen — threshold to the White Lodge.
+ *
+ * Designed for *cryptic, mysterious, powerful, simple* (per user direction).
+ * Visual vocabulary, in order down the page:
+ *
+ *   1. Pulsing amethyst halo — slow 4.2s breath behind the owl
+ *   2. Owl glyph — large (84px), unframed, the single symbol that carries
+ *      the brand. Subtly scales with the halo so they feel like one being.
+ *   3. Wordmark — "WHITE LODGE" in display serif, generous letter-spacing,
+ *      uppercase. Ceremonial register.
+ *   4. Underline-only passphrase input — no label, no border-box, no
+ *      submit button. Enter triggers unlock.
+ *   5. Italic ceremonial line — "Spoken to Diane." — Cooper's tape-recorder
+ *      framing. Twin Peaks fans recognize; non-fans read as atmospheric.
+ *
+ * No "PASSPHRASE" label. No "Unlock" button. No "Concept · Phase 2"
+ * footer. No "Passphrase incorrect" error text — the shake alone is
+ * the failure signal. The lock screen is the prototype's entire
+ * playful budget; everything else holds back.
+ */
 export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase }: LockScreenProps) {
   const [pass, setPass] = useState('');
   const [busy, setBusy] = useState(false);
   const [shaking, setShaking] = useState(false);
-  const [errorHint, setErrorHint] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const reduceMotion = useReducedMotion();
   const [autoTried, setAutoTried] = useState(false);
@@ -36,7 +53,6 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
       .catch(() => setBusy(false));
   }, [autoTried, blob, cachedPassphrase, onUnlock]);
 
-  // Focus the input on mount
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -45,102 +61,110 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
     e.preventDefault();
     if (!blob || busy || !pass) return;
     setBusy(true);
-    setErrorHint(null);
     try {
       const seed = await decryptBlob<ThemisSeed>(pass, blob);
       onUnlock(seed, pass);
     } catch {
       setBusy(false);
       setShaking(true);
-      setErrorHint('Passphrase incorrect.');
       setTimeout(() => setShaking(false), 500);
       inputRef.current?.select();
     }
   };
 
   return (
-    <div className="themis-vignette relative flex min-h-screen items-center justify-center px-4 py-12">
+    <div className="themis-lock-veil relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
       <motion.div
-        initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-        className="w-full max-w-md"
+        initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }}
+        className={cn(
+          'relative z-10 flex w-full max-w-[280px] flex-col items-center gap-8',
+          shaking && 'themis-shake',
+        )}
       >
-        <GlassCard className={shaking ? 'themis-shake p-8' : 'p-8'}>
-          <div className="mb-5 flex items-center justify-center">
-            <span
-              className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)]"
-              style={{ color: 'var(--themis-primary)' }}
-            >
-              <OwlGlyph size={36} />
+        {/* Pulsing halo + owl */}
+        <div className="relative h-28 w-28">
+          <motion.span
+            aria-hidden="true"
+            className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{
+              background:
+                'radial-gradient(circle, var(--themis-primary) 0%, transparent 65%)',
+            }}
+            animate={
+              reduceMotion
+                ? { opacity: 0.18 }
+                : { opacity: [0.10, 0.26, 0.10] }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 4.2, repeat: Infinity, ease: 'easeInOut' }
+            }
+          />
+          <motion.span
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{ color: 'var(--themis-primary)' }}
+            animate={
+              reduceMotion
+                ? { scale: 1 }
+                : { scale: [1, 1.025, 1] }
+            }
+            transition={
+              reduceMotion
+                ? { duration: 0 }
+                : { duration: 4.2, repeat: Infinity, ease: 'easeInOut' }
+            }
+          >
+            <OwlGlyph size={88} />
+          </motion.span>
+        </div>
+
+        {/* Wordmark — ceremonial */}
+        <h1
+          className="font-display text-[22px] font-medium uppercase tracking-[0.32em] text-text-primary"
+          aria-label="White Lodge"
+        >
+          White&nbsp;Lodge
+        </h1>
+
+        {/* Minimal underline input */}
+        <form onSubmit={submit} className="w-full">
+          <input
+            ref={inputRef}
+            type="password"
+            autoComplete="off"
+            spellCheck={false}
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+            disabled={busy || !blob}
+            placeholder="········"
+            aria-label="Passphrase"
+            className="themis-lock-input"
+          />
+        </form>
+
+        {/* Italic ceremonial line */}
+        <p className="font-display text-[12px] italic tracking-widest text-text-tertiary">
+          Spoken to Diane.
+        </p>
+
+        {/* Quiet status feedback — no wrong-passphrase text (shake = failure) */}
+        <div
+          className="min-h-[14px] text-center font-mono text-[9px] uppercase tracking-[0.3em]"
+          aria-live="polite"
+        >
+          {blobError ? (
+            <span className="text-text-tertiary opacity-70">— bundle unreachable —</span>
+          ) : !blob ? (
+            <span className="text-text-tertiary opacity-50">…</span>
+          ) : busy ? (
+            <span style={{ color: 'var(--themis-primary)' }} className="opacity-80">
+              ◌ ◌ ◌
             </span>
-          </div>
-          <div className="mb-7 text-center">
-            <h1 className="font-display text-3xl font-medium tracking-tight text-text-primary">
-              Bookhouse
-            </h1>
-            <p className="mt-1.5 text-sm text-text-tertiary">Approvals, observed.</p>
-          </div>
-          <form onSubmit={submit} className="space-y-4">
-            <label className="block">
-              <span className="mb-1.5 block font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                Passphrase
-              </span>
-              <input
-                ref={inputRef}
-                type="password"
-                autoComplete="off"
-                spellCheck={false}
-                value={pass}
-                onChange={(e) => {
-                  setPass(e.target.value);
-                  if (errorHint) setErrorHint(null);
-                }}
-                disabled={busy || !blob}
-                className="w-full rounded-lg border border-border-subtle bg-surface/60 px-3.5 py-2.5 text-sm text-text-primary outline-none transition-colors placeholder:text-text-tertiary focus:border-[var(--themis-primary)] focus:ring-2 focus:ring-[var(--themis-primary)]/30 disabled:opacity-60"
-                placeholder="••••••••••"
-                aria-invalid={Boolean(errorHint)}
-                aria-describedby={errorHint ? 'themis-pass-error' : undefined}
-              />
-            </label>
-            <button
-              type="submit"
-              disabled={busy || !blob || !pass}
-              className="group relative flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
-              style={{
-                background: 'var(--themis-primary)',
-                color: 'var(--color-bg)',
-              }}
-            >
-              {busy ? (
-                <>
-                  <Loader2 size={14} className="animate-spin" aria-hidden="true" />
-                  <span>Unlocking…</span>
-                </>
-              ) : (
-                <span>Unlock</span>
-              )}
-            </button>
-            <div className="min-h-[20px] text-center text-[12px]" aria-live="polite">
-              {errorHint && (
-                <span id="themis-pass-error" style={{ color: 'var(--themis-rejected)' }}>
-                  {errorHint}
-                </span>
-              )}
-              {!errorHint && blobError && (
-                <span className="text-text-tertiary">
-                  Couldn&apos;t load encrypted bundle: {blobError}
-                </span>
-              )}
-              {!errorHint && !blobError && !blob && (
-                <span className="text-text-tertiary">Fetching…</span>
-              )}
-            </div>
-          </form>
-          <p className="mt-6 border-t border-border-subtle pt-4 text-center font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-            Concept · Phase 2 prototype
-          </p>
-        </GlassCard>
+          ) : null}
+        </div>
       </motion.div>
     </div>
   );
