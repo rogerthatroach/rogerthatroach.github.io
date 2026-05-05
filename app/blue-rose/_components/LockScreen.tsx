@@ -104,7 +104,7 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
             transition={
               reduceMotion
                 ? { duration: 0 }
-                : { duration: 5.4, repeat: Infinity, ease: 'easeInOut' }
+                : { duration: 4.6, repeat: Infinity, ease: 'easeInOut' }
             }
           />
           {/* Inner halo — tighter, brighter */}
@@ -123,7 +123,7 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
             transition={
               reduceMotion
                 ? { duration: 0 }
-                : { duration: 4.2, repeat: Infinity, ease: 'easeInOut' }
+                : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
             }
           />
           <motion.span
@@ -140,7 +140,7 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
             transition={
               reduceMotion
                 ? { duration: 0 }
-                : { duration: 4.2, repeat: Infinity, ease: 'easeInOut' }
+                : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
             }
           >
             <OwlGlyph size={88} />
