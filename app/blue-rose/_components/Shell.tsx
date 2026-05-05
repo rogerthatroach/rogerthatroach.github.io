@@ -6,8 +6,8 @@ import { Bell, LogOut, Search } from 'lucide-react';
 import { useThemis } from '../_lib/store';
 import PersonaPill from './PersonaPill';
 import QueuePreview from './QueuePreview';
-import ThreadView from './ThreadView';
-import ContextPanel from './ContextPanel';
+import SubmissionView from './SubmissionView';
+import RightPane from './RightPane';
 import { blurIn } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
@@ -16,29 +16,26 @@ interface ShellProps {
 }
 
 /**
- * Themis shell — 3-pane layout (Tier 0.6).
+ * Themis shell — Tier 1 three-pane layout (structured-doc-first).
  *
- *   ≥1280px (xl): queue 320px · thread 1fr · context 380px — fixed
- *   1024-1279px:  queue 320px · thread 1fr; context is a slide-in drawer
- *                 triggered from ThreadView header
- *   <1024px:      single pane. Queue ↔ Thread swap; Details opens drawer
+ *   ≥1280px (xl): queue 320px · SubmissionView 1fr · RightPane 380px
+ *   1024-1279px:  queue 320px · SubmissionView 1fr; RightPane is a slide-in
+ *                 drawer triggered from SubmissionView header
+ *   <1024px:      single pane. Queue ↔ SubmissionView swap; "Details"
+ *                 trigger opens RightPane drawer
  *
- * Drawer state lives here so ThreadView can request it via a callback
- * passed through context (kept simple via the existing useThemis store
- * — UI flag added next tier; for now we use a plain useState here and
- * pass to ThreadView via prop).
+ * Drawer state lives here — passed down via prop to SubmissionView so
+ * its header can trigger it on <xl widths.
  */
 export default function Shell({ onLock }: ShellProps) {
   const { seed, currentPersonaId, setCurrentPersonaId, selectedSubmissionId } = useThemis();
-  const showThreadOnMobile = selectedSubmissionId !== null;
+  const showSubmissionOnMobile = selectedSubmissionId !== null;
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // Close drawer if no submission selected
   useEffect(() => {
     if (!selectedSubmissionId) setDrawerOpen(false);
   }, [selectedSubmissionId]);
 
-  // Esc closes drawer
   useEffect(() => {
     if (!drawerOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -105,7 +102,7 @@ export default function Shell({ onLock }: ShellProps) {
           aria-label="Queue"
           className={cn(
             'border-r border-border-subtle/60 lg:overflow-y-auto',
-            showThreadOnMobile && 'hidden lg:block',
+            showSubmissionOnMobile && 'hidden lg:block',
           )}
         >
           <div className="px-3 py-3 md:px-4">
@@ -119,32 +116,32 @@ export default function Shell({ onLock }: ShellProps) {
           </div>
         </section>
         <section
-          aria-label="Thread"
+          aria-label="Submission"
           className={cn(
             'min-h-0 lg:overflow-y-auto',
-            !showThreadOnMobile && 'hidden lg:block',
+            !showSubmissionOnMobile && 'hidden lg:block',
           )}
         >
           <div className="lg:h-[calc(100vh-57px)]">
-            <ThreadView onOpenDetails={() => setDrawerOpen(true)} />
+            <SubmissionView onOpenDetails={() => setDrawerOpen(true)} />
           </div>
         </section>
         <aside
-          aria-label="Context"
-          className="hidden border-l border-border-subtle/60 xl:block xl:overflow-y-auto"
+          aria-label="Right pane"
+          className="hidden border-l border-border-subtle/60 xl:block xl:overflow-hidden"
         >
           <div className="xl:h-[calc(100vh-57px)]">
-            <ContextPanel />
+            <RightPane />
           </div>
         </aside>
       </main>
 
-      {/* Slide-in drawer for context on <xl widths */}
+      {/* Slide-in drawer for the right pane on <xl widths */}
       <AnimatePresence>
         {drawerOpen && (
           <>
             <motion.div
-              key="ctx-backdrop"
+              key="rp-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -154,18 +151,18 @@ export default function Shell({ onLock }: ShellProps) {
               aria-hidden="true"
             />
             <motion.aside
-              key="ctx-drawer"
+              key="rp-drawer"
               role="dialog"
               aria-modal="true"
-              aria-label="Submission context"
+              aria-label="Submission context, thread, and Diane"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 280, damping: 30 }}
-              className="fixed inset-y-0 right-0 z-50 w-[min(420px,92vw)] border-l border-border-subtle bg-background shadow-2xl xl:hidden"
+              className="fixed inset-y-0 right-0 z-50 w-[min(440px,94vw)] border-l border-border-subtle bg-background shadow-2xl xl:hidden"
             >
               <div className="h-full">
-                <ContextPanel />
+                <RightPane />
               </div>
             </motion.aside>
           </>

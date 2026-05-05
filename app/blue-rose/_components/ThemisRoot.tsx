@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { MotionConfig } from 'framer-motion';
 import {
   clearCachedPassphrase,
   getCachedPassphrase,
@@ -58,20 +59,22 @@ export default function ThemisRoot() {
     setSeed(null);
   }, []);
 
-  if (!seed) {
-    return (
-      <LockScreen
-        onUnlock={onUnlock}
-        blob={blob}
-        blobError={blobError}
-        cachedPassphrase={cachedPassphrase}
-      />
-    );
-  }
-
+  // MotionConfig with reducedMotion="user" honors the OS preference for the
+  // entire Themis subtree — animations become instant rather than softer.
   return (
-    <ThemisProvider seed={seed}>
-      <Shell onLock={onLock} />
-    </ThemisProvider>
+    <MotionConfig reducedMotion="user">
+      {!seed ? (
+        <LockScreen
+          onUnlock={onUnlock}
+          blob={blob}
+          blobError={blobError}
+          cachedPassphrase={cachedPassphrase}
+        />
+      ) : (
+        <ThemisProvider seed={seed}>
+          <Shell onLock={onLock} />
+        </ThemisProvider>
+      )}
+    </MotionConfig>
   );
 }

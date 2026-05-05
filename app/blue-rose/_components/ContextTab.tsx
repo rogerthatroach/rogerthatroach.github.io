@@ -38,7 +38,7 @@ const RISK_LABEL: Record<RiskBand, { label: string; color: string }> = {
 };
 
 /**
- * ContextPanel — right pane.
+ * ContextTab — content of the right-pane "Context" tab.
  *
  * Sections (each collapsible):
  *   1. Submitted content (form fields)
@@ -47,8 +47,11 @@ const RISK_LABEL: Record<RiskBand, { label: string; color: string }> = {
  *   4. Historical precedence (similar submissions list)
  *   5. Audit trail (timestamped event log)
  *   6. Watchers (assignees + observers)
+ *
+ * Was previously the entire right pane (ContextPanel); now sits as one
+ * tab inside RightPane alongside Thread and Diane.
  */
-export default function ContextPanel() {
+export default function ContextTab() {
   const { seed, selectedSubmissionId } = useThemis();
   const personaMap = usePersonaMap();
   const [previewOf, setPreviewOf] = useState<Attachment | null>(null);
