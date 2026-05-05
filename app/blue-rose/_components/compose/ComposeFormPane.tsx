@@ -170,8 +170,8 @@ function FieldRow({
             title="Drafted by Diane"
             className="ml-auto inline-flex items-center gap-1 rounded-full px-1.5 font-mono text-[9px] uppercase tracking-widest"
             style={{
-              background: 'rgba(245, 158, 11, 0.14)',
-              color: '#F59E0B',
+              background: 'var(--themis-sakura-pill)',
+              color: 'var(--themis-sakura)',
             }}
           >
             <Sparkles size={9} aria-hidden="true" />
