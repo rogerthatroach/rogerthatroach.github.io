@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   ChevronLeft,
@@ -19,11 +20,13 @@ import {
   type FieldSpec,
   type SectionSpec,
 } from '../../_lib/par-schema';
+import type { SynthesisOutcome } from '../../_lib/par-synthesize';
 import ComposeLedger from './ComposeLedger';
 import DianePresence from './DianePresence';
 import DocumentPreviewPanel from './DocumentPreviewPanel';
 import PoliciesModal from './PoliciesModal';
 import RingCluster from './RingCluster';
+import SubmittingOverlay from './SubmittingOverlay';
 import { cn } from '@/lib/utils';
 
 const DRAFT_ID = 'hsd-v003';
@@ -68,12 +71,14 @@ type Cut = 'all' | 'financial';
  * DocumentPreview slides over both columns when invoked.
  */
 export default function ComposeShell() {
-  const { parDraft, parProvenance, batchSetParFields } = useThemis();
+  const { parDraft, parProvenance, batchSetParFields, submitParDraft, selectSubmission } = useThemis();
+  const router = useRouter();
   const [seeded, setSeeded] = useState(false);
   const [cut, setCut] = useState<Cut>('all');
   const [previewOpen, setPreviewOpen] = useState(false);
   const [policiesOpen, setPoliciesOpen] = useState(false);
   const [focusField, setFocusField] = useState<{ section: SectionSpec; field: FieldSpec } | null>(null);
+  const [synthesizing, setSynthesizing] = useState<SynthesisOutcome | null>(null);
 
   useEffect(() => {
     if (seeded) return;
@@ -103,11 +108,21 @@ export default function ComposeShell() {
     if (typeof window !== 'undefined') window.print();
   };
   const onSubmitDraft = () => {
-    if (typeof window !== 'undefined') {
-      window.alert(
-        'Submit wires up in Phase D — routes to approver review with WhyCard populated from this draft.',
-      );
+    if (synthesizing) return;
+    const outcome = submitParDraft();
+    if (!outcome) {
+      if (typeof window !== 'undefined') {
+        window.alert('Nothing to submit — fill some fields first.');
+      }
+      return;
     }
+    setSynthesizing(outcome);
+  };
+
+  const onSubmittingComplete = (submissionId: string) => {
+    setSynthesizing(null);
+    selectSubmission(submissionId);
+    router.push('/blue-rose/submission');
   };
 
   const onChipPress = (intent: string) => {
@@ -249,6 +264,7 @@ export default function ComposeShell() {
       </div>
 
       <PoliciesModal open={policiesOpen} onClose={() => setPoliciesOpen(false)} />
+      <SubmittingOverlay outcome={synthesizing} onComplete={onSubmittingComplete} />
     </div>
   );
 }
