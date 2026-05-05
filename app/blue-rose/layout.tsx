@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './_styles/themis.css';
 
 export const metadata: Metadata = {
-  title: 'Themis',
+  title: 'Bookhouse',
   description: 'Concept — Phase 2 prototype.',
   robots: { index: false, follow: false },
 };

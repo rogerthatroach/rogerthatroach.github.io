@@ -2,10 +2,11 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Lock, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { decryptBlob, type EncryptedBlob } from '../_lib/crypto';
 import type { ThemisSeed } from '@/data/themis/types';
 import GlassCard from './GlassCard';
+import OwlGlyph from './OwlGlyph';
 
 interface LockScreenProps {
   onUnlock: (seed: ThemisSeed, passphrase: string) => void;
@@ -66,14 +67,17 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
         className="w-full max-w-md"
       >
         <GlassCard className={shaking ? 'themis-shake p-8' : 'p-8'}>
-          <div className="mb-6 flex items-center justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)]">
-              <Lock size={20} style={{ color: 'var(--themis-primary)' }} aria-hidden="true" />
-            </div>
+          <div className="mb-5 flex items-center justify-center">
+            <span
+              className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)]"
+              style={{ color: 'var(--themis-primary)' }}
+            >
+              <OwlGlyph size={36} />
+            </span>
           </div>
           <div className="mb-7 text-center">
             <h1 className="font-display text-3xl font-medium tracking-tight text-text-primary">
-              Themis
+              Bookhouse
             </h1>
             <p className="mt-1.5 text-sm text-text-tertiary">Approvals, observed.</p>
           </div>
