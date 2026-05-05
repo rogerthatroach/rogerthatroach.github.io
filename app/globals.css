@@ -135,6 +135,55 @@
     --color-diagram-grid: #ddd6c9;
   }
 
+  /* Portfolio gate — passphrase lock for invited audiences.
+     Wabi-sabi backdrop using the active theme's accent + bg, so the
+     lock inherits the user's chosen palette. Distinct from the
+     /blue-rose White Lodge gate (which has its own deeper amethyst veil). */
+  .portfolio-lock-veil {
+    background:
+      radial-gradient(ellipse at 50% 38%, var(--color-accent-muted), transparent 55%),
+      radial-gradient(ellipse at 50% 90%, color-mix(in srgb, var(--color-accent) 10%, transparent), transparent 60%),
+      var(--color-bg);
+  }
+
+  .portfolio-lock-input {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);
+    border-radius: 0;
+    padding: 0.65rem 0.25rem;
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    text-align: center;
+    letter-spacing: 0.4em;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  .portfolio-lock-input:focus {
+    border-bottom-color: var(--color-accent);
+  }
+  .portfolio-lock-input:disabled {
+    opacity: 0.5;
+  }
+  .portfolio-lock-input::placeholder {
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.4em;
+    opacity: 0.55;
+  }
+
+  @keyframes portfolio-lock-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  .portfolio-lock-shake {
+    animation: portfolio-lock-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  }
+
   html {
     font-size: 110%;
     scroll-behavior: smooth;
