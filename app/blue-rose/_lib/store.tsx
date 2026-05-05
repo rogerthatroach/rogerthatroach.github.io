@@ -13,6 +13,7 @@ import {
 import type {
   FieldComment,
   Message,
+  Notification,
   ThemisSeed,
 } from '@/data/themis/types';
 import { EMPTY_FILTERS, type QueueFilters } from './filters';
@@ -49,6 +50,7 @@ interface ThemisState {
   messages: Message[];
   fieldComments: FieldComment[];
   threads: ThemisSeed['threads'];
+  notifications: Notification[];
   submissionTab: SubmissionTab;
   queueFilters: QueueFilters;
 }
@@ -59,6 +61,8 @@ type ThemisAction =
   | { type: 'ADD_MESSAGE'; message: Message }
   | { type: 'ADD_FIELD_COMMENT'; comment: FieldComment }
   | { type: 'MARK_THREAD_READ'; threadId: string; personaId: string }
+  | { type: 'MARK_NOTIFICATION_READ'; id: string }
+  | { type: 'MARK_ALL_NOTIFICATIONS_READ'; personaId: string }
   | { type: 'SET_SUBMISSION_TAB'; tab: SubmissionTab }
   | { type: 'PATCH_FILTERS'; patch: Partial<QueueFilters> }
   | { type: 'CLEAR_FILTERS' };
@@ -102,6 +106,20 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
           return { ...t, unreadByPersonaId: next };
         }),
       };
+    case 'MARK_NOTIFICATION_READ':
+      return {
+        ...state,
+        notifications: state.notifications.map((n) =>
+          n.id === action.id ? { ...n, read: true } : n,
+        ),
+      };
+    case 'MARK_ALL_NOTIFICATIONS_READ':
+      return {
+        ...state,
+        notifications: state.notifications.map((n) =>
+          n.forPersonaId === action.personaId ? { ...n, read: true } : n,
+        ),
+      };
     case 'PATCH_FILTERS':
       return { ...state, queueFilters: { ...state.queueFilters, ...action.patch } };
     case 'CLEAR_FILTERS':
@@ -130,6 +148,8 @@ interface ThemisContextValue extends ThemisState {
     mentions: string[],
   ) => void;
   markThreadRead: (threadId: string) => void;
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
 }
 
 const ThemisContext = createContext<ThemisContextValue | null>(null);
@@ -152,6 +172,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     messages: [...seed.messages],
     fieldComments: [...(seed.fieldComments ?? [])],
     threads: seed.threads.map((t) => ({ ...t, unreadByPersonaId: { ...t.unreadByPersonaId } })),
+    notifications: [...seed.notifications],
     submissionTab: 'document' as SubmissionTab,
     queueFilters: EMPTY_FILTERS,
   }));
@@ -259,6 +280,14 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     [state.currentPersonaId],
   );
 
+  const markNotificationRead = useCallback((id: string) => {
+    dispatch({ type: 'MARK_NOTIFICATION_READ', id });
+  }, []);
+
+  const markAllNotificationsRead = useCallback(() => {
+    dispatch({ type: 'MARK_ALL_NOTIFICATIONS_READ', personaId: state.currentPersonaId });
+  }, [state.currentPersonaId]);
+
   const value = useMemo<ThemisContextValue>(
     () => ({
       ...state,
@@ -270,6 +299,8 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       addMessage,
       addFieldComment,
       markThreadRead,
+      markNotificationRead,
+      markAllNotificationsRead,
     }),
     [
       state,
@@ -281,6 +312,8 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       addMessage,
       addFieldComment,
       markThreadRead,
+      markNotificationRead,
+      markAllNotificationsRead,
     ],
   );
 

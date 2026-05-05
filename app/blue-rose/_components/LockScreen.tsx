@@ -88,7 +88,7 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
       >
         {/* Owl pair — focal offset right of center, faint ghost in the
             geometric middle. Opposing breath: as the focal grows the
-            ghost diminishes, and vice versa. Same 3.6s tempo, inverted
+            ghost diminishes, and vice versa. Same 4.2s tempo, inverted
             scale + opacity. */}
         <div className="relative h-[100px] w-[120px]">
           {/* Ghost — centered, very faint, breathes inversely */}
@@ -110,10 +110,10 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
             transition={
               reduceMotion
                 ? { duration: 0 }
-                : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
+                : { duration: 4.2, repeat: Infinity, ease: 'easeInOut' }
             }
           >
-            <OwlGlyph size={88} />
+            <OwlGlyph size={96} />
           </motion.span>
           {/* Focal — offset right, grows as ghost diminishes */}
           <div
@@ -131,10 +131,10 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
               transition={
                 reduceMotion
                   ? { duration: 0 }
-                  : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
+                  : { duration: 4.2, repeat: Infinity, ease: 'easeInOut' }
               }
             >
-              <OwlGlyph size={88} />
+              <OwlGlyph size={96} />
             </motion.span>
           </div>
         </div>
@@ -189,69 +189,49 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
 }
 
 /**
- * BackgroundCircles — long sweeping curved lines that enter the viewport
- * from one edge and exit through another, passing across the lock veil.
- * No fill; thin stroke; very low opacity. Static — the eye reads them
- * as engraved atmosphere, not motion.
+ * BackgroundCircles — concentric rings emanating from the geometric
+ * center, very faint. "Almost there and almost not there." The eye reads
+ * them as atmosphere — a frozen ripple — not as a foreground element.
  *
- * Each curve is a cubic bezier with start + end points planted just
- * outside the 100×100 viewBox (overshoot 18%) and two interior control
- * points pulled with random sway, so curves bend across the canvas
- * organically. Seeded so positions are stable across reloads.
+ * Static. Stroke only, no fill. Pixel radii so each ring renders as a
+ * true circle regardless of viewport aspect ratio. cx/cy at 50% of the
+ * viewport so rings always center perfectly.
  *
- * preserveAspectRatio="none" stretches the viewBox to fill the viewport,
- * which is what we want for atmospheric texture.
+ * Opacity 0.020–0.045 — barely registering. Some rings extend well past
+ * the viewport edges; that's intentional (the rings should feel like
+ * they continue beyond what's visible).
  */
 function BackgroundCircles() {
-  const curves = useMemo(() => {
-    const rng = mulberry32(hashSeed('white-lodge-curves-v1'));
-    const OVERSHOOT = 18;
-    const sideToPoint = (side: number, t: number) => {
-      switch (side) {
-        case 0: return { x: t * 100, y: -OVERSHOOT };           // top
-        case 1: return { x: 100 + OVERSHOOT, y: t * 100 };      // right
-        case 2: return { x: t * 100, y: 100 + OVERSHOOT };      // bottom
-        default: return { x: -OVERSHOOT, y: t * 100 };          // left
-      }
-    };
-    return Array.from({ length: 9 }, (_, i) => {
-      const startSide = Math.floor(rng() * 4);
-      // Bias the end side away from the start side so curves cross the
-      // canvas (rather than barely-grazing one corner).
-      let endSide = (startSide + 1 + Math.floor(rng() * 3)) % 4;
-      const start = sideToPoint(startSide, rng());
-      const end = sideToPoint(endSide, rng());
-      const sway = 80;
-      const c1x = start.x + (end.x - start.x) * 0.33 + (rng() - 0.5) * sway;
-      const c1y = start.y + (end.y - start.y) * 0.33 + (rng() - 0.5) * sway;
-      const c2x = start.x + (end.x - start.x) * 0.66 + (rng() - 0.5) * sway;
-      const c2y = start.y + (end.y - start.y) * 0.66 + (rng() - 0.5) * sway;
-      return {
-        id: i,
-        d: `M ${start.x.toFixed(1)} ${start.y.toFixed(1)} C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${end.x.toFixed(1)} ${end.y.toFixed(1)}`,
-        strokeWidth: 0.18 + rng() * 0.32, // thin
-        opacity: 0.04 + rng() * 0.06,
-      };
-    });
+  const rings = useMemo(() => {
+    const rng = mulberry32(hashSeed('white-lodge-rings-v1'));
+    // Eight concentric rings with organic spacing — each step a bit
+    // larger than the last, with small jitter so the spacing doesn't
+    // read as mechanical.
+    const radii = [70, 130, 200, 290, 400, 540, 720, 940];
+    return radii.map((base, i) => ({
+      id: i,
+      radius: base + (rng() - 0.5) * 24,
+      strokeWidth: 0.45 + rng() * 0.4,
+      opacity: 0.020 + rng() * 0.025,
+    }));
   }, []);
 
   return (
     <svg
       aria-hidden="true"
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
       className="pointer-events-none absolute inset-0 h-full w-full"
       style={{ color: 'var(--themis-primary)' }}
     >
-      {curves.map((c) => (
-        <path
-          key={c.id}
-          d={c.d}
-          stroke="currentColor"
-          strokeWidth={c.strokeWidth}
+      {rings.map((r) => (
+        <circle
+          key={r.id}
+          cx="50%"
+          cy="50%"
+          r={r.radius}
           fill="none"
-          opacity={c.opacity}
-          strokeLinecap="round"
+          stroke="currentColor"
+          strokeWidth={r.strokeWidth}
+          opacity={r.opacity}
         />
       ))}
     </svg>
