@@ -92,7 +92,7 @@ export const metadata: Metadata = {
 const themeScript = `
   (function() {
     try {
-      var valid = ['sakura-light','sakura-dark','nord','solarized-dark','monokai','paper'];
+      var valid = ['sakura-light','sakura-dark','nord','solarized-dark','monokai','paper','themis','themis-dark'];
       // URL param override — e.g. ?theme=monokai — ephemeral (not
       // persisted), useful for preview links and Lighthouse sweeps.
       var params = new URLSearchParams(window.location.search);
@@ -104,10 +104,13 @@ const themeScript = `
         var legacy = localStorage.getItem('theme');
         pack = legacy === 'dark' ? 'sakura-dark' : 'sakura-light';
       }
-      var darkBase = ['sakura-dark','nord','solarized-dark','monokai'].indexOf(pack) !== -1;
+      var darkBase = ['sakura-dark','nord','solarized-dark','monokai','themis-dark'].indexOf(pack) !== -1;
       if (darkBase) document.documentElement.classList.add('dark');
+      // 'themis' and 'themis-dark' both resolve to the same data-theme
+      // attribute — only the .dark class differs.
+      var themeAttr = pack === 'themis-dark' ? 'themis' : pack;
       if (pack !== 'sakura-light' && pack !== 'sakura-dark') {
-        document.documentElement.setAttribute('data-theme', pack);
+        document.documentElement.setAttribute('data-theme', themeAttr);
       }
     } catch (e) { /* localStorage blocked — fall through to default */ }
   })();
