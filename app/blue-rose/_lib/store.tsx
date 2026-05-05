@@ -39,10 +39,20 @@ import { EMPTY_FILTERS, type QueueFilters } from './filters';
 const PERSONA_KEY = 'themis:persona';
 const FILTERS_KEY = 'themis:queue-filters:v1';
 const SPLIT_KEY = 'themis:submission-split:v1';
+const PAR_DRAFT_KEY = 'themis:par-draft:v1';
 
 export type SubmissionTab = 'document' | 'thread' | 'context' | 'diane';
 /** @deprecated alias kept for any callsite still using the old name */
 export type RightPaneTab = SubmissionTab;
+
+/**
+ * Per-field provenance tracker for the PAR draft. Marks whether a field
+ * value was authored by Diane (during a drafting chain) or by the user
+ * (manual edit). Drives the dashed-border + amber-tint visual cue
+ * required by §12 (AI-replied differentiation: Diane content never
+ * indistinguishable from human content).
+ */
+export type FieldProvenance = 'diane' | 'user';
 
 interface ThemisState {
   seed: ThemisSeed;
@@ -60,6 +70,13 @@ interface ThemisState {
   /** Width ratio of the left pane in split mode (0..1). Persisted. */
   splitRatio: number;
   queueFilters: QueueFilters;
+  /**
+   * In-flight PAR draft (single, latest). Keyed by field-spec key. Reset
+   * on submit. Persists across reload via localStorage.
+   */
+  parDraft: Record<string, string | number | boolean>;
+  /** Per-field provenance — drives Diane-drafted vs user-authored visual cues. */
+  parProvenance: Record<string, FieldProvenance>;
 }
 
 type ThemisAction =
@@ -75,7 +92,10 @@ type ThemisAction =
   | { type: 'SET_SPLIT_RATIO'; ratio: number }
   | { type: 'SWAP_PANE_CONTENT' }
   | { type: 'PATCH_FILTERS'; patch: Partial<QueueFilters> }
-  | { type: 'CLEAR_FILTERS' };
+  | { type: 'CLEAR_FILTERS' }
+  | { type: 'SET_PAR_FIELD'; key: string; value: string | number | boolean; provenance: FieldProvenance }
+  | { type: 'BATCH_SET_PAR_FIELDS'; values: Record<string, string | number | boolean>; provenance: FieldProvenance }
+  | { type: 'RESET_PAR_DRAFT' };
 
 function reducer(state: ThemisState, action: ThemisAction): ThemisState {
   switch (action.type) {
@@ -157,6 +177,25 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
       return { ...state, queueFilters: { ...state.queueFilters, ...action.patch } };
     case 'CLEAR_FILTERS':
       return { ...state, queueFilters: EMPTY_FILTERS };
+    case 'SET_PAR_FIELD':
+      return {
+        ...state,
+        parDraft: { ...state.parDraft, [action.key]: action.value },
+        parProvenance: { ...state.parProvenance, [action.key]: action.provenance },
+      };
+    case 'BATCH_SET_PAR_FIELDS': {
+      const nextProvenance = { ...state.parProvenance };
+      for (const k of Object.keys(action.values)) {
+        nextProvenance[k] = action.provenance;
+      }
+      return {
+        ...state,
+        parDraft: { ...state.parDraft, ...action.values },
+        parProvenance: nextProvenance,
+      };
+    }
+    case 'RESET_PAR_DRAFT':
+      return { ...state, parDraft: {}, parProvenance: {} };
     default:
       return state;
   }
@@ -186,6 +225,9 @@ interface ThemisContextValue extends ThemisState {
   markThreadRead: (threadId: string) => void;
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: () => void;
+  setParField: (key: string, value: string | number | boolean, provenance?: FieldProvenance) => void;
+  batchSetParFields: (values: Record<string, string | number | boolean>, provenance?: FieldProvenance) => void;
+  resetParDraft: () => void;
 }
 
 const ThemisContext = createContext<ThemisContextValue | null>(null);
@@ -214,6 +256,8 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     splitMode: false,
     splitRatio: 0.5,
     queueFilters: EMPTY_FILTERS,
+    parDraft: {},
+    parProvenance: {},
   }));
 
   const [hydrated, setHydrated] = useState(false);
@@ -228,6 +272,37 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       if (storedFilters) {
         const parsed = JSON.parse(storedFilters) as Partial<QueueFilters>;
         dispatch({ type: 'PATCH_FILTERS', patch: parsed });
+      }
+      const storedDraft = localStorage.getItem(PAR_DRAFT_KEY);
+      if (storedDraft) {
+        try {
+          const parsed = JSON.parse(storedDraft) as {
+            values?: Record<string, string | number | boolean>;
+            provenance?: Record<string, FieldProvenance>;
+          };
+          if (parsed.values && typeof parsed.values === 'object') {
+            dispatch({
+              type: 'BATCH_SET_PAR_FIELDS',
+              values: parsed.values,
+              provenance: 'user',
+            });
+            // Re-apply per-field provenance after batch
+            if (parsed.provenance) {
+              for (const [k, prov] of Object.entries(parsed.provenance)) {
+                if (prov === 'diane' && parsed.values[k] !== undefined) {
+                  dispatch({
+                    type: 'SET_PAR_FIELD',
+                    key: k,
+                    value: parsed.values[k],
+                    provenance: 'diane',
+                  });
+                }
+              }
+            }
+          }
+        } catch {
+          /* ignore */
+        }
       }
       const storedSplit = localStorage.getItem(SPLIT_KEY);
       if (storedSplit) {
@@ -293,6 +368,21 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       /* noop */
     }
   }, [hydrated, state.splitMode, state.splitRatio, state.submissionTabRight]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(
+        PAR_DRAFT_KEY,
+        JSON.stringify({
+          values: state.parDraft,
+          provenance: state.parProvenance,
+        }),
+      );
+    } catch {
+      /* noop */
+    }
+  }, [hydrated, state.parDraft, state.parProvenance]);
 
   const setCurrentPersonaId = useCallback((id: string) => {
     dispatch({ type: 'SET_PERSONA', id });
@@ -383,6 +473,24 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     dispatch({ type: 'MARK_ALL_NOTIFICATIONS_READ', personaId: state.currentPersonaId });
   }, [state.currentPersonaId]);
 
+  const setParField = useCallback(
+    (key: string, value: string | number | boolean, provenance: FieldProvenance = 'user') => {
+      dispatch({ type: 'SET_PAR_FIELD', key, value, provenance });
+    },
+    [],
+  );
+
+  const batchSetParFields = useCallback(
+    (values: Record<string, string | number | boolean>, provenance: FieldProvenance = 'diane') => {
+      dispatch({ type: 'BATCH_SET_PAR_FIELDS', values, provenance });
+    },
+    [],
+  );
+
+  const resetParDraft = useCallback(() => {
+    dispatch({ type: 'RESET_PAR_DRAFT' });
+  }, []);
+
   const value = useMemo<ThemisContextValue>(
     () => ({
       ...state,
@@ -399,6 +507,9 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       markThreadRead,
       markNotificationRead,
       markAllNotificationsRead,
+      setParField,
+      batchSetParFields,
+      resetParDraft,
     }),
     [
       state,
@@ -415,6 +526,9 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       markThreadRead,
       markNotificationRead,
       markAllNotificationsRead,
+      setParField,
+      batchSetParFields,
+      resetParDraft,
     ],
   );
 
