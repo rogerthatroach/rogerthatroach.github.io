@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -21,11 +21,14 @@ import {
   type SectionSpec,
 } from '../../_lib/par-schema';
 import type { SynthesisOutcome } from '../../_lib/par-synthesize';
+import { extractFromFile, type ExtractionResult } from '../../_lib/par-extract';
 import ComposeLedger from './ComposeLedger';
 import DianePresence from './DianePresence';
 import DocumentPreviewPanel from './DocumentPreviewPanel';
+import DraftingOverlay from './DraftingOverlay';
 import PoliciesModal from './PoliciesModal';
 import RingCluster from './RingCluster';
+import SourceHighlightModal from './SourceHighlightModal';
 import SubmittingOverlay from './SubmittingOverlay';
 import { cn } from '@/lib/utils';
 
@@ -71,7 +74,7 @@ type Cut = 'all' | 'financial';
  * DocumentPreview slides over both columns when invoked.
  */
 export default function ComposeShell() {
-  const { parDraft, parProvenance, batchSetParFields, submitParDraft, selectSubmission } = useThemis();
+  const { parDraft, parProvenance, batchSetParFields, submitParDraft, selectSubmission, resetParDraft } = useThemis();
   const router = useRouter();
   const [seeded, setSeeded] = useState(false);
   const [cut, setCut] = useState<Cut>('all');
@@ -79,6 +82,13 @@ export default function ComposeShell() {
   const [policiesOpen, setPoliciesOpen] = useState(false);
   const [focusField, setFocusField] = useState<{ section: SectionSpec; field: FieldSpec } | null>(null);
   const [synthesizing, setSynthesizing] = useState<SynthesisOutcome | null>(null);
+  /** In-flight drafting overlay — non-null while DraftingOverlay is playing. */
+  const [drafting, setDrafting] = useState<ExtractionResult | null>(null);
+  /** Most-recent completed extraction — drives source-highlight click-throughs in the Ledger. */
+  const [lastExtraction, setLastExtraction] = useState<ExtractionResult | null>(null);
+  /** Field whose source-highlight modal is open. */
+  const [sourceField, setSourceField] = useState<FieldSpec | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (seeded) return;
@@ -125,12 +135,33 @@ export default function ComposeShell() {
     router.push('/blue-rose/submission');
   };
 
+  const onAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Reset the input so the same file can be re-attached later
+    e.target.value = '';
+    // For multi-file we'd loop — for the demo we take the first.
+    // Clear the parDraft so Diane starts from a clean slate (the user can
+    // later re-merge or mix). The provenance stays consistent with the
+    // new extraction.
+    resetParDraft();
+    const extraction = extractFromFile(file.name);
+    setDrafting(extraction);
+  };
+
+  const onDraftingComplete = () => {
+    if (drafting) setLastExtraction(drafting);
+    setDrafting(null);
+  };
+
   const onChipPress = (intent: string) => {
     if (intent === 'preview') setPreviewOpen(true);
     else if (intent === 'attach') {
-      if (typeof window !== 'undefined') {
-        window.alert('File-attach + Diane drafting chain wires up in Phase C.');
-      }
+      onAttachClick();
     } else if (intent === 'walk_remaining') {
       // Pick the first unfilled required field and focus on it
       for (const section of PAR_SECTIONS) {
@@ -250,6 +281,8 @@ export default function ComposeShell() {
             onFocusField={(section, field) =>
               setFocusField({ section, field })
             }
+            lastExtraction={lastExtraction}
+            onSourceClick={(field) => setSourceField(field)}
           />
         </div>
 
@@ -265,6 +298,23 @@ export default function ComposeShell() {
 
       <PoliciesModal open={policiesOpen} onClose={() => setPoliciesOpen(false)} />
       <SubmittingOverlay outcome={synthesizing} onComplete={onSubmittingComplete} />
+      <DraftingOverlay extraction={drafting} onComplete={onDraftingComplete} />
+      <SourceHighlightModal
+        extraction={lastExtraction}
+        field={sourceField}
+        onClose={() => setSourceField(null)}
+      />
+
+      {/* Hidden file input — triggered programmatically from the Diane composer
+          paperclip + the "Attach a memo" suggestion chip. */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.docx,.pptx,.txt,.md,.png,.jpg,.jpeg"
+        onChange={onFileSelected}
+        className="hidden"
+        aria-hidden="true"
+      />
     </div>
   );
 }
