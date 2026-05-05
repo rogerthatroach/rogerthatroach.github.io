@@ -87,6 +87,37 @@
     --color-diagram-grid: #3e3d32;
   }
 
+  /* Themis (Amethyst) — soft glass palette built for the /blue-rose
+     prototype. Available site-wide so the same skin can dress the
+     whole portfolio if picked from the ThemePicker. WCAG AA on both
+     bases. Slightly cooler bg than Sakura Light; primary is a
+     muted amethyst that pairs with the existing display serif. */
+  html[data-theme='themis'] {
+    --color-bg: #f6f4f8;
+    --color-surface: #ffffff;
+    --color-surface-hover: #ede9f1;
+    --color-border: #d8d0e2;
+    --color-accent: #7e6aa8;
+    --color-accent-muted: #ede5f5;
+    --color-text-primary: #1c1822;
+    --color-text-secondary: #5a5566;
+    --color-text-tertiary: #797184;
+    --color-diagram-grid: #d4ccdd;
+  }
+
+  html.dark[data-theme='themis'] {
+    --color-bg: #0d0b14;
+    --color-surface: #15121d;
+    --color-surface-hover: #1d1928;
+    --color-border: #2a2438;
+    --color-accent: #b9a8d6;
+    --color-accent-muted: #2c243a;
+    --color-text-primary: #ece7f3;
+    --color-text-secondary: #a89eb8;
+    --color-text-tertiary: #847a96;
+    --color-diagram-grid: #2a2438;
+  }
+
   /* Papyrus (née Paper) — editorial cream + black ink, light base.
      text-tertiary darkened from #6e6e66 (4.48:1, one hair below) to
      #67675f (5.10:1). Accent darkened from #8b5e34 (4.13:1 on muted)
