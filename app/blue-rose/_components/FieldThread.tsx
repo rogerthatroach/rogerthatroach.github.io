@@ -143,7 +143,7 @@ export default function FieldThread({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -4, scale: 0.97 }}
           transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
-          className="themis-glass fixed z-[100] overflow-hidden rounded-xl shadow-2xl"
+          className="themis-glass-pop fixed z-[100] overflow-hidden rounded-xl"
           style={{ top: pos.top, left: pos.left, width: POPOVER_WIDTH }}
         >
           <div className="flex items-center justify-between border-b border-border-subtle px-3 py-2">
@@ -232,7 +232,14 @@ export default function FieldThread({
           </button>
         )}
       </div>
-      {mounted && createPortal(popover, document.body)}
+      {mounted &&
+        createPortal(
+          /* Wrap in [data-themis="true"] so the Themis CSS vars + glass class
+             cascade into the portalled subtree (the portal lands in document.body,
+             outside the route's data-themis wrapper). */
+          <div data-themis="true">{popover}</div>,
+          document.body,
+        )}
     </>
   );
 }

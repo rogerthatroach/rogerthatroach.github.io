@@ -74,6 +74,44 @@ html.dark [data-themis='true'] .themis-glass {
     rgba(21, 18, 29, 0.55);
 }
 
+/* ── Popover glass — opaque + glossy ──────────────────────────────
+   For floating surfaces that overlay arbitrary content (field-comment
+   popovers, future menus). Solid enough to read clearly; gloss highlight
+   on top sells the "real glass" feel. */
+[data-themis='true'] .themis-glass-pop {
+  background:
+    /* Gloss highlight at top — bright sheen */
+    linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 38%),
+    /* Subtle amethyst tint for brand */
+    linear-gradient(180deg, var(--themis-glass-tint), transparent 60%),
+    /* Near-opaque base — cream-amethyst, not pure white, so it sits warmly */
+    rgba(248, 245, 250, 0.96);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--themis-glass-border);
+  box-shadow:
+    /* Inner highlight for the gloss edge */
+    0 1px 0 inset rgba(255, 255, 255, 0.7),
+    /* Soft drop shadow for depth */
+    0 24px 60px -20px rgba(60, 50, 90, 0.28),
+    0 6px 16px -8px rgba(60, 50, 90, 0.18);
+}
+html.dark [data-themis='true'] .themis-glass-pop {
+  background:
+    /* Soft top sheen — much subtler in dark mode */
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 38%),
+    /* Amethyst tint */
+    linear-gradient(180deg, var(--themis-glass-tint), transparent 60%),
+    /* Near-opaque deep amethyst */
+    rgba(15, 12, 22, 0.96);
+  box-shadow:
+    /* Inner highlight, very faint */
+    0 1px 0 inset rgba(255, 255, 255, 0.06),
+    /* Deep drop shadow */
+    0 24px 60px -12px rgba(0, 0, 0, 0.55),
+    0 6px 16px -6px rgba(0, 0, 0, 0.4);
+}
+
 /* ── Subtle soft-vignette backdrop for the lock screen ───────────── */
 [data-themis='true'] .themis-vignette {
   background:
