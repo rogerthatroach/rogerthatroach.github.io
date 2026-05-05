@@ -15,6 +15,7 @@ const ROUTE_LABEL: Record<string, string> = {
   audit: 'Audit',
   workflows: 'Workflows',
   diane: 'Diane',
+  insights: 'Insights',
 };
 
 interface Crumb {

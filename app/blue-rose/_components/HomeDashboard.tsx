@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import {
   Activity,
   ArrowRight,
+  BarChart3,
   ChevronRight,
   Eye,
   FileEdit,
@@ -171,11 +172,18 @@ export default function HomeDashboard() {
             </>
           )}
           <Tile
+            href="/blue-rose/insights"
+            icon={BarChart3}
+            label="Insights"
+            value={stats.recent.length > 0 ? '↗' : '—'}
+            hint="KPIs, charts, scenarios, ask Diane"
+          />
+          <Tile
             href="/blue-rose/diane"
             icon={Sparkles}
             label="Diane"
             value="—"
-            hint={`${stats.fieldCommentsTotal} field comment${stats.fieldCommentsTotal === 1 ? '' : 's'} · Tier 2/3`}
+            hint={`${stats.fieldCommentsTotal} field comment${stats.fieldCommentsTotal === 1 ? '' : 's'} · Tier 5`}
             accent="#F59E0B"
             disabled
           />
