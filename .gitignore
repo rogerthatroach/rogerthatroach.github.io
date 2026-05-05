@@ -50,3 +50,8 @@ public/images/IMG_*.png
 public/images/IMG_*.heic
 public/images/logos/RBC/
 public/images/logos/Tata_Consultancy_Services/
+
+# Themis (/blue-rose) — plaintext seed is the secret. Only the AES-GCM
+# ciphertext (public/blue-rose/data.enc.json) is committed.
+data/themis/seed.json
+.themis-passphrase
