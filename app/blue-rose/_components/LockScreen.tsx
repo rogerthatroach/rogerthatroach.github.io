@@ -83,69 +83,18 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
           shaking && 'themis-shake',
         )}
       >
-        {/* Pulsing halo + owl — two layered halos (outer faint, inner
-            brighter) on offset rhythms create a quiet beat. Owl back at
-            its proportioned 88px; the dual-halo work gives it presence
-            without scaling the symbol up. */}
-        <div className="relative h-28 w-28">
-          {/* Outer halo — wider, fainter */}
-          <motion.span
-            aria-hidden="true"
-            className="absolute left-1/2 top-1/2 h-44 w-44 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              background:
-                'radial-gradient(circle, var(--themis-primary) 0%, transparent 60%)',
-            }}
-            animate={
-              reduceMotion
-                ? { opacity: 0.10 }
-                : { opacity: [0.06, 0.18, 0.06] }
-            }
-            transition={
-              reduceMotion
-                ? { duration: 0 }
-                : { duration: 4.6, repeat: Infinity, ease: 'easeInOut' }
-            }
-          />
-          {/* Inner halo — tighter, brighter */}
-          <motion.span
-            aria-hidden="true"
-            className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{
-              background:
-                'radial-gradient(circle, var(--themis-primary) 0%, transparent 65%)',
-            }}
-            animate={
-              reduceMotion
-                ? { opacity: 0.20 }
-                : { opacity: [0.12, 0.34, 0.12] }
-            }
-            transition={
-              reduceMotion
-                ? { duration: 0 }
-                : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
-            }
-          />
-          <motion.span
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{
-              color: 'var(--themis-primary)',
-              filter: 'drop-shadow(0 0 8px rgba(126, 106, 168, 0.25))',
-            }}
-            animate={
-              reduceMotion
-                ? { scale: 1 }
-                : { scale: [1, 1.025, 1] }
-            }
-            transition={
-              reduceMotion
-                ? { duration: 0 }
-                : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
-            }
-          >
-            <OwlGlyph size={88} />
-          </motion.span>
-        </div>
+        {/* Owl — quiet scale-only breath, no halo, no drop-shadow */}
+        <motion.span
+          style={{ color: 'var(--themis-primary)' }}
+          animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.025, 1] }}
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : { duration: 3.6, repeat: Infinity, ease: 'easeInOut' }
+          }
+        >
+          <OwlGlyph size={88} />
+        </motion.span>
 
         {/* Wordmark — ceremonial */}
         <h1
