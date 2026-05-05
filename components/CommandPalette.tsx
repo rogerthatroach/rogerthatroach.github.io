@@ -13,7 +13,15 @@ import { PROJECTS } from '@/data/projects';
 // Six theme packs mirror ThemePicker.tsx — keep this table in sync when
 // that list changes. The palette lets users jump straight to any theme
 // from ⌘K without opening the nav picker.
-type ThemeId = 'sakura-light' | 'sakura-dark' | 'nord' | 'solarized-dark' | 'monokai' | 'paper';
+type ThemeId =
+  | 'sakura-light'
+  | 'sakura-dark'
+  | 'nord'
+  | 'solarized-dark'
+  | 'monokai'
+  | 'paper'
+  | 'themis'
+  | 'themis-dark';
 const THEMES: { id: ThemeId; label: string; base: 'light' | 'dark' }[] = [
   { id: 'sakura-light',    label: 'Theme · Sakura Light',        base: 'light' },
   { id: 'sakura-dark',     label: 'Theme · Sakura Dark',         base: 'dark'  },
@@ -21,6 +29,8 @@ const THEMES: { id: ThemeId; label: string; base: 'light' | 'dark' }[] = [
   { id: 'solarized-dark',  label: 'Theme · Obsidian (Solarized)', base: 'dark'  },
   { id: 'monokai',         label: 'Theme · Ember (Monokai)',     base: 'dark'  },
   { id: 'paper',           label: 'Theme · Papyrus (Paper)',     base: 'light' },
+  { id: 'themis',          label: 'Theme · Amethyst (Themis)',   base: 'light' },
+  { id: 'themis-dark',     label: 'Theme · Amethyst Dark',       base: 'dark'  },
 ];
 const THEME_BASES: Record<ThemeId, 'light' | 'dark'> = Object.fromEntries(
   THEMES.map((t) => [t.id, t.base])
@@ -94,7 +104,8 @@ export default function CommandPalette() {
     if (id === 'sakura-light' || id === 'sakura-dark') {
       html.removeAttribute('data-theme');
     } else {
-      html.setAttribute('data-theme', id);
+      const attr = id === 'themis-dark' ? 'themis' : id;
+      html.setAttribute('data-theme', attr);
     }
     localStorage.setItem('theme-pack', id);
     localStorage.removeItem('theme'); // drop legacy key

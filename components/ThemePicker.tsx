@@ -27,7 +27,9 @@ export type ThemeId =
   | 'nord'
   | 'solarized-dark'
   | 'monokai'
-  | 'paper';
+  | 'paper'
+  | 'themis'
+  | 'themis-dark';
 
 interface ThemeOption {
   id: ThemeId;
@@ -84,6 +86,20 @@ const THEMES: ThemeOption[] = [
     base: 'light',
     swatches: { bg: '#f4efe6', accent: '#7a4e28', text: '#1a1a1a' },
   },
+  {
+    id: 'themis',
+    name: 'Amethyst',
+    description: 'Soft glass · Themis (light)',
+    base: 'light',
+    swatches: { bg: '#f6f4f8', accent: '#7e6aa8', text: '#1c1822' },
+  },
+  {
+    id: 'themis-dark',
+    name: 'Amethyst Dark',
+    description: 'Deep amethyst · Themis (dark)',
+    base: 'dark',
+    swatches: { bg: '#0d0b14', accent: '#b9a8d6', text: '#ece7f3' },
+  },
 ];
 
 function applyTheme(id: ThemeId) {
@@ -95,7 +111,10 @@ function applyTheme(id: ThemeId) {
   if (id === 'sakura-light' || id === 'sakura-dark') {
     html.removeAttribute('data-theme');
   } else {
-    html.setAttribute('data-theme', id);
+    // 'themis' and 'themis-dark' both apply data-theme="themis" — the
+    // .dark class is what differentiates the two bases.
+    const attr = id === 'themis-dark' ? 'themis' : id;
+    html.setAttribute('data-theme', attr);
   }
   localStorage.setItem('theme-pack', id);
   // Cleanup legacy key; we'll keep writing new one
