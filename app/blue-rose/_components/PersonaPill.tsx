@@ -12,6 +12,7 @@ const ROLE_LABEL: Record<Persona['role'], string> = {
   approver: 'Approver',
   observer: 'Observer',
   admin: 'Admin',
+  agent: 'AI agent',
 };
 
 interface PersonaPillProps {

@@ -13,6 +13,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import type { Attachment } from '@/data/themis/types';
+import AuditRow from './AuditRow';
 import { useThemis, usePersonaMap } from '../_lib/store';
 import {
   anomalyHints,
@@ -251,37 +252,15 @@ export default function ContextTab() {
                 aria-hidden="true"
                 className="absolute left-[5px] top-1.5 h-[calc(100%-12px)] w-px bg-border-subtle"
               />
-              {audit.map((e) => {
-                const actor = personaMap.get(e.actorPersonaId);
-                return (
-                  <li key={e.id} className="relative">
-                    <span
-                      aria-hidden="true"
-                      className="absolute -left-4 top-1 h-2.5 w-2.5 rounded-full ring-2 ring-[var(--color-bg)]"
-                      style={{ background: auditKindColor(e.kind) }}
-                    />
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-[11.5px] font-medium text-text-primary">
-                        {actor?.displayName ?? 'Unknown'}
-                      </span>
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                        {e.kind.replace(/_/g, ' ')}
-                      </span>
-                    </div>
-                    <span className="font-mono text-[10px] tracking-wider text-text-tertiary">
-                      {relativeTime(e.at)}
-                      {e.before != null && e.after != null ? (
-                        <>
-                          {' · '}
-                          <span className="text-text-secondary">
-                            {String(e.before)} → {String(e.after)}
-                          </span>
-                        </>
-                      ) : null}
-                    </span>
-                  </li>
-                );
-              })}
+              {audit.map((e) => (
+                <AuditRow
+                  key={e.id}
+                  event={e}
+                  actorName={personaMap.get(e.actorPersonaId)?.displayName ?? 'Unknown'}
+                  isAgent={personaMap.get(e.actorPersonaId)?.role === 'agent'}
+                  citations={submission.diane?.citations}
+                />
+              ))}
             </ol>
           )}
         </Section>
@@ -378,10 +357,3 @@ function Stat({
   );
 }
 
-function auditKindColor(kind: string): string {
-  if (kind === 'approved') return 'var(--themis-approved)';
-  if (kind === 'rejected') return 'var(--themis-rejected)';
-  if (kind === 'changes_requested') return 'var(--themis-needs-info)';
-  if (kind === 'submitted') return 'var(--themis-pending)';
-  return 'var(--themis-secondary)';
-}
