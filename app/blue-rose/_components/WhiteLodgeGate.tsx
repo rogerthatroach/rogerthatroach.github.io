@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { MotionConfig } from 'framer-motion';
 import {
   clearCachedPassphrase,
@@ -10,20 +11,29 @@ import {
 import type { ThemisSeed } from '@/data/themis/types';
 import { ThemisProvider } from '../_lib/store';
 import LockScreen from './LockScreen';
-import Shell from './Shell';
+import WhiteLodgeLayout from './WhiteLodgeLayout';
+
+const LOCK_ROOT = '/blue-rose';
+const HOME_ROUTE = '/blue-rose/home';
 
 /**
- * ThemisRoot — orchestrates the gate.
+ * WhiteLodgeGate — wraps every /blue-rose/* route via app/blue-rose/layout.tsx.
  *
- *   1. On mount, fetch the encrypted bundle from /blue-rose/data.enc.json.
- *   2. Try the cached sessionStorage passphrase (silent re-unlock).
- *   3. Otherwise render LockScreen and wait for user input.
- *   4. On successful decrypt, mount ThemisProvider with the seed and the
- *      shell renders.
+ * Responsibilities (subsumes the prior ThemisRoot.tsx):
+ *   1. Fetch the AES-GCM ciphertext at /blue-rose/data.enc.json once.
+ *   2. Try to auto-unlock with the sessionStorage-cached passphrase.
+ *   3. While locked, render <LockScreen> — regardless of which subroute
+ *      the user landed on. After successful unlock, redirect to /home
+ *      if they were on the lock root.
+ *   4. While unlocked, mount <ThemisProvider> + <WhiteLodgeLayout> with
+ *      the active page (children) inside.
  *
- * The "Lock" button in the shell clears sessionStorage and resets state.
+ * MotionConfig with reducedMotion="user" wraps the entire subtree so
+ * OS reduced-motion preference flows through every component.
  */
-export default function ThemisRoot() {
+export default function WhiteLodgeGate({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const [blob, setBlob] = useState<EncryptedBlob | null>(null);
   const [blobError, setBlobError] = useState<string | null>(null);
   const [seed, setSeed] = useState<ThemisSeed | null>(null);
@@ -31,7 +41,8 @@ export default function ThemisRoot() {
     typeof window !== 'undefined' ? getCachedPassphrase() : null,
   );
 
-  // Fetch ciphertext once
+  const isLockRoot = pathname === LOCK_ROOT;
+
   useEffect(() => {
     let alive = true;
     fetch('/blue-rose/data.enc.json', { cache: 'no-store' })
@@ -50,17 +61,22 @@ export default function ThemisRoot() {
     };
   }, []);
 
-  const onUnlock = useCallback((decrypted: ThemisSeed, _passphrase: string) => {
+  useEffect(() => {
+    if (seed && isLockRoot) {
+      router.replace(HOME_ROUTE);
+    }
+  }, [seed, isLockRoot, router]);
+
+  const onUnlock = useCallback((decrypted: ThemisSeed) => {
     setSeed(decrypted);
   }, []);
 
   const onLock = useCallback(() => {
     clearCachedPassphrase();
     setSeed(null);
-  }, []);
+    if (!isLockRoot) router.replace(LOCK_ROOT);
+  }, [router, isLockRoot]);
 
-  // MotionConfig with reducedMotion="user" honors the OS preference for the
-  // entire Themis subtree — animations become instant rather than softer.
   return (
     <MotionConfig reducedMotion="user">
       {!seed ? (
@@ -72,7 +88,7 @@ export default function ThemisRoot() {
         />
       ) : (
         <ThemisProvider seed={seed}>
-          <Shell onLock={onLock} />
+          <WhiteLodgeLayout onLock={onLock}>{children}</WhiteLodgeLayout>
         </ThemisProvider>
       )}
     </MotionConfig>

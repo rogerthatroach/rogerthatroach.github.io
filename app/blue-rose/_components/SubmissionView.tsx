@@ -41,7 +41,7 @@ export default function SubmissionView({ onOpenDetails }: SubmissionViewProps = 
     seed,
     selectedSubmissionId,
     selectSubmission,
-    setRightPaneTab,
+    setSubmissionTab,
     addMessage,
   } = useThemis();
   const persona = useCurrentPersona();
@@ -71,7 +71,7 @@ export default function SubmissionView({ onOpenDetails }: SubmissionViewProps = 
 
   const postAction = (body: string) => {
     addMessage(submission.threadId, body, [], []);
-    setRightPaneTab('thread');
+    setSubmissionTab('thread');
   };
 
   return (
@@ -120,7 +120,7 @@ export default function SubmissionView({ onOpenDetails }: SubmissionViewProps = 
         <div className="hidden shrink-0 items-center gap-1.5 sm:flex">
           <button
             type="button"
-            onClick={() => setRightPaneTab('thread')}
+            onClick={() => setSubmissionTab('thread')}
             aria-label="Open thread"
             title="Open the chat thread"
             className="flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-2.5 py-1 text-[11px] font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"

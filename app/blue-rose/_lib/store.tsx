@@ -38,7 +38,9 @@ import { EMPTY_FILTERS, type QueueFilters } from './filters';
 const PERSONA_KEY = 'themis:persona';
 const FILTERS_KEY = 'themis:queue-filters:v1';
 
-export type RightPaneTab = 'context' | 'thread' | 'diane';
+export type SubmissionTab = 'document' | 'thread' | 'context' | 'diane';
+/** @deprecated alias kept for any callsite still using the old name */
+export type RightPaneTab = SubmissionTab;
 
 interface ThemisState {
   seed: ThemisSeed;
@@ -47,7 +49,7 @@ interface ThemisState {
   messages: Message[];
   fieldComments: FieldComment[];
   threads: ThemisSeed['threads'];
-  rightPaneTab: RightPaneTab;
+  submissionTab: SubmissionTab;
   queueFilters: QueueFilters;
 }
 
@@ -57,7 +59,7 @@ type ThemisAction =
   | { type: 'ADD_MESSAGE'; message: Message }
   | { type: 'ADD_FIELD_COMMENT'; comment: FieldComment }
   | { type: 'MARK_THREAD_READ'; threadId: string; personaId: string }
-  | { type: 'SET_RIGHT_PANE_TAB'; tab: RightPaneTab }
+  | { type: 'SET_SUBMISSION_TAB'; tab: SubmissionTab }
   | { type: 'PATCH_FILTERS'; patch: Partial<QueueFilters> }
   | { type: 'CLEAR_FILTERS' };
 
@@ -66,10 +68,10 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
     case 'SET_PERSONA':
       return { ...state, currentPersonaId: action.id };
     case 'SELECT_SUBMISSION':
-      // Reset to context tab when switching submissions
-      return { ...state, selectedSubmissionId: action.id, rightPaneTab: 'context' };
-    case 'SET_RIGHT_PANE_TAB':
-      return { ...state, rightPaneTab: action.tab };
+      // Reset to document tab when switching submissions
+      return { ...state, selectedSubmissionId: action.id, submissionTab: 'document' };
+    case 'SET_SUBMISSION_TAB':
+      return { ...state, submissionTab: action.tab };
     case 'ADD_MESSAGE':
       return {
         ...state,
@@ -112,7 +114,7 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
 interface ThemisContextValue extends ThemisState {
   setCurrentPersonaId: (id: string) => void;
   selectSubmission: (id: string | null) => void;
-  setRightPaneTab: (tab: RightPaneTab) => void;
+  setSubmissionTab: (tab: SubmissionTab) => void;
   patchFilters: (patch: Partial<QueueFilters>) => void;
   clearFilters: () => void;
   addMessage: (
@@ -150,7 +152,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     messages: [...seed.messages],
     fieldComments: [...(seed.fieldComments ?? [])],
     threads: seed.threads.map((t) => ({ ...t, unreadByPersonaId: { ...t.unreadByPersonaId } })),
-    rightPaneTab: 'context' as RightPaneTab,
+    submissionTab: 'document' as SubmissionTab,
     queueFilters: EMPTY_FILTERS,
   }));
 
@@ -199,8 +201,8 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     dispatch({ type: 'SELECT_SUBMISSION', id });
   }, []);
 
-  const setRightPaneTab = useCallback((tab: RightPaneTab) => {
-    dispatch({ type: 'SET_RIGHT_PANE_TAB', tab });
+  const setSubmissionTab = useCallback((tab: SubmissionTab) => {
+    dispatch({ type: 'SET_SUBMISSION_TAB', tab });
   }, []);
 
   const patchFilters = useCallback((patch: Partial<QueueFilters>) => {
@@ -262,7 +264,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       ...state,
       setCurrentPersonaId,
       selectSubmission,
-      setRightPaneTab,
+      setSubmissionTab,
       patchFilters,
       clearFilters,
       addMessage,
@@ -273,7 +275,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       state,
       setCurrentPersonaId,
       selectSubmission,
-      setRightPaneTab,
+      setSubmissionTab,
       patchFilters,
       clearFilters,
       addMessage,

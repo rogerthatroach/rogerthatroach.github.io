@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import Link from 'next/link';
 import { Inbox, Paperclip, AtSign, MessageCircle, FilterX } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useThemis, useCurrentPersona } from '../_lib/store';
@@ -130,10 +131,10 @@ export default function QueuePreview() {
 
         return (
           <motion.li key={s.id} variants={fadeUp}>
-            <button
-              type="button"
+            <Link
+              href="/blue-rose/submission"
               onClick={() => selectSubmission(s.id)}
-              aria-pressed={isActive}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'group relative flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors',
                 'hover:bg-surface-hover/60',
@@ -211,7 +212,7 @@ export default function QueuePreview() {
                   {unreadCount}
                 </span>
               )}
-            </button>
+            </Link>
           </motion.li>
         );
       })}
