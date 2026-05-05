@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   FileText,
   MessageCircleWarning,
@@ -24,8 +26,12 @@ import WhyCard from './WhyCard';
 import DocumentBody from './DocumentBody';
 import ThreadTab from './ThreadTab';
 import ContextTab from './ContextTab';
+import QueueFilters from './QueueFilters';
+import QueuePreview from './QueuePreview';
 import { fadeUp } from '@/lib/motion';
 import { cn } from '@/lib/utils';
+
+const RAIL_KEY = 'themis:submission-rail-collapsed';
 
 const TABS: { id: SubmissionTab; label: string; icon: typeof FileText }[] = [
   { id: 'document', label: 'Document', icon: FileText },
@@ -63,6 +69,28 @@ export default function SubmissionPage() {
   const personaMap = usePersonaMap();
   const router = useRouter();
 
+  // Collapsible queue rail — local UI state, persisted in localStorage so
+  // the user's preference sticks across sessions.
+  const [railCollapsed, setRailCollapsed] = useState(false);
+  const [railHydrated, setRailHydrated] = useState(false);
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(RAIL_KEY);
+      if (stored === '1') setRailCollapsed(true);
+    } catch {
+      /* noop */
+    }
+    setRailHydrated(true);
+  }, []);
+  useEffect(() => {
+    if (!railHydrated) return;
+    try {
+      localStorage.setItem(RAIL_KEY, railCollapsed ? '1' : '0');
+    } catch {
+      /* noop */
+    }
+  }, [railCollapsed, railHydrated]);
+
   const submission = useMemo(
     () => seed.submissions.find((s) => s.id === selectedSubmissionId) ?? null,
     [seed.submissions, selectedSubmissionId],
@@ -90,8 +118,62 @@ export default function SubmissionPage() {
       variants={fadeUp}
       initial="initial"
       animate="animate"
-      className="flex h-full flex-col"
+      className="relative flex h-full"
     >
+      {/* Left rail — queue + filters; collapsible. Mobile (<lg) hides
+          the rail entirely; the breadcrumb is the back path there. */}
+      <aside
+        aria-label="Queue rail"
+        className={cn(
+          'hidden h-full shrink-0 overflow-hidden border-r border-border-subtle/60 bg-background/30 backdrop-blur-sm transition-[width] duration-300 ease-out lg:block',
+          railCollapsed ? 'w-0' : 'w-[320px]',
+        )}
+      >
+        <div
+          className={cn(
+            'flex h-full w-[320px] flex-col transition-opacity duration-200',
+            railCollapsed && 'pointer-events-none opacity-0',
+          )}
+        >
+          <div className="shrink-0 border-b border-border-subtle/40 px-3 py-3">
+            <div className="mb-2 flex items-baseline justify-between px-1">
+              <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-text-tertiary">
+                Queue
+              </span>
+              <span className="font-mono text-[10px] tracking-wider text-text-tertiary">
+                {seed.submissions.length}
+              </span>
+            </div>
+            <QueueFilters />
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+            <QueuePreview />
+          </div>
+        </div>
+      </aside>
+
+      {/* Rail toggle handle — slim vertical button at the boundary */}
+      <button
+        type="button"
+        onClick={() => setRailCollapsed((s) => !s)}
+        aria-label={railCollapsed ? 'Show queue' : 'Hide queue'}
+        title={railCollapsed ? 'Show queue' : 'Hide queue'}
+        className={cn(
+          'absolute top-1/2 z-20 hidden h-14 w-3.5 -translate-y-1/2 items-center justify-center border border-border-subtle bg-surface/80 text-text-tertiary shadow-sm transition-all duration-300 ease-out hover:bg-surface-hover hover:text-text-primary lg:flex',
+          railCollapsed
+            ? 'left-0 rounded-r-md border-l-0'
+            : 'left-[320px] -translate-x-1/2 rounded-md',
+        )}
+      >
+        {railCollapsed ? (
+          <ChevronRight size={11} aria-hidden="true" />
+        ) : (
+          <ChevronLeft size={11} aria-hidden="true" />
+        )}
+      </button>
+
+      {/* Right pane — the submission detail */}
+      <div className="flex min-w-0 flex-1 flex-col">
       {/* Compact submission header */}
       <header className="shrink-0 border-b border-border-subtle/40 bg-background/40 px-4 py-4 backdrop-blur-sm md:px-8">
         <div className="mx-auto max-w-5xl">
@@ -215,6 +297,7 @@ export default function SubmissionPage() {
           </div>
         )}
         {submissionTab === 'diane' && <DianeStub />}
+      </div>
       </div>
     </motion.div>
   );
