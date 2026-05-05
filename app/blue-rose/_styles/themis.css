@@ -32,6 +32,19 @@
   --themis-approved-bg: rgba(93, 136, 112, 0.12);
   --themis-rejected-bg: rgba(168, 93, 106, 0.12);
   --themis-draft-bg: rgba(138, 129, 129, 0.10);
+
+  /* ── Diane palette ─────────────────────────────────────────────── */
+  /* Diane's brand stays amber (the Stripe-test-mode homage) — used for
+     byline + pill + chat-bubble border-left. AI content is never visually
+     indistinguishable from human content, per §12 RAI. */
+  --themis-diane: #F59E0B;
+  /* Sakura wash — softer field-level treatment for Diane-drafted
+     content. The "play between" sakura + amber: pink fill (delicate ·
+     ai-touched) under the amber dashed border (Diane brand signal),
+     replacing the heavier amber/beige fill that read as "warning". */
+  --themis-sakura: #b07a82;            /* portfolio sakura particle */
+  --themis-sakura-bg: rgba(176, 122, 130, 0.06);
+  --themis-sakura-border: rgba(176, 122, 130, 0.34);
 }
 
 html.dark [data-themis='true'] {
@@ -53,6 +66,13 @@ html.dark [data-themis='true'] {
   --themis-approved-bg: rgba(143, 176, 154, 0.14);
   --themis-rejected-bg: rgba(192, 138, 144, 0.14);
   --themis-draft-bg: rgba(168, 158, 155, 0.12);
+
+  /* Diane in dark mode — amber lifts slightly + sakura brightens to
+     dark-mode portfolio token (#d4a0a7) for the field wash. */
+  --themis-diane: #F8B547;
+  --themis-sakura: #d4a0a7;
+  --themis-sakura-bg: rgba(212, 160, 167, 0.08);
+  --themis-sakura-border: rgba(212, 160, 167, 0.36);
 }
 
 /* The "Themis" pack as a site-wide theme lives in app/globals.css under
