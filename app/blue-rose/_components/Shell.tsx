@@ -5,21 +5,27 @@ import { Bell, LogOut, Search } from 'lucide-react';
 import { useThemis } from '../_lib/store';
 import PersonaPill from './PersonaPill';
 import QueuePreview from './QueuePreview';
+import ThreadView from './ThreadView';
 import { blurIn } from '@/lib/motion';
+import { cn } from '@/lib/utils';
 
 interface ShellProps {
   onLock: () => void;
 }
 
 /**
- * Themis shell — Tier 0 placeholder.
+ * Themis shell — Tier 0.5 two-pane layout.
  *
- * Top bar with wordmark + persona switcher + lock button. Body shows the
- * filtered queue for the current persona (read-only preview). Tier 1
- * upgrades this to the full three-pane (queue ↔ thread ↔ context).
+ * ≥1024px: queue (left, fixed width) + thread (right, fluid). Both panes
+ * always rendered.
+ * <1024px: single pane. Selecting a queue item swaps the queue out for
+ * the thread; thread's back button returns to the queue.
+ *
+ * Tier 1 will add a third pane for context/audit on the right.
  */
 export default function Shell({ onLock }: ShellProps) {
-  const { seed, currentPersonaId, setCurrentPersonaId } = useThemis();
+  const { seed, currentPersonaId, setCurrentPersonaId, selectedSubmissionId } = useThemis();
+  const showThreadOnMobile = selectedSubmissionId !== null;
 
   return (
     <motion.div
@@ -29,7 +35,7 @@ export default function Shell({ onLock }: ShellProps) {
       className="themis-vignette flex min-h-screen flex-col"
     >
       <header className="sticky top-0 z-30 border-b border-border-subtle bg-background/70 backdrop-blur-md">
-        <div className="mx-auto flex max-w-content items-center gap-3 px-6 py-3 md:px-10">
+        <div className="mx-auto flex w-full items-center gap-3 px-4 py-3 md:px-6">
           <div className="flex items-baseline gap-3">
             <span className="font-display text-lg font-medium tracking-tight text-text-primary">
               Themis
@@ -50,14 +56,14 @@ export default function Shell({ onLock }: ShellProps) {
               onClick={() => {
                 document.dispatchEvent(new CustomEvent('cmdk:open'));
               }}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface/70 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface/70 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary sm:flex"
             >
               <Search size={14} aria-hidden="true" />
             </button>
             <button
               type="button"
-              aria-label="Notifications (coming in Tier 3)"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface/70 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
+              aria-label="Notifications (Tier 3)"
+              className="hidden h-9 w-9 items-center justify-center rounded-full border border-border-subtle bg-surface/70 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary sm:flex"
             >
               <Bell size={14} aria-hidden="true" />
             </button>
@@ -73,20 +79,35 @@ export default function Shell({ onLock }: ShellProps) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-content flex-1 px-6 pb-16 pt-6 md:px-10">
-        <div className="mb-5 flex items-baseline justify-between">
-          <h2 className="font-display text-xl font-medium text-text-primary">
-            Queue
-          </h2>
-          <span className="font-mono text-[11px] uppercase tracking-widest text-text-tertiary">
-            Tier 0 · read-only · queue → thread → context lands in Tier 1
-          </span>
-        </div>
-        <QueuePreview />
-        <p className="mt-8 text-center font-mono text-[11px] uppercase tracking-widest text-text-tertiary">
-          {seed.submissions.length} submissions · {seed.threads.length} threads ·{' '}
-          {seed.messages.length} messages · {seed.personas.length} personas
-        </p>
+      <main className="grid w-full flex-1 grid-cols-1 lg:grid-cols-[380px_1fr]">
+        <section
+          aria-label="Queue"
+          className={cn(
+            'border-r border-border-subtle/60 lg:overflow-y-auto',
+            showThreadOnMobile && 'hidden lg:block',
+          )}
+        >
+          <div className="px-3 py-3 md:px-4">
+            <div className="mb-2 flex items-baseline justify-between px-1">
+              <h2 className="font-display text-[15px] font-medium text-text-primary">Queue</h2>
+              <span className="font-mono text-[9px] uppercase tracking-widest text-text-tertiary">
+                {seed.submissions.length}
+              </span>
+            </div>
+            <QueuePreview />
+          </div>
+        </section>
+        <section
+          aria-label="Thread"
+          className={cn(
+            'min-h-0 lg:overflow-y-auto',
+            !showThreadOnMobile && 'hidden lg:block',
+          )}
+        >
+          <div className="lg:h-[calc(100vh-57px)]">
+            <ThreadView />
+          </div>
+        </section>
       </main>
     </motion.div>
   );
