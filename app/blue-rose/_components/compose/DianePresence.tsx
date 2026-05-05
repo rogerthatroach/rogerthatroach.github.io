@@ -18,6 +18,8 @@ import {
   type FieldSpec,
   type SectionSpec,
 } from '../../_lib/par-schema';
+import { estimateDays, pickRoutingChain } from '../../_lib/par-synthesize';
+import { useThemis } from '../../_lib/store';
 import { cn } from '@/lib/utils';
 
 type Author = 'user' | 'diane';
@@ -76,12 +78,27 @@ export default function DianePresence({
   const [revealStep, setRevealStep] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const { seed } = useThemis();
   const coverage = overallCoverage(values);
   const percent = Math.round(coverage * 100);
   const priorityFields = useMemo(
     () => nextHighPriorityFields(values, 4),
     [values],
   );
+  // Live routing preview — re-derives on every parDraft change so the
+  // submitter sees how their fill choices reshape the chain before
+  // submit. Mirrors what the SubmittingOverlay will narrate.
+  const liveRouting = useMemo(() => {
+    const chain = pickRoutingChain(values);
+    if (chain.length === 0) return null;
+    const personaMap = new Map(seed.personas.map((p) => [p.id, p]));
+    const names = chain.map((c) => personaMap.get(c.approverId)?.displayName ?? c.role);
+    const days = estimateDays(chain);
+    return {
+      label: names.join(' → '),
+      days,
+    };
+  }, [values, seed.personas]);
   const completedSections = useMemo(
     () =>
       PAR_SECTIONS.filter(
@@ -169,7 +186,7 @@ export default function DianePresence({
       aria-label="Diane"
       className="relative flex h-full min-h-0 flex-col"
     >
-      {/* Top of column — Diane's avatar + draft title */}
+      {/* Top of column — Diane's avatar + draft title + live routing whisper */}
       <header className="shrink-0 px-8 pt-10 pb-6 text-center">
         <div className="mx-auto mb-4 flex justify-center">
           <DianeAvatar size="hero" pulsing />
@@ -180,6 +197,23 @@ export default function DianePresence({
         <h1 className="mt-1 font-display text-[26px] font-medium leading-tight tracking-tight text-text-primary">
           {draftTitle}
         </h1>
+        {liveRouting && (
+          <motion.p
+            key={liveRouting.label}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mx-auto mt-3 max-w-md font-display text-[12.5px] italic leading-relaxed text-text-tertiary"
+          >
+            <span style={{ color: 'var(--themis-sakura)' }}>✦</span>{' '}
+            At this draft I&apos;d route through{' '}
+            <span style={{ color: 'var(--themis-primary)' }} className="font-medium not-italic">
+              {liveRouting.label}
+            </span>
+            {' · '}
+            {liveRouting.days} business {liveRouting.days === 1 ? 'day' : 'days'}
+          </motion.p>
+        )}
       </header>
 
       {/* Conversation transcript */}

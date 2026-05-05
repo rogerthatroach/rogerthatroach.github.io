@@ -209,11 +209,12 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
         submissionId: action.submission.id,
         participantIds: [
           action.submission.submittedBy,
+          'p_diane',
           ...action.submission.assignees,
         ],
         lastMessageAt: action.submission.createdAt,
         unreadByPersonaId: Object.fromEntries(
-          action.submission.assignees.map((id) => [id, 1]),
+          action.submission.assignees.map((id) => [id, 2]),
         ),
       };
       // Notifications for each assignee — "you've been routed a new
@@ -230,6 +231,52 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
           linkTo: action.submission.id,
         }),
       );
+      // System + Diane chat messages on the freshly-created thread, so the
+      // approver doesn't land on an empty Thread tab. The system message
+      // renders as a centered pill via MessageBubble.systemKind; the Diane
+      // message renders as a sakura-bordered bubble alongside her audit
+      // events.
+      const submitter = state.seed.personas.find(
+        (p) => p.id === action.submission.submittedBy,
+      );
+      const submitterName = submitter?.displayName ?? 'submitter';
+      const chain = action.submission.diane?.routingPreview.steps ?? [];
+      const personaMap = new Map(state.seed.personas.map((p) => [p.id, p]));
+      const chainNames = chain
+        .map((s) => personaMap.get(s.approverId)?.displayName ?? s.role)
+        .join(' → ');
+      const coveragePct = Math.round((action.submission.diane?.coverage ?? 0) * 100);
+      const citationIds = (action.submission.diane?.citations ?? [])
+        .slice(0, 3)
+        .map((c) => `[${c.id}]`)
+        .join(' ');
+      const dianeBody =
+        chain.length > 0
+          ? `Routed to ${chainNames}. Coverage ${coveragePct}%${citationIds ? `. Citations: ${citationIds}` : ''}.`
+          : `Submitted at ${coveragePct}% coverage. No routing chain proposed.`;
+      const submitMessages: Message[] = [
+        {
+          id: `m_local_sub_${action.submission.createdAt}`,
+          threadId: action.submission.threadId,
+          authorPersonaId: action.submission.submittedBy,
+          body: `${submitterName} submitted this request`,
+          createdAt: action.submission.createdAt,
+          mentions: [],
+          tags: [],
+          readByPersonaIds: [action.submission.submittedBy],
+          systemKind: 'submitted',
+        },
+        {
+          id: `m_local_diane_${action.submission.createdAt + 100}`,
+          threadId: action.submission.threadId,
+          authorPersonaId: 'p_diane',
+          body: dianeBody,
+          createdAt: action.submission.createdAt + 100,
+          mentions: [],
+          tags: [],
+          readByPersonaIds: [action.submission.submittedBy, 'p_diane'],
+        },
+      ];
       return {
         ...state,
         seed: {
@@ -237,6 +284,7 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
           submissions: [...state.seed.submissions, action.submission],
           audit: [...state.seed.audit, ...action.audit],
         },
+        messages: [...state.messages, ...submitMessages],
         threads: [...state.threads, newThread],
         notifications: [...state.notifications, ...newNotifications],
         selectedSubmissionId: action.submission.id,

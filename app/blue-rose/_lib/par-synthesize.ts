@@ -33,7 +33,7 @@ import { findRule, SEEDED_RULES } from './rules';
 
 // ── Routing rule selection ──────────────────────────────────────────
 
-type RoutingChoice = {
+export type RoutingChoice = {
   ruleId: string;
   approverId: string;
   role: string;
@@ -46,8 +46,12 @@ type RoutingChoice = {
  * Façade over exact-match lookup — see plan §9.3. Uses the financial
  * total + classification + jurisdiction signals to pick rules. Always
  * returns at least one step so the chain is never empty.
+ *
+ * Exported so /compose can surface a live routing preview as the user
+ * fills the form — the chain re-derives on every parDraft change and
+ * the Ledger / DianePresence renders it inline.
  */
-function pickRoutingChain(values: Record<string, string | number | boolean>): RoutingChoice[] {
+export function pickRoutingChain(values: Record<string, string | number | boolean>): RoutingChoice[] {
   const total = Number(values.total_expenditure ?? 0); // CAD thousands
   const classification = String(values.classification ?? '');
   const initiative = String(values.initiative_type ?? '');
@@ -110,7 +114,7 @@ function pickRoutingChain(values: Record<string, string | number | boolean>): Ro
   return chain;
 }
 
-function estimateDays(chain: RoutingChoice[]): number {
+export function estimateDays(chain: RoutingChoice[]): number {
   // 1 day per first-line + 2 days per additional (parallel) — capped at 5
   if (chain.length === 0) return 1;
   return Math.min(1 + (chain.length - 1) * 2, 5);
