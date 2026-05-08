@@ -75,7 +75,7 @@ type Cut = 'all' | 'financial';
  * DocumentPreview slides over both columns when invoked.
  */
 export default function ComposeShell() {
-  const { parDraft, parProvenance, batchSetParFields, submitParDraft, selectSubmission, resetParDraft } = useThemis();
+  const { parDraft, parProvenance, batchSetParFields, submitParDraft, selectSubmission, resetParDraft, dianePaused } = useThemis();
   const router = useRouter();
   const [seeded, setSeeded] = useState(false);
   const [cut, setCut] = useState<Cut>('all');
@@ -120,6 +120,14 @@ export default function ComposeShell() {
   };
   const onSubmitDraft = () => {
     if (synthesizing) return;
+    if (dianePaused) {
+      if (typeof window !== 'undefined') {
+        window.alert(
+          'Diane is paused. Resume from the chrome chip to route this submission.',
+        );
+      }
+      return;
+    }
     const outcome = submitParDraft();
     if (!outcome) {
       if (typeof window !== 'undefined') {
@@ -148,6 +156,14 @@ export default function ComposeShell() {
     if (!file) return;
     // Reset the input so the same file can be re-attached later
     e.target.value = '';
+    if (dianePaused) {
+      if (typeof window !== 'undefined') {
+        window.alert(
+          'Diane is paused — file attached but drafting chain refused. Resume from the chrome chip to draft from this document.',
+        );
+      }
+      return;
+    }
     // For multi-file we'd loop — for the demo we take the first.
     // Clear the parDraft so Diane starts from a clean slate (the user can
     // later re-merge or mix). The provenance stays consistent with the
