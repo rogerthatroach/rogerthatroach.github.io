@@ -25,6 +25,7 @@ export function auditKindColor(kind: string): string {
   if (kind === 'rejected') return 'var(--themis-rejected)';
   if (kind === 'changes_requested') return 'var(--themis-needs-info)';
   if (kind === 'submitted') return 'var(--themis-pending)';
+  if (kind === 'routing_overridden') return 'var(--themis-primary)';
   if (kind.startsWith('diane_')) return '#F59E0B';
   return 'var(--themis-secondary)';
 }

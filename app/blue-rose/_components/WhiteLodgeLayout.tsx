@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Bell, LogOut, Search } from 'lucide-react';
 import { useThemis } from '../_lib/store';
+import PauseDianeChip from './PauseDianeChip';
 import PersonaPill from './PersonaPill';
 import OwlGlyph from './OwlGlyph';
 import Breadcrumb from './Breadcrumb';
@@ -75,8 +76,11 @@ export default function WhiteLodgeLayout({ children, onLock }: WhiteLodgeLayoutP
           />
           <Breadcrumb />
 
-          {/* Right cluster — persona, search, notifications, lock */}
+          {/* Right cluster — Diane state, persona, search, notifications, lock */}
           <div className="ml-auto flex items-center gap-2">
+            <span className="hidden sm:flex">
+              <PauseDianeChip />
+            </span>
             <PersonaPill
               personas={seed.personas}
               currentPersonaId={currentPersonaId}
