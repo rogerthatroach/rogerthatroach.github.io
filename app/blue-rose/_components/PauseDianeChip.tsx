@@ -36,16 +36,16 @@ export default function PauseDianeChip() {
         aria-label={dianePaused ? 'Resume Diane' : 'Pause Diane'}
         title={dianePaused ? 'Diane is paused — click to resume' : 'Diane is on — click to pause'}
         className={cn(
-          'flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors',
+          'inline-flex h-9 items-center gap-1.5 rounded-full border px-3 font-mono text-[10px] uppercase leading-none tracking-widest transition-colors',
           dianePaused
             ? 'border-[var(--themis-needs-info)]/50 bg-[var(--themis-needs-info-bg)] text-[var(--themis-needs-info)] hover:brightness-105'
             : 'border-[var(--themis-sakura-border)] bg-transparent text-[var(--themis-sakura)] hover:bg-[var(--themis-sakura-bg)]',
         )}
       >
         {dianePaused ? (
-          <Pause size={10} aria-hidden="true" fill="currentColor" />
+          <Pause size={11} aria-hidden="true" fill="currentColor" />
         ) : (
-          <Sparkles size={10} aria-hidden="true" />
+          <Sparkles size={11} aria-hidden="true" />
         )}
         <span>{dianePaused ? 'Diane paused' : 'Diane on'}</span>
       </button>
