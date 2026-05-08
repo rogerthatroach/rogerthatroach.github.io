@@ -43,6 +43,7 @@ const PERSONA_KEY = 'themis:persona';
 const FILTERS_KEY = 'themis:queue-filters:v1';
 const SPLIT_KEY = 'themis:submission-split:v1';
 const PAR_DRAFT_KEY = 'themis:par-draft:v1';
+const DIANE_PAUSED_KEY = 'themis:diane-paused:v1';
 
 export type SubmissionTab = 'document' | 'thread' | 'context' | 'diane';
 /** @deprecated alias kept for any callsite still using the old name */
@@ -80,6 +81,11 @@ interface ThemisState {
   parDraft: Record<string, string | number | boolean>;
   /** Per-field provenance — drives Diane-drafted vs user-authored visual cues. */
   parProvenance: Record<string, FieldProvenance>;
+  /**
+   * RAI kill switch — when true, Diane refuses to draft, synthesize, or
+   * route. Persisted in localStorage. Toggled from the chrome chip + ⌘K.
+   */
+  dianePaused: boolean;
 }
 
 type ThemisAction =
@@ -99,7 +105,9 @@ type ThemisAction =
   | { type: 'SET_PAR_FIELD'; key: string; value: string | number | boolean; provenance: FieldProvenance }
   | { type: 'BATCH_SET_PAR_FIELDS'; values: Record<string, string | number | boolean>; provenance: FieldProvenance }
   | { type: 'RESET_PAR_DRAFT' }
-  | { type: 'COMMIT_SYNTHESIZED_SUBMISSION'; submission: Submission; audit: AuditEvent[] };
+  | { type: 'COMMIT_SYNTHESIZED_SUBMISSION'; submission: Submission; audit: AuditEvent[] }
+  | { type: 'SET_DIANE_PAUSED'; paused: boolean }
+  | { type: 'OVERRIDE_ROUTING'; submissionId: string; assignees: string[]; actorPersonaId: string };
 
 function reducer(state: ThemisState, action: ThemisAction): ThemisState {
   switch (action.type) {
@@ -200,6 +208,29 @@ function reducer(state: ThemisState, action: ThemisAction): ThemisState {
     }
     case 'RESET_PAR_DRAFT':
       return { ...state, parDraft: {}, parProvenance: {} };
+    case 'SET_DIANE_PAUSED':
+      return { ...state, dianePaused: action.paused };
+    case 'OVERRIDE_ROUTING': {
+      const auditEvent: AuditEvent = {
+        id: `ae_local_override_${Date.now()}`,
+        submissionId: action.submissionId,
+        actorPersonaId: action.actorPersonaId,
+        kind: 'routing_overridden',
+        at: Date.now(),
+      };
+      return {
+        ...state,
+        seed: {
+          ...state.seed,
+          submissions: state.seed.submissions.map((s) =>
+            s.id === action.submissionId
+              ? { ...s, assignees: action.assignees, updatedAt: Date.now() }
+              : s,
+          ),
+          audit: [...state.seed.audit, auditEvent],
+        },
+      };
+    }
     case 'COMMIT_SYNTHESIZED_SUBMISSION': {
       // Append the freshly synthesized submission + its audit trail to the
       // in-memory seed; create a thread shell so the existing surfaces (chat
@@ -328,9 +359,13 @@ interface ThemisContextValue extends ThemisState {
    * Synthesize the current parDraft into a Submission with full
    * DianeAnnotation, commit it to the in-memory seed, and return the
    * synthesis outcome (so the caller can drive the SubmittingOverlay
-   * sequence + navigation).
+   * sequence + navigation). Returns null when Diane is paused.
    */
   submitParDraft: () => SynthesisOutcome | null;
+  /** Toggle Diane's global pause state. Persisted in localStorage. */
+  setDianePaused: (paused: boolean) => void;
+  /** Approver-side routing override — replaces a submission's assignees. */
+  overrideRouting: (submissionId: string, assignees: string[]) => void;
 }
 
 const ThemisContext = createContext<ThemisContextValue | null>(null);
@@ -361,6 +396,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     queueFilters: EMPTY_FILTERS,
     parDraft: {},
     parProvenance: {},
+    dianePaused: false,
   }));
 
   const [hydrated, setHydrated] = useState(false);
@@ -375,6 +411,10 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       if (storedFilters) {
         const parsed = JSON.parse(storedFilters) as Partial<QueueFilters>;
         dispatch({ type: 'PATCH_FILTERS', patch: parsed });
+      }
+      const storedPaused = localStorage.getItem(DIANE_PAUSED_KEY);
+      if (storedPaused === 'true') {
+        dispatch({ type: 'SET_DIANE_PAUSED', paused: true });
       }
       const storedDraft = localStorage.getItem(PAR_DRAFT_KEY);
       if (storedDraft) {
@@ -487,6 +527,15 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
     }
   }, [hydrated, state.parDraft, state.parProvenance]);
 
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(DIANE_PAUSED_KEY, String(state.dianePaused));
+    } catch {
+      /* noop */
+    }
+  }, [hydrated, state.dianePaused]);
+
   const setCurrentPersonaId = useCallback((id: string) => {
     dispatch({ type: 'SET_PERSONA', id });
   }, []);
@@ -595,6 +644,7 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
   }, []);
 
   const submitParDraft = useCallback((): SynthesisOutcome | null => {
+    if (state.dianePaused) return null; // RAI gate — Diane refuses while paused
     const submitter = state.seed.personas.find((p) => p.id === state.currentPersonaId);
     if (!submitter) return null;
     if (Object.keys(state.parDraft).length === 0) return null;
@@ -610,7 +660,23 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       audit: outcome.audit,
     });
     return outcome;
-  }, [state.seed, state.parDraft, state.parProvenance, state.currentPersonaId]);
+  }, [state.seed, state.parDraft, state.parProvenance, state.currentPersonaId, state.dianePaused]);
+
+  const setDianePaused = useCallback((paused: boolean) => {
+    dispatch({ type: 'SET_DIANE_PAUSED', paused });
+  }, []);
+
+  const overrideRouting = useCallback(
+    (submissionId: string, assignees: string[]) => {
+      dispatch({
+        type: 'OVERRIDE_ROUTING',
+        submissionId,
+        assignees,
+        actorPersonaId: state.currentPersonaId,
+      });
+    },
+    [state.currentPersonaId],
+  );
 
   const value = useMemo<ThemisContextValue>(
     () => ({
@@ -632,6 +698,8 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       batchSetParFields,
       resetParDraft,
       submitParDraft,
+      setDianePaused,
+      overrideRouting,
     }),
     [
       state,
@@ -652,6 +720,8 @@ export function ThemisProvider({ seed, children }: ThemisProviderProps) {
       batchSetParFields,
       resetParDraft,
       submitParDraft,
+      setDianePaused,
+      overrideRouting,
     ],
   );
 

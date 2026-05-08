@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Minus, Plus, Sparkles, ThumbsUp, AlertCircle, ThumbsDown } from 'lucide-react';
+import { ChevronDown, Minus, Pause, Plus, Sparkles, ThumbsUp, AlertCircle, ThumbsDown } from 'lucide-react';
 import type { Confidence, DianeAnnotation, DianeCitation, Submission } from '@/data/themis/types';
 import { riskBand } from '../_lib/insights';
+import { useThemis } from '../_lib/store';
 import { cn } from '@/lib/utils';
+import RoutingOverrideModal from './RoutingOverrideModal';
 
 /**
  * Diane's recommended action, derived from the annotation. Used by the
@@ -81,8 +83,105 @@ const CONFIDENCE_COLOR: Record<Confidence, string> = {
  */
 export default function WhyCard({ submission }: WhyCardProps) {
   const { diane } = submission;
+  const { dianePaused } = useThemis();
+  if (dianePaused) return <WhyCardPaused submission={submission} />;
   if (!diane) return <WhyCardEmpty submission={submission} />;
+  if (diane.confidence === 'low') {
+    return <WhyCardRefusal submission={submission} diane={diane} />;
+  }
   return <WhyCardPopulated submission={submission} diane={diane} />;
+}
+
+/**
+ * WhyCardPaused — Diane is on the kill switch. Surfaces the structural
+ * fact that her authority is revoked, with a path to resume.
+ */
+function WhyCardPaused({ submission }: { submission: Submission }) {
+  const band = riskBand(submission);
+  return (
+    <div
+      className="mb-4 rounded-2xl border bg-[var(--themis-needs-info-bg)] px-4 py-3.5"
+      style={{ borderColor: 'var(--themis-needs-info)', borderLeftWidth: 2 }}
+    >
+      <header className="mb-2 flex flex-wrap items-center gap-2">
+        <Pause
+          size={12}
+          aria-hidden="true"
+          fill="currentColor"
+          style={{ color: 'var(--themis-needs-info)' }}
+        />
+        <span
+          className="font-mono text-[10px] uppercase tracking-widest"
+          style={{ color: 'var(--themis-needs-info)' }}
+        >
+          Diane is paused
+        </span>
+        <span
+          className="ml-auto rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+          style={{ background: `${RISK_COLOR[band]}1f`, color: RISK_COLOR[band] }}
+        >
+          Risk · {RISK_LABEL[band]}
+        </span>
+      </header>
+      <p className="font-display text-[13px] italic leading-relaxed text-text-primary">
+        Diane&apos;s analysis is unavailable while paused. The submission&apos;s
+        content is intact and the decision is yours to make. Resume from the
+        chrome chip to view her recommendation.
+      </p>
+    </div>
+  );
+}
+
+/**
+ * WhyCardRefusal — when synthesis confidence is `low`, Diane refuses to
+ * recommend rather than confabulating reasons. Surfaces this honestly:
+ * "I don't have enough policy coverage to draft this confidently — recommend
+ * assigning to a human reviewer for full triage."
+ */
+function WhyCardRefusal({
+  submission,
+  diane,
+}: {
+  submission: Submission;
+  diane: DianeAnnotation;
+}) {
+  const band = riskBand(submission);
+  return (
+    <div
+      className="mb-4 rounded-2xl border bg-[var(--themis-needs-info-bg)] px-4 py-3.5"
+      style={{ borderColor: 'var(--themis-needs-info)', borderLeftWidth: 2 }}
+    >
+      <header className="mb-2 flex flex-wrap items-center gap-2">
+        <AlertCircle
+          size={12}
+          aria-hidden="true"
+          style={{ color: 'var(--themis-needs-info)' }}
+        />
+        <span
+          className="font-mono text-[10px] uppercase tracking-widest"
+          style={{ color: 'var(--themis-needs-info)' }}
+        >
+          ✦ Diane abstains · low confidence
+        </span>
+        <span
+          className="ml-auto rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+          style={{ background: `${RISK_COLOR[band]}1f`, color: RISK_COLOR[band] }}
+        >
+          Risk · {RISK_LABEL[band]}
+        </span>
+      </header>
+      <p className="font-display text-[13.5px] italic leading-relaxed text-text-primary">
+        I don&apos;t have enough policy coverage to draft this confidently —
+        recommend assigning to a human reviewer for full triage. Coverage at{' '}
+        {Math.round(diane.coverage * 100)}%; only {diane.citations.length}{' '}
+        clause{diane.citations.length === 1 ? '' : 's'} matched the request
+        shape.
+      </p>
+      <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.25em] text-text-tertiary">
+        Approver discretion · this is your call
+      </p>
+    </div>
+  );
 }
 
 function WhyCardPopulated({
@@ -95,6 +194,7 @@ function WhyCardPopulated({
   const band = riskBand(submission);
   const [detailExpanded, setDetailExpanded] = useState(false);
   const [whyExpanded, setWhyExpanded] = useState(false);
+  const [overrideOpen, setOverrideOpen] = useState(false);
   const fieldGroupsCount = diane.fieldGroupsRetrieved.length;
   const recommendation = dianeRecommendation(diane);
   const verdictColor = VERDICT_COLOR[recommendation];
@@ -297,10 +397,19 @@ function WhyCardPopulated({
                       </li>
                     ))}
                   </ol>
-                  <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                    Estimated decision: {diane.routingPreview.estimatedDays} business{' '}
-                    {diane.routingPreview.estimatedDays === 1 ? 'day' : 'days'}
-                  </p>
+                  <div className="mt-2 flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                      Estimated decision: {diane.routingPreview.estimatedDays} business{' '}
+                      {diane.routingPreview.estimatedDays === 1 ? 'day' : 'days'}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setOverrideOpen(true)}
+                      className="font-mono text-[10px] uppercase tracking-widest text-[var(--themis-primary)] transition-colors hover:text-text-primary"
+                    >
+                      Edit chain →
+                    </button>
+                  </div>
                 </>
               )}
             </div>
@@ -311,6 +420,12 @@ function WhyCardPopulated({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <RoutingOverrideModal
+        submission={submission}
+        open={overrideOpen}
+        onClose={() => setOverrideOpen(false)}
+      />
     </div>
   );
 }
