@@ -78,9 +78,9 @@ export default function WhiteLodgeLayout({ children, onLock }: WhiteLodgeLayoutP
 
           {/* Right cluster — Diane state, persona, search, notifications, lock */}
           <div className="ml-auto flex items-center gap-2">
-            <span className="hidden sm:flex">
+            <div className="hidden sm:block">
               <PauseDianeChip />
-            </span>
+            </div>
             <PersonaPill
               personas={seed.personas}
               currentPersonaId={currentPersonaId}
