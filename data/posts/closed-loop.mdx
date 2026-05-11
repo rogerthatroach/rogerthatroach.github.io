@@ -8,13 +8,13 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-This paper examines a structural pattern — **closed-loop optimization** (sense &rarr; model &rarr; optimize &rarr; act) — as it manifests across four distinct application domains at ascending levels of abstraction: industrial emissions control via Particle Swarm Optimization at a 900MW coal power plant, cloud-based document processing pipelines, financial process automation, and enterprise agentic AI platforms. We present the formal PSO framework as applied to multi-output combustion tuning (84 simultaneous regression models across 90+ sensor inputs), derive the multi-objective optimization formulation for pollutant minimization under operational constraints, and demonstrate that the same four-phase architectural pattern recurs in each subsequent system despite fundamentally different technologies, domains, and abstraction levels. The paper argues that recognizing this structural isomorphism is itself a design methodology — one that accelerates architecture decisions in novel domains by drawing on proven patterns from prior ones.
+This paper examines a structural pattern, **closed-loop optimization** (sense &rarr; model &rarr; optimize &rarr; act), as it manifests across four distinct application domains at ascending levels of abstraction: industrial emissions control via Particle Swarm Optimization at a 900MW coal power plant, cloud-based document processing pipelines, financial process automation, and enterprise agentic AI platforms. We present the formal PSO framework as applied to multi-output combustion tuning (84 simultaneous regression models across 90+ sensor inputs), derive the multi-objective optimization formulation for pollutant minimization under operational constraints, and demonstrate that the same four-phase architectural pattern recurs in each subsequent system despite fundamentally different technologies, domains, and abstraction levels. The paper argues that recognizing this structural isomorphism is itself a design methodology, one that accelerates architecture decisions in novel domains by drawing on proven patterns from prior ones.
 
 ## 1. Introduction
 
-Applied AI practitioners often describe their careers as a sequence of projects, each with its own technologies, clients, and challenges. This framing obscures a deeper structural truth: the most impactful AI systems share common architectural patterns regardless of domain. Recognizing these patterns is not merely an academic exercise — it is a practical design methodology that reduces architecture risk in novel applications.
+Applied AI practitioners often describe their careers as a sequence of projects, each with its own technologies, clients, and challenges. This framing obscures a deeper structural truth: the most impactful AI systems share common architectural patterns regardless of domain. Recognizing these patterns is not merely an academic exercise. It is a practical design methodology that reduces architecture risk in novel applications.
 
-This paper traces one such pattern — **closed-loop optimization** — through four instantiations spanning a decade of applied work:
+This paper traces one such pattern, **closed-loop optimization**, through four instantiations spanning a decade of applied work:
 
 <div className="my-6 overflow-x-auto">
   <table className="w-full text-sm">
@@ -136,7 +136,7 @@ This is not a limitation but a design feature. The system recommends; the human 
 
 ### 3.1 Physical System
 
-The Maizuru 900MW coal-fired power plant (operated by Mitsubishi Hitachi Power Systems) combusts pulverized coal in a boiler to generate steam. The combustion process produces three primary pollutants — nitrogen oxides (NOx), sulfur oxides (SOx), and carbon monoxide (CO) — whose concentrations depend on boiler input settings: fuel mix ratios, air flow rates, damper positions, and secondary air distributions.
+The Maizuru 900MW coal-fired power plant (operated by Mitsubishi Hitachi Power Systems) combusts pulverized coal in a boiler to generate steam. The combustion process produces three primary pollutants: nitrogen oxides (NOx), sulfur oxides (SOx), and carbon monoxide (CO). Their concentrations depend on boiler input settings: fuel mix ratios, air flow rates, damper positions, and secondary air distributions.
 
 ### 3.2 Sensing: The Input Space
 
@@ -175,7 +175,7 @@ Retain features where <InlineEquation html={tex("|r_{j,i}| > r_{\\min}")} /> for
 
 **Step 2: Feature-feature correlation.** Among retained features, identify pairs with <InlineEquation html={tex("|r_{j,k}| > r_{\\text{collinear}}")} />. For collinear pairs, retain the feature with higher target correlation.
 
-This yields a model-specific feature set <InlineEquation html={tex("\\mathbf{x}_i \\subseteq \\mathbf{x}")} /> for each of the 84 models — not all models use the same features.
+This yields a model-specific feature set <InlineEquation html={tex("\\mathbf{x}_i \\subseteq \\mathbf{x}")} /> for each of the 84 models; not all models use the same features.
 
 #### 3.3.2 Model Selection: Multi-Indicator Evaluation
 
@@ -357,7 +357,7 @@ Why PSO over gradient-based methods?
 
 The PSO output is a set of optimal boiler input settings: specific fuel ratios, air flow rates, and damper positions. These recommendations were delivered to plant operators who made the physical adjustments.
 
-The human-in-the-loop design was deliberate. In a 900MW power plant, automated control changes carry catastrophic risk — incorrect settings could damage equipment worth hundreds of millions of dollars or cause safety incidents. The operators provided a validation layer the model could not: awareness of transient plant states, equipment wear, and operational context not captured in sensor data.
+The human-in-the-loop design was deliberate. In a 900MW power plant, automated control changes carry catastrophic risk: incorrect settings could damage equipment worth hundreds of millions of dollars or cause safety incidents. The operators provided a validation layer the model could not: awareness of transient plant states, equipment wear, and operational context not captured in sensor data.
 
 ### 3.6 Results
 
@@ -365,7 +365,7 @@ The system achieved:
 
 - **$3M annual cost savings** through optimized fuel consumption and reduced emissions penalties
 - **Measurable reduction in NOx, SOx, and CO concentrations** at stack outlets
-- **R&D positioning** — Digital Twin / combustion tuning was nascent technology in 2017–2018; this work positioned the consultancy as an innovator in industrial AI
+- **R&D positioning:** Digital Twin / combustion tuning was nascent technology in 2017–2018; this work positioned the consultancy as an innovator in industrial AI
 
 ## 4. The Pattern at Higher Abstraction Levels
 
@@ -404,7 +404,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{Z}")} /> (Sense)
         </td>
         <td className="py-2">
-          Document ingestion — structured and unstructured files from
+          Document ingestion: structured and unstructured files from
           insurance/financial clients
         </td>
       </tr>
@@ -413,7 +413,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{M}")} /> (Model)
         </td>
         <td className="py-2">
-          Entity extraction models (Vertex AI, AutoML) — mapping document content to
+          Entity extraction models (Vertex AI, AutoML): mapping document content to
           structured fields
         </td>
       </tr>
@@ -422,7 +422,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
         </td>
         <td className="py-2">
-          Reduce manual review cycles — maximize extraction accuracy to minimize human
+          Reduce manual review cycles: maximize extraction accuracy to minimize human
           intervention
         </td>
       </tr>
@@ -462,7 +462,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{M}")} /> (Model)
         </td>
         <td className="py-2">
-          PySpark transformation pipelines — mapping raw GL data to tax-ready formats
+          PySpark transformation pipelines: mapping raw GL data to tax-ready formats
         </td>
       </tr>
       <tr className="border-b border-border-subtle/50">
@@ -501,7 +501,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{Z}")} /> (Sense)
         </td>
         <td className="py-2">
-          Policy documents, historical data, user queries — ingested via chunking +
+          Policy documents, historical data, user queries: ingested via chunking +
           embedding pipelines
         </td>
       </tr>
@@ -510,7 +510,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{M}")} /> (Model)
         </td>
         <td className="py-2">
-          LangGraph agentic orchestration — intent detection, sub-agent routing, RAG
+          LangGraph agentic orchestration: intent detection, sub-agent routing, RAG
           retrieval
         </td>
       </tr>
@@ -519,7 +519,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
         </td>
         <td className="py-2">
-          RAG relevance optimization, MCP tool selection, disambiguation — maximizing
+          RAG relevance optimization, MCP tool selection, disambiguation: maximizing
           response accuracy under entitlement constraints
         </td>
       </tr>
@@ -528,7 +528,7 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{A}")} /> (Act)
         </td>
         <td className="py-2">
-          Guided enterprise decisions — structured drafts, financial insights,
+          Guided enterprise decisions: structured drafts, financial insights,
           benchmarking comparisons
         </td>
       </tr>
@@ -543,7 +543,7 @@ The system achieved:
 1. **The sensing function becomes more semantic.** Physical sensors (<InlineEquation html={tex("\\mathbb{R}^n")} />) &rarr; document parsers &rarr; data pipelines &rarr; embedding models (<InlineEquation html={tex("\\mathbb{R}^d")} />). The inputs evolve from physical measurements to semantic representations.
 2. **The modeling function becomes more compositional.** Single regression models &rarr; extraction pipelines &rarr; transformation chains &rarr; multi-agent orchestration. Each level composes more sub-models.
 3. **The optimization function becomes more constrained.** Operational bounds &rarr; accuracy thresholds &rarr; process SLAs &rarr; entitlement rules + regulatory compliance + data confidentiality. The constraint space grows richer.
-4. **The actuation function becomes more autonomous.** Human-operated controls &rarr; semi-automated pipelines &rarr; automated reports &rarr; AI-guided decisions with human oversight. But full autonomy is never the goal — human judgment remains in the loop.
+4. **The actuation function becomes more autonomous.** Human-operated controls &rarr; semi-automated pipelines &rarr; automated reports &rarr; AI-guided decisions with human oversight. But full autonomy is never the goal. Human judgment remains in the loop.
 
 <VisualizationContainer
   minHeight={480}
@@ -582,8 +582,8 @@ The pattern is structural, not implementational. Knowing that an agentic AI plat
 
 ## 7. Conclusion
 
-The closed-loop optimization pattern — sense, model, optimize, act — is not merely a useful abstraction. It is a structural invariant that appears in systems as different as industrial combustion control and enterprise agentic AI. Recognizing this invariant provides a design methodology: decompose the new system into its four phases, identify what each phase looks like in the new domain, and apply the structural lessons learned from prior instantiations.
+The closed-loop optimization pattern (sense, model, optimize, act) is not merely a useful abstraction. It is a structural invariant that appears in systems as different as industrial combustion control and enterprise agentic AI. Recognizing this invariant provides a design methodology: decompose the new system into its four phases, identify what each phase looks like in the new domain, and apply the structural lessons learned from prior instantiations.
 
-The most important structural lesson is this: **the "act" step defines the system's value.** A model that predicts emissions without recommending settings is a dashboard. A system that recommends optimal settings is a decision engine. An agentic platform that ingests policies without guiding decisions is a search tool. A platform that guides structured enterprise decisions is a transformation engine. The leap from descriptive to prescriptive — from informing to acting — is where the impact lives at every abstraction level.
+The most important structural lesson is this: **the "act" step defines the system's value.** A model that predicts emissions without recommending settings is a dashboard. A system that recommends optimal settings is a decision engine. An agentic platform that ingests policies without guiding decisions is a search tool. A platform that guides structured enterprise decisions is a transformation engine. The leap from descriptive to prescriptive, from informing to acting, is where the impact lives at every abstraction level.
 
 {/* References and Further Reading rendered by PostLayout from data/posts/index.ts */}

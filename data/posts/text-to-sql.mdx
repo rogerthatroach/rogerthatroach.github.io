@@ -8,8 +8,8 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## 1. Introduction
 
-Text-to-SQL — the task of translating natural language questions into executable
-SQL queries — has seen significant progress through large language models. DIN-SQL
+Text-to-SQL, the task of translating natural language questions into executable
+SQL queries, has seen significant progress through large language models. DIN-SQL
 <CitationRef id={1} />, DAIL-SQL <CitationRef id={2} />, and C3 <CitationRef id={3} /> achieve execution accuracies above 85% on the Spider
 benchmark <CitationRef id={4} />. However, production deployment in regulated financial environments
 exposes failure modes that benchmark evaluations do not capture:
@@ -18,7 +18,7 @@ exposes failure modes that benchmark evaluations do not capture:
 1. **Evolving taxonomies** where new KPIs are continuously added to the catalog
 1. **Injection vulnerabilities** from unguarded SQL generation
 1. **Non-deterministic outputs** that cannot be regression-tested
-1. **Displacive errors** — a confidently wrong answer is worse than no answer
+1. **Displacive errors:** a confidently wrong answer is worse than no answer
 
 We address these failures through decomposition: rather than treating text-to-SQL
 as a single function <InlineEquation html={tex("f: \\text{NL} \\rightarrow \\text{SQL}")} />, we factor it into
@@ -160,7 +160,7 @@ where:
 ### 4.2 Constrained Generation
 
 The LLM is prompted with a schema definition of <InlineEquation html={tex("\\mathcal{I}")} /> and instructed to output a JSON object
-conforming to the schema. This is constrained generation — the model's output
+conforming to the schema. This is constrained generation: the model's output
 space is restricted to valid intent tuples.
 
 **Validation.** The JSON output is validated against the schema before
@@ -303,7 +303,7 @@ a held-out query set.
 ### 6.4 Model Readiness as a Precondition
 
 The disambiguation safety property in Proposition 4 is *conditional on
-calibration* — and calibration is an empirical property of the underlying LLM,
+calibration*, and calibration is an empirical property of the underlying LLM,
 not of the architecture. The same five-stage pipeline executed against a less-
 calibrated model fails Requirement 3 even though it satisfies the architecture
 specification.
@@ -367,8 +367,8 @@ provides the structural skeleton, and parameterization fills in the specific val
     values) at the database driver level <CitationRef id={7} />. The driver processes the SQL template as
     a prepared statement, compiling it into an execution plan before binding parameter
     values. Parameter values are treated as data literals, not as SQL syntax.
-    Therefore, no content of <InlineEquation html={tex("q")} /> — regardless of its structure
-    or embedded SQL keywords — can alter the query's syntactic structure or
+    Therefore, no content of <InlineEquation html={tex("q")} /> (regardless of its structure
+    or embedded SQL keywords) can alter the query's syntactic structure or
     execution plan.
   </div>
 </TheoremBlock>
@@ -400,9 +400,9 @@ Even with template-based generation, a validation layer provides defense-in-dept
 1. **Operation check:** Verify the top-level operation is SELECT (no INSERT, UPDATE, DELETE, DROP)
 1. **Structure check:** Compare the generated SQL structure against the expected template structure using tree edit distance on the AST
 1. **Parameter type check:** Verify each bound parameter matches the expected type from the template definition
-1. **Forbidden-keyword filter (deny-list):** Reject SQL containing operations or schema mutations the allow-list might miss (e.g. `CREATE`, `GRANT`, `EXEC`). Defense-in-depth — redundant with the whitelist by design
+1. **Forbidden-keyword filter (deny-list):** Reject SQL containing operations or schema mutations the allow-list might miss (e.g. `CREATE`, `GRANT`, `EXEC`). Defense-in-depth: redundant with the whitelist by design
 
-If any check fails, the query is rejected and logged for review — it never reaches
+If any check fails, the query is rejected and logged for review; it never reaches
 the database. The validation layer is intentionally redundant: an allow-list defines what is permitted; a deny-list catches what slipped past the allow-list. Either alone is sufficient in theory; both together is what gets shipped to production.
 
 <VisualizationContainer
@@ -415,7 +415,7 @@ the database. The validation layer is intentionally redundant: an allow-list def
 ## 8. Stage 5: Deterministic Result Formatting
 
 The final stage transforms raw query results into the output format <InlineEquation html={tex("\\omega")} /> specified in the intent. This stage is entirely
-deterministic — no LLM involvement:
+deterministic, no LLM involvement:
 
 <MathBlock html={tex("s_5: (\\text{QueryResult}, \\omega) \\rightarrow \\mathcal{R}", true)} />
 
@@ -481,7 +481,7 @@ The five-stage decomposition transforms text-to-SQL from a monolithic generation
 task into a pipeline with formal safety properties. By factoring the problem into
 intent parsing, embedding-based detection, confidence-thresholded disambiguation,
 template-based generation with parameterization, and deterministic formatting, we
-achieve injection impossibility, schema compliance, and disambiguation correctness —
+achieve injection impossibility, schema compliance, and disambiguation correctness,
 properties that are provable, not aspirational.
 
 The key insight: **decomposition is itself the primary guardrail.** Each stage has a narrow contract, a testable interface, and clear failure modes.
