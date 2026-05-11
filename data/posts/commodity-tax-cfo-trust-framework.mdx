@@ -7,11 +7,11 @@ import Glossed from '@/components/resume/story/Glossed'
 import { CommodityTaxPipeline } from "@/components/blog/BlogDiagrams"
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
 
-In September 2022 I joined <Glossed>CFO Group</Glossed> at RBC as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the <Glossed>Commodity Tax</Glossed> return process — a manual workflow that consumed finance analysts for months per cycle.
+In September 2022 I joined <Glossed>CFO Group</Glossed> at RBC as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the <Glossed>Commodity Tax</Glossed> return process, a manual workflow that consumed finance analysts for months per cycle.
 
-By Q4 2023, the process took **90 minutes**. The metric earned the **CFO Group RBC Quarterly Team Award**. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually Prometheus — a cascade that shaped the next three years.
+By Q4 2023, the process took **90 minutes**. The metric earned the **CFO Group RBC Quarterly Team Award**. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually Prometheus, a cascade that shaped the next three years.
 
-This post walks the architectural decisions that made it land — under explicit constraints, against named alternatives, with the reasoning that produced each call. The narrative version of this story (with the cycle-1 anchor moment that compressed the whole strategy into a single afternoon) lives in the [builder companion](/blog/commodity-tax-cfo-trust). The formal frame — pipeline as a sequence of provenance-preserving graph rewrites, Tableau as a parallel presentation layer derived from the same provenance algebra — lives in the [formal post](/blog/commodity-tax-provenance).
+This post walks the architectural decisions that made it land: under explicit constraints, against named alternatives, with the reasoning that produced each call. The narrative version of this story (with the cycle-1 anchor moment that compressed the whole strategy into a single afternoon) lives in the [builder companion](/blog/commodity-tax-cfo-trust). The formal frame (pipeline as a sequence of provenance-preserving graph rewrites, Tableau as a parallel presentation layer derived from the same provenance algebra) lives in the [formal post](/blog/commodity-tax-provenance).
 
 <VisualizationContainer
   minHeight={500}
@@ -33,18 +33,18 @@ Five constraints shaped every decision below. Three regulatory or hard-technical
     },
     {
       kind: 'regulatory',
-      label: 'Auditability — chain of custody',
+      label: 'Auditability: chain of custody',
       detail: 'Every derived number must trace back to the specific journal entries that contributed to it. CFO-level sign-off requires an unbroken provenance chain from filed return to source GL row. SOX-adjacent controls mean the automation pipeline itself is audit-tested, not just the output.',
     },
     {
       kind: 'regulatory',
       label: 'Tax return compliance',
-      detail: 'Returns feed statutory filings — the ~$600M tax allocation per cycle is what the bank actually owes. No silent re-categorizations; rule changes require explicit approval and version trail.',
+      detail: 'Returns feed statutory filings: the ~$600M tax allocation per cycle is what the bank actually owes. No silent re-categorizations; rule changes require explicit approval and version trail.',
     },
     {
       kind: 'soft',
       label: 'Tool adoption friction',
-      detail: 'Finance team’s muscle memory was Tableau + Excel. A new frontend would add adoption cost on top of automation cost — and adoption cost is what kills automations on first sight of an anomaly.',
+      detail: 'Finance team’s muscle memory was Tableau + Excel. A new frontend would add adoption cost on top of automation cost, and adoption cost is what kills automations on first sight of an anomaly.',
     },
     {
       kind: 'soft',
@@ -56,7 +56,7 @@ Five constraints shaped every decision below. Three regulatory or hard-technical
 
 ## First project, first audition
 
-When you join an organization as the AI person and your first assignment is process automation, there are two ways to read it. You can treat it as a detour — &ldquo;I&rsquo;ll do this so I can get to the real AI work.&rdquo; Or you can treat it as an audition.
+When you join an organization as the AI person and your first assignment is process automation, there are two ways to read it. You can treat it as a detour: &ldquo;I&rsquo;ll do this so I can get to the real AI work.&rdquo; Or you can treat it as an audition.
 
 I treated it as an audition. Finance leaders were not going to green-light a machine-learning platform for CFO-level decisions on the strength of my CV. They were going to green-light it on the strength of my first delivery.
 
@@ -77,13 +77,13 @@ The first decision was close to obvious. The second decision is the whole post.
       summary: 'Distributed dataframe on the enterprise-sanctioned platform.',
       pros: [
         'Scales to full-cycle extraction in one pass; no batching gymnastics',
-        'CDP is the sanctioned platform for PII-adjacent workloads — staying inside avoids a governance fight',
+        'CDP is the sanctioned platform for PII-adjacent workloads, staying inside avoids a governance fight',
         'Code is maintainable by other data scientists, not just me',
         'Native lineage tracking on CDP supports the auditability constraint downstream',
       ],
       cons: [
         'Steeper onboarding vs. pandas for collaborators unfamiliar with Spark',
-        'Local dev cycle slower than pure-Python — necessary trade for the scale property',
+        'Local dev cycle slower than pure-Python, necessary trade for the scale property',
       ],
     },
     {
@@ -95,7 +95,7 @@ The first decision was close to obvious. The second decision is the whole post.
       cons: [
         'Incremental batching gymnastics for datasets of this size',
         'Memory pressure on any single machine running a full cycle',
-        'Edge cases in batch boundaries become new failure modes — exactly the wrong place to introduce non-determinism',
+        'Edge cases in batch boundaries become new failure modes, exactly the wrong place to introduce non-determinism',
       ],
     },
     {
@@ -105,7 +105,7 @@ The first decision was close to obvious. The second decision is the whole post.
         'Some adjacent processes already use it',
       ],
       cons: [
-        'Not part of the AI team’s stack — commits the future to SAS for any AI-adjacent work',
+        'Not part of the AI team’s stack, commits the future to SAS for any AI-adjacent work',
         'Licensing cost scales with team adoption',
         'Future-AI surface (Aegis, Astraeus, Prometheus) was Python-native; SAS would have forked the stack',
       ],
@@ -118,10 +118,10 @@ The first decision was close to obvious. The second decision is the whole post.
   summary="Match the data scale (hard constraint) and stay inside the sanctioned platform (regulatory)."
 >
   <p>
-    PySpark is the only option that handles full-cycle GL scale in one pass without batching gymnastics, and <Glossed>CDP</Glossed> is the sanctioned enterprise platform — staying inside it avoided a governance review that would have cost weeks. SAS was a dead end for any future AI-adjacent work; pandas would have failed at full-cycle scale. The decision wasn&rsquo;t close.
+    PySpark is the only option that handles full-cycle GL scale in one pass without batching gymnastics, and <Glossed>CDP</Glossed> is the sanctioned enterprise platform. Staying inside it avoided a governance review that would have cost weeks. SAS was a dead end for any future AI-adjacent work; pandas would have failed at full-cycle scale. The decision wasn&rsquo;t close.
   </p>
   <p>
-    A subtlety worth naming: this decision didn&rsquo;t earn any stakeholder trust. Finance leadership did not care which dataframe library produced the numbers. The compute decision was about <em>making the second decision possible</em> — once compute was solved, attention could move to the architectural call that did earn trust.
+    A subtlety worth naming: this decision didn&rsquo;t earn any stakeholder trust. Finance leadership did not care which dataframe library produced the numbers. The compute decision was about <em>making the second decision possible</em>: once compute was solved, attention could move to the architectural call that did earn trust.
   </p>
 </DecisionRationale>
 
@@ -130,7 +130,7 @@ The first decision was close to obvious. The second decision is the whole post.
 This is the decision that built trust.
 
 <OptionsConsidered
-  decision="What the finance team interacts with — the output surface"
+  decision="What the finance team interacts with: the output surface"
   options={[
     {
       name: 'Static report artifact',
@@ -140,7 +140,7 @@ This is the decision that built trust.
         'Zero learning curve for reviewers',
       ],
       cons: [
-        'Black box — reviewers can’t inspect how a number was produced',
+        'Black box: reviewers can’t inspect how a number was produced',
         'First time a number looks off, the team reverts to spreadsheets',
         'Fails the auditability constraint in spirit if not in letter',
       ],
@@ -150,10 +150,10 @@ This is the decision that built trust.
       summary: 'Dynamic view of the finished numbers.',
       pros: [
         'Better UX than PDF',
-        'Familiar tool — uses existing Tableau muscle memory',
+        'Familiar tool: uses existing Tableau muscle memory',
       ],
       cons: [
-        'Still a black box — dashboard shows the output, not the logic that produced it',
+        'Still a black box: dashboard shows the output, not the logic that produced it',
         'Doesn’t build the trust relationship needed for adoption',
       ],
     },
@@ -169,7 +169,7 @@ This is the decision that built trust.
       ],
       cons: [
         'More dashboards to build and maintain vs. a single output view',
-        'Analysts can see intermediate mess early on — requires a "we’ll fix this together" framing',
+        'Analysts can see intermediate mess early on, requires a "we’ll fix this together" framing',
       ],
     },
     {
@@ -192,13 +192,13 @@ This is the decision that built trust.
   summary="Output was the side effect; transparency was the product."
 >
   <p>
-    This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation — even one with bugs in v1 — built a debuggable, auditable relationship between the analysts and the system.
+    This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation, even one with bugs in v1, built a debuggable, auditable relationship between the analysts and the system.
   </p>
   <p>
     This satisfies every constraint above simultaneously: audit trail (regulatory + tax compliance), inspection at every step (first-impression risk), Tableau familiarity (adoption friction), and scales with the PySpark pipeline&rsquo;s output shape (GL scale).
   </p>
   <p>
-    The structural reason this works: once the pipeline preserves provenance — every derived row carries a back-edge to the source GL rows — the dashboards do not need to compute anything new. They render the same provenance graph the pipeline already maintains. The cost of the transparency layer is dashboard authoring, not data plumbing. (The <a href="/blog/commodity-tax-provenance">formal post</a> develops this as the provenance-algebra theorem; here it&rsquo;s enough to know that building both surfaces from one substrate is cheaper than building either alone.)
+    The structural reason this works: once the pipeline preserves provenance (every derived row carries a back-edge to the source GL rows) the dashboards do not need to compute anything new. They render the same provenance graph the pipeline already maintains. The cost of the transparency layer is dashboard authoring, not data plumbing. (The <a href="/blog/commodity-tax-provenance">formal post</a> develops this as the provenance-algebra theorem; here it&rsquo;s enough to know that building both surfaces from one substrate is cheaper than building either alone.)
   </p>
 </DecisionRationale>
 
@@ -210,16 +210,16 @@ Building the dashboards was half the work. The other half was a four-cycle ritua
   label="How trust compounded across cycles"
   steps={[
     {
-      title: 'Cycle 1 — joint bug hunt',
+      title: 'Cycle 1: joint bug hunt',
       caption: 'Q1 2023',
       content: (
         <p>
-          Analysts questioned numbers; we clicked into the Tableau view together; we traced each back to source; we either confirmed the automation&rsquo;s logic or fixed a mapping. Each session was a bug-hunt and a trust-building ritual at the same time. The automation had real bugs in v1. Fixing them in the open — with the analysts watching — is what built trust, not shipping it perfectly. The cycle-1 anchor moment is in the <a href="/blog/commodity-tax-cfo-trust">builder post</a>: a senior analyst flagged a GST aggregation; we drilled together and found a stale mapping rule from a tax-law update three quarters earlier.
+          Analysts questioned numbers; we clicked into the Tableau view together; we traced each back to source; we either confirmed the automation&rsquo;s logic or fixed a mapping. Each session was a bug-hunt and a trust-building ritual at the same time. The automation had real bugs in v1. Fixing them in the open, with the analysts watching, is what built trust, not shipping it perfectly. The cycle-1 anchor moment is in the <a href="/blog/commodity-tax-cfo-trust">builder post</a>: a senior analyst flagged a GST aggregation; we drilled together and found a stale mapping rule from a tax-law update three quarters earlier.
         </p>
       ),
     },
     {
-      title: 'Cycle 2 — analysts run the pipeline',
+      title: 'Cycle 2: analysts run the pipeline',
       caption: 'Q2 2023',
       content: (
         <p>
@@ -228,7 +228,7 @@ Building the dashboards was half the work. The other half was a four-cycle ritua
       ),
     },
     {
-      title: 'Cycle 3 — analysts request new views',
+      title: 'Cycle 3: analysts request new views',
       caption: 'Q3 2023',
       content: (
         <p>
@@ -237,7 +237,7 @@ Building the dashboards was half the work. The other half was a four-cycle ritua
       ),
     },
     {
-      title: 'Cycle 4 — 90-minute cycle, team award',
+      title: 'Cycle 4: 90-minute cycle, team award',
       caption: 'Q4 2023',
       content: (
         <p>
@@ -288,7 +288,7 @@ That confidence was the deliverable. The 90-minute metric was the side effect.
 
 ## What this opened
 
-By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose <Glossed>Aegis v1</Glossed> — a benchmarking engine for the Big 6 Canadian banks — and get the air cover to build it. When Aegis v1 shipped (2025 CFO One RBC Team Award), I could propose <Glossed>Aegis v2</Glossed>, the text-to-SQL refactor, and deliver it in a concurrent 2-week sprint while Astraeus productionization was underway. When <Glossed>Astraeus</Glossed> reached production scale, I had the credibility to conceive <Glossed>Prometheus</Glossed>, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the bank-wide platform end-to-end.
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose <Glossed>Aegis v1</Glossed> (a benchmarking engine for the Big 6 Canadian banks) and get the air cover to build it. When Aegis v1 shipped (2025 CFO One RBC Team Award), I could propose <Glossed>Aegis v2</Glossed>, the text-to-SQL refactor, and deliver it in a concurrent 2-week sprint while Astraeus productionization was underway. When <Glossed>Astraeus</Glossed> reached production scale, I had the credibility to conceive <Glossed>Prometheus</Glossed>, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the bank-wide platform end-to-end.
 
 Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. Commodity Tax was underwriting every subsequent bet.
 
@@ -296,13 +296,13 @@ Every one of those projects was technically ambitious. None of them would have b
 
 One scope call I&rsquo;d revisit: the first dashboard set surfaced provenance for *outputs* but not for *rules*. Analysts could drill from a derived number back to the source GL rows, but the rules that produced each category mapping lived in PySpark code, modifiable only by the data team. New tax categories or re-categorizations of existing GL accounts therefore required code changes and redeploys.
 
-In retrospect I&rsquo;d have built a *mapping-rules dashboard* from cycle 2 onward — letting analysts propose rule additions directly (still requiring code-review approval before production), turning the mapping layer from a single-person bottleneck into a shared surface. Formally (see the [provenance post](/blog/commodity-tax-provenance) §7), this is a missing presentation function: a <em>π<sub>ρ</sub></em> over the rule set itself, not just <em>π<sub>i</sub></em> over the data states. The transparency-as-architecture principle worked for outputs; I should have applied it to the rules at the same time. It would have cost about a week in v1 and saved much more than that across the next two years.
+In retrospect I&rsquo;d have built a *mapping-rules dashboard* from cycle 2 onward, letting analysts propose rule additions directly (still requiring code-review approval before production), turning the mapping layer from a single-person bottleneck into a shared surface. Formally (see the [provenance post](/blog/commodity-tax-provenance) §7), this is a missing presentation function: a <em>π<sub>ρ</sub></em> over the rule set itself, not just <em>π<sub>i</sub></em> over the data states. The transparency-as-architecture principle worked for outputs; I should have applied it to the rules at the same time. It would have cost about a week in v1 and saved much more than that across the next two years.
 
 ## The pattern
 
 Your first project at a new organization isn&rsquo;t just a deliverable. It&rsquo;s the audition that determines which doors open next.
 
-The architectural decision — Tableau as a transparency layer, not an output — was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
+The architectural decision (Tableau as a transparency layer, not an output) was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
 
 Astraeus&rsquo;s LLM-as-Router separation is a descendant of this idea. Aegis v2&rsquo;s confidence-thresholded clarification is a descendant of this idea. Prometheus&rsquo;s typed MCP tool contracts that log every field assignment are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
 
@@ -313,4 +313,4 @@ Commodity Tax was where I learned that. Cycle 1 was where the lesson actually la
 
 ### Reference implementation
 
-The 5-stage pipeline + provenance graph + drill API are implemented as a working Python repo at [`rogerthatroach/commodity-tax-provenance`](https://github.com/rogerthatroach/commodity-tax-provenance). 29 tests assert the load-bearing invariants — provenance preservation across composition, drill correctness, stale-rule isolation per quarter, dashboard ⇔ return-form consistency. Useful as a worked example when adapting this framework to other regulated-output pipelines.
+The 5-stage pipeline + provenance graph + drill API are implemented as a working Python repo at [`rogerthatroach/commodity-tax-provenance`](https://github.com/rogerthatroach/commodity-tax-provenance). 29 tests assert the load-bearing invariants: provenance preservation across composition, drill correctness, stale-rule isolation per quarter, dashboard ⇔ return-form consistency. Useful as a worked example when adapting this framework to other regulated-output pipelines.

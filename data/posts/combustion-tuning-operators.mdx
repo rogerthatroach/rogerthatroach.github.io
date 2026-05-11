@@ -24,9 +24,9 @@ The first iteration of the system produced recommendations. The operators ignore
 
 Not out of malice. Out of the entirely reasonable position of: I have been tuning this plant for twenty years, you have been looking at the data for six months, why would I change a valve position because a spreadsheet told me to. If I make a wrong adjustment at 900MW, something expensive and possibly dangerous happens. The recommendation has to earn the adjustment.
 
-The first few tuning cycles after deployment, I spent more time with the operators than with the models. They would run the pipeline, see a recommendation, and ask me what it meant. Not in general terms. Specifically: which valve, by how much, why. An abstract recommendation &mdash; "increase air flow in the secondary zone by 3%" &mdash; was useless until it translated into the exact operational knob they were going to turn. So I learned their language. The recommendations started shipping in their terms, with traceable reasoning: the model predicts that moving this knob by this amount reduces NOx by this much, here&rsquo;s which sensors the prediction depends on, here&rsquo;s how confident we are.
+The first few tuning cycles after deployment, I spent more time with the operators than with the models. They would run the pipeline, see a recommendation, and ask me what it meant. Not in general terms. Specifically: which valve, by how much, why. An abstract recommendation ("increase air flow in the secondary zone by 3%") was useless until it translated into the exact operational knob they were going to turn. So I learned their language. The recommendations started shipping in their terms, with traceable reasoning: the model predicts that moving this knob by this amount reduces NOx by this much, here&rsquo;s which sensors the prediction depends on, here&rsquo;s how confident we are.
 
-They also taught me things the data hadn&rsquo;t. The plant had quirks &mdash; which burner tended to run hot under certain load conditions, how the fuel supplier&rsquo;s blend varied seasonally, where a particular sensor was flaky and should be weighted less. None of this was in the dataset. All of it mattered. Some of the most valuable improvements to the system came from encoding operator intuition into features the model could use.
+They also taught me things the data hadn&rsquo;t. The plant had quirks: which burner tended to run hot under certain load conditions, how the fuel supplier&rsquo;s blend varied seasonally, where a particular sensor was flaky and should be weighted less. None of this was in the dataset. All of it mattered. Some of the most valuable improvements to the system came from encoding operator intuition into features the model could use.
 
 Within a few cycles, recommendations were getting applied. Within more, operators were calling us to flag cases where the model was confused and asking how to improve it. The pipeline became collaborative, not prescriptive.
 
@@ -39,7 +39,7 @@ Within a few cycles, recommendations were getting applied. Within more, operator
 
 ## The pattern
 
-This was the first time the closed-loop pattern appeared in my work &mdash; sense, model, optimize, act &mdash; and the first time I learned that the "act" step depends on humans who have to trust the system enough to do it.
+This was the first time the closed-loop pattern appeared in my work (sense, model, optimize, act), and the first time I learned that the "act" step depends on humans who have to trust the system enough to do it.
 
 Six years later, when I was building Commodity Tax at RBC, the same pattern showed up in a different industry. The technical layer was PySpark and Tableau instead of regression models and PSO. The trust layer was finance analysts instead of plant operators. The requirement was the same: a system whose outputs the humans who own the decision are willing to act on, and whose reasoning they can audit when they&rsquo;re skeptical.
 
