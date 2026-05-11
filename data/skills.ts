@@ -21,6 +21,7 @@ export type SkillCategory =
   | 'ml-dl'
   | 'data-eng'
   | 'cloud'
+  | 'platform-infra'
   | 'viz-frontend';
 
 export interface SkillCategoryMeta {
@@ -60,6 +61,11 @@ export const SKILL_CATEGORIES: SkillCategoryMeta[] = [
     id: 'cloud',
     label: 'Cloud & Platforms',
     description: 'GCP + Vertex AI, enterprise managed platforms.',
+  },
+  {
+    id: 'platform-infra',
+    label: 'Platform & Infra',
+    description: 'API services, container runtimes, multi-vendor LLM gateway integration, audit + observability.',
   },
   {
     id: 'viz-frontend',
@@ -109,6 +115,15 @@ export const SKILLS: Skill[] = [
   { name: 'Document AI', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana OCR layer', anchorLink: '/projects/document-intelligence' },
   { name: 'BigQuery / BigTable', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana data infrastructure', anchorLink: '/projects/document-intelligence' },
   { name: 'Dataiku', category: 'cloud', firstShipped: 2023, anchorProject: 'RBC managed Jupyter environment' },
+
+  // ─── Platform & Infra ───
+  { name: 'OpenShift (OCP)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'All RBC AI services on Kubernetes runtime', anchorLink: '/platform' },
+  { name: 'FastAPI / API services', category: 'platform-infra', firstShipped: 2024, anchorProject: 'WorkforceAnalytics + FundingRequest orchestration services', anchorLink: '/platform' },
+  { name: 'Multi-vendor LLM routing (via ModelGateway gateway)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Approved foundation-model endpoint integration', anchorLink: '/platform' },
+  { name: 'Permission cascade / authorization', category: 'platform-infra', firstShipped: 2025, anchorProject: 'WorkforceAnalytics 5-stage entitlement', anchorLink: '/projects/workforceAnalytics' },
+  { name: 'Audit logging (Postgres-backed)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'FundingRequest typed-MCP audit trail', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'Typed MCP tool registry', category: 'platform-infra', firstShipped: 2026, anchorProject: 'FundingRequest tool dispatcher', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'Cython (production compute paths)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'WorkforceAnalytics event-level ins-outs math at ms latency', anchorLink: '/projects/workforceAnalytics' },
 
   // ─── Viz & Frontend ───
   { name: 'Tableau', category: 'viz-frontend', firstShipped: 2022, anchorProject: 'Chick-fil-A → RBC CFO dashboards' },
