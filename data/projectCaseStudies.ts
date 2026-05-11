@@ -371,4 +371,64 @@ export const CASE_STUDIES: CaseStudy[] = [
     blogPostSlug: 'enterprise-agentic-ai-architecture',
     companionBlogPostSlug: 'par-assist-building',
   },
+  {
+    projectId: 'argus',
+    timeline: 'May 2026',
+    era: 'Intelligent Systems',
+    status: 'shipped',
+    tldr: {
+      problem:
+        'Senior bank leadership (SVP / EVP / group head audience) needed instant access to cross-segment KPIs and Canadian peer-bank comparisons across a substantial financial corpus. Query turnaround sat at minutes to hours via existing channels.',
+      decision:
+        'Solo build inside RBC Assist Pro\'s fixed orchestration over a single weekend (~21 hours). 300-line XML system prompt routes across 55 per-domain skill files. Pipeline: GPT-5 vision for tabular PDF parse, Anthropic Claude Opus 4.6 via AWS Bedrock for OCR-to-schema conversion.',
+      impact:
+        'Seconds-level turnaround on KPI queries across the corpus, with cross-segment KPIs and Canadian peer-bank comparisons answered on demand and on-demand professional visuals. Demo\'d to multiple SVPs who will present higher up the leadership chain.',
+    },
+    sequencing:
+      'ARGUS is the third architectural archetype in my portfolio. PAR Assist demonstrates full-stack end-to-end ownership. Astraeus demonstrates production-scale distributed multi-agent. ARGUS demonstrates constraint-shaped speed: working within someone else\'s platform, doing the architectural work in the seams, shipping under a tight timeline on a high-stakes deliverable. That\'s the operating mode platform engineers spend half their time in, and it\'s a distinct interview story from the other two.',
+    leadershipCallout:
+      'ARGUS was a single-weekend solo build during the final stages of PAR Assist. The architectural challenge wasn\'t infrastructure; it was working inside RBC Assist Pro\'s fixed orchestration (file search, embeddings search, LLM routing) and doing the design work in the seams the platform exposed: a 300-line XML system prompt, 55 per-domain skill files, and visualization governance. The deliverable was demo\'d to multiple SVPs who will carry it up the leadership chain. Constraint-shaped speed is its own discipline.',
+    sections: {
+      context:
+        'Senior bank leadership at RBC needed instant access to cross-segment KPIs and Canadian peer-bank comparisons across a substantial tabular financial corpus. Existing channels for ad-hoc questions ran on the order of minutes to hours. The deliverable had to demo to an SVP / EVP audience within a fixed window during the final stages of PAR Assist productionization.',
+      myRole:
+        'Sole designer, builder, and shipper. Conceived the agent layer, architected the skill-file routing pattern, built the ingestion pipeline, composed the system prompt and 55 per-domain skill files, and demo\'d the working prototype. Approximately 21 hours total across a single weekend (Friday evening through Saturday into early Sunday).',
+      stakeholders:
+        'Senior bank leadership (SVP / EVP / group head audience) as the demo recipients. Director AI for governance and priority alignment. No engineering services partner involvement (single-author build).',
+      challenge:
+        'Three constraints stacked. (1) RBC Assist Pro is RBC\'s internal AI product platform. It handles orchestration: file search, embeddings search, LLM routing. It exposes user-defined system prompts and skill files as the design surface. The orchestration layer itself is fixed; no architectural changes to the platform are possible. (2) The source corpus is a substantial tabular financial corpus across segments and peer banks. Schema-mapping the corresponding Excel files would have consumed the entire timeline; tabular OCR from the PDF needed to be accurate enough to feed analytical retrieval. (3) The deliverable had to demo to senior leadership within a fixed window.',
+      optionsConsidered: [
+        {
+          option: 'Schema-map the Excel files into a relational store',
+          prosAndCons: 'Maximum control, queryable via SQL. But Excel schemas vary inconsistently across segments and peer banks; mapping would have taken longer than the entire timeline. Rejected on time grounds.',
+          chosen: false,
+        },
+        {
+          option: 'Direct retrieval without an intermediate schema',
+          prosAndCons: 'Simplest path. But response quality across cross-segment KPI questions would suffer without structured layout per skill domain. Rejected because analytical responses needed retrievable structure.',
+          chosen: false,
+        },
+        {
+          option: 'Treat the orchestration layer as fixed and design in the seams',
+          prosAndCons: 'RBC Assist Pro\'s orchestration is fixed, but the system prompt and skill-file surface are user-defined. Putting the architectural work into those surfaces sidesteps the platform constraint. The risk: getting routing right with only a system prompt and per-domain skill files.',
+          chosen: true,
+        },
+        {
+          option: 'GPT-5 vision (PDF parse) + Claude Opus 4.6 via AWS Bedrock (OCR-to-schema) + skill-file routing',
+          prosAndCons: 'Three-stage pipeline. Vision-model parse handles tabular layout faster than Excel schema-mapping and with surprising accuracy. Opus 4.6 converts OCR into a JSON arrays-of-arrays schema with metadata enrichment. main_skill.md routes across 55 per-domain data_skill.md files; design.md governs visualization output. The architecture lives in the seams RBC Assist Pro exposes. Picked.',
+          chosen: true,
+        },
+      ],
+      decision:
+        'Three-stage pipeline inside RBC Assist Pro\'s fixed orchestration. Ingest: GPT-5 vision parses the tabular PDF corpus directly, faster than schema-mapping the corresponding Excel files and with surprising accuracy on the layouts. Structure: Anthropic Claude Opus 4.6 via AWS Bedrock converts raw OCR into logical groupings, standardizes a JSON arrays-of-arrays schema, and enriches with metadata. Compose skill files: output becomes the content of 55 per-domain data_skill.md files (one per KPI category, segment, or peer-bank slice), plus main_skill.md (router) and design.md (visualization governance). Runtime: RBC Assist Pro handles file search and embeddings search across the corpus; the 300-line XML system prompt dispatches across skill files; Opus 4.6 generates analytical responses with HTML visuals as supporting reference.',
+      implementation:
+        'XML system prompt (~300 lines) defines persona, constraints, response shape, analytical voice, error handling, refusal behavior, and formatting rules. Two or three lines reference main_skill.md and design.md as docs the model invokes when needed. main_skill.md is a router that dispatches to the appropriate per-domain data_skill.md file based on the query. Each per-domain skill file contains structured data, context, and retrieval hints for one KPI category, segment, or peer-bank slice. design.md references HTML files for visualizations and dashboard outputs. Runtime composition: RBC Assist Pro orchestration handles file and embeddings search, then the system prompt dispatches through skill files, and Claude Opus 4.6 generates the response with an HTML visual where applicable.',
+      impact:
+        'Collapses senior-leadership query turnaround from minutes and hours to seconds across the corpus. Cross-segment KPIs and Canadian peer-bank comparisons answer on demand, with professional visuals generated by the agent. Demo\'d to multiple SVPs who will present higher up the leadership chain. Beyond the direct demo win, ARGUS established the constraint-shaped-speed playbook for working inside RBC Assist Pro\'s envelope: the design surfaces are the system prompt and the skill files; the orchestration layer is leveraged, not modified.',
+      inProduction:
+        'Shipped as a prototype demo for senior bank leadership in May 2026. Hosted inside RBC Assist Pro; senior-leadership audiences access it through the platform\'s standard interface. Not a production-grade system; a working prototype demonstrated to multiple SVPs as a proof of the pattern.',
+      lessonsLearned:
+        'Three lessons. Architectural: when the orchestration layer is fixed, the architectural work moves into the seams (system prompt, skill files, visualization governance). Pipeline: GPT-5 vision parse of tabular PDFs was the timeline-saving decision (Excel schema-mapping would have consumed the weekend). Cadence: constraint-shaped speed is its own discipline. Working within someone else\'s platform under a tight timeline is not a fallback mode; it is the operating mode platform engineers spend half their time in. ARGUS is the third archetype my portfolio demonstrates, alongside full-stack end-to-end (PAR Assist) and production-scale distributed multi-agent (Astraeus).',
+    },
+  },
 ];
