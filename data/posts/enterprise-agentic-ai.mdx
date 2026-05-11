@@ -8,11 +8,11 @@ import { tex } from '@/lib/katex'
 
 ## 1. Introduction
 
-Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews — these workflows are high-stakes, document-heavy, and riddled with institutional knowledge that lives in people's heads rather than systems.
+Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews: these workflows are high-stakes, document-heavy, and riddled with institutional knowledge that lives in people's heads rather than systems.
 
-Most teams throw a chatbot at this. But the user doesn't need a Q&A interface. They need a *collaborator* — something that understands where they are in a multi-step process, holds context across the entire session, pulls the right reference material at the right moment, and resolves contradictions between policy documents without the user knowing there was a conflict.
+Most teams throw a chatbot at this. But the user doesn't need a Q&A interface. They need a *collaborator*: something that understands where they are in a multi-step process, holds context across the entire session, pulls the right reference material at the right moment, and resolves contradictions between policy documents without the user knowing there was a conflict.
 
-That's a fundamentally different problem than retrieval-augmented generation <CitationRef id={7} />. It's an orchestration problem over a structured form, inside a regulated-institution governance envelope. This paper formalizes the architectural pattern that solves it — as deployed at Prometheus inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
+That's a fundamentally different problem than retrieval-augmented generation <CitationRef id={7} />. It's an orchestration problem over a structured form, inside a regulated-institution governance envelope. This paper formalizes the architectural pattern that solves it, as deployed at Prometheus inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
 
 ## 2. Problem Formulation
 
@@ -44,7 +44,7 @@ where <InlineEquation html={tex("G(q, s_t) \\subseteq \\mathcal{G}")} /> is the 
 
 ### 2.2 Why Monolithic Architectures Fail
 
-A monolithic LLM <InlineEquation html={tex("\\Phi_{\\text{mono}}(u_t) = \\mathcal{L}(u_t, \\mathcal{D}, s_t)")} /> violates Requirement 1 by construction <CitationRef id={10} />, lacks Requirement 2, and cannot satisfy Requirement 4. Sequential chain architectures <CitationRef id={12} /> address none of these. A naïve multi-agent design satisfies Requirements 1–4 but violates Requirement 5 — which disqualifies it from first-deployment approval in regulated environments.
+A monolithic LLM <InlineEquation html={tex("\\Phi_{\\text{mono}}(u_t) = \\mathcal{L}(u_t, \\mathcal{D}, s_t)")} /> violates Requirement 1 by construction <CitationRef id={10} />, lacks Requirement 2, and cannot satisfy Requirement 4. Sequential chain architectures <CitationRef id={12} /> address none of these. A naïve multi-agent design satisfies Requirements 1–4 but violates Requirement 5, which disqualifies it from first-deployment approval in regulated environments.
 
 ## 3. Architecture
 
@@ -77,11 +77,11 @@ By induction on <InlineEquation html={tex("t")} />. Base case: <InlineEquation h
 
 ### 3.2 Why LangGraph Over Vanilla Chains
 
-LangChain's sequential chains implement <InlineEquation html={tex("f = f_n \\circ \\cdots \\circ f_1")} /> — insufficient for conditional-branching workflows. LangGraph <CitationRef id={6} /> models the workflow as a directed graph with conditional routing:
+LangChain's sequential chains implement <InlineEquation html={tex("f = f_n \\circ \\cdots \\circ f_1")} />, insufficient for conditional-branching workflows. LangGraph <CitationRef id={6} /> models the workflow as a directed graph with conditional routing:
 
 <MathBlock html={tex("v_{\\text{next}} = \\text{Router}(s_t) = \\begin{cases} v_{\\text{clarify}} & \\text{if open\\_followups}(s_t) \\\\ v_{\\text{retrieve}} & \\text{if groups\\_pending}(s_t) \\\\ v_{\\text{extract}} & \\text{if chunks\\_ready}(s_t) \\\\ v_{\\text{merge}} & \\text{if extractions\\_complete}(s_t) \\\\ v_{\\text{respond}} & \\text{if coverage\\_clear}(s_t) \\end{cases}", true)} />
 
-LangGraph was picked for maturity (the most stable production-deployed graph orchestrator at evaluation time) and because PAR drafting is shaped like a graph, not a pipeline. Multi-agent-first frameworks (CrewAI, AutoGen <CitationRef id={4} />) were considered but not deeply evaluated — their primitives would have violated Requirement 5.
+LangGraph was picked for maturity (the most stable production-deployed graph orchestrator at evaluation time) and because PAR drafting is shaped like a graph, not a pipeline. Multi-agent-first frameworks (CrewAI, AutoGen <CitationRef id={4} />) were considered but not deeply evaluated. Their primitives would have violated Requirement 5.
 
 ### 3.3 MCP Tools as the Action Layer
 
@@ -101,7 +101,7 @@ The tool set <InlineEquation html={tex("\\mathcal{T} = \\{T_{\\text{ingest}}, T_
 By construction. The LangGraph execution engine dispatches actions exclusively through <InlineEquation html={tex("\\mathcal{T}")} />; no code path exists outside the tool registry. Each invocation writes a typed record to the Postgres audit table as part of the transactional commit of <InlineEquation html={tex("\\delta")} />, so Requirement 4 holds unconditionally.
 </TheoremBlock>
 
-Template selection is itself an MCP tool. <InlineEquation html={tex("T_{\\text{template}}")} /> accepts the user's uploaded material and decision-tree answers (project type, spend tier, business line, regulatory exposure) and returns a typed template identifier with confidence and rationale — so even the act of choosing *what PAR we are writing* is auditable.
+Template selection is itself an MCP tool. <InlineEquation html={tex("T_{\\text{template}}")} /> accepts the user's uploaded material and decision-tree answers (project type, spend tier, business line, regulatory exposure) and returns a typed template identifier with confidence and rationale, so even the act of choosing *what PAR we are writing* is auditable.
 
 ### 3.4 Two-Stage Field-Group Retrieval
 
@@ -134,7 +134,7 @@ Field-group partitioning ensures every retrieved chunk belongs to a group whose 
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
-Immediate from the partition structure of Definition 4 and the selection criterion in Stage 1. Because <InlineEquation html={tex("\\mathcal{D}_g \\cap \\mathcal{D}_{g'} = \\emptyset")} /> for distinct groups, no chunk appears in unrelated retrieval scopes — which is the structural correction flat top-<InlineEquation html={tex("k")} /> retrieval cannot provide.
+Immediate from the partition structure of Definition 4 and the selection criterion in Stage 1. Because <InlineEquation html={tex("\\mathcal{D}_g \\cap \\mathcal{D}_{g'} = \\emptyset")} /> for distinct groups, no chunk appears in unrelated retrieval scopes, which is the structural correction flat top-<InlineEquation html={tex("k")} /> retrieval cannot provide.
 </TheoremBlock>
 
 ### 3.5 Parallel Extraction Within a Single-Agent Envelope
@@ -154,7 +154,7 @@ Because <InlineEquation html={tex("\\mathcal{F}_{g_i} \\cap \\mathcal{F}_{g_j} =
 </TheoremBlock>
 
 <TheoremBlock variant="theorem" number={2} title="Single-Agent Envelope">
-Under the construction above, parallelism <InlineEquation html={tex("N > 1")} /> does not imply multiple agents. The deterministic orchestrator <InlineEquation html={tex("G")} /> dispatches <InlineEquation html={tex("N")} /> instances of <InlineEquation html={tex("T_{\\text{extract}}")} /> — each a typed tool invocation, not an autonomous agent — and merges their outputs via Definition 7. Exactly one agent-shaped entity <InlineEquation html={tex("\\alpha")} /> exists in the control surface; Requirement 5 holds.
+Under the construction above, parallelism <InlineEquation html={tex("N > 1")} /> does not imply multiple agents. The deterministic orchestrator <InlineEquation html={tex("G")} /> dispatches <InlineEquation html={tex("N")} /> instances of <InlineEquation html={tex("T_{\\text{extract}}")} /> (each a typed tool invocation, not an autonomous agent) and merges their outputs via Definition 7. Exactly one agent-shaped entity <InlineEquation html={tex("\\alpha")} /> exists in the control surface; Requirement 5 holds.
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
@@ -191,12 +191,12 @@ The LLM operates at the intake/template node and at the <InlineEquation html={te
 
 Prometheus transformed multi-week governance drafting into a guided interactive session, with every extracted field cited back to a policy, guideline, or few-shot example. Pilot launched April 2026; enterprise rollout across RBC business lines through Q2/Q3 2026.
 
-The five-piece pattern — LangGraph <CitationRef id={6} />, MCP tool boundary <CitationRef id={5} />, two-stage field-group retrieval <CitationRef id={7} />, N parallel scoped extraction with dict-union merge, unified Postgres backbone — is reusable for any enterprise workflow with (i) a structured target form, (ii) institutional knowledge across heterogeneous sources, and (iii) regulatory audit requirements. The v2 evolution replaces the single-agent envelope with a multi-agent *skills* framework composed over the same MCP tool registry; v1 is the substrate v2 extends.
+The five-piece pattern (LangGraph <CitationRef id={6} />, MCP tool boundary <CitationRef id={5} />, two-stage field-group retrieval <CitationRef id={7} />, N parallel scoped extraction with dict-union merge, unified Postgres backbone) is reusable for any enterprise workflow with (i) a structured target form, (ii) institutional knowledge across heterogeneous sources, and (iii) regulatory audit requirements. The v2 evolution replaces the single-agent envelope with a multi-agent *skills* framework composed over the same MCP tool registry; v1 is the substrate v2 extends.
 
 <TheoremBlock variant="remark">
 <MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{Postgres remembers}}", true)} />
 
-That separation is what makes agentic AI viable in regulated environments <CitationRef id={3} /><CitationRef id={13} /> — structural guarantees, not prompt engineering tricks, and a single-agent envelope that trades maximum capability today for an approved substrate that v2 skills already sit on top of.
+That separation is what makes agentic AI viable in regulated environments <CitationRef id={3} /><CitationRef id={13} />: structural guarantees, not prompt engineering tricks, and a single-agent envelope that trades maximum capability today for an approved substrate that v2 skills already sit on top of.
 </TheoremBlock>
 
 

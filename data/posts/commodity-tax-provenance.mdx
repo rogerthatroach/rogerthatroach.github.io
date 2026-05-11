@@ -8,13 +8,13 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## 1. Introduction
 
-Process automation in regulated finance has a property that most software engineering treats as separate: every output number must be defensible against an auditor, a regulator, or a skeptical domain expert who has built years of intuition about what the numbers should look like. The standard pipeline-as-ETL pattern <CitationRef id={1} /> &mdash; extract, transform, load &mdash; satisfies functional correctness but does not, on its own, satisfy *audit* correctness.
+Process automation in regulated finance has a property that most software engineering treats as separate: every output number must be defensible against an auditor, a regulator, or a skeptical domain expert who has built years of intuition about what the numbers should look like. The standard pipeline-as-ETL pattern <CitationRef id={1} /> (extract, transform, load) satisfies functional correctness but does not, on its own, satisfy *audit* correctness.
 
 The gap is provenance. An ETL pipeline that produces a tax-return number from millions of journal entries is functionally correct if the number is right; it is *auditably* correct if and only if there is a reconstructable chain from the output number back to the specific journal entries that contributed to it, with every intermediate transformation visible and replayable.
 
-This paper formalizes the architecture used to automate the Commodity Tax return process at a major Canadian bank, where the engineering target was not just functional correctness but *provenance preservation across pipeline composition*. We model the pipeline as a sequence of graph rewrites <CitationRef id={2} />, each rewrite preserving a typed provenance relation. We prove that under this construction, every output node has a deterministic, inspectable provenance chain back to source rows in the General Ledger journals. We then characterize the *transparency layer* &mdash; the parallel surface of Tableau dashboards through which stakeholders interact with the provenance chain &mdash; as a separate but composable abstraction over the same provenance algebra.
+This paper formalizes the architecture used to automate the Commodity Tax return process at a major Canadian bank, where the engineering target was not just functional correctness but *provenance preservation across pipeline composition*. We model the pipeline as a sequence of graph rewrites <CitationRef id={2} />, each rewrite preserving a typed provenance relation. We prove that under this construction, every output node has a deterministic, inspectable provenance chain back to source rows in the General Ledger journals. We then characterize the *transparency layer* (the parallel surface of Tableau dashboards through which stakeholders interact with the provenance chain) as a separate but composable abstraction over the same provenance algebra.
 
-The architectural punchline is that *transparency is not a feature appended to compute*. It is a parallel structure derivable from the same provenance relation that makes the pipeline correct. Building both at once costs less than building either alone &mdash; once provenance is a first-class object, the dashboards write themselves.
+The architectural punchline is that *transparency is not a feature appended to compute*. It is a parallel structure derivable from the same provenance relation that makes the pipeline correct. Building both at once costs less than building either alone: once provenance is a first-class object, the dashboards write themselves.
 
 ## 2. Problem Formulation
 
@@ -24,7 +24,7 @@ The system operates on General Ledger (GL) journal entries representing all bank
 
 - <InlineEquation html={tex("\\mathcal{J} = \\{j_1, j_2, \\ldots, j_n\\}")} /> be the set of GL journal rows for the period (typical scale: <InlineEquation html={tex("|\\mathcal{J}| \\sim 10^7")} />)
 - <InlineEquation html={tex("\\mathcal{B}")} /> be the set of tax-category buckets (e.g., GST-recoverable, PVAT-allocated, exempt)
-- <InlineEquation html={tex("\\mathcal{R}")} /> be the space of returns &mdash; one number per bucket, plus metadata
+- <InlineEquation html={tex("\\mathcal{R}")} /> be the space of returns, one number per bucket, plus metadata
 
 The pipeline must implement <InlineEquation html={tex("F: \\mathcal{J} \\rightarrow \\mathcal{R}")} /> with the properties below.
 
@@ -75,11 +75,11 @@ The pipeline factors <InlineEquation html={tex("F")} /> into five sequential sta
 
 | Stage | Function | Transformation |
 |---|---|---|
-| <InlineEquation html={tex("s_1")} /> | Extract | <InlineEquation html={tex("\\mathcal{J}_{\\text{raw}} \\rightarrow \\mathcal{J}_{\\text{typed}}")} /> &mdash; load GL rows into typed PySpark dataframes |
-| <InlineEquation html={tex("s_2")} /> | Reconcile | <InlineEquation html={tex("\\mathcal{J}_{\\text{typed}} \\rightarrow \\mathcal{J}_{\\text{rec}}")} /> &mdash; align journals to the tax-period reporting boundary |
-| <InlineEquation html={tex("s_3")} /> | Category map | <InlineEquation html={tex("\\mathcal{J}_{\\text{rec}} \\rightarrow \\mathcal{J}_{\\text{cat}}")} /> &mdash; assign each row to a tax-category bucket via rule lookup |
-| <InlineEquation html={tex("s_4")} /> | Aggregate | <InlineEquation html={tex("\\mathcal{J}_{\\text{cat}} \\rightarrow \\mathcal{V}")} /> &mdash; sum per bucket |
-| <InlineEquation html={tex("s_5")} /> | Return | <InlineEquation html={tex("\\mathcal{V} \\rightarrow \\mathcal{R}")} /> &mdash; format aggregated values into the canonical return shape |
+| <InlineEquation html={tex("s_1")} /> | Extract | <InlineEquation html={tex("\\mathcal{J}_{\\text{raw}} \\rightarrow \\mathcal{J}_{\\text{typed}}")} />: load GL rows into typed PySpark dataframes |
+| <InlineEquation html={tex("s_2")} /> | Reconcile | <InlineEquation html={tex("\\mathcal{J}_{\\text{typed}} \\rightarrow \\mathcal{J}_{\\text{rec}}")} />: align journals to the tax-period reporting boundary |
+| <InlineEquation html={tex("s_3")} /> | Category map | <InlineEquation html={tex("\\mathcal{J}_{\\text{rec}} \\rightarrow \\mathcal{J}_{\\text{cat}}")} />: assign each row to a tax-category bucket via rule lookup |
+| <InlineEquation html={tex("s_4")} /> | Aggregate | <InlineEquation html={tex("\\mathcal{J}_{\\text{cat}} \\rightarrow \\mathcal{V}")} />: sum per bucket |
+| <InlineEquation html={tex("s_5")} /> | Return | <InlineEquation html={tex("\\mathcal{V} \\rightarrow \\mathcal{R}")} />: format aggregated values into the canonical return shape |
 
 <VisualizationContainer
   minHeight={500}
@@ -93,7 +93,7 @@ The pipeline factors <InlineEquation html={tex("F")} /> into five sequential sta
 We model each intermediate state <InlineEquation html={tex("\\mathcal{J}_k")} /> as a labelled directed graph <InlineEquation html={tex("G_k = (V_k, E_k, L_k)")} /> where:
 
 - <InlineEquation html={tex("V_k")} /> is the set of data nodes after stage <InlineEquation html={tex("s_k")} />
-- <InlineEquation html={tex("E_k \\subseteq V_k \\times V_{k-1}")} /> is the *provenance edge set* &mdash; each edge <InlineEquation html={tex("(v, u)")} /> records that <InlineEquation html={tex("v \\in V_k")} /> was derived from <InlineEquation html={tex("u \\in V_{k-1}")} />
+- <InlineEquation html={tex("E_k \\subseteq V_k \\times V_{k-1}")} /> is the *provenance edge set*, each edge <InlineEquation html={tex("(v, u)")} /> records that <InlineEquation html={tex("v \\in V_k")} /> was derived from <InlineEquation html={tex("u \\in V_{k-1}")} />
 - <InlineEquation html={tex("L_k")} /> is the labelling function carrying derivation metadata (rule applied, timestamp, version)
 
 Each stage <InlineEquation html={tex("s_k")} /> is a graph rewrite that constructs <InlineEquation html={tex("G_k")} /> from <InlineEquation html={tex("G_{k-1}")} /> while extending the provenance edge set:
@@ -143,7 +143,7 @@ The provenance relation <InlineEquation html={tex("P")} /> obeys two algebraic p
   <MathBlock html={tex("P\\bigl(\\sum_{i} v_i\\bigr) = \\bigcup_i P(v_i)", true)} />
 </TheoremBlock>
 
-These properties are what make drill-through possible &mdash; a user inspecting an aggregated number can mechanically expand it into its contributing rows by traversing the provenance graph.
+These properties are what make drill-through possible: a user inspecting an aggregated number can mechanically expand it into its contributing rows by traversing the provenance graph.
 
 ## 4. The Transparency Layer as Parallel Structure
 
@@ -157,7 +157,7 @@ The presentation function is parameterized but pure: given the same <InlineEquat
 
 ### 4.2 Drill-Through as Provenance-Edge Traversal
 
-A drill-through interaction &mdash; an analyst clicking from a derived number back to the rows that produced it &mdash; is formally a backward traversal of the provenance edge set. Given an aggregated value <InlineEquation html={tex("v \\in V_k")} />, drilling to the source GL rows is:
+A drill-through interaction (an analyst clicking from a derived number back to the rows that produced it) is formally a backward traversal of the provenance edge set. Given an aggregated value <InlineEquation html={tex("v \\in V_k")} />, drilling to the source GL rows is:
 
 <MathBlock html={tex("\\text{drill}(v) = \\{u \\in V_0 : (v, \\ldots, u) \\in E^*\\}", true)} />
 
@@ -165,7 +165,7 @@ where <InlineEquation html={tex("E^*")} /> is the transitive closure of all prov
 
 <TheoremBlock variant="theorem" number={2} title="Drill correctness">
   <div>
-    For every derived value <InlineEquation html={tex("v \\in V_k")} />, <InlineEquation html={tex("\\text{drill}(v) = P(v)")} /> &mdash; the rows
+    For every derived value <InlineEquation html={tex("v \\in V_k")} />, <InlineEquation html={tex("\\text{drill}(v) = P(v)")} />, the rows
     surfaced by drill-through are exactly the provenance set of <InlineEquation html={tex("v")} />.
   </div>
 </TheoremBlock>
@@ -180,7 +180,7 @@ where <InlineEquation html={tex("E^*")} /> is the transitive closure of all prov
 
 ### 4.3 Why the Transparency Layer Is Not Free But Is Cheap
 
-A naive reading of this architecture suggests the transparency layer is free &mdash; once provenance is preserved, dashboards are just queries over the provenance graph. This is partially correct: the *information* needed for the dashboards is already in <InlineEquation html={tex("G_k")} />. What is not free is the *presentation engineering*: choosing what to show, how to summarize at each stage, and how to design the navigation between stages so that an analyst&rsquo;s drill-through is fluent rather than mechanical.
+A naive reading of this architecture suggests the transparency layer is free: once provenance is preserved, dashboards are just queries over the provenance graph. This is partially correct: the *information* needed for the dashboards is already in <InlineEquation html={tex("G_k")} />. What is not free is the *presentation engineering*: choosing what to show, how to summarize at each stage, and how to design the navigation between stages so that an analyst&rsquo;s drill-through is fluent rather than mechanical.
 
 The cost of the transparency layer is therefore the cost of dashboard authoring, *not* the cost of data plumbing. Once provenance is preserved at the pipeline layer, the dashboards do not need to compute anything new; they only need to render. This is the structural reason why building both pipeline and transparency layer in v1 is cheaper than the conventional pattern of building the pipeline first, watching adoption fail, and bolting on inspection tools later.
 
@@ -192,7 +192,7 @@ The transparency-layer architecture supports a quantitative model of stakeholder
 
 <MathBlock html={tex("\\frac{dT_t}{dt} \\propto \\text{rate of successful drill-throughs} - \\text{rate of unresolved anomalies}", true)} />
 
-Each successful drill-through &mdash; an analyst flagging a number, drilling to source, and either confirming the system&rsquo;s logic or having a real bug fixed &mdash; increments trust. Each unresolved anomaly (a number that looks wrong but cannot be explained by drilling) decrements it.
+Each successful drill-through (an analyst flagging a number, drilling to source, and either confirming the system&rsquo;s logic or having a real bug fixed) increments trust. Each unresolved anomaly (a number that looks wrong but cannot be explained by drilling) decrements it.
 
 ### 5.2 The Critical Threshold
 
@@ -200,7 +200,7 @@ For automation adoption, the critical event is when team confidence in the syste
 
 <MathBlock html={tex("T_t^{\\text{auto}} > T_t^{\\text{manual}}", true)} />
 
-In the deployment described, this threshold was reached after four cycles. Each cycle delivered a stream of successful drill-throughs &mdash; a category found, a mapping fixed, a roll-up validated &mdash; and the rate of unresolved anomalies fell to zero by cycle three.
+In the deployment described, this threshold was reached after four cycles. Each cycle delivered a stream of successful drill-throughs (a category found, a mapping fixed, a roll-up validated) and the rate of unresolved anomalies fell to zero by cycle three.
 
 ### 5.3 Why Black-Box Automation Loses Even When Correct
 
@@ -216,7 +216,7 @@ The compute pipeline runs as a sequence of PySpark jobs on Cloudera Data Platfor
 
 ### 6.2 Tableau as the Presentation Layer
 
-Tableau was chosen over a custom inspection UI for two reasons: (a) the finance team already had Tableau muscle memory; introducing a new tool would have added adoption cost on top of automation cost, and (b) Tableau&rsquo;s native joins between datasets reproduce the provenance-edge traversal mechanically &mdash; an analyst doesn&rsquo;t need to learn a new navigation; they use the same drill-down they already know.
+Tableau was chosen over a custom inspection UI for two reasons: (a) the finance team already had Tableau muscle memory; introducing a new tool would have added adoption cost on top of automation cost, and (b) Tableau&rsquo;s native joins between datasets reproduce the provenance-edge traversal mechanically: an analyst doesn&rsquo;t need to learn a new navigation; they use the same drill-down they already know.
 
 ### 6.3 Provenance Mechanism
 
@@ -242,9 +242,9 @@ This is the second-order application of the transparency-as-architecture princip
 
 Process automation in regulated finance has a property that ordinary ETL does not address: every output must be defensible to a domain expert who has built years of intuition about what the numbers should look like. Functional correctness is necessary; auditability is sufficient.
 
-The architecture above &mdash; a five-stage pipeline whose graph rewrites preserve provenance, paired with a parallel Tableau presentation layer whose drill-throughs are formally traversals of the provenance edge set &mdash; produces both. The cost of building the transparency layer alongside the pipeline is the cost of dashboard authoring, not data plumbing; the structure makes both surfaces composable from the same provenance algebra.
+The architecture above (a five-stage pipeline whose graph rewrites preserve provenance, paired with a parallel Tableau presentation layer whose drill-throughs are formally traversals of the provenance edge set) produces both. The cost of building the transparency layer alongside the pipeline is the cost of dashboard authoring, not data plumbing; the structure makes both surfaces composable from the same provenance algebra.
 
-The deeper claim is that *transparency is not a feature*. It is a structural property of any architecture that takes auditability seriously. In a regulated context, the architecture that survives stakeholder review is the architecture that surfaces its own derivations &mdash; and the architecture that surfaces its own derivations is the only architecture that earns the trust required for an automation to actually replace the manual process it sits next to.
+The deeper claim is that *transparency is not a feature*. It is a structural property of any architecture that takes auditability seriously. In a regulated context, the architecture that survives stakeholder review is the architecture that surfaces its own derivations, and the architecture that surfaces its own derivations is the only architecture that earns the trust required for an automation to actually replace the manual process it sits next to.
 
 
 ---
@@ -253,4 +253,4 @@ The deeper claim is that *transparency is not a feature*. It is a structural pro
 
 Working code, synthetic data, and reproducible plots: [`rogerthatroach/commodity-tax-provenance`](https://github.com/rogerthatroach/commodity-tax-provenance).
 
-The 5-stage pipeline runs end-to-end on 1,000 synthetic GL rows; drill-through is implemented as a backward BFS over the provenance edge set; the parallel-presentation invariant is asserted in tests (`test_dashboard_view_matches_return_lines`). A stale GST rule injected for one quarter surfaces in the drill lineage but stays out of every other quarter — verifying both the staleness-detection claim and the rule-isolation property formally.
+The 5-stage pipeline runs end-to-end on 1,000 synthetic GL rows; drill-through is implemented as a backward BFS over the provenance edge set; the parallel-presentation invariant is asserted in tests (`test_dashboard_view_matches_return_lines`). A stale GST rule injected for one quarter surfaces in the drill lineage but stays out of every other quarter, verifying both the staleness-detection claim and the rule-isolation property formally.

@@ -9,7 +9,7 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern — **LLM-as-Router** — that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group — up to six GPT-4.1 calls per query (parse, route, up to three parallel metadata extractions, one-or-three-then-combined synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee-level events with millisecond response times.
+Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: up to six GPT-4.1 calls per query (parse, route, up to three parallel metadata extractions, one-or-three-then-combined synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee-level events with millisecond response times.
 
 <VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed walls separate the three bands: LLM intent (parse / route / metadata extract), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM synthesis (one call or up to three parallel final subagents, then combined). Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
   {(isVisible) => <AstraeusCascade />}
@@ -19,7 +19,7 @@ Large Language Models (LLMs) have demonstrated remarkable capability in natural 
 
 Enterprise AI systems operating on sensitive financial data face a trilemma: they must be *intelligent* (understand natural language queries), *correct* (produce deterministic, auditable results), and *secure* (enforce fine-grained access controls). Existing LLM-powered analytics tools typically sacrifice correctness and security for intelligence, passing sensitive data through model context windows and relying on probabilistic inference for computation <CitationRef id={1} /><CitationRef id={2} />.
 
-We argue that this tradeoff is architectural, not fundamental. By decomposing the system into two layers with distinct computational properties — a stateless, data-free intent detection layer powered by an LLM, and a stateful, data-rich deterministic computation layer powered by conventional software — we achieve all three properties simultaneously.
+We argue that this tradeoff is architectural, not fundamental. By decomposing the system into two layers with distinct computational properties (a stateless, data-free intent detection layer powered by an LLM, and a stateful, data-rich deterministic computation layer powered by conventional software) we achieve all three properties simultaneously.
 
 The contributions of this paper are:
 
@@ -65,7 +65,7 @@ A monolithic architecture passes both the query and relevant data into a single 
 
 <MathBlock html={tex("f_{\\text{mono}}(q) = \\mathcal{L}(q, \\mathcal{D}_{\\text{relevant}})", true)} />
 
-This violates Requirement 3 by construction. It also violates Requirement 2 because LLM outputs are stochastic — the same prompt produces different outputs across invocations <CitationRef id={3} />. Temperature zero does not guarantee determinism across model versions or API updates.
+This violates Requirement 3 by construction. It also violates Requirement 2 because LLM outputs are stochastic: the same prompt produces different outputs across invocations <CitationRef id={3} />. Temperature zero does not guarantee determinism across model versions or API updates.
 
 <VisualizationContainer minHeight={400} caption="Figure 1: Monolithic vs. LLM-as-Router architecture comparison. The monolithic approach passes data through the LLM context, violating confidentiality and determinism guarantees.">
   {(isVisible) => <AgenticArchitecture />}
@@ -107,17 +107,17 @@ where:
 - <InlineEquation html={tex("\\tau \\in \\mathcal{T}")} /> is the **temporal specification** (point-in-time, range, trend)
 - <InlineEquation html={tex("\\omega \\in \\Omega")} /> is the **output format** (table, chart, summary, report)
 
-The intent space is finite and enumerable, which is what makes the downstream agents deterministic — they handle a known set of structured inputs, not open-ended natural language.
+The intent space is finite and enumerable, which is what makes the downstream agents deterministic: they handle a known set of structured inputs, not open-ended natural language.
 
 ### 3.3 Call Layering and Sub-Agent Orchestration
 
 The production system organizes LLM work into **up to six calls per query** arranged in three phases. The first two phases sit on the LLM *intent* side of the deterministic wall; the third phase sits on the LLM *synthesis* side.
 
-**Phase 1 — Parse and route (two LLM calls).** A parse call extracts structured intent from the natural-language query; a route call decides whether the query is in scope for Astraeus and, if so, which downstream phase to invoke. If the query is out of scope, execution terminates here — neither phase 2 nor the deterministic compute layer is touched.
+**Phase 1 — Parse and route (two LLM calls).** A parse call extracts structured intent from the natural-language query; a route call decides whether the query is in scope for Astraeus and, if so, which downstream phase to invoke. If the query is out of scope, execution terminates here. Neither phase 2 nor the deterministic compute layer is touched.
 
-**Phase 2 — Metadata extraction (up to three parallel LLM calls, conditional).** When the routing decision warrants, one metadata-extract call fires per candidate domain (Headcount, HR Costs, Open Positions), in parallel. Each call returns a structured parameter set scoped to its domain — time range, organizational scope, comparison shape — *without* any data access. This is the final LLM touch before the first wall.
+**Phase 2 — Metadata extraction (up to three parallel LLM calls, conditional).** When the routing decision warrants, one metadata-extract call fires per candidate domain (Headcount, HR Costs, Open Positions), in parallel. Each call returns a structured parameter set scoped to its domain (time range, organizational scope, comparison shape) *without* any data access. This is the final LLM touch before the first wall.
 
-**Phase 3 — Synthesis (one call, or up to three parallel final sub-agents then combined).** After the deterministic layer returns aggregates, the system either (path A) issues a single synthesis call to compose the answer, or (path B) fans out to up to three parallel final sub-agents — one for cost, one for headcount, one for open positions — whose outputs are combined deterministically into the user-facing response. The choice between path A and path B is made by the phase-1 router based on the cross-domain structure of the query.
+**Phase 3 — Synthesis (one call, or up to three parallel final sub-agents then combined).** After the deterministic layer returns aggregates, the system either (path A) issues a single synthesis call to compose the answer, or (path B) fans out to up to three parallel final sub-agents (one for cost, one for headcount, one for open positions) whose outputs are combined deterministically into the user-facing response. The choice between path A and path B is made by the phase-1 router based on the cross-domain structure of the query.
 
 Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
 
@@ -166,7 +166,7 @@ We consider a threat model where the LLM provider is an honest-but-curious adver
 
 <TheoremBlock variant="proof">
   <div className="mb-2">
-    By construction, <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} />. The input to <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> at each invocation is <InlineEquation html={tex("(q_t, p)")} /> where <InlineEquation html={tex("q_t \\in \\mathcal{Q}")} /> and <InlineEquation html={tex("p \\in \\mathcal{P}")} />. Since <InlineEquation html={tex("\\mathcal{Q}")} /> contains only user-generated natural language and <InlineEquation html={tex("\\mathcal{P}")} /> contains only structural metadata (table names, column types, domain labels — not data values), and <InlineEquation html={tex("\\mathcal{D}")} /> contains only data values (employee records, financial figures, organizational assignments):
+    By construction, <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} />. The input to <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> at each invocation is <InlineEquation html={tex("(q_t, p)")} /> where <InlineEquation html={tex("q_t \\in \\mathcal{Q}")} /> and <InlineEquation html={tex("p \\in \\mathcal{P}")} />. Since <InlineEquation html={tex("\\mathcal{Q}")} /> contains only user-generated natural language and <InlineEquation html={tex("\\mathcal{P}")} /> contains only structural metadata (table names, column types, domain labels, not data values), and <InlineEquation html={tex("\\mathcal{D}")} /> contains only data values (employee records, financial figures, organizational assignments):
   </div>
   <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}_{\\text{route}}) = \\bigcup_t \\{q_t\\} \\cup \\{p\\} \\subseteq \\mathcal{Q} \\cup \\mathcal{P}", true)} />
   <div>
@@ -182,9 +182,9 @@ We consider a threat model where the LLM provider is an honest-but-curious adver
 
 ### 4.2 Boundary Enforcement
 
-The confidentiality guarantee holds only if the architectural boundary is enforced — i.e., no code path exists that passes data values to the LLM. In the production system, this is enforced by:
+The confidentiality guarantee holds only if the architectural boundary is enforced; i.e., no code path exists that passes data values to the LLM. In the production system, this is enforced by:
 
-1. **Interface typing:** The routing function's input type signature accepts only <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs">(query: string, system_prompt: string)</code> — no data parameters exist in the function signature
+1. **Interface typing:** The routing function's input type signature accepts only <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs">(query: string, system_prompt: string)</code>; no data parameters exist in the function signature
 2. **Network isolation:** The LLM API call originates from a service that has no database credentials and no access to data stores
 3. **Audit logging:** Every LLM invocation is logged with its full input, enabling automated verification that <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D} = \\emptyset")} />
 
@@ -192,7 +192,7 @@ The confidentiality guarantee holds only if the architectural boundary is enforc
 
 ### 5.1 The Translation Problem
 
-Enterprise Performance Management (EPM) systems enforce access control through multidimensional domain permissions — a user may see certain intersections of dimensions (e.g., "Risk division × North America × FY2025") but not others. SQL databases enforce access through row-level predicates. Translating between these models is non-trivial because domain permissions are *conjunctive* over dimensions while SQL predicates are *disjunctive* over rows.
+Enterprise Performance Management (EPM) systems enforce access control through multidimensional domain permissions: a user may see certain intersections of dimensions (e.g., "Risk division × North America × FY2025") but not others. SQL databases enforce access through row-level predicates. Translating between these models is non-trivial because domain permissions are *conjunctive* over dimensions while SQL predicates are *disjunctive* over rows.
 
 ### 5.2 Formal Model
 
@@ -224,7 +224,7 @@ The production system implements this translation as a four-stage pipeline:
 
 **Stage <InlineEquation html={tex("\\alpha")} />:** Extract permission grants from EPM as structured tuples <InlineEquation html={tex("(u, D_1, D_2, \\ldots, D_n)")} />.
 
-**Stage <InlineEquation html={tex("\\beta")} />:** Map permission grants to security group memberships. Security groups represent natural organizational boundaries (e.g., "Division A Managers") and serve as a caching layer — permissions change slowly, so pre-computing group-to-employee mappings avoids runtime entitlement queries.
+**Stage <InlineEquation html={tex("\\beta")} />:** Map permission grants to security group memberships. Security groups represent natural organizational boundaries (e.g., "Division A Managers") and serve as a caching layer. Permissions change slowly, so pre-computing group-to-employee mappings avoids runtime entitlement queries.
 
 **Stage <InlineEquation html={tex("\\gamma")} />:** Expand security groups to employee-level event sets. A event is the fundamental unit of the data model (see Section 6), representing an employee's assignment to an organizational position.
 
@@ -357,11 +357,11 @@ The architecture has been deployed in production at a major bank's CFO Group sin
   </table>
 </div>
 
-The system delivers financial insights through three channels: a production-grade dynamic dashboard, a conversational chatbot interface, and inbox-ready HTML reports — all enforcing the same entitlement model.
+The system delivers financial insights through three channels: a production-grade dynamic dashboard, a conversational chatbot interface, and inbox-ready HTML reports, all enforcing the same entitlement model.
 
 ### 7.1 The "Impossible" Capability
 
-Before Astraeus, dynamic *ins-outs* analysis — *"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"* — was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level events queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in milliseconds.
+Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"*) was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level events queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in milliseconds.
 
 ## 8. Related Work
 
@@ -369,7 +369,7 @@ The separation of LLM reasoning from data computation relates to several active 
 
 **Tool-use architectures.** ReAct <CitationRef id={5} /> and Toolformer <CitationRef id={6} /> demonstrate LLMs using external tools, but typically pass data through the LLM context for reasoning. Our architecture is stricter: the LLM never sees data, only intents.
 
-**Guardrailed generation.** NeMo Guardrails <CitationRef id={7} /> and similar frameworks add safety filters around LLM outputs. Our approach is complementary but more fundamental — rather than filtering unsafe outputs, we prevent unsafe inputs.
+**Guardrailed generation.** NeMo Guardrails <CitationRef id={7} /> and similar frameworks add safety filters around LLM outputs. Our approach is complementary but more fundamental: rather than filtering unsafe outputs, we prevent unsafe inputs.
 
 **Text-to-SQL.** DIN-SQL <CitationRef id={8} /> and DAIL-SQL <CitationRef id={9} /> achieve strong results on benchmarks but assume the LLM can access schema and data. Our architecture restricts the LLM to schema metadata only.
 
@@ -390,4 +390,4 @@ The key insight is simple but consequential: **use LLMs for what they're good at
 
 Working code, synthetic data, and reproducible plots: [`rogerthatroach/astraeus-llm-as-router`](https://github.com/rogerthatroach/astraeus-llm-as-router).
 
-A 100-query synthetic eval, 4 users with varied access scopes, and the 5-stage cascade composed end-to-end. The pytest suite asserts that hallucinated entities are caught at the entity stage and cross-domain leak attempts are caught at the domain stage — independently of the LLM, which is exactly the point.
+A 100-query synthetic eval, 4 users with varied access scopes, and the 5-stage cascade composed end-to-end. The pytest suite asserts that hallucinated entities are caught at the entity stage and cross-domain leak attempts are caught at the domain stage, independently of the LLM, which is exactly the point.

@@ -7,11 +7,11 @@ import DecisionRationale from '@/components/blog/framework/DecisionRationale'
 import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
 import StepThrough from '@/components/blog/framework/StepThrough'
 
-Finance analysts ask a question with subtle ambiguity baked in: *"how does our cost-to-income ratio compare against the peer average this quarter?"* &mdash; a sentence that maps cleanly to one KPI in some banks and to three near-duplicate KPIs in others, depending on how each bank reports its Supplementary Financial Package. The answer has to be a single number, on a deterministic computation path, with the resolution from natural language to specific KPI defensible under audit.
+Finance analysts ask a question with subtle ambiguity baked in: *"how does our cost-to-income ratio compare against the peer average this quarter?"*, a sentence that maps cleanly to one KPI in some banks and to three near-duplicate KPIs in others, depending on how each bank reports its Supplementary Financial Package. The answer has to be a single number, on a deterministic computation path, with the resolution from natural language to specific KPI defensible under audit.
 
-The industry pattern here is straightforward: prompt an LLM with a schema definition and the user&rsquo;s question; let the model emit SQL; run it. Fast to prototype. Easy to demo. Impossible to ship inside regulated finance &mdash; chain-of-thought is not an audit trail; LLM-emitted SQL is not a safety property; *"the model usually gets it right"* is not a confidence interval.
+The industry pattern here is straightforward: prompt an LLM with a schema definition and the user&rsquo;s question; let the model emit SQL; run it. Fast to prototype. Easy to demo. Impossible to ship inside regulated finance: chain-of-thought is not an audit trail; LLM-emitted SQL is not a safety property; *"the model usually gets it right"* is not a confidence interval.
 
-Aegis went the other way. Five sequential stages, two dashed walls, LLM use bounded to two stages (and the second only when a confidence gate fires). Templates produce SQL; parameters bind values; deterministic code formats the result. This post unpacks the four architectural decisions that separate decomposition-as-guardrail from the seductive single-prompt pattern &mdash; with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of *when* those calls landed &mdash; and the role GPT-4.1&rsquo;s calibration played in unlocking a shelved design &mdash; lives in the [builder companion](/blog/aegis-v2-velocity). The formal proofs of injection impossibility, schema compliance, and bounded disambiguation live in the [formal post](/blog/text-to-sql).
+Aegis went the other way. Five sequential stages, two dashed walls, LLM use bounded to two stages (and the second only when a confidence gate fires). Templates produce SQL; parameters bind values; deterministic code formats the result. This post unpacks the four architectural decisions that separate decomposition-as-guardrail from the seductive single-prompt pattern, with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of *when* those calls landed, and the role GPT-4.1&rsquo;s calibration played in unlocking a shelved design, lives in the [builder companion](/blog/aegis-v2-velocity). The formal proofs of injection impossibility, schema compliance, and bounded disambiguation live in the [formal post](/blog/text-to-sql).
 
 <VisualizationContainer minHeight={500} caption="The Aegis cascade. Five sequential stages cut by two dashed walls. Band 1 — intent (LLM, JSON-schema constrained). Wall 1: no raw data crosses. Band 2 — KPI detect (deterministic embeddings) → disambiguation gate (LLM if confidence drops below 1−ε; clarify if even the LLM is uncertain). Wall 2: no free-form SQL emits. Band 3 — template-based SQL generation with parameter binding → deterministic formatting. One Postgres + pgvector store underneath: catalog, embeddings, templates, query log, audit.">
 {() => <AegisCascade />}
@@ -26,22 +26,22 @@ Four constraints shaped every decision below. Two regulatory, one hard-technical
     {
       kind: 'regulatory',
       label: 'Injection impossibility by construction',
-      detail: 'A natural-language query is the new attack surface. Financial-services regulators do not accept "we use prepared statements" as a control unless the architecture makes string-interpolated SQL structurally impossible &mdash; not just unlikely. The contract is: no path through the code generates a SQL string from user input by concatenation. Templates select; parameters bind; the database driver enforces the boundary at the prepared-statement level.',
+      detail: 'A natural-language query is the new attack surface. Financial-services regulators do not accept "we use prepared statements" as a control unless the architecture makes string-interpolated SQL structurally impossible, not just unlikely. The contract is: no path through the code generates a SQL string from user input by concatenation. Templates select; parameters bind; the database driver enforces the boundary at the prepared-statement level.',
     },
     {
       kind: 'regulatory',
       label: 'Disambiguation safety under audit',
-      detail: 'A CFO-grade number that turned out to be the wrong KPI is worse than no number. The system has to either resolve a KPI reference correctly with bounded error probability or request clarification &mdash; never silently guess. That is a calibration property of the LLM and a contract on the system: confidence p ≥ 1−ε accepts; p < 1−ε clarifies; ε set conservatively (we use 0.05).',
+      detail: 'A CFO-grade number that turned out to be the wrong KPI is worse than no number. The system has to either resolve a KPI reference correctly with bounded error probability or request clarification, never silently guess. That is a calibration property of the LLM and a contract on the system: confidence p ≥ 1−ε accepts; p < 1−ε clarifies; ε set conservatively (we use 0.05).',
     },
     {
       kind: 'hard',
       label: 'KPI catalog grows super-linearly with each quarter',
-      detail: 'Big 6 Canadian banks each publish Supplementary Financial Packages quarterly. Every quarter introduces minor variations &mdash; renamed line items, new sub-categorizations, near-duplicate KPIs that look like the same metric but compute differently. v1 was rules-based; the rule surface area grew faster than the catalog. v2 needs a representation where adding a new KPI is data, not code.',
+      detail: 'Big 6 Canadian banks each publish Supplementary Financial Packages quarterly. Every quarter introduces minor variations: renamed line items, new sub-categorizations, near-duplicate KPIs that look like the same metric but compute differently. v1 was rules-based; the rule surface area grew faster than the catalog. v2 needs a representation where adding a new KPI is data, not code.',
     },
     {
       kind: 'soft',
       label: 'Model readiness is empirical',
-      detail: 'The disambiguation safety property is conditional on LLM calibration &mdash; an architectural specification an LLM either clears or doesn&rsquo;t. An earlier prototype on GPT-4o failed both directions: over-confident misselection on near-duplicate clusters, pathological caution elsewhere. The architecture has to fail gracefully when the model behind it is not yet a fit, and come back online without a redesign once a better model lands.',
+      detail: 'The disambiguation safety property is conditional on LLM calibration, an architectural specification an LLM either clears or doesn&rsquo;t. An earlier prototype on GPT-4o failed both directions: over-confident misselection on near-duplicate clusters, pathological caution elsewhere. The architecture has to fail gracefully when the model behind it is not yet a fit, and come back online without a redesign once a better model lands.',
     },
   ]}
 />
@@ -63,9 +63,9 @@ Does the system give the LLM the natural-language question and ask for SQL? Or d
       chosen: true,
       pros: [
         'Each stage independently testable with deterministic inputs/outputs',
-        'LLM use is structurally bounded — Wall 1 keeps the LLM out of data; Wall 2 keeps the LLM out of SQL emission',
+        'LLM use is structurally bounded: Wall 1 keeps the LLM out of data; Wall 2 keeps the LLM out of SQL emission',
         'Failure modes are localized: an intent-parse failure does not cascade into wrong SQL',
-        'Catalog growth is data, not code — adding a KPI is a row, not a rule',
+        'Catalog growth is data, not code: adding a KPI is a row, not a rule',
       ],
       cons: [
         'Five stages means five contracts to design, document, and maintain',
@@ -76,13 +76,13 @@ Does the system give the LLM the natural-language question and ask for SQL? Or d
       name: 'Single-prompt LLM (NL → SQL in one call)',
       summary: 'One LLM call given the schema definition, the catalog, and the natural-language query; it emits SQL directly.',
       pros: [
-        'Lowest engineering cost — a strong model can demo this in a day',
+        'Lowest engineering cost: a strong model can demo this in a day',
         'No explicit catalog-disambiguation step; the model handles everything implicitly',
       ],
       cons: [
-        'LLM-emitted SQL is not a safety property — injection prevention reduces to "the model usually gets it right"',
-        'Disambiguation happens implicitly inside the model — unauditable, uncalibrated, unbounded',
-        'Schema compliance is best-effort — model can hallucinate columns under load',
+        'LLM-emitted SQL is not a safety property: injection prevention reduces to "the model usually gets it right"',
+        'Disambiguation happens implicitly inside the model: unauditable, uncalibrated, unbounded',
+        'Schema compliance is best-effort: model can hallucinate columns under load',
         'Failure modes are global: a single bad emission produces a bad answer with no localization',
       ],
     },
@@ -90,24 +90,24 @@ Does the system give the LLM the natural-language question and ask for SQL? Or d
       name: 'Two-stage NL→intent → intent→SQL',
       summary: 'LLM parses intent; second LLM call generates SQL from the intent. No catalog disambiguation step; no template library.',
       pros: [
-        'Marginal improvement over single-prompt — at least intent is structured',
+        'Marginal improvement over single-prompt: at least intent is structured',
         'Familiar pattern from text-to-SQL benchmark literature (DIN-SQL, DAIL-SQL)',
       ],
       cons: [
         'Still LLM-emitted SQL; same injection + schema-compliance arguments as the single-prompt option',
-        'Disambiguation is not a stage — KPI ambiguity gets baked into the intent or silently resolved by the SQL-gen call',
+        'Disambiguation is not a stage: KPI ambiguity gets baked into the intent or silently resolved by the SQL-gen call',
       ],
     },
     {
       name: 'Hand-tuned rules + small LLM-classifier sidecar',
       summary: 'Extend Aegis v1’s rules engine with an LLM classifier for fuzzy matches; keep rule-based SQL templating.',
       pros: [
-        'Lower-risk evolution from v1 — the existing rule surface is preserved',
+        'Lower-risk evolution from v1: the existing rule surface is preserved',
         'No new architecture to learn for the team',
       ],
       cons: [
-        'The catalog-growth problem is the rule surface itself — bolting an LLM onto rules does not solve it',
-        'Two cognitive models for "how the system answers a question" — the rule path and the LLM path',
+        'The catalog-growth problem is the rule surface itself: bolting an LLM onto rules does not solve it',
+        'Two cognitive models for "how the system answers a question": the rule path and the LLM path',
         'Disambiguation safety remains a function of which path fired, not a property of the system',
       ],
     },
@@ -115,18 +115,18 @@ Does the system give the LLM the natural-language question and ask for SQL? Or d
 />
 
 <DecisionRationale option="Decomposed five-stage pipeline (LLM use bounded to S1 + S3)">
-Three reasons, in order. First &mdash; **decomposition is the guardrail.** Each stage has a narrow contract, a testable interface, and clear failure modes. When the disambiguation gate fires, the SQL stage has not run yet. When SQL gen fires, the KPI is already resolved and validated. Errors do not propagate through the system; they are caught at the stage where they originate. The architecture is auditable because the data flow is auditable.
+Three reasons, in order. First: **decomposition is the guardrail.** Each stage has a narrow contract, a testable interface, and clear failure modes. When the disambiguation gate fires, the SQL stage has not run yet. When SQL gen fires, the KPI is already resolved and validated. Errors do not propagate through the system; they are caught at the stage where they originate. The architecture is auditable because the data flow is auditable.
 
-Second &mdash; **the safety properties prove per stage.** Injection impossibility comes from the SQL stage&rsquo;s template + parameter contract; it does not depend on the LLM behaving well. Schema compliance comes from the template library + AST validator; same. Disambiguation safety comes from the confidence gate + ε threshold; same. Each property is local to a stage. The proofs are short. The audit is short.
+Second: **the safety properties prove per stage.** Injection impossibility comes from the SQL stage&rsquo;s template + parameter contract; it does not depend on the LLM behaving well. Schema compliance comes from the template library + AST validator; same. Disambiguation safety comes from the confidence gate + ε threshold; same. Each property is local to a stage. The proofs are short. The audit is short.
 
-Third &mdash; **catalog growth is data, not code.** Adding a new KPI from a new SFP is a row in the catalog table plus an embedding. No new rule, no new template (templates are organized by query *shape*, not by KPI). The system absorbs catalog growth without architectural amendment &mdash; which is exactly what v1 could not do.
+Third: **catalog growth is data, not code.** Adding a new KPI from a new SFP is a row in the catalog table plus an embedding. No new rule, no new template (templates are organized by query *shape*, not by KPI). The system absorbs catalog growth without architectural amendment, which is exactly what v1 could not do.
 
 The cost is the upfront template library and the per-stage contract design. Both are one-time engineering investments. They paid back in the first month of operation.
 </DecisionRationale>
 
 ### Decision 2 · KPI detection method
 
-Once the intent is parsed, the system has a metric reference (μ &mdash; the user&rsquo;s phrase for the KPI they want). The catalog has thousands of entries with overlapping names. How does the system find the right one?
+Once the intent is parsed, the system has a metric reference (μ, the user&rsquo;s phrase for the KPI they want). The catalog has thousands of entries with overlapping names. How does the system find the right one?
 
 <OptionsConsidered
   decision="How does the system map a metric reference to a candidate set of KPIs in the catalog?"
@@ -141,7 +141,7 @@ Once the intent is parsed, the system has a metric reference (μ &mdash; the use
         'Catalog-growth-friendly: adding a KPI is a single embedding pass, no new rules',
       ],
       cons: [
-        'Near-duplicate KPIs cluster too tightly — disambiguation step is required for the cluster danger zone',
+        'Near-duplicate KPIs cluster too tightly: disambiguation step is required for the cluster danger zone',
         'Embedding model selection matters; off-the-shelf sentence transformers are good but not perfect on financial-domain text',
       ],
     },
@@ -165,7 +165,7 @@ Once the intent is parsed, the system has a metric reference (μ &mdash; the use
       ],
       cons: [
         'Catalog size grows; context window cost grows linearly',
-        'Disambiguation and detection collapse into one prompt — no calibration boundary, no testable intermediate',
+        'Disambiguation and detection collapse into one prompt: no calibration boundary, no testable intermediate',
         'No confidence score on the *detection* step; only on the final answer',
       ],
     },
@@ -175,7 +175,7 @@ Once the intent is parsed, the system has a metric reference (μ &mdash; the use
 <DecisionRationale option="Sentence embeddings + cosine similarity threshold">
 The catalog has the structural feature that breaks keyword matching and saves embedding similarity: synonymy across human conventions. *NIM* and *Net Interest Margin* and *Net Interest Income / Total Assets* are the same concept under three notations; embeddings put them in the same neighborhood, keywords do not.
 
-The detection stage&rsquo;s job is *recall*, not precision. It returns a candidate set <em>K<sub>c</sub></em>, not a single answer. Precision is the next stage&rsquo;s job &mdash; the disambiguation gate decides whether the candidate set is unambiguous (top candidate dominates) or whether the LLM (or, ultimately, the user) needs to break the tie. Separating recall from precision is what lets the embedding stage stay deterministic and lets the disambiguation stage stay LLM-bounded.
+The detection stage&rsquo;s job is *recall*, not precision. It returns a candidate set <em>K<sub>c</sub></em>, not a single answer. Precision is the next stage&rsquo;s job: the disambiguation gate decides whether the candidate set is unambiguous (top candidate dominates) or whether the LLM (or, ultimately, the user) needs to break the tie. Separating recall from precision is what lets the embedding stage stay deterministic and lets the disambiguation stage stay LLM-bounded.
 </DecisionRationale>
 
 ### Decision 3 · SQL generation safety model
@@ -190,8 +190,8 @@ The pipeline now has a resolved KPI plus parameters (time window, entity, compar
       summary: 'A pre-authored, schema-whitelisted SQL template library covers the query shapes (peer comparison, time series, single-point lookup, ranking). Parameters bind through the DB driver as prepared-statement values; templates are never modified at runtime.',
       chosen: true,
       pros: [
-        'SQL injection is impossible by construction — parameter values are never interpreted as SQL syntax (proven in formal post, Theorem 3)',
-        'Schema compliance is a static property of the template library — verifiable once, holds always',
+        'SQL injection is impossible by construction: parameter values are never interpreted as SQL syntax (proven in formal post, Theorem 3)',
+        'Schema compliance is a static property of the template library: verifiable once, holds always',
         'Templates are reviewable artefacts under regulatory inspection; LLM-generated SQL is not',
         'Defense-in-depth validation layer (whitelist + AST + SELECT-only + parameter type + deny-list) catches anything anomalous before execution',
       ],
@@ -209,8 +209,8 @@ The pipeline now has a resolved KPI plus parameters (time window, entity, compar
       ],
       cons: [
         'Injection prevention is reactive (catch bad SQL) rather than constructive (cannot generate bad SQL)',
-        'Sanitization is a denylist exercise — every new attack vector requires a rule update',
-        'LLM-emitted SQL is not a reviewable artefact in the same sense as a template — it is generated per query',
+        'Sanitization is a denylist exercise: every new attack vector requires a rule update',
+        'LLM-emitted SQL is not a reviewable artefact in the same sense as a template: it is generated per query',
         'Schema compliance is best-effort and probabilistic',
       ],
     },
@@ -218,11 +218,11 @@ The pipeline now has a resolved KPI plus parameters (time window, entity, compar
       name: 'AST-based SQL synthesis from intent',
       summary: 'Build an AST from the parsed intent + resolved KPI; serialize to SQL.',
       pros: [
-        'Theoretically sound — the AST captures structure exactly',
+        'Theoretically sound: the AST captures structure exactly',
         'No string concatenation anywhere',
       ],
       cons: [
-        'Materially the same as templates with extra steps — query shapes still have to be enumerated',
+        'Materially the same as templates with extra steps: query shapes still have to be enumerated',
         'AST builder becomes the new template library, with worse ergonomics for review',
       ],
     },
@@ -232,7 +232,7 @@ The pipeline now has a resolved KPI plus parameters (time window, entity, compar
 <DecisionRationale option="Template selection + parameterized binding">
 The mental shift required is recognizing that *the template library is the system&rsquo;s SQL surface*, not the LLM. Once that lands, every safety property follows: injection impossibility because parameters bind through the driver; schema compliance because templates reference only allowed tables and columns; auditability because the template library is a review artefact under version control.
 
-The defense-in-depth validation layer is intentionally redundant. A whitelist defines what is permitted; a deny-list catches what slipped past the whitelist; an AST check verifies structure; a SELECT-only operation check rules out DDL or mutation. Either alone would be sufficient in theory. Both together &mdash; plus parameter type checking &mdash; is what gets shipped to production. The redundancy costs almost nothing and earns the right to claim "impossible by construction" rather than "very unlikely in practice."
+The defense-in-depth validation layer is intentionally redundant. A whitelist defines what is permitted; a deny-list catches what slipped past the whitelist; an AST check verifies structure; a SELECT-only operation check rules out DDL or mutation. Either alone would be sufficient in theory. Both together, plus parameter type checking, is what gets shipped to production. The redundancy costs almost nothing and earns the right to claim "impossible by construction" rather than "very unlikely in practice."
 </DecisionRationale>
 
 ### Decision 4 · Disambiguation contract
@@ -249,11 +249,11 @@ Some KPI references are unambiguous. Some are not. What does the system do when 
       pros: [
         'Disambiguation safety property is testable: P(k̂ = k* | accept) ≥ 1−ε if calibration holds',
         'Calibration can be empirically validated on held-out queries; bad calibration shows up in metrics, not in user trust',
-        'Clarification requests improve over time as the catalog stabilizes — the system learns where the edges live',
+        'Clarification requests improve over time as the catalog stabilizes: the system learns where the edges live',
         '"Confidently wrong" failure mode is structurally precluded',
       ],
       cons: [
-        'Requires LLM calibration that holds across the catalog distribution — empirical, not architectural',
+        'Requires LLM calibration that holds across the catalog distribution: empirical, not architectural',
         'Clarification asks add a step in the user flow; some users find this friction',
       ],
     },
@@ -266,14 +266,14 @@ Some KPI references are unambiguous. Some are not. What does the system do when 
       ],
       cons: [
         'Confidently-wrong failure mode is the *default*: top match on near-duplicates can easily be the wrong KPI',
-        'CFO-grade analytics cannot tolerate silent misselection — once trust is broken, it does not return',
+        'CFO-grade analytics cannot tolerate silent misselection: once trust is broken, it does not return',
       ],
     },
     {
       name: 'Always clarify (return candidates; let the user pick)',
       summary: 'Whenever |K_c| > 1, return the candidate list and have the user choose.',
       pros: [
-        'Maximally safe — the user is always in the loop',
+        'Maximally safe: the user is always in the loop',
         'No LLM disambiguation cost',
       ],
       cons: [
@@ -286,9 +286,9 @@ Some KPI references are unambiguous. Some are not. What does the system do when 
 />
 
 <DecisionRationale option="Confidence-thresholded clarify (accept if p ≥ 1−ε; clarify otherwise)">
-The disambiguation contract is the single property most CFO-Group analysts care about: *will it confidently give me the wrong number?* The architectural answer is no &mdash; structurally. The confidence gate is the keystone that makes the answer no. Below the threshold, the system never emits an answer; above the threshold, calibration plus a conservative ε ensures the error rate is bounded.
+The disambiguation contract is the single property most CFO-Group analysts care about: *will it confidently give me the wrong number?* The architectural answer is no, structurally. The confidence gate is the keystone that makes the answer no. Below the threshold, the system never emits an answer; above the threshold, calibration plus a conservative ε ensures the error rate is bounded.
 
-The calibration dependency is what gated the v2 launch. An earlier prototype on GPT-4o exhibited two failure modes the gate could not absorb: over-confidence on near-duplicates (high p, wrong selection &mdash; gate accepts a wrong answer) and pathological caution (low p on unambiguous cases &mdash; gate over-clarifies). Either failure violates the safety property. We deferred deployment until a model with sufficient calibration on the catalog domain was available; GPT-4.1 cleared the bar on a held-out evaluation and the architecture went live as designed.
+The calibration dependency is what gated the v2 launch. An earlier prototype on GPT-4o exhibited two failure modes the gate could not absorb: over-confidence on near-duplicates (high p, wrong selection, gate accepts a wrong answer) and pathological caution (low p on unambiguous cases, gate over-clarifies). Either failure violates the safety property. We deferred deployment until a model with sufficient calibration on the catalog domain was available; GPT-4.1 cleared the bar on a held-out evaluation and the architecture went live as designed.
 </DecisionRationale>
 
 ## A production query, end to end
@@ -300,17 +300,17 @@ A working CFO-Group query against Aegis exercises every stage. *"How does our co
     {
       label: 'S1 · Parse intent',
       title: 'GPT-4.1 returns a typed intent tuple I = (μ, τ, δ, ω)',
-      content: 'JSON-schema-constrained call. μ = "cost-to-income ratio". τ = "last 3 quarters" (relative-time enum). δ = "peer-comparison" (compare against Big 6 average). ω = "table" (default for ratio comparisons). Validation passes; no clarification needed. The intent crosses Wall 1 — only the structured tuple, no values.',
+      content: 'JSON-schema-constrained call. μ = "cost-to-income ratio". τ = "last 3 quarters" (relative-time enum). δ = "peer-comparison" (compare against Big 6 average). ω = "table" (default for ratio comparisons). Validation passes; no clarification needed. The intent crosses Wall 1, only the structured tuple, no values.',
     },
     {
       label: 'S2 · KPI detection',
       title: 'Embedding similarity returns candidate set K_c',
-      content: 'μ embeds; cosine similarity against the catalog returns 4 candidates above τ_min: "Cost-to-Income Ratio (Reported)", "Operating Efficiency Ratio", "Cost-to-Income Ratio (Adjusted)", "Non-Interest Expense Ratio". Top-1 wins by a 0.04 margin — not a clear win.',
+      content: 'μ embeds; cosine similarity against the catalog returns 4 candidates above τ_min: "Cost-to-Income Ratio (Reported)", "Operating Efficiency Ratio", "Cost-to-Income Ratio (Adjusted)", "Non-Interest Expense Ratio". Top-1 wins by a 0.04 margin, not a clear win.',
     },
     {
       label: 'S3 · Disambiguation gate',
       title: 'Confidence below threshold → LLM disambiguator fires',
-      content: 'Margin is below the gate threshold γ. LLM 2 receives the query plus the four candidate names and definitions (no values, ever). Returns "Cost-to-Income Ratio (Reported)" with p = 0.96. p ≥ 1 − 0.05 = 0.95 — accept. k̂ resolved.',
+      content: 'Margin is below the gate threshold γ. LLM 2 receives the query plus the four candidate names and definitions (no values, ever). Returns "Cost-to-Income Ratio (Reported)" with p = 0.96. p ≥ 1 − 0.05 = 0.95. Accept. k̂ resolved.',
     },
     {
       label: 'S4 · SQL generation',
@@ -320,12 +320,12 @@ A working CFO-Group query against Aegis exercises every stage. *"How does our co
     {
       label: 'Database execution',
       title: 'Prepared statement runs against the values store',
-      content: 'Postgres executes the prepared statement; returns 6 rows × 3 quarters of cost-to-income values. Result set is small (~18 cells) — millisecond latency.',
+      content: 'Postgres executes the prepared statement; returns 6 rows × 3 quarters of cost-to-income values. Result set is small (~18 cells), millisecond latency.',
     },
     {
       label: 'S5 · Format result',
       title: 'Deterministic formatter emits the response',
-      content: 'ω = "table" — formatter builds a 7-column comparison table (RBC + 5 peers + peer-average row) across the three quarters, with the resolved KPI name and definition cited. Audit log entry written: query, intent tuple, k̂ + confidence, template ID + parameters, response. Total LLM calls: 2 (parse + disambiguate). Total deterministic stages: 3.',
+      content: 'ω = "table". Formatter builds a 7-column comparison table (RBC + 5 peers + peer-average row) across the three quarters, with the resolved KPI name and definition cited. Audit log entry written: query, intent tuple, k̂ + confidence, template ID + parameters, response. Total LLM calls: 2 (parse + disambiguate). Total deterministic stages: 3.',
     },
   ]}
 />
@@ -334,23 +334,23 @@ A working CFO-Group query against Aegis exercises every stage. *"How does our co
 
 <BeforeAfterDiff
   before={{
-    label: 'Aegis v1 — rules-based, rigid query syntax',
+    label: 'Aegis v1: rules-based, rigid query syntax',
     items: [
       'Analyst translates question into v1’s syntax (or asks someone who knows it)',
       'Rules engine matches against the catalog by static rule patterns',
       'Adding a new KPI: write a rule. Adding a near-duplicate: write a disambiguation patch.',
       'Catalog growth → rule-surface growth. Maintenance burden compounds quarterly.',
-      'No clarification path — query syntax errors return errors, not guidance',
+      'No clarification path: query syntax errors return errors, not guidance',
     ],
   }}
   after={{
-    label: 'Aegis v2 — decomposed pipeline + walls',
+    label: 'Aegis v2: decomposed pipeline + walls',
     items: [
       'Analyst types the question in natural language',
       'LLM parses intent into a typed tuple; embeddings retrieve KPI candidates; gate either accepts or asks',
       'Adding a new KPI: insert a row + run an embedding pass. No rule, no patch.',
       'Catalog growth → data growth. Maintenance burden flat.',
-      'Confidence gate produces clarification requests automatically when the system is unsure — guidance, not errors',
+      'Confidence gate produces clarification requests automatically when the system is unsure: guidance, not errors',
     ],
   }}
 />
@@ -359,13 +359,13 @@ A working CFO-Group query against Aegis exercises every stage. *"How does our co
 
 The *family* this architecture belongs to is the LLM-as-Router pattern (see [Astraeus practitioner post](/blog/astraeus-llm-as-router-framework) for the cross-domain analytics variant). The general shape: bound the LLM to *intent* and *judgment under uncertainty*; deterministic code does compute and produces SQL/results. Walls separate the LLM context from data and from emitted SQL. Decomposition is the guardrail.
 
-What transfers across instances of the family is the *shape* &mdash; the bounded LLM surface area, the confidence gates where uncertainty triggers clarification, the deterministic compute or generation backbone. What does *not* transfer is the specific load-bearing piece: in Astraeus it is event-level ins-outs math across 40K leaf-level events; in Aegis it is the template library plus parameterized binding. Each system is built around the part that has to be most precise. The LLM does what LLMs do well, in the narrowest possible surface area, behind walls that hold by construction.
+What transfers across instances of the family is the *shape*: the bounded LLM surface area, the confidence gates where uncertainty triggers clarification, the deterministic compute or generation backbone. What does *not* transfer is the specific load-bearing piece: in Astraeus it is event-level ins-outs math across 40K leaf-level events; in Aegis it is the template library plus parameterized binding. Each system is built around the part that has to be most precise. The LLM does what LLMs do well, in the narrowest possible surface area, behind walls that hold by construction.
 
-The hardest engineering is not the LLM integration. It is figuring out which one piece is load-bearing &mdash; and refusing to let the LLM near it.
+The hardest engineering is not the LLM integration. It is figuring out which one piece is load-bearing, and refusing to let the LLM near it.
 
 
 ---
 
 ### Reference implementation
 
-The five-stage decomposition is implemented in [`rogerthatroach/aegis-guarded-text-to-sql`](https://github.com/rogerthatroach/aegis-guarded-text-to-sql) — `sqlglot` for AST validation, regex-trigger templates with parameter type-checking, temperature-scaling calibrator, and a `GuardedRouter` that composes them. 39 tests assert the safety properties this post argues for.
+The five-stage decomposition is implemented in [`rogerthatroach/aegis-guarded-text-to-sql`](https://github.com/rogerthatroach/aegis-guarded-text-to-sql): `sqlglot` for AST validation, regex-trigger templates with parameter type-checking, temperature-scaling calibrator, and a `GuardedRouter` that composes them. 39 tests assert the safety properties this post argues for.
