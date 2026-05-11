@@ -92,10 +92,10 @@ export function computeYearsExperience(asOf: Date = new Date()): number {
 
 /**
  * Format raw years as a display string. Uses "nearly N" with N = round(value),
- * matching the conservative framing in CAREER_KNOWLEDGE_BASE_v2.md §6:
- * 7.5+ years / 8+ years / over 8 years all collapse to "nearly 8 years".
- * Slightly past an integer (e.g., 8.02) still reads as "nearly 8" until the
- * value crosses N.5, at which point it shifts to "nearly N+1".
+ * matching the conservative framing in CAREER_KNOWLEDGE_BASE_v2.md §6. All
+ * common forms (`seven and a half`, `over eight`) collapse to one canonical
+ * phrasing. Slightly past an integer (e.g., 8.02) still reads as "nearly 8"
+ * until the value crosses N.5, at which point it shifts to "nearly N+1".
  * Re-evaluated per build.
  */
 export function formatYearsExperience(years: number = computeYearsExperience()): string {
