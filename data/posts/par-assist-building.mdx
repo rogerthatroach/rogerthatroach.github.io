@@ -1,13 +1,13 @@
 import { AgenticArchitecturePAR } from '@/components/blog/BlogDiagrams'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 
-> **A conversational companion to the formal post [Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Field-Group Retrieval](/blog/enterprise-agentic-ai-architecture).** That post formalizes the system as a directed graph with typed MCP tool contracts, two-stage field-group retrieval, and N parallel scoped extraction calls — and proves context isolation by construction. This one tells the story: how an intern&rsquo;s prototype became the bank&rsquo;s first true agentic AI platform, what architecture decisions we made and why, and the leadership lessons that had nothing to do with the code.
+> **A conversational companion to the formal post [Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Field-Group Retrieval](/blog/enterprise-agentic-ai-architecture).** That post formalizes the system as a directed graph with typed MCP tool contracts, two-stage field-group retrieval, and N parallel scoped extraction calls, and proves context isolation by construction. This one tells the story: how a one-page vision became the bank&rsquo;s first true agentic AI platform, what architecture decisions I made and why, and the leadership lessons that had nothing to do with the code.
 
 ---
 
 In November 2025, I wrote a one-page plan for an AI system that would transform how RBC drafts Project Approval Requests. Five months later, it shipped bank-wide.
 
-This is the story of how it happened, what I learned about scaling an intern&rsquo;s proof-of-concept into an enterprise product, and why the hardest part had nothing to do with technology.
+This is the story of how it happened, what I learned about translating a one-page vision into an enterprise product, and why the hardest part had nothing to do with technology.
 
 <VisualizationContainer minHeight={1040} caption="Prometheus at a glance: the dashed envelope is the v1 single-agent governance scope. Intake → template MCP tool with decision-tree dialog → stage-1 field-group hub → N parallel extraction lanes (top-10 chunks · custom compression · Sonnet-4.5 call per group) → dict-union merge → coverage + follow-ups loop. Postgres rail beneath carries everything. The rest of the post explains why each piece is shaped the way it is.">
 {() => <AgenticArchitecturePAR />}
@@ -19,11 +19,11 @@ Project Approval Requests (PARs) are how major banks govern significant initiati
 
 This wasn&rsquo;t a search problem. It was an orchestration problem.
 
-## The spark
+## The vision
 
-During the 2025 summer intern program, one of the four interns I was managing prototyped a concept: what if an AI assistant could guide you through a PAR step by step? The prototype was rough, a basic chatbot with a single RAG layer, but the insight was sharp. The user didn&rsquo;t need answers. They needed guidance through a process.
+The one-page plan framed the question simply: what if an AI assistant could guide a PAR author through the entire drafting process, step by step, with the right context at the right moment? Not a chatbot. An agentic platform that understands where you are in the workflow, pulls the right context, resolves contradictions between policies automatically, and adapts to any PAR type across any business line.
 
-I saw it could scale from a one-team prototype to a bank-wide platform. Not a chatbot. An agentic platform that could understand where you were in the workflow, pull the right context at the right moment, resolve conflicts between policies automatically, and adapt to any PAR type across any business line.
+I handed the concept to the 2025 Amplify cohort I was managing as an ideation exercise to explore the problem space. Four interns, four weeks, four angles on what a PAR-drafting assistant could look like. The exploration sharpened what mattered (process guidance, not search) and what didn&rsquo;t (free-form chat, more RAG layers stacked on top of each other). Then I built the production platform end-to-end.
 
 ## The architecture decisions
 
@@ -49,7 +49,7 @@ The hardest part wasn&rsquo;t the architecture. It was three things.
 
 **Parallel execution.** I was running Prometheus alongside Astraeus (the production analytics platform) and the tail end of Aegis v2. The only way it worked was because the architecture was clean enough that the work could be parallelized. Clean separation of concerns isn&rsquo;t just good engineering. It&rsquo;s a management strategy. When your components have narrow interfaces, multiple workstreams can progress independently without stepping on each other. I didn&rsquo;t appreciate this until I was trying to run three products with one direct report and a rotating cast of interns.
 
-**Trusting the origin.** An intern had the initial idea. Some leaders would have absorbed it, renamed it, and made it &ldquo;theirs.&rdquo; I think that&rsquo;s how you kill innovation. The best thing I did was resource the idea, scale the vision, and make sure everyone, including senior leadership, knew where it started. That&rsquo;s not generosity. It&rsquo;s how you build a team where people bring their best ideas to work. If the intern who sparks your next enterprise product gets a promotion, a reference, and visible credit, the next intern does too. And the one after that.
+**Exploration before production.** Handing the concept to four interns for a month of ideation, before I started building, was the single highest-leverage move in the project. Four people with no prior assumptions explored angles I might have skipped: single-agent versus multi-agent envelopes, retrieval shape, dialog versus form. The architecture I built afterward had clearer rationale because the alternatives had already been pressure-tested. Production builds get faster when someone else has already eliminated the bad paths. Most enterprise AI dies in the gap between ideation and production; the fix is to plan that transition before either starts.
 
 ## The result
 
@@ -79,7 +79,7 @@ The technology is different from Particle Swarm Optimization on a 900MW coal pla
 ```bibtex
 @misc{dhaliwal2026parassist,
   author  = {Dhaliwal, Harmilap Singh},
-  title   = {How We Built Prometheus: From Intern POC to Bank-Wide Product},
+  title   = {How We Built Prometheus: From One-Page Vision to Bank-Wide Product},
   year    = {2026},
   month   = {April},
   url     = {https://rogerthatroach.github.io/blog/par-assist-building},
@@ -87,7 +87,7 @@ The technology is different from Particle Swarm Optimization on a 900MW coal pla
 }
 ```
 
-Or plain text: *Dhaliwal, Harmilap Singh. (April 2026). How We Built Prometheus: From Intern POC to Bank-Wide Product. https://rogerthatroach.github.io/blog/par-assist-building.*
+Or plain text: *Dhaliwal, Harmilap Singh. (April 2026). How We Built Prometheus: From One-Page Vision to Bank-Wide Product. https://rogerthatroach.github.io/blog/par-assist-building.*
 
 ---
 
