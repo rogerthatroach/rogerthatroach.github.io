@@ -238,13 +238,13 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'par-assist-building',
-      title: 'How We Built Prometheus: From Intern POC to Bank-Wide Product',
+      title: 'How We Built Prometheus: From One-Page Vision to Bank-Wide Product',
       subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind the bank\u2019s first true agentic AI platform.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '9 min read',
       abstract:
-        'The story of how an intern\u2019s one-page proof-of-concept during the 2025 summer intern program became Prometheus, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and trusting the origin of an idea.',
+        'The story of how a one-page vision became Prometheus, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). The concept was handed to the 2025 Amplify cohort as an ideation exercise to explore the problem space; the production platform was then built end-to-end. Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and translating vision into shipped systems.',
       status: 'published',
       projectId: 'par-assist',
       register: 'builder',

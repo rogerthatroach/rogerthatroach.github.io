@@ -20,7 +20,7 @@ export const GLOSSARY: Record<string, string> = {
   'Astraeus':
     'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level events with event-level ins-outs math (Cython-compiled). GPT-4.1 used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
   'Aegis':
-    'AI-native benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 productionized 2024 (rules-based). v2 (2025) is a concurrent 2-week refactor — text-to-SQL first with KPI disambiguation, done alongside Prometheus + Astraeus work. 2025 CFO One RBC Team Award.',
+    'Strategic peer-benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 (Sr DS period): solo end-to-end build that automated extraction and matching despite quarterly SFP schema shifts, the long-standing bottleneck blocking timely peer analysis. v2 (Lead, 2025): 2-week solo build adding multi-stage RAG with multi-gate query parsing across bank / parameter / platform / time-period plus text-to-SQL, run in parallel with Astraeus and the Amplify intern program. 2025 CFO One RBC Team Award for v1.',
   'Commodity Tax':
     '~$600M tax allocation per cycle. Processing time slashed from months to 90 minutes. Q4 2023 CFO Group RBC Quarterly Team Award.',
   'External Data Service automation':
@@ -28,7 +28,7 @@ export const GLOSSARY: Record<string, string> = {
 
   // ── Programs ──
   'summer intern program':
-    'RBC internal innovation / intern program. I led the 2025 cohort end-to-end: 4 interns across PAR drafting and adjacent projects. The program is what converted the intern PAR POC into a bank-wide initiative.',
+    'RBC Amplify internship program. I led the 2025 cohort end-to-end: 4 interns across PAR drafting and adjacent projects. The Prometheus (PAR Assist) concept was my vision, given to the interns as an ideation exercise to explore the problem space; the production platform was conceived, architected, and built end-to-end thereafter.',
 
   // ── Organizations ──
   'engineering services partner': 'Cross-functional engineering peers — senior + junior — on Astraeus delivery.',

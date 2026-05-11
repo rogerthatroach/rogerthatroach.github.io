@@ -22,7 +22,7 @@ export const HERO = {
   name: 'Harmilap Singh Dhaliwal',
   title: 'AI & Data Science Lead — RBC',
   tagline: 'Architecting agentic AI for RBC CFO Group — the bank’s largest function.',
-  bio: '7.5+ years from 900MW power plants in Japan to bank-wide AI platforms in Toronto. Same closed-loop pattern. Four abstraction levels.',
+  bio: `${YEARS_EXPERIENCE} years from 900MW power plants in Japan to bank-wide AI platforms in Toronto. Same closed-loop pattern. Four abstraction levels.`,
   location: 'Toronto, Canada',
   links: {
     linkedin: 'https://www.linkedin.com/in/harmilapsingh',

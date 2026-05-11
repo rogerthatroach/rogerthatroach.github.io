@@ -98,7 +98,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived Prometheus (pilot April 2026; enterprise rollout in progress). Productionized Astraeus. Refactored Aegis v1 → v2 in a concurrent 2-week sprint. Led the 2025 summer intern cohort. ~70% hands-on.',
+      'Architecting enterprise agentic AI. Conceived, architected, and built Prometheus end-to-end (pilot April 2026; enterprise rollout in progress). Conceived, architected, and built Astraeus end-to-end (production since Nov 2025). Designed and built Aegis v2 in a 2-week solo sprint while running Astraeus and the Amplify intern program in parallel. Shipped ARGUS in May 2026 as a single-weekend solo build for senior bank leadership. Led the 2025 Amplify intern cohort. ~70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
@@ -108,16 +108,16 @@ export const TIMELINE: TimelineNode[] = [
       label: 'Conceived + architected in 12 months',
     },
     transitionStory:
-      'Promoted internally from Senior Data Scientist after 2.5 years — Commodity Tax (months → 90 min), Aegis v1 productionization, Astraeus groundwork. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and ownership of net-new enterprise platforms (Prometheus originated post-promotion via the summer intern program).',
+      'Promoted internally from Senior Data Scientist after 2.5 years built on Commodity Tax (months → 90 min) and Aegis v1 solo end-to-end productionization. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and ownership of net-new enterprise platforms: Astraeus development began April 2025 coincident with the promotion, and Prometheus was conceived as my own vision, handed to Amplify interns for problem-space ideation, then built end-to-end as a bank-wide production platform.',
     teamContext:
-      'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (the 2025 summer intern cohort led the conversion of an intern POC → bank-wide product). Cross-functional leadership of engineering services partners (senior + junior) on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
+      'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (the 2025 Amplify cohort explored the Prometheus problem space via an ideation exercise before I built the production platform end-to-end). Cross-functional leadership of engineering services partners (senior + junior) on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
     projects: [
       {
         name: 'Prometheus',
         oneLiner:
-          'Enterprise-wide agentic AI platform guiding PAR drafting across all RBC business lines. Pilot launched April 2026.',
+          'Conceived, architected, and built end-to-end: enterprise-wide agentic AI platform guiding PAR drafting across all RBC business lines. Pilot launched April 2026.',
         decisionRationale:
-          'LangGraph over plain LangChain chains because PAR workflows branch conditionally (template selection → field assignment → conflict resolution loops back). PostgreSQL + pgvector over vector-DB-only so embeddings stay co-located with relational metadata.',
+          'LangGraph over plain LangChain chains because PAR workflows branch conditionally (template selection, field assignment, conflict resolution looping back). PostgreSQL + pgvector over vector-DB-only so embeddings stay co-located with relational metadata. Concept handed to Amplify interns as an ideation exercise; production system built end-to-end after the exploration. Production deployment runs through GFT on OpenShift via CI/CD.',
         metric: { value: 'Pilot April 2026', label: 'Enterprise rollout Q2/Q3 2026' },
         caseStudyLink: '/projects/par-assist',
         blogLink: '/blog/par-assist-building',
@@ -125,19 +125,19 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: 'Astraeus',
         oneLiner:
-          'Production analytics platform for CFO Group — dynamic headcount, HR costs, open positions at bank scale with millisecond slicing. Production since Nov 2025.',
+          'Conceived, architected, and built end-to-end: production analytics platform for CFO Group delivering dynamic headcount, HR costs, and open positions at bank scale with millisecond slicing. Production since Nov 2025.',
         decisionRationale:
-          'Two-wall architecture. GPT-4.1 on the intent side (parse, route, metadata extract, synthesis — never touches data). Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail.',
-        metric: { value: '~40K leaf-level events', label: 'arbitrary combinations · ms' },
+          'Two-wall architecture. GPT-4.1 on the intent side handles parse, route, metadata extract, and synthesis; never touches data. Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Refactored an initial single-model implementation into 3 parallel sub-agents (EPM, Headcount, Open Positions) to break Command-A context limits and unlock all financial domains, improving accuracy, latency, and fault resilience simultaneously. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail. Production deployment runs through GFT on OpenShift via CI/CD.',
+        metric: { value: '~40K leaf-level events', label: 'arbitrary combinations, ms latency' },
         caseStudyLink: '/projects/astraeus',
       },
       {
         name: 'Aegis v2',
         oneLiner:
-          'Concurrent 2-week refactor of Aegis v1 into a text-to-SQL-first architecture with KPI disambiguation and guardrails.',
+          '2-week solo design and build, run in parallel with Astraeus and the Amplify intern program. Multi-stage RAG with multi-gate query parsing across bank, parameter, platform, and time-period, plus a text-to-SQL layer over rich KPI metadata and embeddings. Productionalized by direct report.',
         decisionRationale:
-          'Guarded LLM disambiguation over pure semantic search for near-duplicate KPI names. Text-to-SQL with whitelisting + parameterization over free-form generation — schema safety is non-negotiable in regulated finance.',
-        metric: { value: '2 weeks', label: 'v1 → v2 refactor sprint' },
+          'Guarded LLM disambiguation over pure semantic search for near-duplicate KPI names. Text-to-SQL with whitelisting and parameterization over free-form generation, because schema safety is non-negotiable in regulated finance.',
+        metric: { value: '2 weeks', label: 'solo design and build' },
         caseStudyLink: '/projects/aegis',
       },
     ],
@@ -151,7 +151,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'Senior Data Scientist — CFO Group',
     description:
-      'Overhauled the Commodity Tax process (months → 90 min). Productionized Aegis v1. Built the data foundations for Astraeus. Earned trust with CFO stakeholders.',
+      'Overhauled the Commodity Tax process (months → 90 min). Built and productionized Aegis v1 end-to-end (solo): the Big 6 bank peer-benchmarking engine whose SFP extraction automation broke the long-standing peer-analysis bottleneck. Earned trust with CFO stakeholders.',
     skills: ['PySpark', 'SQL', 'Tableau', 'Financial Modeling', 'Aegis v1'],
     milestone: COMMODITY_TAX_EFFICIENCY,
     accent: 'amber',
@@ -161,7 +161,7 @@ export const TIMELINE: TimelineNode[] = [
       label: 'Tax allocation automated (months → 90 min)',
     },
     transitionStory:
-      'Joined RBC after Quantiphi seeking financial services depth and a bigger platform than consulting. The Senior DS role at CFO Group delivered C-suite stakeholder access, bank-scale data (Big 6 peer benchmarking, enterprise GL), and the chance to evolve from ML engineering into product-oriented data science. Promotion to Lead came from accumulated trust — Commodity Tax built credibility, Aegis v1 proved product ownership, Astraeus groundwork demonstrated vision.',
+      'Joined RBC after Quantiphi seeking financial services depth and a bigger platform than consulting. The Senior DS role at CFO Group delivered C-suite stakeholder access, bank-scale data (Big 6 peer benchmarking, enterprise GL), and the chance to evolve from ML engineering into product-oriented data science. Promotion to Lead came from accumulated trust: Commodity Tax built credibility, Aegis v1 proved end-to-end product ownership, and Astraeus scoping in early 2025 set the stage for the platform built end-to-end during the Lead role.',
     teamContext:
       'Individual contributor progressing toward leadership. Partnered with CFO Group leadership, Commodity Tax team, and finance teams across the bank. Mentored junior data scientists. Built the stakeholder relationships that made Astraeus possible.',
     projects: [
@@ -177,10 +177,10 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: 'Aegis v1',
         oneLiner:
-          'Canadian Supplementary Benchmarking engine — derives and compares peer KPIs from Big 6 Canadian banks\' SuppPack data.',
+          'Solo end-to-end build of the Canadian Supplementary Benchmarking engine, deriving and comparing peer KPIs from Big 6 Canadian banks\' Supplementary Financial Package data.',
         decisionRationale:
-          'Automated SuppPack pulls over manual refresh — SuppPacks publish on staggered schedules across banks; automation catches them on publish. Historical matching logic built into v1 to prevent v2 from inheriting a messy dataset.',
-        metric: { value: 'CFO One Team Award', label: '2025 recognition' },
+          'Automated SFP extraction and matching despite quarterly schema shifts (the long-standing bottleneck that had blocked timely peer analysis). Historical matching logic baked into v1 to prevent v2 from inheriting a messy dataset.',
+        metric: { value: 'CFO One RBC Team Award', label: '2025 LLM/AI recognition' },
         caseStudyLink: '/projects/aegis',
       },
       {

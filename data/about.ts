@@ -10,8 +10,8 @@ export const ABOUT = {
       body: "Not the model, not the prompt, not the framework. The decisions about what the LLM touches and what it doesn't, that's what makes an AI system trustworthy in a regulated environment. In every system I've built, GPT handles intent; deterministic code handles truth. That separation isn't a constraint. It's the design.",
     },
     {
-      lead: 'Second, the best ideas come from everywhere.',
-      body: "Prometheus started as an intern's proof-of-concept during the summer intern program. I saw it could scale from a one-team prototype to a bank-wide platform, resourced it, and led the productionization. Today it's the pilot for the bank's first true agentic AI deployment. My job as a leader isn't to have the best ideas. It's to recognize them, clear the path to production, and make sure everyone knows where they started.",
+      lead: 'Second, the best leaders translate vision into shipped systems.',
+      body: "Prometheus is RBC's first true agentic AI platform, conceived as my vision, given to Amplify interns as an ideation exercise to explore the problem space, then built end-to-end as a bank-wide production system. Astraeus followed the same arc: conceived, architected, and built end-to-end into a production analytics platform delivering millisecond-level insights across CFO Group data. The work that matters is the arc from a one-page plan to a system shipping to real users; architecture diagrams without production builds are powerpoint.",
     },
     {
       lead: 'Third, trust beats accuracy in regulated AI.',
