@@ -371,4 +371,5 @@ export const CASE_STUDIES: CaseStudy[] = [
     blogPostSlug: 'enterprise-agentic-ai-architecture',
     companionBlogPostSlug: 'funding-request-drafting-platform-building',
   },
+  
 ];

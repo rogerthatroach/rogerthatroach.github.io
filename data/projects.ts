@@ -166,6 +166,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
     deepDivePath: '/projects/funding-request-drafting',
   },
+  
 ];
 
 export const PROJECTS: Project[] = [...PROJECTS_CHRONOLOGICAL].reverse();
