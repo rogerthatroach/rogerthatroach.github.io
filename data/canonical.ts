@@ -46,11 +46,70 @@ export const AWARDS_COUNT = AWARDS.length;
 export const PRODUCTION_SYSTEMS_COUNT = 3;
 
 // ═══════════════════════════════════════════════════════════════════
-// CAREER SPAN
+// CAREER SPAN — DERIVED from stint dates (auto-updates per build)
 // ═══════════════════════════════════════════════════════════════════
 
-/** TCS (3.3y) + Quantiphi (1y) + RBC (3.5y) = ~7.8y; round to 7.5+. */
-export const YEARS_EXPERIENCE = '7.5+';
+interface CareerStint {
+  org: string;
+  /** First day of the role (inclusive). */
+  start: Date;
+  /** Last day of the role (inclusive). Undefined = ongoing as of now. */
+  end?: Date;
+}
+
+/**
+ * Source of truth for career duration. Years-experience is derived
+ * from this — never hardcode a years number elsewhere.
+ *
+ * Excludes the 2019-09 → 2021-08 gap (Georgian College post-grad +
+ * Canada relocation) so the total reflects professional ML work, not
+ * calendar elapsed since first job.
+ *
+ * REFINE: dates below are approximate per existing canonical reconciliation
+ * (TCS = 3.3y, Quantiphi = 1.0y). Update with exact start/end as known.
+ */
+const CAREER_STINTS: CareerStint[] = [
+  // Dates from CAREER_KNOWLEDGE_BASE_v2.md §2.1, §2.3, §2.4
+  { org: 'TCS',       start: new Date('2016-08-15'), end: new Date('2019-11-30') }, // ~3.3y
+  { org: 'Quantiphi', start: new Date('2021-10-01'), end: new Date('2022-09-30') }, // ~1.0y
+  { org: 'RBC',       start: new Date('2022-09-15') },                              // ongoing (Sr DS Sep 2022, Lead Apr 2025)
+];
+
+const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
+
+/**
+ * Total professional years of experience as a float, summed across all
+ * stints. Ongoing stints (no `end`) use `asOf` (default: now).
+ *
+ * Pure function — exported so tests can pass arbitrary `asOf` dates.
+ */
+export function computeYearsExperience(asOf: Date = new Date()): number {
+  return CAREER_STINTS.reduce((total, stint) => {
+    const end = stint.end ?? asOf;
+    return total + (end.getTime() - stint.start.getTime()) / MS_PER_YEAR;
+  }, 0);
+}
+
+/**
+ * Format raw years as a display string. Uses "nearly N" with N = round(value),
+ * matching the conservative framing in CAREER_KNOWLEDGE_BASE_v2.md §6:
+ * 7.5+ years / 8+ years / over 8 years all collapse to "nearly 8 years".
+ * Slightly past an integer (e.g., 8.02) still reads as "nearly 8" until the
+ * value crosses N.5, at which point it shifts to "nearly N+1".
+ * Re-evaluated per build.
+ */
+export function formatYearsExperience(years: number = computeYearsExperience()): string {
+  return `nearly ${Math.round(years)}`;
+}
+
+/** Display string. Re-evaluated at module load (build time for static export). */
+export const YEARS_EXPERIENCE = formatYearsExperience();
+
+/**
+ * Raw float — for animation/comparison consumers (e.g., MetricsRibbon
+ * AnimatedCounter). Display strings should use `YEARS_EXPERIENCE` instead.
+ */
+export const YEARS_EXPERIENCE_NUMERIC = computeYearsExperience();
 
 // ═══════════════════════════════════════════════════════════════════
 // PROJECT HERO METRICS (discrete, display-oriented)
@@ -80,9 +139,6 @@ export const ASTRAEUS_FACTORIAL_COMBINATIONS = '~40,000';
 
 /** Rollups: intermediate aggregation levels above leaf-level events. */
 export const ASTRAEUS_ROLLUPS = '~9,000';
-
-/** Geography hierarchy size: total nodes in RBC's cost-centre geography tree (hierarchy, not events). */
-export const ASTRAEUS_GEOGRAPHIES = '~60,000';
 
 /** Prometheus pilot launched April 2026; bank-wide rollout in progress through Q2/Q3 2026. */
 export const PROMETHEUS_SCALE = 'Bank-wide';

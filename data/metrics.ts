@@ -19,7 +19,9 @@ export interface Metric {
 // numericValue and tacks on the suffix, so the short display form is a
 // rendering concern, not a truth concern.
 export const METRICS: Metric[] = [
-  { value: YEARS_EXPERIENCE, numericValue: 7.5, suffix: '+', label: 'Years in AI/ML', context: '2016–present' },
+  // Years rendered as static text so YEARS_EXPERIENCE's "almost N" form
+  // displays cleanly. Other entries with numeric+suffix still animate.
+  { value: YEARS_EXPERIENCE, label: 'Years in AI/ML', context: '2016–present' },
   { value: DIGITAL_TWIN_SAVINGS, numericValue: 3, prefix: '$', suffix: 'M', label: 'Cost Savings Delivered', context: 'Digital Twin — annual' },
   { value: String(PRODUCTION_SYSTEMS_COUNT), numericValue: PRODUCTION_SYSTEMS_COUNT, label: 'Production Gen AI Systems', context: 'Prometheus, Astraeus, Aegis (v1 → v2 refactor)' },
   { value: '40K+', numericValue: 40, suffix: 'K+', label: 'Events Analyzed', context: 'Astraeus — on-the-fly millisecond slicing' },

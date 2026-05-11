@@ -22,6 +22,7 @@ const HOME_SECTIONS = [
 ];
 import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
+import { YEARS_EXPERIENCE } from '@/data/canonical';
 
 export default function Home() {
   const projectRows = PROJECTS.map((project) => {
@@ -70,7 +71,7 @@ export default function Home() {
             </Link>
           </div>
           <p className="mb-6 max-w-2xl text-sm text-text-secondary">
-            Six systems across 7.5+ years. From power plant combustion tuning to bank-wide agentic
+            Six systems across {YEARS_EXPERIENCE} years. From power plant combustion tuning to bank-wide agentic
             AI.
           </p>
 
