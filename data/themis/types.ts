@@ -79,7 +79,7 @@ export interface Submission {
 
 /**
  * Diane's per-submission annotation. Vocabulary echoes public AI/LLM Drafting Platform
- * (FundingRequest) Phase 1 architecture so stakeholders recognize the same
+ * (AI/LLM Drafting Platform) Phase 1 architecture so stakeholders recognize the same
  * patterns: MCP tool boundary, two-stage field-group retrieval, coverage
  * analyzer, structural guarantees.
  */

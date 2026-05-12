@@ -35,7 +35,7 @@ export interface Project {
 /**
  * Projects defined in chronological order (oldest → newest) so the arc
  * narrative reads cleanly in source. Exported reversed at the end so
- * consumers see latest-first (FundingRequest → Combustion Tuning), which is
+ * consumers see latest-first (AI/LLM Drafting Platform → Combustion Tuning), which is
  * what recruiters and skimmers expect.
  */
 const PROJECTS_CHRONOLOGICAL: Project[] = [
@@ -147,7 +147,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   },
   {
     id: 'funding-request-drafting',
-    title: 'FundingRequest',
+    title: 'AI/LLM Drafting Platform',
     subtitle: 'Enterprise Agentic AI Platform — RBC Bank-wide',
     role: 'Conceived, architected, and built end-to-end',
     stack: ['LangGraph', 'MCP', 'PostgreSQL + pgvector', 'approved foundation model', 'Field-group RAG'],
@@ -166,7 +166,6 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
     deepDivePath: '/projects/funding-request-drafting',
   },
-  
 ];
 
 export const PROJECTS: Project[] = [...PROJECTS_CHRONOLOGICAL].reverse();

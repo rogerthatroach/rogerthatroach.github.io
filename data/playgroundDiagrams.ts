@@ -6,7 +6,7 @@
  * with click-to-drill between them? If the read holds, promote the best
  * level(s) to the formal blog post.
  *
- * FundingRequest is the test subject because it's the flagship (LangGraph +
+ * AI/LLM Drafting Platform is the test subject because it's the flagship (LangGraph +
  * MCP + multi-layer RAG) and already has a canonical one-level diagram
  * in components/diagrams/FundingRequestDiagram.tsx — so we have a baseline.
  */
@@ -42,7 +42,7 @@ export interface DiagramLevel {
   edges: Edge[];
 }
 
-// ─── FundingRequest — four levels ────────────────────────────────────────────
+// ─── AI/LLM Drafting Platform — four levels ────────────────────────────────────────────
 
 const VIOLET = '#93c5fd';  // Intelligent Systems era — primary (dark-mode 300)
 
@@ -70,13 +70,13 @@ const L0_overview: DiagramLevel = {
       type: 'agent',
       position: { x: 240, y: 80 },
       data: {
-        label: 'FundingRequest',
+        label: 'AI/LLM Drafting Platform',
         description: 'Agentic drafting platform. Click to see the system layer.',
         icon: '🧠',
         category: 'orchestrator',
         drillTo: 'system',
         detail: {
-          heading: 'FundingRequest — agentic drafting platform',
+          heading: 'AI/LLM Drafting Platform — agentic drafting platform',
           body:
             "A LangGraph-orchestrated agent guides the author through the PAR template. Deterministic stages handle truth (schema, validation, retrieval); an LLM handles intent (parse query, pick template, resolve ambiguity). Click to drop a layer and see the parser/orchestrator/RAG/responder decomposition.",
         },

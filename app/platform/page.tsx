@@ -28,7 +28,10 @@ const STACK: { title: string; body: React.ReactNode }[] = [
         Kubernetes-based runtime. Containerized FastAPI services,
         OCP-managed scaling, rollout, secrets, and network policy.
         Every system I lead ships as OCP-deployable artifacts on the
-        standard CI/CD pipeline.
+        standard CI/CD pipeline. OCP itself is operated by GFT
+        (Global Functions Technology); my role is consumer-side
+        &mdash; designing services to deploy cleanly into the
+        pipeline they own.
       </>
     ),
   },
@@ -38,7 +41,7 @@ const STACK: { title: string; body: React.ReactNode }[] = [
       <>
         The unified store. Application state, audit logs, embeddings,
         and vector search &mdash; one database, multiple roles.
-        FundingRequest runs production RAG on this stack: field-group
+        AI/LLM Drafting Platform runs production RAG on this stack: field-group
         classifier picks groups, two-stage retrieval pulls top-K
         passages from <span className="font-mono">pgvector</span>,
         parallel extraction agents run against approved foundation model (via
@@ -93,7 +96,7 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
           href="/projects/funding-request-drafting"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          FundingRequest
+          AI/LLM Drafting Platform
         </Link>
         .
       </>
@@ -152,7 +155,7 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
     surface: 'Audit logging / observability',
     evidence: (
       <>
-        Typed MCP tool registry &rarr; Postgres audit log (FundingRequest);
+        Typed MCP tool registry &rarr; Postgres audit log (AI/LLM Drafting Platform);
         provenance algebra (
         <Link
           href="/blog/commodity-tax-provenance"
@@ -217,7 +220,9 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
     surface: 'Container runtime',
     evidence: (
       <>
-        OpenShift (OCP) &mdash; production deployments at RBC scale.
+        OpenShift (OCP) &mdash; consumer-side. Services I own deploy
+        through GFT&rsquo;s standard CI/CD pipeline; GFT operates the
+        runtime.
       </>
     ),
   },
@@ -255,7 +260,7 @@ const REFERENCE_IMPLEMENTATIONS: {
   {
     name: 'funding-request-drafting-multi-agent-retrieval',
     url: 'https://github.com/rogerthatroach/funding-request-drafting-multi-agent-retrieval',
-    backs: 'FundingRequest — two-stage retrieval + N parallel extraction + coverage loop',
+    backs: 'AI/LLM Drafting Platform — two-stage retrieval + N parallel extraction + coverage loop',
   },
 ];
 
@@ -290,7 +295,7 @@ export default function PlatformPage() {
             The platform underneath.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-            The systems on the home page &mdash; FundingRequest, WorkforceAnalytics,
+            The systems on the home page &mdash; AI/LLM Drafting Platform, WorkforceAnalytics,
             FinancialBenchmarking &mdash; don&rsquo;t exist in isolation. They sit on a
             stack that defines what &ldquo;an AI service at RBC&rdquo;
             actually means: how it talks to LLMs, where it runs, how it

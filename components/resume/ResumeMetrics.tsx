@@ -29,7 +29,7 @@ const RESUME_METRICS = [
   {
     value: String(PRODUCTION_SYSTEMS_COUNT),
     label: 'Production Gen AI Systems',
-    context: 'FundingRequest · WorkforceAnalytics · FinancialBenchmarking',
+    context: 'AI/LLM Drafting Platform · WorkforceAnalytics · FinancialBenchmarking',
   },
 ];
 

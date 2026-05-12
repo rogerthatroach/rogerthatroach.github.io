@@ -70,7 +70,7 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
         bezier edges. Custom node types (hero hub, dot, rail, label) for
         non-rectangular shapes. Hand-authored SVG where layout is static.
         KaTeX pre-rendered at module scope for math (never pass LaTeX
-        through client-component props). FundingRequest{' '}
+        through client-component props). AI/LLM Drafting Platform{' '}
         <a
           href="/blog/enterprise-agentic-ai-framework"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
@@ -153,7 +153,7 @@ const REFERENCE_IMPLEMENTATIONS: {
   {
     name: 'funding-request-drafting-multi-agent-retrieval',
     url: 'https://github.com/rogerthatroach/funding-request-drafting-multi-agent-retrieval',
-    backs: 'FundingRequest multi-agent retrieval — three registers',
+    backs: 'AI/LLM Drafting Platform multi-agent retrieval — three registers',
     status: 'live',
   },
 ];

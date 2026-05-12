@@ -7,7 +7,7 @@ const LINKS = [
     icon: FileText,
     title: 'Engineering blog',
     summary:
-      'Deep-dives: FundingRequest architecture, WorkforceAnalytics LLM-as-Router, commodity-tax CFO trust, combustion tuning with operators, text-to-SQL.',
+      'Deep-dives: AI/LLM Drafting Platform architecture, WorkforceAnalytics LLM-as-Router, commodity-tax CFO trust, combustion tuning with operators, text-to-SQL.',
   },
   {
     href: '/papers',

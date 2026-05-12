@@ -7,7 +7,7 @@
  * the formal blog post (`components/blog/diagrams/FinancialBenchmarkingCascade.tsx`).
  * The case study and the blog post render exactly the same architecture
  * visual — any drift is a bug, not a feature. Matches the WorkforceAnalytics +
- * FundingRequest pattern.
+ * AI/LLM Drafting Platform pattern.
  */
 
 export { default } from '@/components/blog/diagrams/FinancialBenchmarkingCascade';

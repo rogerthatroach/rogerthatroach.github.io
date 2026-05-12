@@ -76,9 +76,9 @@ export const SKILL_CATEGORIES: SkillCategoryMeta[] = [
 
 export const SKILLS: Skill[] = [
   // ─── GenAI & Agentic ───
-  { name: 'LangGraph', category: 'genai', firstShipped: 2026, anchorProject: 'FundingRequest', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'MCP (Model Context Protocol)', category: 'genai', firstShipped: 2026, anchorProject: 'FundingRequest', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'Field-group RAG (two-stage retrieval)', category: 'genai', firstShipped: 2024, anchorProject: 'External Data Service automation → FundingRequest', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'LangGraph', category: 'genai', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'MCP (Model Context Protocol)', category: 'genai', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'Field-group RAG (two-stage retrieval)', category: 'genai', firstShipped: 2024, anchorProject: 'External Data Service automation → AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
   { name: 'Text-to-SQL', category: 'genai', firstShipped: 2025, anchorProject: 'FinancialBenchmarking v2', anchorLink: '/projects/financialBenchmarking' },
   { name: 'Embeddings / semantic search', category: 'genai', firstShipped: 2025, anchorProject: 'FinancialBenchmarking v2 KPI disambiguation', anchorLink: '/projects/financialBenchmarking' },
   { name: 'Prompt engineering', category: 'genai', firstShipped: 2024, anchorProject: 'All RBC GenAI work' },
@@ -100,13 +100,13 @@ export const SKILLS: Skill[] = [
   { name: 'Feature engineering', category: 'ml-dl', firstShipped: 2017, anchorProject: '90+ sensors → Combustion models', anchorLink: '/projects/combustion-tuning' },
 
   // ─── Data Engineering ───
-  { name: 'PostgreSQL (+ pgvector)', category: 'data-eng', firstShipped: 2026, anchorProject: 'FundingRequest storage', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'PostgreSQL (+ pgvector)', category: 'data-eng', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform storage', anchorLink: '/projects/funding-request-drafting' },
   { name: 'PySpark', category: 'data-eng', firstShipped: 2022, anchorProject: 'Commodity Tax automation', anchorLink: '/projects/commodity-tax' },
   { name: 'SQL', category: 'data-eng', firstShipped: 2018, anchorProject: 'FinancialBenchmarking v2 text-to-SQL (anchor)', anchorLink: '/projects/financialBenchmarking' },
-  { name: 'Hadoop / Spark', category: 'data-eng', firstShipped: 2022, anchorProject: 'Commodity Tax + Journal Entry automation (PySpark on Spark)', anchorLink: '/projects/commodity-tax' },
+  { name: 'PySpark on Cloudera Data Platform (CDP)', category: 'data-eng', firstShipped: 2022, anchorProject: 'Commodity Tax + Journal Entry automation', anchorLink: '/projects/commodity-tax' },
   { name: 'CDP (Cloudera Data Platform)', category: 'data-eng', firstShipped: 2023, anchorProject: 'Journal entry automation' },
   { name: 'ETL pipeline design', category: 'data-eng', firstShipped: 2017, anchorProject: 'TCS sensor pipelines', anchorLink: '/projects/combustion-tuning' },
-  { name: 'Chunking & embedding pipelines', category: 'data-eng', firstShipped: 2026, anchorProject: 'FundingRequest document ingestion', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'Chunking & embedding pipelines', category: 'data-eng', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform document ingestion', anchorLink: '/projects/funding-request-drafting' },
 
   // ─── Cloud & Platforms ───
   { name: 'Google Cloud Platform', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana Document Understanding', anchorLink: '/projects/document-intelligence' },
@@ -117,12 +117,12 @@ export const SKILLS: Skill[] = [
   { name: 'Dataiku', category: 'cloud', firstShipped: 2023, anchorProject: 'RBC managed Jupyter environment' },
 
   // ─── Platform & Infra ───
-  { name: 'OpenShift (OCP)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'All RBC AI services on Kubernetes runtime', anchorLink: '/platform' },
-  { name: 'FastAPI / API services', category: 'platform-infra', firstShipped: 2024, anchorProject: 'WorkforceAnalytics + FundingRequest orchestration services', anchorLink: '/platform' },
+  { name: 'OpenShift (consumer-side via CI/CD)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Services I own deployed to OCP via GFT CI/CD', anchorLink: '/platform' },
+  { name: 'FastAPI / API services', category: 'platform-infra', firstShipped: 2024, anchorProject: 'WorkforceAnalytics + AI/LLM Drafting Platform orchestration services', anchorLink: '/platform' },
   { name: 'Multi-vendor LLM routing (via ModelGateway gateway)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Approved foundation-model endpoint integration', anchorLink: '/platform' },
   { name: 'Permission cascade / authorization', category: 'platform-infra', firstShipped: 2025, anchorProject: 'WorkforceAnalytics 5-stage entitlement', anchorLink: '/projects/workforceAnalytics' },
-  { name: 'Audit logging (Postgres-backed)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'FundingRequest typed-MCP audit trail', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'Typed MCP tool registry', category: 'platform-infra', firstShipped: 2026, anchorProject: 'FundingRequest tool dispatcher', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'Audit logging (Postgres-backed)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'AI/LLM Drafting Platform typed-MCP audit trail', anchorLink: '/projects/funding-request-drafting' },
+  { name: 'Typed MCP tool registry', category: 'platform-infra', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform tool dispatcher', anchorLink: '/projects/funding-request-drafting' },
   { name: 'Cython (production compute paths)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'WorkforceAnalytics event-level ins-outs math at ms latency', anchorLink: '/projects/workforceAnalytics' },
 
   // ─── Viz & Frontend ───

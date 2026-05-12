@@ -35,7 +35,7 @@ interface LedgerRow {
  * actions across submissions, surfaced as a single LLMOps view.
  * Columns: timestamp / submission / MCP tool / field-group / confidence
  * / outcome / delta vs. predicted. T4 adds the confidence-calibration
- * scatter plot (predicted vs. actual outcomes per FundingRequest framing).
+ * scatter plot (predicted vs. actual outcomes per AI/LLM Drafting Platform framing).
  */
 export default function DianePage() {
   const { seed, selectSubmission } = useThemis();
@@ -237,7 +237,7 @@ export default function DianePage() {
           className="mt-4 max-w-2xl text-[12px] leading-relaxed text-text-tertiary"
         >
           Diane runs only where she&apos;s invoked. Single-agent governance
-          envelope per FundingRequest Phase 1 — actions land in this ledger
+          envelope per AI/LLM Drafting Platform Phase 1 — actions land in this ledger
           structurally, not aspirationally.
         </motion.p>
 

@@ -5,7 +5,7 @@
  *
  * Single source of truth: re-exports the "Pipeline + Transparency Rail"
  * diagram built for the formal blog post. Matches the WorkforceAnalytics +
- * FinancialBenchmarking + FundingRequest pattern where the case-study slot and the blog
+ * FinancialBenchmarking + AI/LLM Drafting Platform pattern where the case-study slot and the blog
  * post render the exact same architecture visual — drift is a bug.
  */
 

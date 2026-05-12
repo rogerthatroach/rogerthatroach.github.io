@@ -23,7 +23,7 @@ export const HERO = {
   title: 'AI & Data Science Lead — RBC',
   tagline: 'Architecting agentic AI for RBC CFO Group — the bank’s largest function.',
   bio: `${YEARS_EXPERIENCE} years from 900MW power plants in Japan to bank-wide AI platforms in Toronto. Same closed-loop pattern. Four abstraction levels.`,
-  location: 'Toronto, Canada',
+  location: 'Toronto, ON',
   links: {
     linkedin: 'https://www.linkedin.com/in/harmilapsingh',
     github: 'https://github.com/rogerthatroach',

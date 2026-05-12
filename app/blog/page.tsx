@@ -19,12 +19,12 @@ export const metadata: Metadata = {
  *
  * Each post carries an optional `projectId` on its metadata (see
  * `BlogPostMeta` in `data/posts/index.ts`). The index groups posts by
- * project so multi-post projects (FundingRequest has 3, Commodity Tax has
+ * project so multi-post projects (AI/LLM Drafting Platform has 3, Commodity Tax has
  * 2) read as a set, not as scattered cards. Cross-cutting pattern
  * posts without a projectId fall into a final "Patterns" group.
  *
  * Group ordering mirrors the projects-chronological data with newest-
- * first (FundingRequest → WorkforceAnalytics → FinancialBenchmarking → Commodity Tax → Document
+ * first (AI/LLM Drafting Platform → WorkforceAnalytics → FinancialBenchmarking → Commodity Tax → Document
  * Intelligence → Combustion Tuning → Patterns).
  */
 
