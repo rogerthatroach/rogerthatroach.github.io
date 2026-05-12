@@ -15,7 +15,7 @@ This is the story of why, and what it took to build.
 
 ## The problem
 
-RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions (&ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo;) and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (EPM): ~40,000 employee-level events (the leaf-level routing unit), ~9,000 parent rollups, an ~80,000-node business hierarchy, and a ~60,000-node geography hierarchy, with strict entitlement controls at every level.
+RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions (&ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo;) and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (EPM): ~40,000 employee-level events as the leaf-level routing unit and ~9,000 parent rollups across the cost-centre hierarchy, with strict entitlement controls at every level.
 
 No interactive system could answer those questions in under a day. No off-the-shelf product understood the CFO Group&rsquo;s permission model. And every off-the-shelf AI tool that might have helped required giving the LLM full access to the data.
 
@@ -65,7 +65,7 @@ Three things, in the order they mattered:
 
 ## The result
 
-- ~40K employee-level events with ~9K parent rollups, sliced at millisecond backend latency across any cross-domain combination
+- ~40K employee-level events with ~9K parent rollups, sliced in real time at any granularity across any cross-domain combination (millisecond backend compute path)
 - Three delivery channels from a single architecture: dashboard, chatbot, and HTML reports generated for executive consumption
 - Days of email replaced by seconds-level answers
 - Zero sensitive data ever reaching the language model

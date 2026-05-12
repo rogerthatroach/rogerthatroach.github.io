@@ -7,7 +7,7 @@ import DecisionRationale from '@/components/blog/framework/DecisionRationale'
 import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
 import StepThrough from '@/components/blog/framework/StepThrough'
 
-Finance leadership asks questions that cross three domains in one sentence: *"headcount by division, crossed with open positions, crossed with tenure."* The answer needs to be deterministic under audit, scoped by entitlement at every level of the organization, and returned in milliseconds, not days.
+Finance leadership asks questions that cross three domains in one sentence: *"headcount by division, crossed with open positions, crossed with tenure."* The answer needs to be deterministic under audit, scoped by entitlement at every level of the organization, and returned in real time at any granularity (the equivalent queries used to take days, line-of-business level only).
 
 There is one pattern the industry reaches for here: give the LLM full access and let it figure it out. One model, function-calling into the financial data store, iterating with a ReAct-style loop until it lands on an answer. Fast to prototype. Easy to demo. Impossible to ship inside regulated finance.
 
@@ -36,7 +36,7 @@ Four constraints shaped every decision below. Two regulatory, one hard-technical
     {
       kind: 'hard',
       label: 'Millisecond latency across 40K+ events',
-      detail: 'The interactive experience only works if arbitrary cross-domain slices return in under a second: ~40K employee-level events as the leaf-level routing unit, ~9K parent rollups, an ~80K-node business hierarchy, a ~60K-node geography hierarchy. The combinatorics are factorial. Any path that touches a slow aggregation query blows the experience.',
+      detail: 'The interactive experience only works if arbitrary cross-domain slices return in under a second: ~40K employee-level events as the leaf-level routing unit and ~9K parent rollups across the cost-centre hierarchy. The combinatorics are factorial. Any path that touches a slow aggregation query blows the experience.',
     },
     {
       kind: 'soft',

@@ -78,7 +78,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Agentic AI', 'LLM Routing', 'Enterprise Security', 'Entitlement Modeling'],
       readingTime: '20 min read',
       abstract:
-        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee-level events across ~9,000 organizational rollups with millisecond-level response times, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
+        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee-level events across ~9,000 organizational rollups, bringing headcount-movement queries from days (line-of-business level only) to real time at any granularity, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
       status: 'published',
       projectId: 'workforceAnalytics',
       register: 'formal',
@@ -97,6 +97,7 @@ export const POSTS: BlogPost[] = [
       { id: 11, authors: 'Wu, Q. et al.', title: 'AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation', venue: 'arXiv preprint arXiv:2308.08155', year: 2023, url: 'https://arxiv.org/abs/2308.08155' },
     ],
     furtherReading: [
+      { title: 'Building WorkforceAnalytics around a model that wasn’t working', url: '/blog/workforceAnalytics-building-around-failing-model', description: 'The substrate story underneath the formal architecture: approved foundation model failure modes, foundation-model-agnostic design, and the approved foundation model migration that proved the bet.' },
       { title: 'LangChain Documentation', url: 'https://docs.langchain.com/', description: 'Framework for building LLM-powered applications with tool use and agent orchestration.' },
       { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for connecting AI assistants to external data sources and tools.' },
       { title: 'Microsoft Responsible AI Standard', url: 'https://www.microsoft.com/en-us/ai/responsible-ai', description: 'Framework for responsible AI development in enterprise contexts.' },
@@ -291,6 +292,37 @@ export const POSTS: BlogPost[] = [
         description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
       },
       {
+        title: 'Building WorkforceAnalytics around a model that wasn\u2019t working',
+        url: '/blog/workforceAnalytics-building-around-failing-model',
+        description: 'The substrate story underneath: approved foundation model failure modes, the foundation-model-agnostic bet, and the approved foundation model migration that proved it (zero architecture changes).',
+      },
+      {
+        title: 'WorkforceAnalytics \u2014 Case Study',
+        url: '/projects/workforceAnalytics',
+        description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: 
+    references: [],
+    furtherReading: [
+      {
+        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent (the original builder companion)',
+        url: '/blog/workforce-analytics-llm-as-router',
+        description: 'The architectural call against the seductive monolithic-agent pattern. This deep-dive sits underneath it as the model-substrate story.',
+      },
+      {
+        title: 'Deterministic Agentic Architectures (the formal companion)',
+        url: '/blog/agentic-ai',
+        description: 'Formal proofs of data-confidentiality and entitlement-safety under defined threat models.',
+      },
+      {
+        title: 'LLM-as-Router in Practice (the practitioner rewrite)',
+        url: '/blog/workforce-analytics-routing-framework',
+        description: 'Four architectural decisions as first-class structure with options considered, constraint cards, and decision rationale.',
+      },
+      {
         title: 'WorkforceAnalytics \u2014 Case Study',
         url: '/projects/workforceAnalytics',
         description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
@@ -323,6 +355,11 @@ export const POSTS: BlogPost[] = [
         title: 'Why I Chose LLM-as-Router Over a Monolithic Agent (the builder story)',
         url: '/blog/workforce-analytics-llm-as-router',
         description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
+      },
+      {
+        title: 'Building WorkforceAnalytics around a model that wasn\u2019t working (deep-dive)',
+        url: '/blog/workforceAnalytics-building-around-failing-model',
+        description: 'Why the four decisions in this post look the way they do: the approved foundation model failure modes that shaped the bounds on every stage, and the approved foundation model migration that proved foundation-model-agnostic by design.',
       },
       {
         title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (AI/LLM Drafting Platform)',
