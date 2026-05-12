@@ -20,13 +20,15 @@ import { useThemeColor } from '@/lib/useThemeColor';
 /**
  * Astraeus architecture — "The Cascade" diagram.
  *
- * The hero move: two dashed walls cutting the canvas into three bands.
- *   (Band 1) LLM intent side — parse, route, metadata extract
+ * Four-stage LLM pipeline, 5 to 8 LLM calls per query. Two dashed walls
+ * cut the canvas into three bands.
+ *   (Band 1) LLM intent side — Stage 1 Gate, Stage 2 parallel metadata
  *   — WALL: no data crosses —
  *   (Band 2) Deterministic Postgres + Cython compute
  *   — WALL: only aggregates return —
- *   (Band 3) LLM synthesis side — 1 or up to 3 subagents, then combine
- *            → delivered as dashboard / chatbot / HTML
+ *   (Band 3) LLM answer-shaping side — Stage 3 Answer (1 simple OR 3
+ *            parallel cross-domain) + Stage 4 Synthesis (cross-domain
+ *            only) → delivered as dashboard / chatbot / HTML
  *
  * Nodes are oblong pills (no circles); hero nodes are bigger pills with
  * glow. The walls carry the signature property visibly: the LLM never
@@ -307,26 +309,19 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // Parse + Route — row 1 of 2 (sequential flow control)
+  // Stage 1 — Gate (single LLM call: relevance / injection / scope / path selection)
   {
-    id: 'parse',
+    id: 'gate',
     type: 'pill',
-    position: { x: 180, y: 185 },
-    data: { badge: 'LLM 1', label: 'Parse intent', sub: 'GPT-4.1', color: LLM, size: 'sm' } satisfies PillNodeData,
-    draggable: false,
-  },
-  {
-    id: 'route',
-    type: 'pill',
-    position: { x: 480, y: 185 },
-    data: { badge: 'LLM 2', label: 'Route', sub: 'in scope?', color: LLM, size: 'sm' } satisfies PillNodeData,
+    position: { x: 330, y: 185 },
+    data: { badge: 'LLM 1 · Stage 1', label: 'Gate', sub: 'relevance · injection · scope · path', color: LLM, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
 
-  // Metadata extractors — row 2 of 2 (parallel fan-out, 3-wide)
-  { id: 'meta-1', type: 'pill', position: { x: 130, y: 275 }, data: { badge: 'LLM 3', label: 'Headcount',  sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'meta-2', type: 'pill', position: { x: 360, y: 275 }, data: { badge: 'LLM 4', label: 'HR Costs',   sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'meta-3', type: 'pill', position: { x: 590, y: 275 }, data: { badge: 'LLM 5', label: 'Open Pos.',  sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  // Stage 2 — Parallel metadata extraction (3 LLM calls fired in parallel)
+  { id: 'meta-1', type: 'pill', position: { x: 130, y: 275 }, data: { badge: 'LLM 2 · Stage 2', label: 'Headcount',  sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'meta-2', type: 'pill', position: { x: 360, y: 275 }, data: { badge: 'LLM 3 · Stage 2', label: 'HR Costs',   sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'meta-3', type: 'pill', position: { x: 590, y: 275 }, data: { badge: 'LLM 4 · Stage 2', label: 'Open Pos.',  sub: 'metadata', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
 
   // Sidenote on metadata fan-out
   {
@@ -431,31 +426,31 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 665 },
     data: {
-      text: 'Band 3 · LLM synthesis (aggregates only)',
+      text: 'Band 3 · LLM Answer + Synthesis (aggregates only)',
       color: LLM,
       size: 'xs',
     } satisfies LabelNodeData,
     draggable: false,
   },
 
-  // Synthesis pills — 4-wide, shortened labels to fit narrow canvas
+  // Stage 3 — Answer pills (simple path: 1 LLM call. cross-domain path: 3 parallel LLM calls)
   {
     id: 'synth-1',
     type: 'pill',
     position: { x: 60, y: 695 },
-    data: { badge: 'path A', label: '1 call', sub: 'simple answer', color: LLM, size: 'sm' } satisfies PillNodeData,
+    data: { badge: 'LLM 5 · Stage 3', label: 'Answer', sub: 'simple path · 1 call', color: LLM, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
-  { id: 'sub-epm',  type: 'pill', position: { x: 250, y: 695 }, data: { badge: 'path B', label: 'Cost',       color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'sub-hc',   type: 'pill', position: { x: 430, y: 695 }, data: { badge: 'path B', label: 'Headcount',  color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
-  { id: 'sub-open', type: 'pill', position: { x: 620, y: 695 }, data: { badge: 'path B', label: 'Open pos.',  color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'sub-epm',  type: 'pill', position: { x: 250, y: 695 }, data: { badge: 'LLM 5 · Stage 3', label: 'Cost',       sub: 'cross-domain', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'sub-hc',   type: 'pill', position: { x: 430, y: 695 }, data: { badge: 'LLM 6 · Stage 3', label: 'Headcount',  sub: 'cross-domain', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
+  { id: 'sub-open', type: 'pill', position: { x: 620, y: 695 }, data: { badge: 'LLM 7 · Stage 3', label: 'Open pos.',  sub: 'cross-domain', color: LLM, size: 'sm' } satisfies PillNodeData, draggable: false },
 
-  // Combine (centered)
+  // Stage 4 — Synthesis (single LLM call, cross-domain path only)
   {
     id: 'combine',
     type: 'pill',
     position: { x: 370, y: 780 },
-    data: { label: 'Combine', sub: 'one answer', color: HERO, size: 'sm', glow: true } satisfies PillNodeData,
+    data: { badge: 'LLM 8 · Stage 4', label: 'Synthesis', sub: 'cross-domain only', color: LLM, size: 'sm', glow: true } satisfies PillNodeData,
     draggable: false,
   },
 
@@ -487,14 +482,12 @@ const initialNodes: Node[] = [
 ];
 
 const initialEdges: Edge[] = [
-  // User → parse
-  { id: 'e-user-parse', source: 'user', target: 'parse', type: 'animated', data: { color: HERO } },
-  // Parse → route
-  { id: 'e-parse-route', source: 'parse', target: 'route', type: 'animated', data: { color: LLM } },
-  // Route → 3 metadata extractors (fan-out)
-  { id: 'e-route-m1', source: 'route', target: 'meta-1', type: 'animated', data: { color: LLM } },
-  { id: 'e-route-m2', source: 'route', target: 'meta-2', type: 'animated', data: { color: LLM } },
-  { id: 'e-route-m3', source: 'route', target: 'meta-3', type: 'animated', data: { color: LLM } },
+  // User → Stage 1 Gate
+  { id: 'e-user-gate', source: 'user', target: 'gate', type: 'animated', data: { color: HERO } },
+  // Gate → 3 Stage 2 metadata extractors (fan-out)
+  { id: 'e-gate-m1', source: 'gate', target: 'meta-1', type: 'animated', data: { color: LLM } },
+  { id: 'e-gate-m2', source: 'gate', target: 'meta-2', type: 'animated', data: { color: LLM } },
+  { id: 'e-gate-m3', source: 'gate', target: 'meta-3', type: 'animated', data: { color: LLM } },
 
   // Metadata → entitlement chain (fan-in to wall)
   { id: 'e-m1-entitle', source: 'meta-1', target: 'entitle-chain', type: 'animated', data: { color: ENTITLE } },
