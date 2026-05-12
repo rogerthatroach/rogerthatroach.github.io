@@ -9,7 +9,7 @@ import VisualizationContainer from '@/components/blog/VisualizationContainer';
 
 In September 2022 I joined <Glossed>CFO Group</Glossed> at RBC as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the <Glossed>Commodity Tax</Glossed> return process, a manual workflow that consumed finance analysts for months per cycle.
 
-By Q4 2023, the process took **90 minutes**. The metric earned the **CFO Group RBC Quarterly Team Award**. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually Prometheus, a cascade that shaped the next three years.
+By Q4 2023, the process took **90 minutes**. The metric earned the **CFO Group RBC Quarterly Team Award**. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually PAR Assist, a cascade that shaped the next three years.
 
 This post walks the architectural decisions that made it land: under explicit constraints, against named alternatives, with the reasoning that produced each call. The narrative version of this story (with the cycle-1 anchor moment that compressed the whole strategy into a single afternoon) lives in the [builder companion](/blog/commodity-tax-cfo-trust). The formal frame (pipeline as a sequence of provenance-preserving graph rewrites, Tableau as a parallel presentation layer derived from the same provenance algebra) lives in the [formal post](/blog/commodity-tax-provenance).
 
@@ -107,7 +107,7 @@ The first decision was close to obvious. The second decision is the whole post.
       cons: [
         'Not part of the AI team’s stack, commits the future to SAS for any AI-adjacent work',
         'Licensing cost scales with team adoption',
-        'Future-AI surface (Aegis, Astraeus, Prometheus) was Python-native; SAS would have forked the stack',
+        'Future-AI surface (Aegis, Astraeus, PAR Assist) was Python-native; SAS would have forked the stack',
       ],
     },
   ]}
@@ -288,7 +288,7 @@ That confidence was the deliverable. The 90-minute metric was the side effect.
 
 ## What this opened
 
-By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose <Glossed>Aegis v1</Glossed> (a benchmarking engine for the Big 6 Canadian banks) and get the air cover to build it. When Aegis v1 shipped (2025 CFO One RBC Team Award), I could propose <Glossed>Aegis v2</Glossed>, the text-to-SQL refactor, and deliver it in a concurrent 2-week sprint while Astraeus productionization was underway. When <Glossed>Astraeus</Glossed> reached production scale, I had the credibility to conceive <Glossed>Prometheus</Glossed>, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the bank-wide platform end-to-end.
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose <Glossed>Aegis v1</Glossed> (a benchmarking engine for the Big 6 Canadian banks) and get the air cover to build it. When Aegis v1 shipped (2025 CFO One RBC Team Award), I could propose <Glossed>Aegis v2</Glossed>, the text-to-SQL refactor, and deliver it in a concurrent 2-week sprint while Astraeus productionization was underway. When <Glossed>Astraeus</Glossed> reached production scale, I had the credibility to conceive <Glossed>PAR Assist</Glossed>, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the bank-wide platform end-to-end.
 
 Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. Commodity Tax was underwriting every subsequent bet.
 
@@ -304,7 +304,7 @@ Your first project at a new organization isn&rsquo;t just a deliverable. It&rsqu
 
 The architectural decision (Tableau as a transparency layer, not an output) was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
 
-Astraeus&rsquo;s LLM-as-Router separation is a descendant of this idea. Aegis v2&rsquo;s confidence-thresholded clarification is a descendant of this idea. Prometheus&rsquo;s typed MCP tool contracts that log every field assignment are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
+Astraeus&rsquo;s LLM-as-Router separation is a descendant of this idea. Aegis v2&rsquo;s confidence-thresholded clarification is a descendant of this idea. PAR Assist&rsquo;s typed MCP tool contracts that log every field assignment are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
 
 Commodity Tax was where I learned that. Cycle 1 was where the lesson actually landed. The technology changes. The pattern doesn&rsquo;t.
 

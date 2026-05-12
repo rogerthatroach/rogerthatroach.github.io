@@ -35,7 +35,7 @@ export interface Project {
 /**
  * Projects defined in chronological order (oldest → newest) so the arc
  * narrative reads cleanly in source. Exported reversed at the end so
- * consumers see latest-first (Prometheus → Combustion Tuning), which is
+ * consumers see latest-first (PAR Assist → Combustion Tuning), which is
  * what recruiters and skimmers expect.
  */
 const PROJECTS_CHRONOLOGICAL: Project[] = [
@@ -147,7 +147,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   },
   {
     id: 'par-assist',
-    title: 'Prometheus',
+    title: 'PAR Assist',
     subtitle: 'Enterprise Agentic AI Platform — RBC Bank-wide',
     role: 'Conceived, architected, and built end-to-end',
     stack: ['LangGraph', 'MCP', 'PostgreSQL + pgvector', 'Sonnet 4.5', 'Field-group RAG'],
@@ -165,27 +165,6 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     ],
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
     deepDivePath: '/projects/par-assist',
-  },
-  {
-    id: 'argus',
-    title: 'ARGUS',
-    subtitle: 'Analytics Agent for Senior Bank Leadership — RBC',
-    role: 'Designed and built end-to-end (solo, single weekend ~21 hours)',
-    stack: ['RBC Assist Pro', 'XML system prompt', 'GPT-5 vision', 'Claude Opus 4.6 (AWS Bedrock)', 'main_skill.md router', '55 data_skill.md files'],
-    heroMetric: { value: '~21 hours', label: 'Solo weekend build' },
-    caption:
-      'Analytics agent prototype for senior bank leadership (SVP / EVP / group head audience), built within RBC Assist Pro\'s fixed orchestration layer. Collapses query turnaround from minutes and hours to seconds across a substantial financial corpus, with on-demand professional visuals and dashboards. Demo\'d to multiple SVPs.',
-    description:
-      'A prototype analytics agent for senior bank leadership at RBC. Built on top of RBC Assist Pro (the bank\'s internal AI product platform with fixed orchestration). 300-line XML system prompt routes across 55 per-domain skill files; pipeline uses GPT-5 vision for tabular PDF parse and Anthropic Claude Opus 4.6 via AWS Bedrock for OCR-to-schema conversion.',
-    highlights: [
-      'Constraint-shaped speed: RBC Assist Pro\'s orchestration layer (file search, embeddings search, LLM routing) is fixed. The architectural work happens in the seams: system prompt, skill files, visualization governance.',
-      '300-line XML system prompt defines persona, constraints, response shape, analytical voice, error handling, refusal behavior. References main_skill.md (router) and design.md (visualization governance).',
-      'main_skill.md routes across 55 per-domain data_skill.md files (KPI categories, segments, peer-bank slices). Each contains structured data, context, and retrieval hints.',
-      'Pipeline: GPT-5 vision parses a tabular PDF financial corpus directly (faster and more accurate than schema-mapping the corresponding Excel files); Claude Opus 4.6 via AWS Bedrock converts OCR into a JSON arrays-of-arrays schema with metadata enrichment.',
-      'Collapses senior-leadership query turnaround from minutes and hours to seconds across the corpus, with cross-segment KPIs and Canadian peer-bank comparisons answered on demand. Demo\'d to multiple SVPs.',
-    ],
-    palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
-    deepDivePath: '/projects/argus',
   },
 ];
 

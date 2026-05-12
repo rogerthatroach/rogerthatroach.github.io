@@ -11,15 +11,15 @@ const UPDATED = 'April 2026';
 const BULLETS: { heading: string; body: string }[] = [
   {
     heading: 'Shipping',
-    body: 'Prometheus — the first true agentic framework approved for production at RBC. Pilot live April 2026; enterprise rollout across business lines through Q2/Q3 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls. Early design for v2: multi-agent "skills" composed over the v1 substrate.',
+    body: 'PAR Assist — the first true agentic framework approved for production at RBC. Pilot live April 2026; enterprise rollout across business lines through Q2/Q3 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls. Early design for v2: multi-agent "skills" composed over the v1 substrate.',
   },
   {
     heading: 'Writing',
-    body: 'Sanitized Prometheus across every surface (formal math post, practitioner rewrite, builder story, case study, homepage, resume, glossary) in one pass after an audit caught a fabricated three-layer RAG claim sitting unchallenged for weeks. PAR is now the benchmark; applying the same pass to Astraeus next.',
+    body: 'Sanitized PAR Assist across every surface (formal math post, practitioner rewrite, builder story, case study, homepage, resume, glossary) in one pass after an audit caught a fabricated three-layer RAG claim sitting unchallenged for weeks. PAR is now the benchmark; applying the same pass to Astraeus next.',
   },
   {
     heading: 'Thinking about',
-    body: 'How v1 substrates become v2 substrates. The single-agent envelope at Prometheus was constrained by governance, not by engineering — but the constraint forced a structure (typed MCP tool registry, unified Postgres store, field-group taxonomy) that v2 skills compose on without rewrite. Every envelope you build should make its next envelope cheaper.',
+    body: 'How v1 substrates become v2 substrates. The single-agent envelope at PAR Assist was constrained by governance, not by engineering — but the constraint forced a structure (typed MCP tool registry, unified Postgres store, field-group taxonomy) that v2 skills compose on without rewrite. Every envelope you build should make its next envelope cheaper.',
   },
 ];
 

@@ -98,7 +98,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived, architected, and built Prometheus end-to-end (pilot April 2026; enterprise rollout in progress). Conceived, architected, and built Astraeus end-to-end (production since Nov 2025). Designed and built Aegis v2 in a 2-week solo sprint while running Astraeus and the Amplify intern program in parallel. Shipped ARGUS in May 2026 as a single-weekend solo build for senior bank leadership. Led the 2025 Amplify intern cohort. ~70% hands-on.',
+      'Architecting enterprise agentic AI. Conceived, architected, and built PAR Assist end-to-end (pilot April 2026; enterprise rollout in progress). Conceived, architected, and built Astraeus end-to-end (production since Nov 2025). Designed and built Aegis v2 in a 2-week solo sprint while running Astraeus and the Amplify intern program in parallel. Led the 2025 Amplify intern cohort. ~70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
@@ -108,12 +108,12 @@ export const TIMELINE: TimelineNode[] = [
       label: 'Conceived + architected in 12 months',
     },
     transitionStory:
-      'Promoted internally from Senior Data Scientist after 2.5 years built on Commodity Tax (months → 90 min) and Aegis v1 solo end-to-end productionization. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and ownership of net-new enterprise platforms: Astraeus development began April 2025 coincident with the promotion, and Prometheus was conceived as my own vision, handed to Amplify interns for problem-space ideation, then built end-to-end as a bank-wide production platform.',
+      'Promoted internally from Senior Data Scientist after 2.5 years built on Commodity Tax (months → 90 min) and Aegis v1 solo end-to-end productionization. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and ownership of net-new enterprise platforms: Astraeus development began April 2025 coincident with the promotion, and PAR Assist was conceived as my own vision, handed to Amplify interns for problem-space ideation, then built end-to-end as a bank-wide production platform.',
     teamContext:
-      'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (the 2025 Amplify cohort explored the Prometheus problem space via an ideation exercise before I built the production platform end-to-end). Cross-functional leadership of engineering services partners (senior + junior) on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
+      'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (the 2025 Amplify cohort explored the PAR Assist problem space via an ideation exercise before I built the production platform end-to-end). Cross-functional leadership of engineering services partners (senior + junior) on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
     projects: [
       {
-        name: 'Prometheus',
+        name: 'PAR Assist',
         oneLiner:
           'Conceived, architected, and built end-to-end: enterprise-wide agentic AI platform guiding PAR drafting across all RBC business lines. Pilot launched April 2026.',
         decisionRationale:
@@ -127,7 +127,7 @@ export const TIMELINE: TimelineNode[] = [
         oneLiner:
           'Conceived, architected, and built end-to-end: production analytics platform for CFO Group delivering dynamic headcount, HR costs, and open positions at bank scale with millisecond slicing. Production since Nov 2025.',
         decisionRationale:
-          'Two-wall architecture. GPT-4.1 on the intent side handles parse, route, metadata extract, and synthesis; never touches data. Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Refactored an initial single-model implementation into 3 parallel sub-agents (EPM, Headcount, Open Positions) to break Command-A context limits and unlock all financial domains, improving accuracy, latency, and fault resilience simultaneously. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail. Production deployment runs through GFT on OpenShift via CI/CD.',
+          'Two-wall architecture. GPT-4.1 on the intent side handles parse, route, metadata extract, and synthesis; never touches data. Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Bounded, parallel domain-specific metadata extraction across EPM, Headcount, and Open Positions, with defense-in-depth gating between stages — each LLM call has less surface area for failure, and the whole pipeline stays foundation-model-agnostic. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail. Production deployment runs through GFT on OpenShift via CI/CD.',
         metric: { value: '~40K leaf-level events', label: 'arbitrary combinations, ms latency' },
         caseStudyLink: '/projects/astraeus',
       },

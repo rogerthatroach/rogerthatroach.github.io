@@ -23,7 +23,7 @@ export const METRICS: Metric[] = [
   // displays cleanly. Other entries with numeric+suffix still animate.
   { value: YEARS_EXPERIENCE, label: 'Years in AI/ML', context: '2016–present' },
   { value: DIGITAL_TWIN_SAVINGS, numericValue: 3, prefix: '$', suffix: 'M', label: 'Cost Savings Delivered', context: 'Digital Twin — annual' },
-  { value: String(PRODUCTION_SYSTEMS_COUNT), numericValue: PRODUCTION_SYSTEMS_COUNT, label: 'Production Gen AI Systems', context: 'Prometheus, Astraeus, Aegis (v1 → v2 refactor)' },
+  { value: String(PRODUCTION_SYSTEMS_COUNT), numericValue: PRODUCTION_SYSTEMS_COUNT, label: 'Production Gen AI Systems', context: 'PAR Assist, Astraeus, Aegis (v1 → v2 refactor)' },
   { value: '40K+', numericValue: 40, suffix: 'K+', label: 'Events Analyzed', context: 'Astraeus — on-the-fly millisecond slicing' },
   { value: '2wk', numericValue: 2, suffix: 'wk', label: 'Fastest Refactor', context: 'Aegis v1 → v2 concurrent sprint' },
   { value: String(AWARDS_COUNT), numericValue: AWARDS_COUNT, label: 'Awards & Recognition', context: 'RBC + TCS' },

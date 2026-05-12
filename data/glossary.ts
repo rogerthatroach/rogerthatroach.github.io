@@ -15,7 +15,7 @@
 
 export const GLOSSARY: Record<string, string> = {
   // ── Products / systems ──
-  'Prometheus':
+  'PAR Assist':
     'Enterprise-wide agentic AI platform guiding Project Approval Request (PAR) drafting at RBC. Bank-wide pilot launched April 2026; rollout through Q2/Q3 2026.',
   'Astraeus':
     'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level events with event-level ins-outs math (Cython-compiled). GPT-4.1 used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
@@ -28,7 +28,7 @@ export const GLOSSARY: Record<string, string> = {
 
   // ── Programs ──
   'summer intern program':
-    'RBC Amplify internship program. I led the 2025 cohort end-to-end: 4 interns across PAR drafting and adjacent projects. The Prometheus (PAR Assist) concept was my vision, given to the interns as an ideation exercise to explore the problem space; the production platform was conceived, architected, and built end-to-end thereafter.',
+    'RBC Amplify internship program. I led the 2025 cohort end-to-end: 4 interns across PAR drafting and adjacent projects. The PAR Assist concept was my vision, given to the interns as an ideation exercise to explore the problem space; the production platform was conceived, architected, and built end-to-end thereafter.',
 
   // ── Organizations ──
   'engineering services partner': 'Cross-functional engineering peers — senior + junior — on Astraeus delivery.',
@@ -56,14 +56,14 @@ export const GLOSSARY: Record<string, string> = {
 
   // ── Technical concepts ──
   LangGraph:
-    'Graph-based LLM orchestration library. Picked for Prometheus for maturity (most stable orchestrator at evaluation time) and because PAR drafting is a conditional-branching workflow — template selection → field-group retrieval → extraction → coverage loops back on open follow-ups.',
-  MCP: 'Model Context Protocol — emerging standard for typed, logged tool contracts. In Prometheus every action (template selection, retrieval, compression, extraction, merge, coverage) is an MCP tool dispatched through the graph engine, so auditability is structural, not aspirational.',
+    'Graph-based LLM orchestration library. Picked for PAR Assist for maturity (most stable orchestrator at evaluation time) and because PAR drafting is a conditional-branching workflow — template selection → field-group retrieval → extraction → coverage loops back on open follow-ups.',
+  MCP: 'Model Context Protocol — emerging standard for typed, logged tool contracts. In PAR Assist every action (template selection, retrieval, compression, extraction, merge, coverage) is an MCP tool dispatched through the graph engine, so auditability is structural, not aspirational.',
   pgvector:
-    'PostgreSQL vector-similarity extension. Prometheus uses pgvector alongside LangGraph checkpoints + logs + raw/mapped content + audit trail — one Postgres store holds every layer of the session, so the full provenance for any draft is one query away.',
+    'PostgreSQL vector-similarity extension. PAR Assist uses pgvector alongside LangGraph checkpoints + logs + raw/mapped content + audit trail — one Postgres store holds every layer of the session, so the full provenance for any draft is one query away.',
   'field-group retrieval':
-    'Prometheus\'s two-stage retrieval pattern. Stage 1 picks which logically-related field groups are relevant to the session. Stage 2 runs similarity search within each group for top-10 chunks, then custom compression fits them into a Sonnet-4.5 prompt with up to 20 fields of rich metadata per call.',
+    'PAR Assist\'s two-stage retrieval pattern. Stage 1 picks which logically-related field groups are relevant to the session. Stage 2 runs similarity search within each group for top-10 chunks, then custom compression fits them into a Sonnet-4.5 prompt with up to 20 fields of rich metadata per call.',
   'single-agent envelope':
-    'The governance constraint behind Prometheus v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
+    'The governance constraint behind PAR Assist v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
   'GPT-4.1':
     'The model used in Astraeus for all LLM calls (parse, route, metadata extract, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
   event:

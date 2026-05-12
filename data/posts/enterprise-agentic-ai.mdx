@@ -12,7 +12,7 @@ Enterprise organizations run on structured processes. Project approvals, budget 
 
 Most teams throw a chatbot at this. But the user doesn't need a Q&A interface. They need a *collaborator*: something that understands where they are in a multi-step process, holds context across the entire session, pulls the right reference material at the right moment, and resolves contradictions between policy documents without the user knowing there was a conflict.
 
-That's a fundamentally different problem than retrieval-augmented generation <CitationRef id={7} />. It's an orchestration problem over a structured form, inside a regulated-institution governance envelope. This paper formalizes the architectural pattern that solves it, as deployed at Prometheus inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
+That's a fundamentally different problem than retrieval-augmented generation <CitationRef id={7} />. It's an orchestration problem over a structured form, inside a regulated-institution governance envelope. This paper formalizes the architectural pattern that solves it, as deployed at PAR Assist inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
 
 ## 2. Problem Formulation
 
@@ -189,7 +189,7 @@ The LLM operates at the intake/template node and at the <InlineEquation html={te
 
 ## 5. Impact and Reusability
 
-Prometheus transformed multi-week governance drafting into a guided interactive session, with every extracted field cited back to a policy, guideline, or few-shot example. Pilot launched April 2026; enterprise rollout across RBC business lines through Q2/Q3 2026.
+PAR Assist transformed multi-week governance drafting into a guided interactive session, with every extracted field cited back to a policy, guideline, or few-shot example. Pilot launched April 2026; enterprise rollout across RBC business lines through Q2/Q3 2026.
 
 The five-piece pattern (LangGraph <CitationRef id={6} />, MCP tool boundary <CitationRef id={5} />, two-stage field-group retrieval <CitationRef id={7} />, N parallel scoped extraction with dict-union merge, unified Postgres backbone) is reusable for any enterprise workflow with (i) a structured target form, (ii) institutional knowledge across heterogeneous sources, and (iii) regulatory audit requirements. The v2 evolution replaces the single-agent envelope with a multi-agent *skills* framework composed over the same MCP tool registry; v1 is the substrate v2 extends.
 
