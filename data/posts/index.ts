@@ -78,7 +78,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Agentic AI', 'LLM Routing', 'Enterprise Security', 'Entitlement Modeling'],
       readingTime: '20 min read',
       abstract:
-        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee-level events across ~9,000 organizational rollups with millisecond-level response times, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
+        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee-level events across ~9,000 organizational rollups, bringing headcount-movement queries from days (line-of-business level only) to real time at any granularity, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
       status: 'published',
       projectId: 'astraeus',
       register: 'formal',
@@ -97,6 +97,7 @@ export const POSTS: BlogPost[] = [
       { id: 11, authors: 'Wu, Q. et al.', title: 'AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation', venue: 'arXiv preprint arXiv:2308.08155', year: 2023, url: 'https://arxiv.org/abs/2308.08155' },
     ],
     furtherReading: [
+      { title: 'Building Astraeus around a model that wasn’t working', url: '/blog/astraeus-building-around-failing-model', description: 'The substrate story underneath the formal architecture: Command-A failure modes, foundation-model-agnostic design, and the GPT-4.1 migration that proved the bet.' },
       { title: 'LangChain Documentation', url: 'https://docs.langchain.com/', description: 'Framework for building LLM-powered applications with tool use and agent orchestration.' },
       { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for connecting AI assistants to external data sources and tools.' },
       { title: 'Microsoft Responsible AI Standard', url: 'https://www.microsoft.com/en-us/ai/responsible-ai', description: 'Framework for responsible AI development in enterprise contexts.' },
@@ -291,6 +292,50 @@ export const POSTS: BlogPost[] = [
         description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
       },
       {
+        title: 'Building Astraeus around a model that wasn\u2019t working',
+        url: '/blog/astraeus-building-around-failing-model',
+        description: 'The substrate story underneath: Command-A failure modes, the foundation-model-agnostic bet, and the GPT-4.1 migration that proved it (zero architecture changes).',
+      },
+      {
+        title: 'Astraeus \u2014 Case Study',
+        url: '/projects/astraeus',
+        description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
+      },
+    ],
+  },
+  {
+    meta: {
+      slug: 'astraeus-building-around-failing-model',
+      title: 'Astraeus: Building a Multi-Stage LLM Pipeline Around a Model That Wasn\u2019t Working',
+      subtitle:
+        'A case study in defense-in-depth architecture, model-agnostic design, and what to do when the foundation model you\u2019ve been given keeps regressing on you.',
+      date: '2026-05-12',
+      tags: ['Astraeus', 'Foundation Models', 'Defense-in-Depth', 'Regulated AI', 'Architecture'],
+      readingTime: '12 min read',
+      abstract:
+        'When Astraeus was built, the only approved foundation model in the bank was Command-A. It was unreliable: hallucinated values, ignored few-shot examples, regressed week over week. The architecture that resulted (4-stage LLM pipeline with deterministic Python orchestration and defense-in-depth gating, 5\u20138 LLM calls per query, foundation-model-agnostic by design) was shaped by the failure modes of the model we had. When GPT-4.1 received bank-wide approval for sensitive data, the migration was clean: zero architecture changes, zero prompt changes, zero instruction changes. This post is the substrate story underneath the architectural call, and what working with a failing model taught me about all model integrations.',
+      status: 'published',
+      projectId: 'astraeus',
+      register: 'builder',
+    },
+    references: [],
+    furtherReading: [
+      {
+        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent (the original builder companion)',
+        url: '/blog/astraeus-llm-as-router',
+        description: 'The architectural call against the seductive monolithic-agent pattern. This deep-dive sits underneath it as the model-substrate story.',
+      },
+      {
+        title: 'Deterministic Agentic Architectures (the formal companion)',
+        url: '/blog/agentic-ai',
+        description: 'Formal proofs of data-confidentiality and entitlement-safety under defined threat models.',
+      },
+      {
+        title: 'LLM-as-Router in Practice (the practitioner rewrite)',
+        url: '/blog/astraeus-llm-as-router-framework',
+        description: 'Four architectural decisions as first-class structure with options considered, constraint cards, and decision rationale.',
+      },
+      {
         title: 'Astraeus \u2014 Case Study',
         url: '/projects/astraeus',
         description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
@@ -323,6 +368,11 @@ export const POSTS: BlogPost[] = [
         title: 'Why I Chose LLM-as-Router Over a Monolithic Agent (the builder story)',
         url: '/blog/astraeus-llm-as-router',
         description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
+      },
+      {
+        title: 'Building Astraeus around a model that wasn\u2019t working (deep-dive)',
+        url: '/blog/astraeus-building-around-failing-model',
+        description: 'Why the four decisions in this post look the way they do: the Command-A failure modes that shaped the bounds on every stage, and the GPT-4.1 migration that proved foundation-model-agnostic by design.',
       },
       {
         title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (PAR Assist)',
