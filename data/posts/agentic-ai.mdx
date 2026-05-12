@@ -9,7 +9,7 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: up to six GPT-4.1 calls per query (parse, route, up to three parallel metadata extractions, one-or-three-then-combined synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee-level events with millisecond response times.
+Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: up to six GPT-4.1 calls per query (parse, route, up to three parallel metadata extractions, one-or-three-then-combined synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee-level events, where the equivalent headcount-movement queries previously took days and now return in real time at any granularity.
 
 <VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed walls separate the three bands: LLM intent (parse / route / metadata extract), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM synthesis (one call or up to three parallel final subagents, then combined). Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
   {(isVisible) => <AstraeusCascade />}
@@ -326,16 +326,12 @@ The architecture has been deployed in production at a major bank's CFO Group sin
         <td className="py-2 font-mono">~9,000</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Business-hierarchy nodes</td>
-        <td className="py-2 font-mono">~80,000</td>
+        <td className="py-2 pr-4">User-facing query latency</td>
+        <td className="py-2 font-mono">Real time at any granularity (was: days, line-of-business only)</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Geography-hierarchy nodes</td>
-        <td className="py-2 font-mono">~60,000</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Query response latency</td>
-        <td className="py-2 font-mono">Millisecond-level across arbitrary cuts</td>
+        <td className="py-2 pr-4">Compute-layer latency</td>
+        <td className="py-2 font-mono">Millisecond-level across arbitrary cuts (Cython compute path)</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">Final sub-agent count (synthesis side)</td>
@@ -361,7 +357,7 @@ The system delivers financial insights through three channels: a production-grad
 
 ### 7.1 The "Impossible" Capability
 
-Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"*) was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level events queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in milliseconds.
+Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"*) was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level events queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in real time at any granularity (the Cython compute path itself runs in milliseconds).
 
 ## 8. Related Work
 

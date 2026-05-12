@@ -1,0 +1,130 @@
+import AstraeusCascade from '@/components/blog/diagrams/AstraeusCascade'
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
+
+> **A builder-register deep-dive on the substrate question underneath [Why I Chose LLM-as-Router Over a Monolithic Agent](/blog/astraeus-llm-as-router).** The builder companion is about the architectural call against the seductive monolithic pattern. This one is about what happened underneath that call: the foundation model we started with was unreliable, the architecture had to be designed around its failures, and the GPT-4.1 migration that landed later proved the bet. The formal paper is at [Deterministic Agentic Architectures for Enterprise Financial Analytics](/blog/agentic-ai). The practitioner version of the four decisions lives at [LLM-as-Router in Practice — Four Decisions](/blog/astraeus-llm-as-router-framework).
+
+---
+
+*A case study in defense-in-depth architecture, model-agnostic design, and what to do when the foundation model you've been given keeps regressing on you.*
+
+## The problem we started with
+
+RBC's CFO Group needed to answer questions like *"how many people moved into the Capital Markets technology rollup last quarter, broken down by hiring vs lateral move?"* — across an 18-level cost-center hierarchy with roughly 40,000 leaf-level cost centres (we call them transits) rolling up through ~9,000 aggregation levels.
+
+The state of the art before Astraeus: queries like that took **days**, and only at the highest line-of-business level. Anyone wanting a different cut of the data had to wait, file a request, get a custom report. The data was there. The structure was there. What we didn't have was a way to let people ask their own questions and get answers in real time.
+
+We needed:
+
+- **Real time at any granularity.** Transit-level, any rollup level, any time window.
+- **Three financial domains.** EPM (running on IBM Cognos TM1), Headcount, and Open Positions.
+- **Regulated-environment quality bar.** Auditability of every decision, no third-party LLM exposure to sensitive bank data, defense-in-depth on entitlement.
+- **CFO-ready.** Leadership had to trust this. Not just trust the answer, trust the architecture that produced it.
+
+## The constraint that shaped everything
+
+The foundation model approved for this work inside the bank, at the time we built Astraeus, was Command-A. LangGraph and similar agentic frameworks weren't yet available in the bank. They would land later, alongside PAR Assist, in 2026. So the orchestration layer was going to be hand-rolled Python. That part was fine.
+
+The model was not fine.
+
+I'll be direct, because the architecture story doesn't make sense otherwise: **Command-A was unreliable for this use case.** Specifically:
+
+- It hallucinated values. We'd ask about transits and rollups it had been given context for, and it would invent numbers.
+- It assumed. It would fill in things we hadn't asked for, returning answers shaped by what it thought the question *should* be.
+- It was inaccurate at parsing query structure. Same query phrased two slightly different ways could produce structurally different outputs.
+- It ignored few-shot examples. Even with explicit examples in the prompt demonstrating the exact output shape we wanted, it would drift.
+- And on top of all of that, the operational layer was unstable: inconsistent latency, throttling patterns, bandwidth issues. All of that was outside the team's control.
+
+The pattern I kept seeing during development was painful in a specific way. I'd build a stage, validate it, watch it work. I'd build the next stage. I'd come back a week later and find that the earlier stage had **regressed**. Same prompts. Worse outputs. The model wasn't getting better with time; it was getting harder to work with.
+
+That observation, that the foundation model was an adversary, not an ally, became the architectural premise.
+
+## The architecture that resulted
+
+Astraeus is a **multi-stage LLM pipeline** with deterministic Python orchestration between stages, and defense-in-depth gating at every handoff.
+
+<VisualizationContainer minHeight={500} caption="The pipeline shape: LLM intent layer (gate → parallel metadata extraction → answer-or-cross-domain synthesis) sandwiches a Cython-compiled deterministic compute layer that holds the permission cascade and event-level math. Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
+  {(isVisible) => <AstraeusCascade />}
+</VisualizationContainer>
+
+Four stages:
+
+**Stage 1: Gate.** One LLM call that validates the incoming query. Is this relevant to what Astraeus answers? Is it an injection attempt? Is it within scope? If any check fails, the query is rejected at the door. If it passes, we proceed.
+
+**Stage 2: Parallel metadata extraction.** Three LLM calls fired in parallel, one per domain (EPM, Headcount, Open Positions). Each extracts rich, domain-specific metadata: which transits or rollups the question touches, which time windows, which aggregation levels, which filters apply. The three calls are independent, so they run concurrently. Total latency is the max of the three, not the sum.
+
+**Stage 3: Answer.** Now the orchestration branches by complexity. If the query is single-domain or simple, one LLM call resolves it using the extracted metadata. If it's cross-domain or complex, three more LLM calls fire in parallel, one per domain.
+
+**Stage 4: Synthesis.** One final LLM call takes the domain-specific answers and synthesizes them into a single coherent response.
+
+That's 5 to 8 LLM calls per query, depending on the path. Each call is **bounded to a single task.** None of them is asked to do too much.
+
+Between stages, the deterministic Python layer handles:
+
+- **Dispatch.** Which path runs based on the gate result and the metadata-extraction outputs.
+- **Parallelization.** Where stages are independent, they run concurrently.
+- **Re-gating.** Privilege checks happen at multiple levels, not just at the front door. A user who's entitled to ask about Headcount but not about Open Positions can't get an Open Positions answer through a cross-domain query. The gates between stages catch that.
+- **Validation contracts.** Each stage produces typed JSON that the next stage expects. The contract is enforced at the boundary, not inside the LLM call.
+
+The deterministic compute over the cost-center hierarchy (the actual graph traversal across 9,000 rollups, the netting of employee-by-transit events, the SQL-level entitlement enforcement) happens in milliseconds. The LLM pipeline sits on top of that compute. The "real time" answer is the deterministic compute time plus the pipeline latency. We measure both, and we tune for both.
+
+## EPM-to-SQL entitlement: the data-rights backbone
+
+Underneath the LLM pipeline is a layer that doesn't get mentioned in casual descriptions of Astraeus but is doing essential work: the **EPM-to-SQL entitlement layer.**
+
+The challenge: IBM EPM's permission model is cube-based. SQL's permission model is row- and column-based. We needed any user given access to Astraeus to be able to ask any question, but only see what they're entitled to see. That meant translating EPM's cube permissions, down through security groups, through employees, through transits, into SQL clauses that constrain what data the deterministic compute path returns.
+
+That layer enforces least-privilege uniformly across three different surfaces: the dashboard UI, the chatbot, and the HTML reporting output. The user-facing AI surface doesn't need to know about either permission model. The entitlement layer is the bridge.
+
+This is defense-in-depth applied to data rights. The gates in the LLM pipeline catch privilege violations at handoff points. The entitlement layer enforces them at the compute boundary. If one layer fails, the other catches it.
+
+## Why this architecture, and not the alternatives
+
+When I'm explaining Astraeus to other engineers, the question I get most often is: *why this shape?* The honest answer involves what I tried and rejected.
+
+**Single end-to-end prompt with structured output.** This is the cheapest pattern if it works. Command-A's reliability problems made it untenable for us. But even with a better model, a single opaque LLM call isn't auditable end-to-end. A regulated environment needs every step inspectable. This was an easy "no."
+
+**Sequential pipeline (no parallelism).** Simpler to reason about. But latency would have been the sum of all stages instead of the max of parallel stages. We needed real time. The math didn't work.
+
+**Agentic loop with model-decided tool calls.** This was the most attractive alternative, conceptually. Let the model decide what to call next. But it's unbounded. There's no upper limit on how many calls the model might make, and the call graph isn't predictable. Hard to audit. Hard to test deterministically. The architecture has to be inspectable; an agentic loop fights that requirement.
+
+**RAG over a flat document store.** Works beautifully for unstructured corpora. Fails on structurally hierarchical data like 18-level cost-center rollups, where the relationships between data points matter as much as the data points themselves.
+
+The pattern Astraeus ended up with (multi-stage parallel pipeline with deterministic Python orchestration between stages) has the property that each individual LLM call is bounded, the parallelism is explicit where stages are independent, the sequencing is explicit where stages depend on each other, the gates are explicit at handoff points, and the whole thing is inspectable end-to-end.
+
+That's what a regulated environment actually requires. The architecture isn't elegant in the way a pure agentic loop would be. It's the shape the constraints produced.
+
+## Designing for the model not being there
+
+The hardest architectural decision in Astraeus wasn't about decomposition. It was about **abstraction.**
+
+When you're working with a foundation model that's failing on you, the natural impulse is to write prompts that compensate for the failures. To keep adding examples, keep tightening instructions, keep working around the specific quirks of that specific model. You can ship that way, but you've made yourself dependent on the very thing that's failing you.
+
+I made a different call early. Every stage's prompts and instructions were written to **follow best practices independent of any specific model.** No Command-A-specific workarounds. No prompt patterns that exploited Command-A's quirks. If Command-A failed on a stage, that was a signal to redesign the stage's contract, not to add a Command-A-specific patch.
+
+The cost of that decision was real. We shipped slower than we would have if I'd let myself optimize for Command-A. The payoff arrived later.
+
+## The migration that proved the architecture
+
+Bank-wide approval eventually landed for GPT-4.1 on sensitive data. The decision wasn't Astraeus-specific. It was a separate process about which foundation models had cleared the bank's risk and security review for that data class.
+
+When the approval landed, we migrated Astraeus from Command-A to GPT-4.1.
+
+**Zero architecture changes were required. Zero prompt changes. Zero instruction changes.**
+
+The pipeline structure, the gates, the stage contracts, the entitlement layer, the deterministic compute: none of it knew or cared what foundation model was running underneath it. The only thing that changed was which model endpoint each stage's LLM call hit.
+
+Astraeus is in production on GPT-4.1 now. The ongoing practice is a regression suite that runs on every model upgrade, and an open question at each upgrade about whether the new model's capabilities let us tighten or loosen any of the stage contracts. So far, mostly tighten.
+
+## What this taught me
+
+The architecture isn't the interesting part of this story. Multi-stage LLM pipelines aren't novel. Deterministic orchestration with defense-in-depth gating isn't novel. Plenty of people have built things shaped like Astraeus.
+
+The interesting part is: **the architecture's value isn't that it shipped Astraeus. The architecture's value is that the next foundation-model migration is cheap.** GPT-4.1 was clean. The model after GPT-4.1 will be clean. The first six months of designing for a model that wasn't working bought a permanent property of the system, that it survives the foundation-model lottery.
+
+Working with a model that's failing on you changes how you think about all model integrations. The model is the lever; the architecture is the value. If you've built something that only works because the current foundation model happens to be good at the patterns you're using, you've shipped a system with a hidden dependency on whichever vendor's product is currently working. That's not a system. That's a fragile coincidence.
+
+The velocity loop people talk about (research, fail, learn, integrate, ship, repeat) usually gets framed as a personal practice. Astraeus is the loop applied at the architecture level. Command-A failed us. We learned that the foundation model is the wrong abstraction to depend on. We integrated that learning into a design that doesn't depend on any specific model. We shipped. And we'll do it again, with whichever model comes next.
+
+---
+
+*Built April 2025 onward, in production with GPT-4.1 as of May 2026.*
