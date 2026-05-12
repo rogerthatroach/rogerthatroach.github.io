@@ -9,9 +9,9 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: up to six GPT-4.1 calls per query (parse, route, up to three parallel metadata extractions, one-or-three-then-combined synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee-level events, where the equivalent headcount-movement queries previously took days and now return in real time at any granularity.
+Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: 5 to 8 GPT-4.1 calls per query arranged in four stages (gate, parallel metadata extraction, answer, synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee-level events, where the equivalent headcount-movement queries previously took days and now return in real time at any granularity.
 
-<VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed walls separate the three bands: LLM intent (parse / route / metadata extract), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM synthesis (one call or up to three parallel final subagents, then combined). Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
+<VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed walls separate the three bands: LLM intent (gate / parallel metadata extraction), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM answer and synthesis (1 answer call on the simple path, or 3 parallel answer calls plus 1 synthesis call on the cross-domain path). Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
   {(isVisible) => <AstraeusCascade />}
 </VisualizationContainer>
 
@@ -109,17 +109,19 @@ where:
 
 The intent space is finite and enumerable, which is what makes the downstream agents deterministic: they handle a known set of structured inputs, not open-ended natural language.
 
-### 3.3 Call Layering and Sub-Agent Orchestration
+### 3.3 Call Layering and Stage Orchestration
 
-The production system organizes LLM work into **up to six calls per query** arranged in three phases. The first two phases sit on the LLM *intent* side of the deterministic wall; the third phase sits on the LLM *synthesis* side.
+The production system organizes LLM work into **5 to 8 calls per query** arranged in four stages. Stages 1 and 2 sit on the LLM *intent* side of the deterministic wall; stages 3 and 4 sit on the LLM *answer-shaping* side, downstream of the deterministic compute layer.
 
-**Phase 1 — Parse and route (two LLM calls).** A parse call extracts structured intent from the natural-language query; a route call decides whether the query is in scope for Astraeus and, if so, which downstream phase to invoke. If the query is out of scope, execution terminates here. Neither phase 2 nor the deterministic compute layer is touched.
+**Stage 1 — Gate (one LLM call).** A single gate call validates the query against three concerns at the door: is it relevant to Astraeus, is it a prompt-injection attempt, and is it within the scoped domain set. If the gate rejects, execution terminates here. Neither downstream LLM work nor the deterministic compute layer is touched.
 
-**Phase 2 — Metadata extraction (up to three parallel LLM calls, conditional).** When the routing decision warrants, one metadata-extract call fires per candidate domain (Headcount, HR Costs, Open Positions), in parallel. Each call returns a structured parameter set scoped to its domain (time range, organizational scope, comparison shape) *without* any data access. This is the final LLM touch before the first wall.
+**Stage 2 — Parallel metadata extraction (three parallel LLM calls).** Three metadata-extract calls fire in parallel, one per domain (Headcount, HR Costs / EPM, Open Positions). Each call returns rich domain-scoped metadata (time range, organizational scope, comparison shape) *without* any data access. This is the final LLM touch before the first wall. The deterministic Python layer between stages handles dispatch, parallelization, re-gating (privilege checks at each handoff), and typed JSON validation contracts at every stage boundary.
 
-**Phase 3 — Synthesis (one call, or up to three parallel final sub-agents then combined).** After the deterministic layer returns aggregates, the system either (path A) issues a single synthesis call to compose the answer, or (path B) fans out to up to three parallel final sub-agents (one for cost, one for headcount, one for open positions) whose outputs are combined deterministically into the user-facing response. The choice between path A and path B is made by the phase-1 router based on the cross-domain structure of the query.
+**Stage 3 — Answer (one or three LLM calls; branches by query complexity).** After the deterministic compute layer returns aggregates, the system branches. On the simple path (single-domain query), one answer call composes the response and becomes the final output: stage 4 is skipped. On the cross-domain path, three answer calls fire in parallel, one per domain, each phrasing its slice from the aggregate it owns.
 
-Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
+**Stage 4 — Synthesis (one LLM call, cross-domain path only).** When stage 3 fans out across domains, a final synthesis call combines the three domain-specific answers into a single coherent response. The contract on this call's inputs is typed and structured: the synthesis LLM phrases the answer, but the numerical reconciliation rules (how rollups interact, which base number anchors the cross-domain join) are enforced by the validation contract on its inputs, not by freeform LLM reasoning. Total calls: 5 on the simple path (gate + 3 metadata + 1 answer); 8 on the cross-domain path (gate + 3 metadata + 3 answer + 1 synthesis).
+
+Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic compute agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
 
 <MathBlock html={tex("\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})", true)} />
 
@@ -129,18 +131,18 @@ In the production system <InlineEquation html={tex("k = 3")} />: a cost agent, a
 
 <TheoremBlock variant="proposition" number={1} title="Parallel Correctness">
   <div>
-    If each sub-agent <InlineEquation html={tex("A_j")} /> is deterministic and operates on disjoint data partitions, then parallel execution preserves correctness:
+    If each compute agent <InlineEquation html={tex("A_j")} /> is deterministic and operates on disjoint data partitions, then parallel execution preserves correctness:
   </div>
   <MathBlock html={tex("\\forall j \\neq j': \\mathcal{D}_j \\cap \\mathcal{D}_{j'} = \\emptyset \\implies (A_1 \\| A_2 \\| A_3)(i, \\mathcal{D}) = A_{c(i)}(i, \\mathcal{D}_{c(i)})", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
   <div>
-    Since each agent reads only from its own data partition and writes only to its own output buffer, there are no read-write conflicts. The routing function <InlineEquation html={tex("c(i)")} /> selects exactly one agent per query. The other agents either idle (no matching intent) or handle independent concurrent queries. By the absence of shared mutable state, parallel execution is equivalent to serial execution of the selected agent. <InlineEquation html={tex("\\square")} />
+    Since each compute agent reads only from its own data partition and writes only to its own output buffer, there are no read-write conflicts. The routing function <InlineEquation html={tex("c(i)")} /> selects exactly one agent per query. The other agents either idle (no matching intent) or handle independent concurrent queries. By the absence of shared mutable state, parallel execution is equivalent to serial execution of the selected agent. The same parallel-correctness argument applies symmetrically to the answer-stage LLM calls on the cross-domain path, which operate on disjoint domain-aggregate inputs and write to disjoint output slots. <InlineEquation html={tex("\\square")} />
   </div>
 </TheoremBlock>
 
-<VisualizationContainer minHeight={400} caption="Figure 2: Sub-agent parallel execution. Select a query type to see how the router dispatches to the corresponding agent track while others remain idle.">
+<VisualizationContainer minHeight={400} caption="Figure 2: Compute-agent parallel execution. Select a query type to see how the router dispatches to the corresponding agent track while others remain idle.">
   {(isVisible) => <SubAgentExecution />}
 </VisualizationContainer>
 
@@ -311,7 +313,7 @@ The architecture has been deployed in production at a major bank's CFO Group sin
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">LLM calls per query</td>
-        <td className="py-2 font-mono">Up to 6 (1 parse · 1 route · up to 3 metadata · 1 or up to 3 synthesis)</td>
+        <td className="py-2 font-mono">5 to 8 in 4 stages (1 gate · 3 parallel metadata · 1 or 3 answer · 0 or 1 synthesis)</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">Deterministic compute</td>
@@ -334,8 +336,8 @@ The architecture has been deployed in production at a major bank's CFO Group sin
         <td className="py-2 font-mono">Millisecond-level across arbitrary cuts (Cython compute path)</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Final sub-agent count (synthesis side)</td>
-        <td className="py-2 font-mono">3 (Cost / Headcount / Open Positions), parallel</td>
+        <td className="py-2 pr-4">Answer-stage parallelism (Stage 3, cross-domain path)</td>
+        <td className="py-2 font-mono">3 parallel answer calls (Cost / Headcount / Open Positions), then 1 synthesis call</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">LLM data exposure</td>

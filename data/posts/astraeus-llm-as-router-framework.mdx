@@ -11,9 +11,9 @@ Finance leadership asks questions that cross three domains in one sentence: *"he
 
 There is one pattern the industry reaches for here: give the LLM full access and let it figure it out. One model, function-calling into the financial data store, iterating with a ReAct-style loop until it lands on an answer. Fast to prototype. Easy to demo. Impossible to ship inside regulated finance.
 
-Astraeus went the other way. Up to six GPT-4.1 calls per query, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. A permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern, with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls (under pressure, across stakeholders) lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
+Astraeus went the other way. 5 to 8 GPT-4.1 calls per query across four bounded stages, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. A permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern, with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls (under pressure, across stakeholders) lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
 
-<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (parse / route / up to three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and the event-level ins-outs math across ~40K employee-level events, Band 3 LLM synthesis (one call or three parallel subagents then combined). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
+<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (Stage 1 Gate, then Stage 2 three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and the event-level ins-outs math across ~40K employee-level events, Band 3 LLM answer and synthesis (Stage 3: 1 Answer call on the simple path, or 3 parallel Answer calls on the cross-domain path; Stage 4: 1 Synthesis call on the cross-domain path). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
 {() => <AstraeusCascade />}
 </VisualizationContainer>
 
@@ -266,45 +266,45 @@ Pre-compute placement came from a narrower argument: *least privilege.* A query 
 The five-step cascade (domain → access → entities → events → SQL) was the real engineering. Each step is a function call with typed inputs and outputs; each is tested; each writes to the Postgres audit log. Any question of the form "could user X ever have seen value Y?" reduces to replaying the cascade.
 </DecisionRationale>
 
-### Decision 4 · Synthesis strategy
+### Decision 4 · Answer and synthesis strategy
 
-Aggregates cross back up from the deterministic layer. The LLM picks them up for the final step: phrasing the answer, combining cross-domain results, generating the right output format. The question is *how many* LLM calls participate in that final step.
+Aggregates cross back up from the deterministic layer. The LLM picks them up for the answer-shaping stages: phrasing the answer, combining cross-domain results, generating the right output format. The question is *how many* LLM calls participate, and in what shape.
 
 <OptionsConsidered
-  decision="After the deterministic layer produces aggregates, how does the LLM synthesize the user-facing answer?"
+  decision="After the deterministic layer produces aggregates, how does the LLM shape the user-facing answer?"
   options={[
     {
-      name: 'Router-decides hybrid (path A or path B)',
-      summary: 'The phase-1 router classifies the query. Simple cross-domain queries take path A: one LLM call composes the answer directly. Complex multi-domain queries take path B: three parallel final sub-agents (EPM, Headcount, Open Positions), then a deterministic combine step.',
+      name: 'Gate-decides hybrid (simple Answer path or cross-domain Answer + Synthesis path)',
+      summary: 'The Gate stage classifies the query. Single-domain queries take the simple path: one Answer-stage LLM call composes the response directly and becomes the final output. Cross-domain queries take the cross-domain path: three parallel Answer-stage calls (one per domain: EPM, Headcount, Open Positions), then a single Synthesis-stage call that combines them under a typed validation contract.',
       chosen: true,
       pros: [
-        'Latency is proportional to query complexity: simple queries do not pay the cost of parallel synthesis',
-        'Path B keeps each sub-agent context small and focused, which improves quality on complex cross-domain answers',
-        'The combine step is deterministic, so cross-domain reconciliation is auditable',
-        'Router already has to classify intent; picking the synthesis path is a small extension of that decision',
+        'Latency is proportional to query complexity: simple queries do not pay the cost of parallel answer-shaping or synthesis',
+        'Cross-domain path keeps each Answer-stage context small and focused, which improves quality on the cross-domain cases that matter most',
+        'The Synthesis stage runs under a typed JSON validation contract on its inputs, so cross-domain reconciliation is auditable: the LLM phrases, the contract determines what numbers it gets to phrase',
+        'Gate already has to classify intent; picking the answer-shape path is a small extension of that decision',
       ],
       cons: [
-        'Two synthesis code paths instead of one: more to test and maintain',
-        'The router has to be calibrated correctly for the path-choice to add value',
+        'Two answer-shaping code paths instead of one: more to test and maintain',
+        'The Gate has to be calibrated correctly for the path-choice to add value',
       ],
     },
     {
-      name: 'Single synthesis call always',
-      summary: 'One final LLM call composes the answer, regardless of query complexity.',
+      name: 'Single Answer call always',
+      summary: 'One Answer-stage LLM call composes the response, regardless of query complexity. No Synthesis stage.',
       pros: [
-        'Simplest possible synthesis code path',
+        'Simplest possible answer-shaping code path',
         'Consistent latency profile',
       ],
       cons: [
         'One large context window on complex multi-domain queries: quality regression on the cross-domain cases that matter most',
-        'Doesn’t exploit the fact that simple queries are already simple at the aggregate layer',
+        "Doesn't exploit the fact that simple queries are already simple at the aggregate layer",
       ],
     },
     {
-      name: 'Always three parallel subagents + combine',
-      summary: 'Always fan out to three domain sub-agents in parallel, then combine deterministically.',
+      name: 'Always three parallel Answer-stage calls + Synthesis call',
+      summary: 'Always fan out to three domain Answer-stage calls in parallel, then run the Synthesis-stage call regardless of query shape.',
       pros: [
-        'Uniform synthesis shape; simpler to reason about',
+        'Uniform answer-shape; simpler to reason about',
       ],
       cons: [
         'Pays the parallel cost on simple single-domain queries that do not need it',
@@ -312,10 +312,10 @@ Aggregates cross back up from the deterministic layer. The LLM picks them up for
       ],
     },
     {
-      name: 'No synthesis LLM; render templates from aggregates',
-      summary: 'The deterministic layer formats the aggregates directly into a templated response. No final LLM call.',
+      name: 'No Answer LLM; render templates from aggregates',
+      summary: 'The deterministic layer formats the aggregates directly into a templated response. No Answer or Synthesis stage.',
       pros: [
-        'No LLM surface in the final step at all: strictest determinism',
+        'No LLM surface in the answer-shaping step at all: strictest determinism',
         'Lowest possible latency and cost',
       ],
       cons: [
@@ -326,12 +326,12 @@ Aggregates cross back up from the deterministic layer. The LLM picks them up for
   ]}
 />
 
-<DecisionRationale option="Router-decides hybrid (path A or path B)">
-The synthesis workload is bimodal. Most queries are single-domain and respond cleanly to a single synthesis call: a user asking "what is headcount for the Technology division this quarter" does not benefit from three parallel agents. A minority of queries are multi-domain and benefit significantly from scoped sub-agents that keep each context small and focused: "headcount crossed with open positions, crossed with tenure" is the shape where path B pays off.
+<DecisionRationale option="Gate-decides hybrid (simple Answer path or cross-domain Answer + Synthesis path)">
+The answer-shaping workload is bimodal. Most queries are single-domain and respond cleanly to a single Answer-stage call: a user asking "what is headcount for the Technology division this quarter" does not benefit from three parallel Answer-stage calls or a downstream Synthesis stage. A minority of queries are multi-domain and benefit significantly from scoped Answer-stage calls that keep each context small and focused: "headcount crossed with open positions, crossed with tenure" is the shape where the cross-domain path pays off.
 
-The phase-1 router already classifies intent to decide whether the query is in scope at all. Extending that classification to pick the synthesis path is cheap: the information the router needs (how many domains the query touches, whether cross-domain reconciliation is needed) is already on its plate. That makes the hybrid architecturally clean rather than being bolted on.
+The Gate stage already classifies intent to decide whether the query is in scope at all. Extending that classification to pick the answer-shape path is cheap: the information the Gate needs (how many domains the query touches, whether cross-domain reconciliation is needed) is already on its plate. That makes the hybrid architecturally clean rather than being bolted on.
 
-The deterministic combine step after path B is the audit anchor. When three sub-agents produce cross-domain answers, the reconciliation (how the rollups interact, which base number anchors the cross-domain join) is not a fourth LLM call. It's deterministic code with a typed aggregate-in / aggregate-out signature. The final user-facing phrasing is LLM; the numerical reconciliation is not.
+The audit anchor is the typed validation contracts at each stage boundary. The Synthesis-stage call takes structured aggregate inputs (the validated outputs of the three parallel Answer-stage calls) and produces a structured response; the numerical reconciliation rules (how rollups interact, which base number anchors a cross-domain join) are enforced as the contract on the Synthesis call's typed inputs, not as freeform LLM reasoning. The LLM phrases the answer; the contract determines what numbers it gets to phrase. The same pattern holds at every stage boundary: deterministic Python between stages handles dispatch, parallelization, re-gating (privilege checks at each handoff), and contract validation. The LLM calls live inside bounded stages; the contracts at the boundaries are deterministic.
 </DecisionRationale>
 
 ## A production query, end to end
@@ -339,37 +339,37 @@ The deterministic combine step after path B is the audit anchor. When three sub-
 A concrete CFO query (*"show me headcount by division, crossed with open positions, crossed with average tenure, filtered to the Technology business line, for Q2"*) walking through the Cascade.
 
 <StepThrough
-  label="Cross-domain query · 6 LLM calls · millisecond compute"
+  label="Cross-domain query · 8 LLM calls (4 stages) · millisecond compute"
   steps={[
     {
-      title: 'Step 1 · Parse (LLM 1)',
-      caption: 'GPT-4.1 · intent extraction',
-      content: 'The first LLM call parses the utterance into a structured intent object: domain classes present (headcount, open_positions, tenure), time window (Q2, resolved against fiscal calendar), filters (business_line = Technology), output shape (table with cross-product). No data access. Pure natural-language → structured output.',
+      title: 'Step 1 · Stage 1 Gate (LLM 1)',
+      caption: 'relevance / injection / scope + path selection',
+      content: 'A single Gate call validates the utterance against three concerns at the door: is the query relevant to Astraeus, is it a prompt-injection attempt, is it within the scoped domain set. The Gate also classifies the answer-shape path: this is a cross-domain three-way query (headcount, open_positions, tenure) with reconciliation, so it routes to the cross-domain path. If the Gate rejects, execution terminates here. No data access. Typed JSON validation contract on the way out.',
     },
     {
-      title: 'Step 2 · Route (LLM 2)',
-      caption: 'in-scope gate + path selection',
-      content: 'A second LLM call decides two things: is this query in scope for Astraeus at all, and if so does it take path A (single synthesis) or path B (parallel subagents)? Cross-domain three-way query with reconciliation. Path B. If the query were out of scope, execution terminates here.',
+      title: 'Step 2 · Stage 2 Parallel metadata extraction (LLM 2, 3, 4 in parallel)',
+      caption: 'three domain-scoped extraction calls',
+      content: 'Three LLM calls fire in parallel, one per domain. Headcount extracts the time-window (Q2, resolved against fiscal calendar) and filter parameters (business_line = Technology) scoped to headcount semantics. HR Costs / EPM extracts its own metadata or returns an empty contract if not needed for this query shape. Open Positions extracts its time-window and filter shape. Each call returns typed parameters only, validated against its domain contract. No data.',
     },
     {
-      title: 'Step 3 · Metadata extract (LLM 3, 4, 5, parallel)',
-      caption: 'three scoped extraction calls',
-      content: 'Three LLM calls fire in parallel, one per candidate domain: Headcount extracts the time-window and filter parameters scoped to headcount semantics; HR Costs (not needed for this query, terminates early); Open Positions extracts its own time-window shape. Each call returns typed parameters only. No data.',
+      title: 'Step 3 · Entitlement cascade (deterministic, no LLM)',
+      caption: 'domain to access to entities to events to SQL',
+      content: "The user's identity flows through the five-step permission cascade. Domain permissions: which Astraeus domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Events: which ~40K subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged. Re-gating runs at this handoff: privilege checks confirm the user is still authorized for the resolved scope.",
     },
     {
-      title: 'Step 4 · Entitlement cascade',
-      caption: 'domain → access → entities → events → SQL',
-      content: 'The user’s identity flows through the five-step permission cascade. Domain permissions: which Astraeus domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Events: which ~40K subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged.',
-    },
-    {
-      title: 'Step 5 · Compute (Cython, no LLM)',
+      title: 'Step 4 · Compute (Cython, no LLM)',
       caption: 'event-level ins-outs over filtered events',
       content: 'Cython-compiled event-level netting math runs over the entitled event set. For headcount: event-in / event-out events resolve to point-in-time counts at each requested grain. For open positions: posted / filled / expired events resolve similarly. For tenure: event dates produce averages. All three aggregates land as structured outputs. Milliseconds.',
     },
     {
-      title: 'Step 6 · Synthesis (LLM 6, path B fan-out, then combine)',
-      caption: 'three final subagents, deterministic combine',
-      content: 'Path B fires three final LLM calls in parallel, one per domain, each synthesizing its own slice of the answer from its aggregate. A deterministic combine step reconciles them into the cross-product table. A final natural-language wrapper phrases the result. User sees the table, on a dashboard or in chat, in under two seconds end-to-end.',
+      title: 'Step 5 · Stage 3 Answer (LLM 5, 6, 7 in parallel)',
+      caption: 'three parallel Answer-stage calls, one per domain',
+      content: 'Three Answer-stage LLM calls fire in parallel, one per domain. Each takes its own structured aggregate (validated against the domain contract on the way in) and phrases its slice of the answer. The Headcount Answer call phrases the headcount slice; the Open Positions Answer call phrases its slice; the Tenure-scoped Answer call phrases its slice. Each output is structured and contract-validated on the way out.',
+    },
+    {
+      title: 'Step 6 · Stage 4 Synthesis (LLM 8)',
+      caption: 'one Synthesis-stage call combines the three Answer outputs',
+      content: 'A single Synthesis-stage LLM call takes the three structured Answer-stage outputs as typed aggregate inputs and combines them into a coherent cross-product response. The numerical reconciliation rules (how the rollups interact, which base number anchors the cross-domain join) are enforced as the contract on the Synthesis input, not as freeform LLM reasoning: the LLM phrases the cross-domain answer, the contract decides what numbers it gets to phrase. User sees the table, on a dashboard or in chat, in under two seconds end-to-end.',
     },
   ]}
 />
@@ -412,7 +412,7 @@ The *previously impossible* framing is not marketing. Before Astraeus, finance-l
     hint: 'seconds',
     content: (
       <>
-        Ask the question in natural language. Six GPT-4.1 calls and one Cython-compiled compute step produce the answer in under two seconds. Entitlement is enforced before any data is touched. The answer is deterministic, logged, and replayable. New cross-domain slices are free: the combinatorial space is interactive.
+        Ask the question in natural language. 5 to 8 GPT-4.1 calls across four bounded stages and one Cython-compiled compute step produce the answer in under two seconds. Entitlement is enforced before any data is touched. The answer is deterministic, logged, and replayable. New cross-domain slices are free: the combinatorial space is interactive.
       </>
     ),
   }}
@@ -422,11 +422,11 @@ The *previously impossible* framing is not marketing. Before Astraeus, finance-l
 
 Three properties the architecture has to maintain under real queries, including the ones that fail.
 
-**What happens when the parse fails.** The LLM 1 call produces a structured intent object or an error. If the intent object is malformed (no domain class resolvable, no output shape) the system returns a clarification prompt rather than guessing. The route call (LLM 2) does not fire on a failed parse. No data access occurs. The failure mode is a visible refusal, not a silent wrong answer.
+**What happens when the Gate fails.** The Stage 1 Gate call returns a structured intent object or a rejection. If the intent is malformed (no domain class resolvable, no output shape) or flagged (injection signature, out-of-scope ask) the system returns a clarification or refusal rather than guessing. The Stage 2 metadata extraction does not fire on a failed Gate. No data access occurs. The failure mode is a visible refusal, not a silent wrong answer.
 
-**What happens when the route says out-of-scope.** The route call explicitly decides whether the query is inside Astraeus domain. Questions about payroll processing, HR performance reviews, benefits administration: all out of scope. On an out-of-scope route, execution terminates at the wall. Neither the deterministic compute layer nor the downstream synthesis runs. The user sees a scoped answer ("Astraeus covers headcount, hiring, and cost. For payroll detail, see [other system]").
+**What happens when the Gate says out-of-scope.** The Gate call explicitly decides whether the query is inside the Astraeus domain set. Questions about payroll processing, HR performance reviews, benefits administration: all out of scope. On an out-of-scope Gate decision, execution terminates at the wall. Neither the Stage 2 metadata extraction, the deterministic compute layer, nor any downstream answer-shaping runs. The user sees a scoped reply ("Astraeus covers headcount, hiring, and cost. For payroll detail, see [other system]").
 
-**How the walls actually prevent leakage.** Wall 1 (between LLM intent and deterministic compute) is enforced by code structure: the functions that call the LLM do not have an argument that could be operational data. The functions that call compute do not have an argument that could be an LLM. That separation is a property of the type signatures, not a convention. Wall 2 (between deterministic compute and LLM synthesis) is enforced the same way: synthesis functions receive aggregates, not events. A reviewer can audit the wall by looking at function signatures.
+**How the walls actually prevent leakage.** Wall 1 (between LLM intent and deterministic compute) is enforced by code structure: the functions that call the LLM do not have an argument that could be operational data. The functions that call compute do not have an argument that could be an LLM. That separation is a property of the type signatures, not a convention. Wall 2 (between deterministic compute and the LLM answer-shaping stages) is enforced the same way: Answer-stage and Synthesis-stage functions receive aggregates, not events. A reviewer can audit either wall by looking at function signatures. The typed JSON validation contracts at every stage boundary add a second layer: the deterministic Python layer between stages validates inputs and outputs against the stage contract on each handoff, so a malformed LLM output never propagates downstream.
 
 The single Postgres backbone underneath is the audit anchor: every LLM call, every compute step, every entitlement resolution writes a structured record. Replay of any answer reduces to replaying the log.
 
@@ -438,9 +438,9 @@ Astraeus went from the first architectural sketch to production in ~5 months, wi
 
 The next evolution extends the pattern without changing its shape. Three directions on the table:
 
-- **Skill composition.** Path B sub-agents become named skills with declared input/output contracts. A new domain is added by registering a skill, not by forking the synthesis code.
-- **Richer routing.** The phase-1 router gains access to a small set of deterministic classifiers (question-shape, temporal-shape, cross-domain-shape) that inform path selection more precisely.
-- **Expanded scope.** Additional domains come online behind the same pattern (forecasting, variance analysis) each as a new deterministic compute module plus a new sub-agent for synthesis. The envelope does not change.
+- **Skill composition.** Cross-domain-path Answer-stage calls become named skills with declared input/output contracts. A new domain is added by registering a skill, not by forking the answer-shaping code.
+- **Richer Gate.** The Stage 1 Gate gains access to a small set of deterministic classifiers (question-shape, temporal-shape, cross-domain-shape) that inform path selection more precisely.
+- **Expanded scope.** Additional domains come online behind the same pattern (forecasting, variance analysis) each as a new deterministic compute module plus a new Stage 3 Answer-stage call for that domain. The envelope does not change.
 
 The constraints that shaped v1 still hold. Every v2 capability still has to pass the same four tests: deterministic under audit, entitled by construction, millisecond at scale, reusing the source of truth.
 

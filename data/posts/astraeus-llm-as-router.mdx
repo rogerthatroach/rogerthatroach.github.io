@@ -39,15 +39,15 @@ The seductive option fails all four.
 
 The pattern I landed on is straightforward to describe and fiddly to build:
 
-- GPT-4.1 is used *strictly* for intent work: parse, route, and (if in scope) up to three parallel metadata extractions (one per candidate domain).
-- Between two dashed walls, a deterministic Cython-compiled Python layer does the real work: permission cascade (domain → access → entities → events → SQL), then event-level ins-outs math over ~40K leaf-level events.
-- Aggregates cross back up; a final LLM call (or up to three parallel domain-scoped synthesis calls, then combined) synthesizes the answer.
+- GPT-4.1 is used *strictly* for intent work and answer-shaping, across four bounded stages: a Gate call (relevance / injection / scope), three parallel domain-specific metadata extractions, one Answer call on the simple path (or three parallel Answer calls on the cross-domain path), and a final Synthesis call on the cross-domain path. 5 to 8 LLM calls per query, total.
+- Between two dashed walls, a deterministic Cython-compiled Python layer does the real work: permission cascade (domain → access → entities → events → SQL), then event-level ins-outs math over ~40K leaf-level events. The deterministic layer also handles dispatch, parallelization, re-gating between stages, and typed JSON validation contracts at every stage boundary.
+- Aggregates cross back up; the Answer-stage and Synthesis-stage calls shape them into the user-facing response.
 - The LLM never sees raw data. It sees classification decisions on the way down and aggregates on the way up.
 - Single Postgres backbone beneath everything: state, entitlements, hierarchies, audit log.
 
 This is LLM-as-Router. The LLM does what language models are good at (classify intent, disambiguate phrasing, handle synonyms). The deterministic layer does everything else. *[For the decision tree behind each of these (orchestration shape, computation layer, entitlement enforcement, synthesis strategy) see the [practitioner post](/blog/astraeus-llm-as-router-framework).]*
 
-<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: LLM intent (parse / route / metadata extract), deterministic Cython compute with permission cascade and event-level ins-outs math, LLM synthesis then combine. Only parsed metadata crosses down; only structured aggregates cross up.">
+<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: LLM intent (Gate, then three parallel metadata extractions), deterministic Cython compute with permission cascade and event-level ins-outs math, LLM answer and synthesis (1 Answer call on the simple path, or 3 parallel Answer calls plus 1 Synthesis call on the cross-domain path). Only parsed metadata crosses down; only structured aggregates cross up.">
 {() => <AstraeusCascade />}
 </VisualizationContainer>
 
