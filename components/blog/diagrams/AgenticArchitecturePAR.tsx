@@ -19,7 +19,7 @@ import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
 import { useThemeColor } from '@/lib/useThemeColor';
 
 /**
- * Prometheus architecture — "the envelope" diagram.
+ * PAR Assist architecture — "the envelope" diagram.
  *
  * One hero visual: a dashed governance envelope that says *this is one
  * agent* from the review side, wrapping a graph whose middle ring fans

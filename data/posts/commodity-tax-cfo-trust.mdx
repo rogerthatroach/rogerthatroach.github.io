@@ -3,7 +3,7 @@ import VisualizationContainer from '@/components/blog/VisualizationContainer';
 
 In September 2022 I joined RBC&rsquo;s CFO Group as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the Commodity Tax return process, a manual workflow that consumed finance analysts for months per cycle.
 
-By Q4 2023, the process took 90 minutes. The metric earned a CFO Group RBC Quarterly Team Award. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually Prometheus, a cascade that shaped the next three years.
+By Q4 2023, the process took 90 minutes. The metric earned a CFO Group RBC Quarterly Team Award. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually PAR Assist, a cascade that shaped the next three years.
 
 This is the story of how automating a tax process became a stakeholder-trust project in disguise, and the architectural decision that made it land. The post that captures the *idea* most precisely happened on a single afternoon in cycle 1: an analyst flagged a number that looked wrong, we clicked through the dashboard together, and we found a real bug. That session was the whole strategy compressed into thirty minutes.
 
@@ -79,7 +79,7 @@ In retrospect I&rsquo;d have built a *mapping-rules dashboard* from cycle 2 onwa
 
 ## What this opened
 
-By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Aegis v1 (a rules-based benchmarking engine for the Big 6 Canadian banks) and get the air cover to build it. When Aegis v1 shipped, I could propose Aegis v2, the AI-native refactor, and deliver it in two weeks while Astraeus productionization was already underway. When Astraeus reached production scale, I had the credibility to conceive Prometheus, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the bank-wide platform end-to-end.
+By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Aegis v1 (a rules-based benchmarking engine for the Big 6 Canadian banks) and get the air cover to build it. When Aegis v1 shipped, I could propose Aegis v2, the AI-native refactor, and deliver it in two weeks while Astraeus productionization was already underway. When Astraeus reached production scale, I had the credibility to conceive PAR Assist, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the bank-wide platform end-to-end.
 
 Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. The Commodity Tax was underwriting every subsequent bet.
 
@@ -89,7 +89,7 @@ Your first project at a new organization isn&rsquo;t just a deliverable. It&rsqu
 
 The architectural decision (Tableau as a transparency layer, not an output) was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
 
-Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. Aegis v2&rsquo;s confidence-thresholded clarification is a descendant of this idea. It would rather ask than confidently mis-resolve. Prometheus&rsquo;s typed MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
+Astraeus&rsquo;s GPT-routes-intent / deterministic-code-handles-truth separation is a descendant of this idea. Aegis v2&rsquo;s confidence-thresholded clarification is a descendant of this idea. It would rather ask than confidently mis-resolve. PAR Assist&rsquo;s typed MCP tool contracts that log every field assignment to an audit trail are a descendant of this idea. In every production AI system at a regulated institution, the architecture has to survive stakeholder audit.
 
 Commodity Tax was where I learned that. Cycle 1 was where the lesson actually landed.
 

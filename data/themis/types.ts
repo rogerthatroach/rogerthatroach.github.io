@@ -79,7 +79,7 @@ export interface Submission {
 
 /**
  * Diane's per-submission annotation. Vocabulary echoes public PAR Assist
- * (Prometheus) Phase 1 architecture so stakeholders recognize the same
+ * (PAR Assist) Phase 1 architecture so stakeholders recognize the same
  * patterns: MCP tool boundary, two-stage field-group retrieval, coverage
  * analyzer, structural guarantees.
  */

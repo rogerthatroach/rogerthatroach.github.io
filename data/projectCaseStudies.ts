@@ -166,7 +166,7 @@ export const CASE_STUDIES: CaseStudy[] = [
         'Months → 90 minutes per cycle on ~$600M tax allocation. CFO Group RBC Quarterly Team Award (Q4 2023). The stakeholder-trust win that opened the door to every subsequent AI initiative at the CFO Group.',
     },
     sequencing:
-      'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with dashboards the CFO could audit, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then Aegis v2 (AI-native rewrite, 2 weeks, 2024), then Astraeus (production 2025), then conceive Prometheus from an intern POC (shipped April 2026). Each project underwrote the next one\'s scope. The Commodity Tax wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
+      'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with dashboards the CFO could audit, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then Aegis v2 (AI-native rewrite, 2 weeks, 2024), then Astraeus (production 2025), then conceive PAR Assist and build it end-to-end after handing the concept to the 2025 Amplify cohort for problem-space ideation (pilot launched April 2026). Each project underwrote the next one\'s scope. The Commodity Tax wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
     blogPostSlug: 'commodity-tax-provenance',
     companionBlogPostSlug: 'commodity-tax-cfo-trust',
     leadershipCallout:
@@ -197,7 +197,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       implementation:
         'Built a PySpark pipeline for General Ledger Journal data extraction at scale, replacing the manual process. Created advanced Tableau dashboards for financial KPI monitoring that gave tax analysts real-time visibility into the data flow. The pipeline codified the institutional knowledge about GL-to-tax-category mappings that had previously lived in spreadsheets and people\'s heads.',
       impact:
-        'Reduced the Commodity Tax return process from months to 90 minutes. Recognized with the CFO Group RBC Quarterly Team Award (Q4 2023). More importantly, this project built the stakeholder trust that opened the door to AI — leadership saw that the AI team could deliver tangible, measurable value. Without this win, Astraeus and Prometheus might never have been greenlit.',
+        'Reduced the Commodity Tax return process from months to 90 minutes. Recognized with the CFO Group RBC Quarterly Team Award (Q4 2023). More importantly, this project built the stakeholder trust that opened the door to AI — leadership saw that the AI team could deliver tangible, measurable value. Without this win, Astraeus and PAR Assist might never have been greenlit.',
       inProduction:
         'Running in production within the CFO Group. The automated pipeline processes each tax cycle, with Tableau dashboards providing ongoing monitoring and verification for the finance team.',
       lessonsLearned:
@@ -325,12 +325,12 @@ export const CASE_STUDIES: CaseStudy[] = [
         'Pilot launched April 2026. Enterprise rollout across RBC business lines through Q2/Q3 2026. The largest-scope agentic AI initiative in the CFO Group — and the reference architecture the v2 multi-agent "skills" framework is being built on top of.',
     },
     leadershipCallout:
-      'Conceived Prometheus as the bank\'s first agentic AI platform. Handed the concept to 2025 Amplify interns as an ideation exercise to explore the problem space, then built the production system end-to-end: ETL pipelines, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), the PostgreSQL/pgvector store, custom multi-layer RAG, and frontend integration. The MCP tool layer is the API surface other workstreams now build against. The single-agent governance envelope, two-stage field-group retrieval, and typed MCP tool registry have become the reference pattern for production agentic AI at the bank.',
+      'Conceived PAR Assist as the bank\'s first bank-wide production agentic AI platform. Handed the concept to 2025 Amplify interns as an ideation exercise to explore the problem space, then built the production system end-to-end: ETL pipelines, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), the PostgreSQL/pgvector store, custom multi-layer RAG, and frontend integration. The single-agent governance envelope, two-stage field-group retrieval, and typed MCP tool registry codify a production-agentic pattern inside RBC\'s regulated quality bar.',
     sections: {
       context:
-        'Project Approval Requests (PARs) are a critical governance process at RBC: every major initiative requires one, and drafting them involves metadata, policies, historical examples, and institutional knowledge. I conceived Prometheus to transform that drafting process. The concept was handed to 2025 Amplify interns as an ideation exercise to explore the problem space; the production platform was then built end-to-end as the bank\'s first true agentic AI deployment, setting the architectural pattern every subsequent agentic system inherits.',
+        'Project Approval Requests (PARs) are a critical governance process at RBC: every major initiative requires one, and drafting them involves metadata, policies, historical examples, and institutional knowledge. I conceived PAR Assist to transform that drafting process. The concept was handed to 2025 Amplify interns as an ideation exercise to explore the problem space; the production platform was then built end-to-end as the bank\'s first true agentic AI deployment, setting the architectural pattern every subsequent agentic system inherits.',
       myRole:
-        'Conceived the product vision, designed the agentic architecture, and built the production system end-to-end: ETL pipelines, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), the PostgreSQL + pgvector store, custom multi-layer RAG, and frontend integration. The MCP tool layer is the API surface other workstreams now build against. Production deployment runs through GFT (RBC\'s Global Functions Technology team) on OpenShift via CI/CD.',
+        'Conceived the product vision, designed the agentic architecture, and built the production system end-to-end: ETL pipelines, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), the PostgreSQL + pgvector store, custom multi-layer RAG, and frontend integration. Production deployment runs through GFT (RBC\'s Global Functions Technology team) on OpenShift via CI/CD.',
       stakeholders:
         'CFO Group leadership (sponsor), enterprise stakeholders across the bank (PAR authors in every department), Director AI (governance and priority), 2025 Amplify interns (problem-space ideation exploration), GFT (Global Functions Technology, RBC\'s infrastructure team) for OpenShift CI/CD production deployment.',
       challenge:
@@ -362,7 +362,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       implementation:
         'LangGraph graph orchestrates the session (intake → template → retrieve → extract → merge → coverage → respond), with conditional edges for loops. Template selection, retrieval, compression, extraction, merge, and coverage are all MCP tools — every action typed, logged, and dispatched through the graph engine. Ingestion handles pptx, docx, pdf, txt, and images (OCR via GPT-4-turbo vision). Field groups are a taxonomy over the hundreds of fields across PAR templates; retrieval runs two-stage similarity search with custom compression on top-10 chunks per group. Parallelism = relevant-group count: up to N Sonnet-4.5 calls fire at once, each carrying ≤20 fields + guardrails + few-shot good/bad examples; each returns JSON. Merge is a dict union (groups disjoint by construction). Coverage analyzer gates the draft — if it finds open follow-ups, the session loops to a clarify node before returning to template/extraction. Postgres (with pgvector for retrieval) is the single store: LangGraph checkpoints, tool-invocation logs, raw ingested content, mapped intermediates, embeddings, and the complete audit trail all land in one place.',
       impact:
-        'Transformed a manual, multi-week governance process into a guided drafting session with every field cited back to its source. Pilot launched April 2026 with the first wave of PAR authors; enterprise rollout expands across RBC business lines through Q2/Q3 2026. Beyond the direct drafting win, Prometheus is the reference architecture for agentic AI at the bank — the MCP tool registry, Postgres backbone, and single-agent envelope are the substrate v2 (multi-agent "skills" framework) is being built on. v1 is the part of v2 that already passed review.',
+        'Transformed a manual, multi-week governance process into a guided drafting session with every field cited back to its source. Pilot launched April 2026 with the first wave of PAR authors; enterprise rollout expands across RBC business lines through Q2/Q3 2026. Beyond the direct drafting win, PAR Assist is the reference architecture for agentic AI at the bank — the MCP tool registry, Postgres backbone, and single-agent envelope are the substrate v2 (multi-agent "skills" framework) is being built on. v1 is the part of v2 that already passed review.',
       inProduction:
         'Shipped April 2026 as a bank-wide agentic AI platform. Every MCP tool call is typed and logged; every field value in every draft traces back to the guideline, policy, or few-shot example that grounded it; the full provenance graph for any session is one Postgres query away. Ongoing: enterprise rollout, author feedback loops, and the first steps toward the v2 skills-and-tools composition.',
       lessonsLearned:
@@ -370,65 +370,5 @@ export const CASE_STUDIES: CaseStudy[] = [
     },
     blogPostSlug: 'enterprise-agentic-ai-architecture',
     companionBlogPostSlug: 'par-assist-building',
-  },
-  {
-    projectId: 'argus',
-    timeline: 'May 2026',
-    era: 'Intelligent Systems',
-    status: 'shipped',
-    tldr: {
-      problem:
-        'Senior bank leadership (SVP / EVP / group head audience) needed instant access to cross-segment KPIs and Canadian peer-bank comparisons across a substantial financial corpus. Query turnaround sat at minutes to hours via existing channels.',
-      decision:
-        'Solo build inside RBC Assist Pro\'s fixed orchestration over a single weekend (~21 hours). 300-line XML system prompt routes across 55 per-domain skill files. Pipeline: GPT-5 vision for tabular PDF parse, Anthropic Claude Opus 4.6 via AWS Bedrock for OCR-to-schema conversion.',
-      impact:
-        'Seconds-level turnaround on KPI queries across the corpus, with cross-segment KPIs and Canadian peer-bank comparisons answered on demand and on-demand professional visuals. Demo\'d to multiple SVPs who will present higher up the leadership chain.',
-    },
-    sequencing:
-      'ARGUS is the third architectural archetype in my portfolio. PAR Assist demonstrates full-stack end-to-end ownership. Astraeus demonstrates production-scale distributed multi-agent. ARGUS demonstrates constraint-shaped speed: working within someone else\'s platform, doing the architectural work in the seams, shipping under a tight timeline on a high-stakes deliverable. That\'s the operating mode platform engineers spend half their time in, and it\'s a distinct interview story from the other two.',
-    leadershipCallout:
-      'ARGUS was a single-weekend solo build during the final stages of PAR Assist. The architectural challenge wasn\'t infrastructure; it was working inside RBC Assist Pro\'s fixed orchestration (file search, embeddings search, LLM routing) and doing the design work in the seams the platform exposed: a 300-line XML system prompt, 55 per-domain skill files, and visualization governance. The deliverable was demo\'d to multiple SVPs who will carry it up the leadership chain. Constraint-shaped speed is its own discipline.',
-    sections: {
-      context:
-        'Senior bank leadership at RBC needed instant access to cross-segment KPIs and Canadian peer-bank comparisons across a substantial tabular financial corpus. Existing channels for ad-hoc questions ran on the order of minutes to hours. The deliverable had to demo to an SVP / EVP audience within a fixed window during the final stages of PAR Assist productionization.',
-      myRole:
-        'Sole designer, builder, and shipper. Conceived the agent layer, architected the skill-file routing pattern, built the ingestion pipeline, composed the system prompt and 55 per-domain skill files, and demo\'d the working prototype. Approximately 21 hours total across a single weekend (Friday evening through Saturday into early Sunday).',
-      stakeholders:
-        'Senior bank leadership (SVP / EVP / group head audience) as the demo recipients. Director AI for governance and priority alignment. No engineering services partner involvement (single-author build).',
-      challenge:
-        'Three constraints stacked. (1) RBC Assist Pro is RBC\'s internal AI product platform. It handles orchestration: file search, embeddings search, LLM routing. It exposes user-defined system prompts and skill files as the design surface. The orchestration layer itself is fixed; no architectural changes to the platform are possible. (2) The source corpus is a substantial tabular financial corpus across segments and peer banks. Schema-mapping the corresponding Excel files would have consumed the entire timeline; tabular OCR from the PDF needed to be accurate enough to feed analytical retrieval. (3) The deliverable had to demo to senior leadership within a fixed window.',
-      optionsConsidered: [
-        {
-          option: 'Schema-map the Excel files into a relational store',
-          prosAndCons: 'Maximum control, queryable via SQL. But Excel schemas vary inconsistently across segments and peer banks; mapping would have taken longer than the entire timeline. Rejected on time grounds.',
-          chosen: false,
-        },
-        {
-          option: 'Direct retrieval without an intermediate schema',
-          prosAndCons: 'Simplest path. But response quality across cross-segment KPI questions would suffer without structured layout per skill domain. Rejected because analytical responses needed retrievable structure.',
-          chosen: false,
-        },
-        {
-          option: 'Treat the orchestration layer as fixed and design in the seams',
-          prosAndCons: 'RBC Assist Pro\'s orchestration is fixed, but the system prompt and skill-file surface are user-defined. Putting the architectural work into those surfaces sidesteps the platform constraint. The risk: getting routing right with only a system prompt and per-domain skill files.',
-          chosen: true,
-        },
-        {
-          option: 'GPT-5 vision (PDF parse) + Claude Opus 4.6 via AWS Bedrock (OCR-to-schema) + skill-file routing',
-          prosAndCons: 'Three-stage pipeline. Vision-model parse handles tabular layout faster than Excel schema-mapping and with surprising accuracy. Opus 4.6 converts OCR into a JSON arrays-of-arrays schema with metadata enrichment. main_skill.md routes across 55 per-domain data_skill.md files; design.md governs visualization output. The architecture lives in the seams RBC Assist Pro exposes. Picked.',
-          chosen: true,
-        },
-      ],
-      decision:
-        'Three-stage pipeline inside RBC Assist Pro\'s fixed orchestration. Ingest: GPT-5 vision parses the tabular PDF corpus directly, faster than schema-mapping the corresponding Excel files and with surprising accuracy on the layouts. Structure: Anthropic Claude Opus 4.6 via AWS Bedrock converts raw OCR into logical groupings, standardizes a JSON arrays-of-arrays schema, and enriches with metadata. Compose skill files: output becomes the content of 55 per-domain data_skill.md files (one per KPI category, segment, or peer-bank slice), plus main_skill.md (router) and design.md (visualization governance). Runtime: RBC Assist Pro handles file search and embeddings search across the corpus; the 300-line XML system prompt dispatches across skill files; Opus 4.6 generates analytical responses with HTML visuals as supporting reference.',
-      implementation:
-        'XML system prompt (~300 lines) defines persona, constraints, response shape, analytical voice, error handling, refusal behavior, and formatting rules. Two or three lines reference main_skill.md and design.md as docs the model invokes when needed. main_skill.md is a router that dispatches to the appropriate per-domain data_skill.md file based on the query. Each per-domain skill file contains structured data, context, and retrieval hints for one KPI category, segment, or peer-bank slice. design.md references HTML files for visualizations and dashboard outputs. Runtime composition: RBC Assist Pro orchestration handles file and embeddings search, then the system prompt dispatches through skill files, and Claude Opus 4.6 generates the response with an HTML visual where applicable.',
-      impact:
-        'Collapses senior-leadership query turnaround from minutes and hours to seconds across the corpus. Cross-segment KPIs and Canadian peer-bank comparisons answer on demand, with professional visuals generated by the agent. Demo\'d to multiple SVPs who will present higher up the leadership chain. Beyond the direct demo win, ARGUS established the constraint-shaped-speed playbook for working inside RBC Assist Pro\'s envelope: the design surfaces are the system prompt and the skill files; the orchestration layer is leveraged, not modified.',
-      inProduction:
-        'Shipped as a prototype demo for senior bank leadership in May 2026. Hosted inside RBC Assist Pro; senior-leadership audiences access it through the platform\'s standard interface. Not a production-grade system; a working prototype demonstrated to multiple SVPs as a proof of the pattern.',
-      lessonsLearned:
-        'Three lessons. Architectural: when the orchestration layer is fixed, the architectural work moves into the seams (system prompt, skill files, visualization governance). Pipeline: GPT-5 vision parse of tabular PDFs was the timeline-saving decision (Excel schema-mapping would have consumed the weekend). Cadence: constraint-shaped speed is its own discipline. Working within someone else\'s platform under a tight timeline is not a fallback mode; it is the operating mode platform engineers spend half their time in. ARGUS is the third archetype my portfolio demonstrates, alongside full-stack end-to-end (PAR Assist) and production-scale distributed multi-agent (Astraeus).',
-    },
   },
 ];

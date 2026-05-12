@@ -11,11 +11,11 @@ export const ABOUT = {
     },
     {
       lead: 'Second, the best leaders translate vision into shipped systems.',
-      body: "Prometheus is RBC's first true agentic AI platform, conceived as my vision, given to Amplify interns as an ideation exercise to explore the problem space, then built end-to-end as a bank-wide production system. Astraeus followed the same arc: conceived, architected, and built end-to-end into a production analytics platform delivering millisecond-level insights across CFO Group data. The work that matters is the arc from a one-page plan to a system shipping to real users; architecture diagrams without production builds are powerpoint.",
+      body: "PAR Assist is RBC's first bank-wide production agentic AI platform, conceived as my vision, given to Amplify interns as an ideation exercise to explore the problem space, then built end-to-end. Astraeus followed the same arc: conceived, architected, and built end-to-end into a production analytics platform that brought headcount-movement queries from days (line-of-business level only) to real time at any granularity across CFO Group data. The work that matters is the arc from a one-page plan to a system shipping to real users; architecture diagrams without production builds are powerpoint.",
     },
     {
       lead: 'Third, trust beats accuracy in regulated AI.',
-      body: "The hardest thing in production AI at a regulated institution isn\u2019t getting the answer right \u2014 it\u2019s getting the humans who own the decision to trust the system that produced it. Commodity Tax\u2019s Tableau transparency layer, Astraeus\u2019s permission entitlement modeling, Prometheus\u2019s MCP-tool audit trail: at every stage the architecture has to survive stakeholder audit. That\u2019s the job.",
+      body: "The hardest thing in production AI at a regulated institution isn\u2019t getting the answer right \u2014 it\u2019s getting the humans who own the decision to trust the system that produced it. Commodity Tax\u2019s Tableau transparency layer, Astraeus\u2019s permission entitlement modeling, PAR Assist\u2019s MCP-tool audit trail: at every stage the architecture has to survive stakeholder audit. That\u2019s the job.",
     },
   ],
   closer:

@@ -19,12 +19,12 @@ export const metadata: Metadata = {
  *
  * Each post carries an optional `projectId` on its metadata (see
  * `BlogPostMeta` in `data/posts/index.ts`). The index groups posts by
- * project so multi-post projects (Prometheus has 3, Commodity Tax has
+ * project so multi-post projects (PAR Assist has 3, Commodity Tax has
  * 2) read as a set, not as scattered cards. Cross-cutting pattern
  * posts without a projectId fall into a final "Patterns" group.
  *
  * Group ordering mirrors the projects-chronological data with newest-
- * first (Prometheus → Astraeus → Aegis → Commodity Tax → Document
+ * first (PAR Assist → Astraeus → Aegis → Commodity Tax → Document
  * Intelligence → Combustion Tuning → Patterns).
  */
 

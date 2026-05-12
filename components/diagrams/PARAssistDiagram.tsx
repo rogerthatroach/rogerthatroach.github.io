@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Prometheus architecture diagram — used on /projects/par-assist.
+ * PAR Assist architecture diagram — used on /projects/par-assist.
  *
  * Single source of truth: re-exports the "envelope" diagram built for
  * the blog post (`components/blog/diagrams/AgenticArchitecturePAR.tsx`).

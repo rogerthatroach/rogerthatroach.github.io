@@ -5,7 +5,7 @@
  *
  * Single source of truth: re-exports the "Pipeline + Transparency Rail"
  * diagram built for the formal blog post. Matches the Astraeus +
- * Aegis + Prometheus pattern where the case-study slot and the blog
+ * Aegis + PAR Assist pattern where the case-study slot and the blog
  * post render the exact same architecture visual — drift is a bug.
  */
 

@@ -7,7 +7,7 @@
  * the formal blog post (`components/blog/diagrams/AegisCascade.tsx`).
  * The case study and the blog post render exactly the same architecture
  * visual — any drift is a bug, not a feature. Matches the Astraeus +
- * Prometheus pattern.
+ * PAR Assist pattern.
  */
 
 export { default } from '@/components/blog/diagrams/AegisCascade';

@@ -209,12 +209,12 @@ export const POSTS: BlogPost[] = [
       slug: 'enterprise-agentic-ai-framework',
       title: 'Enterprise Agentic AI Architecture — Practitioner Rewrite',
       subtitle:
-        'The same Prometheus system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
+        'The same PAR Assist system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
       date: '2026-04-22',
       tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Single-Agent Envelope'],
       readingTime: '10 min read',
       abstract:
-        'Prometheus — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel Sonnet-4.5 extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
+        'PAR Assist — the first true agentic AI platform approved for production at RBC — architected inside a single-agent governance envelope. LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel Sonnet-4.5 extraction calls merging as a dict-union, coverage-and-follow-ups loop. This post walks the four architectural decisions, the honest war story of getting agentic behaviour inside a single-agent shape, and the v2 skills framework v1 is the substrate for. Formal math preserved as an appendix.',
       status: 'published',
       projectId: 'par-assist',
       register: 'practitioner',
@@ -231,20 +231,20 @@ export const POSTS: BlogPost[] = [
     ],
     furtherReading: [
       { title: 'Enterprise Agentic AI Architecture (original formal post)', url: '/blog/enterprise-agentic-ai-architecture', description: 'The sibling post — same system, formal register, theorem/proof structure throughout. Compare with this rewrite to see the register swap.' },
-      { title: 'How We Built Prometheus (builder story)', url: '/blog/par-assist-building', description: 'The third register — conversational builder story, same architecture.' },
+      { title: 'How We Built PAR Assist (builder story)', url: '/blog/par-assist-building', description: 'The third register — conversational builder story, same architecture.' },
       { title: 'Writing rewrite framework spec', url: 'https://github.com/rogerthatroach/rogerthatroach.github.io', description: 'Canonical deep-post structure, reader-level targeting, component palette. Lives in docs/specs/ — see repo.' },
     ],
   },
   {
     meta: {
       slug: 'par-assist-building',
-      title: 'How We Built Prometheus: From One-Page Vision to Bank-Wide Product',
+      title: 'How We Built PAR Assist: From One-Page Vision to Bank-Wide Product',
       subtitle: 'A builder-register companion to the formal architecture post — the story, the decisions, and the leadership lessons behind the bank\u2019s first true agentic AI platform.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '9 min read',
       abstract:
-        'The story of how a one-page vision became Prometheus, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). The concept was handed to the 2025 Amplify cohort as an ideation exercise to explore the problem space; the production platform was then built end-to-end. Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and translating vision into shipped systems.',
+        'The story of how a one-page vision became PAR Assist, the first true agentic AI platform approved for production at the bank (pilot April 2026, enterprise rollout Q2/Q3 2026). The concept was handed to the 2025 Amplify cohort as an ideation exercise to explore the problem space; the production platform was then built end-to-end. Architecture decisions as trade-offs, not theorems: why LangGraph over CrewAI/AutoGen, why MCP tools as the action boundary, why field-group retrieval beat flat RAG, how we got agentic behaviour inside a single-agent governance envelope, why PostgreSQL is the backbone for state + logs + embeddings + audit. Plus three leadership lessons about scoping, parallel execution, and translating vision into shipped systems.',
       status: 'published',
       projectId: 'par-assist',
       register: 'builder',
@@ -286,7 +286,7 @@ export const POSTS: BlogPost[] = [
         description: 'The same architecture in practitioner register \u2014 four decisions as first-class structure with options considered, constraint cards, and decision rationale for each.',
       },
       {
-        title: 'How We Built Prometheus',
+        title: 'How We Built PAR Assist',
         url: '/blog/par-assist-building',
         description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
       },
@@ -325,9 +325,9 @@ export const POSTS: BlogPost[] = [
         description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
       },
       {
-        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (Prometheus)',
+        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (PAR Assist)',
         url: '/blog/enterprise-agentic-ai-framework',
-        description: 'The same register applied to Prometheus \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
+        description: 'The same register applied to PAR Assist \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
       },
       {
         title: 'LangGraph Documentation',
@@ -398,7 +398,7 @@ export const POSTS: BlogPost[] = [
         description: 'The case study page: insurance-specific context, OCR challenges, the hybrid pipeline, and how the lessons carried over to RAG design at RBC.',
       },
       {
-        title: 'How We Built Prometheus',
+        title: 'How We Built PAR Assist',
         url: '/blog/par-assist-building',
         description: 'Where the document-structure insight resurfaced: chunking by structure (not fixed token windows) was the difference between useful and useless retrieval.',
       },
@@ -487,7 +487,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Framework A/B', 'Stakeholder Management', 'PySpark', 'Tableau'],
       readingTime: '9 min read',
       abstract:
-        'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into Aegis v1/v2, Astraeus, Prometheus). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
+        'An A/B framework-rewrite of the builder post on automating RBC\u2019s Commodity Tax return process. Same canonical numbers (months → 90 min; ~$600M tax allocation; Q4 2023 Quarterly Team Award; cascade into Aegis v1/v2, Astraeus, PAR Assist). What the framework adds: ConstraintsBlock before the architecture, OptionsConsidered tables for the two pivotal decisions (PySpark-on-CDP; Tableau as transparency layer), DecisionRationale callouts tying options to constraints, BeforeAfterDiff for the impact, StepThrough of the four-cycle trust ritual.',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'practitioner',
@@ -500,9 +500,9 @@ export const POSTS: BlogPost[] = [
         description: 'Same story, pure prose — no framework components. Read side-by-side to see what the framework adds.',
       },
       {
-        title: 'How We Built Prometheus (practitioner companion)',
+        title: 'How We Built PAR Assist (practitioner companion)',
         url: '/blog/par-assist-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. Prometheus story wouldn\u2019t have happened without the trust built here.',
+        description: 'The other builder-register post in this corpus — same voice, different system. PAR Assist story wouldn\u2019t have happened without the trust built here.',
       },
       {
         title: 'Writing rewrite framework spec',
@@ -573,7 +573,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Stakeholder Management', 'PySpark', 'Tableau', 'Process Automation'],
       readingTime: '7 min read',
       abstract:
-        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes on the ~$600M-per-cycle tax allocation \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Anchored on a single cycle-1 afternoon when an analyst flagged a number, we drilled the dashboard together, and found a real bug from a stale tax-law mapping. That session compressed the whole strategy into thirty minutes. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the four-cycle stakeholder-trust ritual, and the cascade of AI initiatives this first project underwrote: Aegis v1, Aegis v2, Astraeus, Prometheus.',
+        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes on the ~$600M-per-cycle tax allocation \u2014 and why the real deliverable wasn\u2019t the automation but the stakeholder trust it built. Anchored on a single cycle-1 afternoon when an analyst flagged a number, we drilled the dashboard together, and found a real bug from a stale tax-law mapping. That session compressed the whole strategy into thirty minutes. Covers the architectural decision to treat Tableau as a transparency layer (not just an output), the four-cycle stakeholder-trust ritual, and the cascade of AI initiatives this first project underwrote: Aegis v1, Aegis v2, Astraeus, PAR Assist.',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'builder',
@@ -581,9 +581,9 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'How We Built Prometheus (practitioner companion)',
+        title: 'How We Built PAR Assist (practitioner companion)',
         url: '/blog/par-assist-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. Prometheus story wouldn\u2019t have happened without the trust built here.',
+        description: 'The other builder-register post in this corpus — same voice, different system. PAR Assist story wouldn\u2019t have happened without the trust built here.',
       },
       {
         title: 'Closed-Loop Optimization as a Unifying Pattern',

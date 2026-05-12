@@ -32,16 +32,17 @@ export const AWARDS_COUNT = AWARDS.length;
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * RBC production AI systems (3). Codenames as the primary surface
- * (per 2026-04-26 codename restore — Prometheus is the new agentic
- * platform name, replacing PAR Assist).
+ * RBC production AI systems (3). Surface names match the resume
+ * (per 2026-05-12 portfolio↔resume sync — reverted the Session 14
+ * "Prometheus" codename for the agentic platform back to PAR Assist
+ * so the portfolio reads the same as the resume).
  *
- *   1. Prometheus — pilot launched April 2026; enterprise rollout in progress
+ *   1. PAR Assist — pilot launched April 2026; enterprise rollout in progress
  *   2. Astraeus   — production since Nov 2025
  *   3. Aegis      — v1 shipped, v2 is a concurrent 2-week refactor of v1 (one product, two revisions)
  *
  * Per 2026-04-21 audit: do NOT present the v2 refactor as an independent 4th product.
- * v2 was a 2-week focused refactor of v1 done alongside Prometheus + Astraeus work.
+ * v2 was a 2-week focused refactor of v1 done alongside PAR Assist + Astraeus work.
  */
 export const PRODUCTION_SYSTEMS_COUNT = 3;
 
@@ -140,7 +141,7 @@ export const ASTRAEUS_FACTORIAL_COMBINATIONS = '~40,000';
 /** Rollups: intermediate aggregation levels above leaf-level events. */
 export const ASTRAEUS_ROLLUPS = '~9,000';
 
-/** Prometheus pilot launched April 2026; bank-wide rollout in progress through Q2/Q3 2026. */
+/** PAR Assist pilot launched April 2026; bank-wide rollout in progress through Q2/Q3 2026. */
 export const PROMETHEUS_SCALE = 'Bank-wide';
 /** @deprecated alias — see PROMETHEUS_SCALE. Kept so existing consumers keep compiling. */
 export const PAR_ASSIST_SCALE = PROMETHEUS_SCALE;
