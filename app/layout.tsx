@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Fraunces } from 'next/font/google';
 import CommandPalette from '@/components/CommandPalette';
-import PortfolioGate from '@/components/PortfolioGate';
 import './globals.css';
 
 const inter = Inter({
@@ -158,10 +157,10 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        {/* Invited-audience gate — passphrase required to view the
-            portfolio. /blue-rose has its own gate; PortfolioGate
-            pass-throughs that route. */}
-        <PortfolioGate>{children}</PortfolioGate>
+        {/* Portfolio is publicly viewable. /blue-rose still has its
+            own WhiteLodgeGate (AES-GCM passphrase gate) inside the
+            /blue-rose route, independent of the main portfolio. */}
+        {children}
         {/* ⌘K search — listens globally for Cmd/Ctrl+K and for the
             `cmdk:open` custom event fired from mobile nav dropdown. */}
         <CommandPalette />

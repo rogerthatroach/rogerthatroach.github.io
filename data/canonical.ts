@@ -92,15 +92,16 @@ export function computeYearsExperience(asOf: Date = new Date()): number {
 }
 
 /**
- * Format raw years as a display string. Uses "nearly N" with N = round(value),
- * matching the conservative framing in CAREER_KNOWLEDGE_BASE_v2.md §6. All
- * common forms (`seven and a half`, `over eight`) collapse to one canonical
- * phrasing. Slightly past an integer (e.g., 8.02) still reads as "nearly 8"
- * until the value crosses N.5, at which point it shifts to "nearly N+1".
- * Re-evaluated per build.
+ * Format raw years as a display string. Uses "~N" with N = round(value).
+ * Tilde keeps the conservative-rounding semantics of the previous "nearly N"
+ * framing but reads cleaner inline on portfolio surfaces (e.g., "~8 years"
+ * vs "nearly 8 years"). The resume keeps the spelled-out "nearly 8" form
+ * because that register is prose-only; the portfolio is scannable.
+ * Slightly past an integer (e.g., 8.02) still reads as "~8" until the value
+ * crosses N.5, at which point it shifts to "~N+1". Re-evaluated per build.
  */
 export function formatYearsExperience(years: number = computeYearsExperience()): string {
-  return `nearly ${Math.round(years)}`;
+  return `~${Math.round(years)}`;
 }
 
 /** Display string. Re-evaluated at module load (build time for static export). */
