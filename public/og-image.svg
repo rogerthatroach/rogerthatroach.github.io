@@ -16,10 +16,10 @@
   </defs>
 
   <!-- Content -->
-  <g transform="translate(80, 160)">
-    <!-- Title badge -->
+  <g transform="translate(80, 130)">
+    <!-- Eyebrow -->
     <text font-family="monospace" font-size="14" letter-spacing="4" fill="#b07a82" opacity="0.9">
-      AI &amp; DATA SCIENCE LEAD
+      AI &amp; DATA SCIENCE LEAD · RBC CFO GROUP
     </text>
 
     <!-- Name -->
@@ -27,24 +27,35 @@
       Harmilap Singh Dhaliwal
     </text>
 
-    <!-- Tagline -->
-    <text y="115" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#8a8078">
-      I architect AI platforms. I lead teams that ship them.
+    <!-- Tagline (matches hero) -->
+    <text y="110" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#a09890">
+      Architecting agentic AI inside RBC&#8217;s CFO Group.
     </text>
 
     <!-- Accent line -->
-    <rect y="150" width="200" height="1" fill="url(#accent-line)"/>
+    <rect y="140" width="200" height="1" fill="url(#accent-line)"/>
 
-    <!-- Metrics -->
-    <g transform="translate(0, 190)">
+    <!-- Headline claim (matches hero bio opening) -->
+    <text y="195" font-family="system-ui, -apple-system, sans-serif" font-size="30" font-weight="600" fill="#f0ece8">
+      Built RBC&#8217;s first bank-wide production agentic AI
+    </text>
+    <text y="232" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#8a8078">
+      in the last year. ~8 years of progressive AI/ML, from 900MW
+    </text>
+    <text y="259" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#8a8078">
+      power plants in Japan to bank-wide platforms in Toronto.
+    </text>
+
+    <!-- Metrics row -->
+    <g transform="translate(0, 320)">
       <text font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">$3M</text>
       <text x="85" font-family="monospace" font-size="12" fill="#8a8078" dy="4">annual savings</text>
 
-      <text x="280" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">90 min</text>
-      <text x="400" font-family="monospace" font-size="12" fill="#8a8078" dy="4">was: months</text>
+      <text x="280" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Days &#8594; real time</text>
+      <text x="555" font-family="monospace" font-size="12" fill="#8a8078" dy="4">CFO analytics</text>
 
-      <text x="560" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Bank-wide</text>
-      <text x="740" font-family="monospace" font-size="12" fill="#8a8078" dy="4">agentic AI</text>
+      <text x="720" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Bank-wide</text>
+      <text x="900" font-family="monospace" font-size="12" fill="#8a8078" dy="4">agentic AI</text>
     </g>
   </g>
 
