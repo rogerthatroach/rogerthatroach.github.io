@@ -44,11 +44,11 @@ export const metadata: Metadata = {
     template: '%s | Harmilap Singh Dhaliwal',
   },
   description:
-    'From building industrial Digital Twins that saved $3M to architecting enterprise agentic AI platforms — with the technical depth to design systems and the leadership range to ship them.',
+    "Built RBC's first bank-wide production agentic AI in the last year, alongside a multi-stage LLM analytics platform shipped to production. ~8 years of progressive AI/ML, from industrial Digital Twins to bank-wide LLM platforms.",
   openGraph: {
     title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
     description:
-      'From Digital Twins to deterministic agents — shipping AI at bank scale.',
+      "Built RBC's first bank-wide production agentic AI in the last year. ~8 years of progressive AI/ML, from industrial Digital Twins to bank-wide LLM platforms.",
     url: SITE_URL,
     siteName: 'Harmilap Singh Dhaliwal',
     locale: 'en_US',
@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
     description:
-      'From Digital Twins to deterministic agents — shipping AI at bank scale.',
+      "Built RBC's first bank-wide production agentic AI in the last year. ~8 years of progressive AI/ML, from industrial Digital Twins to bank-wide LLM platforms.",
     images: ['/og-image.png'],
   },
   robots: {
