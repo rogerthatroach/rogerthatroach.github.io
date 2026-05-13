@@ -25,6 +25,13 @@ const FADE_UP = {
 export default function Hero() {
   const [frame, setFrame] = useState(0);
   const [sequenceDone, setSequenceDone] = useState(false);
+  // Defer ParticleField (Three.js bundle, ~100KB compressed) until after
+  // the main thread is idle post-LCP. Lighthouse mobile flagged 990ms of
+  // unused JS on the homepage; the ParticleField is dynamically imported
+  // but its bundle still gets parsed during initial hydration. Gating on
+  // a post-mount requestIdleCallback (with setTimeout fallback) pushes
+  // the bundle download past LCP entirely on slow networks.
+  const [showParticles, setShowParticles] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
   const advance = useCallback(() => {
@@ -58,6 +65,28 @@ export default function Hero() {
     }
   }, [frame, advance, sequenceDone]);
 
+  useEffect(() => {
+    if (prefersReducedMotion) return; // reduced-motion: never load the particle bundle
+    type IdleHandle = number;
+    let idleHandle: IdleHandle | null = null;
+    let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout?: number }) => IdleHandle;
+      cancelIdleCallback?: (h: IdleHandle) => void;
+    };
+    if (typeof w.requestIdleCallback === 'function') {
+      idleHandle = w.requestIdleCallback(() => setShowParticles(true), { timeout: 2500 });
+    } else {
+      timeoutHandle = setTimeout(() => setShowParticles(true), 1500);
+    }
+    return () => {
+      if (idleHandle !== null && typeof w.cancelIdleCallback === 'function') {
+        w.cancelIdleCallback(idleHandle);
+      }
+      if (timeoutHandle) clearTimeout(timeoutHandle);
+    };
+  }, [prefersReducedMotion]);
+
   return (
     <section
       id="hero"
@@ -69,7 +98,7 @@ export default function Hero() {
       // the hero's content and the theme toggle right-aligns with it).
       className="relative flex min-h-screen items-center justify-center overflow-hidden pb-16 pt-24 md:pb-12 md:pt-0"
     >
-      <ParticleField />
+      {showParticles && <ParticleField />}
 
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />

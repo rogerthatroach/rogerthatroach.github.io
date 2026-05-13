@@ -143,12 +143,17 @@ function Section({ id, group, isOpen, onToggle }: SectionProps) {
 
       {/* Collapsible body — grid-template-rows trick gives a smooth
           height transition without measuring content. Inner div
-          overflow-hidden so cards clip cleanly when collapsed. */}
+          overflow-hidden so cards clip cleanly when collapsed.
+          `inert` (HTML attr) blocks focus AND interaction on the
+          collapsed subtree, so PostCard links inside the closed panel
+          are properly skipped by tab + screen readers. Replaces an
+          earlier aria-hidden={!isOpen} that Lighthouse flagged as
+          aria-hidden-focus because focusable descendants remained. */}
       <div
         id={`panel-${id}`}
         className="grid transition-[grid-template-rows] duration-300 ease-out"
         style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
-        aria-hidden={!isOpen}
+        {...(!isOpen ? { inert: true } : {})}
       >
         <div className="overflow-hidden">
           <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2 sm:pl-7 sm:pr-5 lg:grid-cols-3">
