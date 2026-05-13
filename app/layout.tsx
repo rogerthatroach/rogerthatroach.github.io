@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.svg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
     description:
       'From Digital Twins to deterministic agents — shipping AI at bank scale.',
-    images: ['/og-image.svg'],
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
