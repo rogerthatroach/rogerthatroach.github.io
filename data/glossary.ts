@@ -23,8 +23,8 @@ export const GLOSSARY: Record<string, string> = {
     'Strategic peer-benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 (Sr DS period): solo end-to-end build that automated extraction and matching despite quarterly SFP schema shifts, the long-standing bottleneck blocking timely peer analysis. v2 (Lead, 2025): 2-week solo build adding multi-stage RAG with multi-gate query parsing across bank / parameter / platform / time-period plus text-to-SQL, run in parallel with Astraeus and the Amplify intern program. 2025 CFO One RBC Team Award for v1.',
   'Commodity Tax':
     '~$600M tax allocation per cycle. Processing time slashed from months to 90 minutes. Q4 2023 CFO Group RBC Quarterly Team Award.',
-  'External Data Service automation':
-    'Actual-vs-planned financial comparison system using a dynamic RAG over finance documents. Widely adopted across the finance team. (Internally: "EDS Automation".)',
+  'EDS Automation':
+    'PAR actual-vs-planned automation built for RBC\'s Enterprise Decision Support team (2022–2023). Custom Python pipeline scheduled in Dataiku, Tableau dashboards for business consumption. Widely adopted across the finance team.',
 
   // ── Programs ──
   'summer intern program':
