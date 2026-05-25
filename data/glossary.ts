@@ -16,7 +16,7 @@
 export const GLOSSARY: Record<string, string> = {
   // ── Products / systems ──
   'PAR Assist':
-    'Enterprise-wide agentic AI platform guiding Project Approval Request (PAR) drafting at RBC. Bank-wide pilot launched April 2026; rollout through Q2/Q3 2026.',
+    'Enterprise-wide agentic AI platform guiding Project Approval Request (PAR) drafting at RBC. Pilot launched April 2026; deployed bank-wide May 2026.',
   'Astraeus':
     'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level events with event-level ins-outs math (Cython-compiled). GPT-4.1 used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
   'Aegis':
