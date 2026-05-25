@@ -184,11 +184,11 @@ export const TIMELINE: TimelineNode[] = [
         caseStudyLink: '/projects/aegis',
       },
       {
-        name: 'External Data Service automation (PAR actual vs. planned)',
+        name: 'EDS Automation (PAR actual vs. planned)',
         oneLiner:
-          'Dynamic RAG system for financial comparisons, widely adopted across the finance team.',
+          'Automated actual-vs-planned comparison across financial accounts, benefits, expenses, capital expenditure, revenue, and depreciation. Custom Python pipeline scheduled in Dataiku; Tableau dashboards for business consumption. Widely adopted across the finance team.',
         decisionRationale:
-          'Dynamic RAG over static rules — PAR structures vary by business line and evolve over time. A rules engine would ossify; RAG adapts as the corpus grows.',
+          'Dataiku used as a scheduler only — pipeline logic is custom Python, not low-code components. Tableau over a custom dashboard for the same adoption-friction reason as Commodity Tax: meet finance users in the tool their muscle memory is already in.',
       },
       {
         name: 'Journal Entry Automation',
