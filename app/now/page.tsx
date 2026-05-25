@@ -6,12 +6,12 @@ import Footer from '@/components/Footer';
 
 // Update this file every ~6 weeks. Sivers convention: three bullets,
 // concrete, present-tense. https://nownownow.com
-const UPDATED = 'April 2026';
+const UPDATED = 'May 2026';
 
 const BULLETS: { heading: string; body: string }[] = [
   {
     heading: 'Shipping',
-    body: 'PAR Assist — the first true agentic framework approved for production at RBC. Pilot live April 2026; enterprise rollout across business lines through Q2/Q3 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls. Early design for v2: multi-agent "skills" composed over the v1 substrate.',
+    body: 'PAR Assist — the first true agentic framework approved for production at RBC. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls. Early design for v2: multi-agent "skills" composed over the v1 substrate.',
   },
   {
     heading: 'Writing',

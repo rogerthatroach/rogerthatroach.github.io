@@ -98,7 +98,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived, architected, and built PAR Assist end-to-end (pilot April 2026; enterprise rollout in progress). Conceived, architected, and built Astraeus end-to-end (production since Nov 2025). Designed and built Aegis v2 in a 2-week solo sprint while running Astraeus and the Amplify intern program in parallel. Led the 2025 Amplify intern cohort. ~70% hands-on.',
+      'Architecting enterprise agentic AI. Conceived, architected, and built PAR Assist end-to-end (pilot April 2026; deployed bank-wide May 2026). Conceived, architected, and built Astraeus end-to-end (production since Nov 2025). Designed and built Aegis v2 in a 2-week solo sprint while running Astraeus and the Amplify intern program in parallel. Led the 2025 Amplify intern cohort. ~70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
@@ -118,7 +118,7 @@ export const TIMELINE: TimelineNode[] = [
           'Conceived, architected, and built end-to-end: enterprise-wide agentic AI platform guiding PAR drafting across all RBC business lines. Pilot launched April 2026.',
         decisionRationale:
           'LangGraph over plain LangChain chains because PAR workflows branch conditionally (template selection, field assignment, conflict resolution looping back). PostgreSQL + pgvector over vector-DB-only so embeddings stay co-located with relational metadata. Concept handed to Amplify interns as an ideation exercise; production system built end-to-end after the exploration. Production deployment runs through GFT on OpenShift via CI/CD.',
-        metric: { value: 'Pilot April 2026', label: 'Enterprise rollout Q2/Q3 2026' },
+        metric: { value: 'Pilot April 2026', label: 'Bank-wide May 2026' },
         caseStudyLink: '/projects/par-assist',
         blogLink: '/blog/par-assist-building',
       },

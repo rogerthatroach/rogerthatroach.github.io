@@ -37,7 +37,7 @@ export const AWARDS_COUNT = AWARDS.length;
  * "Prometheus" codename for the agentic platform back to PAR Assist
  * so the portfolio reads the same as the resume).
  *
- *   1. PAR Assist — pilot launched April 2026; enterprise rollout in progress
+ *   1. PAR Assist — pilot launched April 2026; deployed bank-wide May 2026
  *   2. Astraeus   — production since Nov 2025
  *   3. Aegis      — v1 shipped, v2 is a concurrent 2-week refactor of v1 (one product, two revisions)
  *
@@ -142,7 +142,7 @@ export const ASTRAEUS_FACTORIAL_COMBINATIONS = '~40,000';
 /** Rollups: intermediate aggregation levels above leaf-level events. */
 export const ASTRAEUS_ROLLUPS = '~9,000';
 
-/** PAR Assist pilot launched April 2026; bank-wide rollout in progress through Q2/Q3 2026. */
+/** PAR Assist pilot launched April 2026; deployed bank-wide May 2026. */
 export const PROMETHEUS_SCALE = 'Bank-wide';
 /** @deprecated alias — see PROMETHEUS_SCALE. Kept so existing consumers keep compiling. */
 export const PAR_ASSIST_SCALE = PROMETHEUS_SCALE;
