@@ -15,7 +15,7 @@ This is the story of why, and what it took to build.
 
 ## The problem
 
-RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions (&ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo;) and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (EPM): ~40,000 employee-level events as the leaf-level routing unit and ~9,000 parent rollups across the cost-centre hierarchy, with strict entitlement controls at every level.
+RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions (&ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo;) and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (Enterprise Performance Management): ~40,000 employee-level events as the leaf-level routing unit and ~9,000 parent rollups across the cost-centre hierarchy, with strict entitlement controls at every level.
 
 No interactive system could answer those questions in under a day. No off-the-shelf product understood the CFO Group&rsquo;s permission model. And every off-the-shelf AI tool that might have helped required giving the LLM full access to the data.
 
@@ -31,7 +31,7 @@ Every reason to build it that way is a reason I pushed back.
 
 3. **No audit trail worth the name.** When an LLM decides which rows to query and how to aggregate them, the decision trail is a chain-of-thought string in a log. Finance audit needs typed, logged actions with schemas. &ldquo;Trust me, the model picked the right filter&rdquo; doesn&rsquo;t survive regulatory review.
 
-4. **Non-determinism on permissions.** permission entitlements (who&rsquo;s allowed to see which organizational rollup, at what grain) are not something you can explain to an LLM in a prompt and expect correct enforcement every time. Permission enforcement has to be a first-class property of the system, not an emergent behavior of a language model.
+4. **Non-determinism on permissions.** Permission entitlements (who&rsquo;s allowed to see which organizational rollup, at what grain) are not something you can explain to an LLM in a prompt and expect correct enforcement every time. Permission enforcement has to be a first-class property of the system, not an emergent behavior of a language model.
 
 The seductive option fails all four.
 
