@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import type { Project } from '@/data/projects';
 import type { CaseStudy } from '@/data/projectCaseStudies';
 import PageTransition from '@/components/ui/PageTransition';
+import ScrollProgressRail from '@/components/ui/ScrollProgressRail';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import { paletteStyle } from '@/lib/palette';
@@ -154,6 +155,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
 
   return (
     <PageTransition>
+      <ScrollProgressRail />
       <Nav />
       <main id="main-content" className="px-6 pt-24 pb-12 md:px-16">
         {/* Centered on all widths; from xl, a [sticky ToC | article] grid so
