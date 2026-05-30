@@ -11,7 +11,7 @@ In September 2022 I joined <Glossed>CFO Group</Glossed> at RBC as a Senior Data 
 
 By Q4 2023, the process took **90 minutes**. The metric earned the **CFO Group RBC Quarterly Team Award**. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually PAR Assist, a cascade that shaped the next three years.
 
-This post walks the architectural decisions that made it land: under explicit constraints, against named alternatives, with the reasoning that produced each call. The narrative version of this story (with the cycle-1 anchor moment that compressed the whole strategy into a single afternoon) lives in the [builder companion](/blog/commodity-tax-cfo-trust). The formal frame (pipeline as a sequence of provenance-preserving graph rewrites, Tableau as a parallel presentation layer derived from the same provenance algebra) lives in the [formal post](/blog/commodity-tax-provenance).
+This post walks the architectural decisions that made it land: under explicit constraints, against named alternatives, with the reasoning that produced each call. The narrative version of this story lives in the [builder companion](/blog/commodity-tax-cfo-trust). The formal frame (pipeline as a sequence of provenance-preserving graph rewrites, Tableau as a parallel presentation layer derived from the same provenance algebra) lives in the [formal post](/blog/commodity-tax-provenance).
 
 <VisualizationContainer
   minHeight={500}
@@ -214,7 +214,7 @@ Building the dashboards was half the work. The other half was a four-cycle ritua
       caption: 'Q1 2023',
       content: (
         <p>
-          Analysts questioned numbers; we clicked into the Tableau view together; we traced each back to source; we either confirmed the automation&rsquo;s logic or fixed a mapping. Each session was a bug-hunt and a trust-building ritual at the same time. The automation had real bugs in v1. Fixing them in the open, with the analysts watching, is what built trust, not shipping it perfectly. The cycle-1 anchor moment is in the <a href="/blog/commodity-tax-cfo-trust">builder post</a>: a senior analyst flagged a GST aggregation; we drilled together and found a stale mapping rule from a tax-law update three quarters earlier.
+          Analysts questioned numbers; we clicked into the Tableau view together; we traced each back to source; we either confirmed the automation&rsquo;s logic or fixed a mapping. Each session was a bug-hunt and a trust-building ritual at the same time. The automation had real bugs in v1. Fixing them in the open, with the analysts watching, is what built trust, not shipping it perfectly. The <a href="/blog/commodity-tax-cfo-trust">builder post</a> tells this trust-building story in full.
         </p>
       ),
     },
