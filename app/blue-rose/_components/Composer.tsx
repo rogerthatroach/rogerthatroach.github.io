@@ -179,7 +179,7 @@ export default function Composer({
 
   return (
     <div className={cn('relative', compact ? 'p-2' : 'p-3')}>
-      <div className="relative rounded-xl border border-border-subtle bg-surface/70 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)] focus-within:border-[var(--themis-primary)] focus-within:ring-2 focus-within:ring-[var(--themis-primary)]/20">
+      <div className="relative rounded-xl border border-border-subtle bg-surface/70 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)] focus-within:border-(--themis-primary) focus-within:ring-2 focus-within:ring-(--themis-primary)/20">
         <textarea
           ref={ref}
           value={body}
@@ -189,7 +189,7 @@ export default function Composer({
           placeholder={placeholder}
           rows={compact ? 2 : 3}
           className={cn(
-            'block w-full resize-none bg-transparent text-text-primary outline-none placeholder:text-text-tertiary',
+            'block w-full resize-none bg-transparent text-text-primary outline-hidden placeholder:text-text-tertiary',
             compact ? 'px-3 py-2 text-[12.5px]' : 'px-4 py-3 text-[13.5px]',
           )}
         />

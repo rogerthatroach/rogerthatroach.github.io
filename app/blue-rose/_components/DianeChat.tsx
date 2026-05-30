@@ -195,7 +195,7 @@ export default function DianeChat({ scenario, onFocus }: DianeChatProps) {
                   <button
                     type="button"
                     onClick={() => onSuggestedClick(q)}
-                    className="rounded-lg border border-border-subtle bg-surface/60 px-2.5 py-1.5 text-left text-[12px] text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:bg-[var(--themis-glass-tint)] hover:text-text-primary"
+                    className="rounded-lg border border-border-subtle bg-surface/60 px-2.5 py-1.5 text-left text-[12px] text-text-secondary transition-colors hover:border-(--themis-primary)/40 hover:bg-(--themis-glass-tint) hover:text-text-primary"
                   >
                     {q}
                   </button>
@@ -211,14 +211,14 @@ export default function DianeChat({ scenario, onFocus }: DianeChatProps) {
         onSubmit={submit}
         className="shrink-0 border-t border-border-subtle/60 p-2"
       >
-        <div className="flex items-center gap-1.5 rounded-xl border border-border-subtle bg-surface/70 px-2.5 py-1.5 focus-within:border-[var(--themis-primary)] focus-within:ring-2 focus-within:ring-[var(--themis-primary)]/20">
+        <div className="flex items-center gap-1.5 rounded-xl border border-border-subtle bg-surface/70 px-2.5 py-1.5 focus-within:border-(--themis-primary) focus-within:ring-2 focus-within:ring-(--themis-primary)/20">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask Diane…"
             disabled={composing}
-            className="flex-1 bg-transparent text-[12.5px] text-text-primary outline-none placeholder:text-text-tertiary disabled:opacity-60"
+            className="flex-1 bg-transparent text-[12.5px] text-text-primary outline-hidden placeholder:text-text-tertiary disabled:opacity-60"
             aria-label="Message Diane"
           />
           <button

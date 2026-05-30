@@ -102,7 +102,7 @@ export default function NotificationsDrawer({ open, onClose }: NotificationsDraw
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
             onClick={onClose}
-            className="fixed inset-0 z-40 bg-background/40 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-background/40 backdrop-blur-xs"
             aria-hidden="true"
           />
           <motion.aside
@@ -182,7 +182,7 @@ export default function NotificationsDrawer({ open, onClose }: NotificationsDraw
                           className={cn(
                             'group relative flex w-full items-start gap-3 px-4 py-3 text-left transition-colors',
                             'hover:bg-surface-hover/60',
-                            !n.read && 'bg-[var(--themis-glass-tint)]',
+                            !n.read && 'bg-(--themis-glass-tint)',
                           )}
                         >
                           {!n.read && (

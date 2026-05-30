@@ -210,7 +210,7 @@ export default function CustomDashboardPage() {
         {importBanner && (
           <motion.div
             variants={fadeUp}
-            className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-[var(--themis-in-review)]/40 bg-[var(--themis-in-review-bg)] px-4 py-3"
+            className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-(--themis-in-review)/40 bg-(--themis-in-review-bg) px-4 py-3"
           >
             <div>
               <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-text-tertiary">
@@ -302,8 +302,8 @@ export default function CustomDashboardPage() {
                     className={cn(
                       'rounded-md border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
                       filtersOpen
-                        ? 'border-[var(--themis-primary)]/50 bg-[var(--themis-glass-tint)] text-text-primary'
-                        : 'border-border-subtle bg-surface/60 text-text-secondary hover:border-[var(--themis-primary)]/40 hover:text-text-primary',
+                        ? 'border-(--themis-primary)/50 bg-(--themis-glass-tint) text-text-primary'
+                        : 'border-border-subtle bg-surface/60 text-text-secondary hover:border-(--themis-primary)/40 hover:text-text-primary',
                     )}
                   >
                     Filters
@@ -314,8 +314,8 @@ export default function CustomDashboardPage() {
                     className={cn(
                       'flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
                       editing
-                        ? 'border-[var(--themis-primary)]/50 bg-[var(--themis-glass-tint)] text-text-primary'
-                        : 'border-border-subtle bg-surface/60 text-text-secondary hover:border-[var(--themis-primary)]/40 hover:text-text-primary',
+                        ? 'border-(--themis-primary)/50 bg-(--themis-glass-tint) text-text-primary'
+                        : 'border-border-subtle bg-surface/60 text-text-secondary hover:border-(--themis-primary)/40 hover:text-text-primary',
                     )}
                   >
                     {editing ? (

@@ -1,6 +1,54 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Explicit content sources (mirrors the old tailwind.config.ts `content`).
+   v4 auto-detection may skip .mdx; the blog/paper posts use Tailwind classes
+   directly in MDX prose (~179 className= sites), so declare them explicitly
+   to prevent those utilities being purged. Additive to auto-detection. */
+@source "../app/**/*.{ts,tsx}";
+@source "../components/**/*.{ts,tsx}";
+@source "../data/posts/**/*.{ts,tsx,mdx}";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-border-subtle: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-accent-muted: var(--color-accent-muted);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-tertiary: var(--color-text-tertiary);
+  --color-diagram-grid: var(--color-diagram-grid);
+
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), monospace;
+  --font-display: var(--font-fraunces), Georgia, serif;
+
+  --text-metric: 2.5rem;
+  --text-metric--line-height: 1;
+
+  --container-content: 64rem;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
 
 @layer base {
   /* Light mode (default) — wabi-sabi: warm paper, sakura accent */

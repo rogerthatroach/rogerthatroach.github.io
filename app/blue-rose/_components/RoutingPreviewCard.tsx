@@ -109,7 +109,7 @@ export default function RoutingPreviewCard({
                 <div className="ml-3 mt-2 flex h-3 w-px flex-col items-center">
                   <ArrowDown
                     size={11}
-                    className="-ml-[5px] -mt-1 text-text-tertiary"
+                    className="ml-[-5px] -mt-1 text-text-tertiary"
                     aria-hidden="true"
                   />
                 </div>

@@ -148,7 +148,7 @@ export default function SubmissionPage() {
       <aside
         aria-label="Queue rail"
         className={cn(
-          'hidden h-full shrink-0 overflow-hidden border-r border-border-subtle/60 bg-background/30 backdrop-blur-sm transition-[width] duration-300 ease-out lg:block',
+          'hidden h-full shrink-0 overflow-hidden border-r border-border-subtle/60 bg-background/30 backdrop-blur-xs transition-[width] duration-300 ease-out lg:block',
           railCollapsed ? 'w-0' : 'w-[320px]',
         )}
       >
@@ -182,7 +182,7 @@ export default function SubmissionPage() {
         aria-label={railCollapsed ? 'Show queue' : 'Hide queue'}
         title={railCollapsed ? 'Show queue' : 'Hide queue'}
         className={cn(
-          'absolute top-1/2 z-20 hidden h-14 w-3.5 -translate-y-1/2 items-center justify-center border border-border-subtle bg-surface/80 text-text-tertiary shadow-sm transition-all duration-300 ease-out hover:bg-surface-hover hover:text-text-primary lg:flex',
+          'absolute top-1/2 z-20 hidden h-14 w-3.5 -translate-y-1/2 items-center justify-center border border-border-subtle bg-surface/80 text-text-tertiary shadow-xs transition-all duration-300 ease-out hover:bg-surface-hover hover:text-text-primary lg:flex',
           railCollapsed
             ? 'left-0 rounded-r-md border-l-0'
             : 'left-[320px] -translate-x-1/2 rounded-md',
@@ -198,7 +198,7 @@ export default function SubmissionPage() {
       {/* Right side — submission content */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Compact submission header */}
-        <header className="shrink-0 border-b border-border-subtle/40 bg-background/40 px-4 py-4 backdrop-blur-sm md:px-8">
+        <header className="shrink-0 border-b border-border-subtle/40 bg-background/40 px-4 py-4 backdrop-blur-xs md:px-8">
           <div className="mx-auto max-w-5xl">
             <div className="flex items-start gap-4">
               <div className="min-w-0 flex-1">
@@ -355,7 +355,7 @@ function Pane({
     <div
       className={cn(
         'flex h-full flex-col transition-shadow',
-        dropHover && 'ring-2 ring-inset ring-[var(--themis-primary)]/50',
+        dropHover && 'ring-2 ring-inset ring-(--themis-primary)/50',
       )}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
@@ -402,7 +402,7 @@ function TabBar({
     <nav
       role="tablist"
       aria-label={splitMode ? `${pane} pane tabs` : 'Submission view'}
-      className="relative shrink-0 border-b border-border-subtle bg-background/60 backdrop-blur-sm"
+      className="relative shrink-0 border-b border-border-subtle bg-background/60 backdrop-blur-xs"
     >
       <div
         className={cn(
@@ -430,7 +430,7 @@ function TabBar({
                 'group relative flex items-center gap-1.5 px-3 py-2.5 font-mono text-[10.5px] uppercase tracking-[0.22em] transition-colors',
                 splitMode || 'px-4 py-3 tracking-[0.25em]',
                 isActive
-                  ? 'text-[var(--themis-primary)]'
+                  ? 'text-(--themis-primary)'
                   : 'text-text-tertiary hover:text-text-secondary',
                 isOnOther && !isActive && 'opacity-50',
               )}
@@ -476,7 +476,7 @@ function TabBar({
               className={cn(
                 'flex items-center gap-1 rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-[0.2em] transition-colors',
                 splitMode
-                  ? 'text-[var(--themis-primary)] hover:bg-[var(--themis-glass-tint)]'
+                  ? 'text-(--themis-primary) hover:bg-(--themis-glass-tint)'
                   : 'text-text-tertiary hover:bg-surface-hover hover:text-text-primary',
               )}
             >

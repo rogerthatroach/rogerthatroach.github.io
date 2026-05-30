@@ -305,7 +305,7 @@ function ThingsToTry() {
                   selectSubmission(s.submissionId);
                   router.push('/blue-rose/submission');
                 }}
-                className="group flex w-full items-start gap-3 rounded-2xl border bg-surface/40 px-4 py-3 text-left transition-all hover:border-[var(--themis-sakura-border)] hover:bg-[var(--themis-sakura-bg)]"
+                className="group flex w-full items-start gap-3 rounded-2xl border bg-surface/40 px-4 py-3 text-left transition-all hover:border-(--themis-sakura-border) hover:bg-(--themis-sakura-bg)"
                 style={{ borderColor: 'rgba(176, 122, 130, 0.18)' }}
               >
                 <span
@@ -364,13 +364,13 @@ function Tile({
     <div
       className={cn(
         'group relative flex h-full flex-col rounded-2xl border border-border-subtle bg-surface/40 px-4 py-4 transition-all',
-        !disabled && 'hover:border-[var(--themis-primary)]/40 hover:bg-[var(--themis-glass-tint)] hover:shadow-[0_8px_24px_-12px_rgba(126,106,168,0.25)]',
+        !disabled && 'hover:border-(--themis-primary)/40 hover:bg-(--themis-glass-tint) hover:shadow-[0_8px_24px_-12px_rgba(126,106,168,0.25)]',
         disabled && 'opacity-60',
       )}
     >
       <div className="flex items-center justify-between">
         <span
-          className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--themis-glass-tint)]"
+          className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--themis-glass-tint)"
           style={accent ? { color: accent } : { color: 'var(--themis-primary)' }}
           aria-hidden="true"
         >

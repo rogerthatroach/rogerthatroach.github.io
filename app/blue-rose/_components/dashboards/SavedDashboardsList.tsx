@@ -48,7 +48,7 @@ export default function SavedDashboardsList({
         <button
           type="button"
           onClick={onCreate}
-          className="flex items-center gap-1 rounded-md border border-border-subtle bg-surface/60 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:text-text-primary"
+          className="flex items-center gap-1 rounded-md border border-border-subtle bg-surface/60 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-(--themis-primary)/40 hover:text-text-primary"
           title="New dashboard"
         >
           <Plus size={10} aria-hidden="true" />
@@ -78,7 +78,7 @@ export default function SavedDashboardsList({
                       if (e.key === 'Enter') commitRename(d.id);
                       if (e.key === 'Escape') setRenamingId(null);
                     }}
-                    className="w-full rounded-lg border border-[var(--themis-primary)] bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-none"
+                    className="w-full rounded-lg border border-(--themis-primary) bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-hidden"
                   />
                 ) : (
                   <button
@@ -87,8 +87,8 @@ export default function SavedDashboardsList({
                     className={cn(
                       'group flex w-full items-center gap-2 rounded-lg border px-2.5 py-1.5 text-left transition-colors',
                       active
-                        ? 'border-[var(--themis-primary)]/50 bg-[var(--themis-glass-tint)]'
-                        : 'border-border-subtle bg-surface/40 hover:border-[var(--themis-primary)]/30 hover:bg-surface-hover',
+                        ? 'border-(--themis-primary)/50 bg-(--themis-glass-tint)'
+                        : 'border-border-subtle bg-surface/40 hover:border-(--themis-primary)/30 hover:bg-surface-hover',
                     )}
                   >
                     <span className="min-w-0 flex-1 truncate text-[12.5px] text-text-primary">
@@ -172,7 +172,7 @@ function MenuItem({
       className={cn(
         'flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors',
         tone === 'danger'
-          ? 'text-[var(--themis-rejected)] hover:bg-[var(--themis-rejected-bg)]'
+          ? 'text-(--themis-rejected) hover:bg-(--themis-rejected-bg)'
           : 'text-text-secondary hover:bg-surface-hover hover:text-text-primary',
       )}
     >

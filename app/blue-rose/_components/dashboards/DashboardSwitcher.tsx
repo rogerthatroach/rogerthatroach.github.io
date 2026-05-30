@@ -91,7 +91,7 @@ export default function DashboardSwitcher({
         className={cn(
           'flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
           active === 'holistic'
-            ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+            ? 'bg-(--themis-primary) text-(--color-bg)'
             : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
         )}
       >
@@ -111,7 +111,7 @@ export default function DashboardSwitcher({
             className={cn(
               'flex items-center gap-1.5 rounded-md px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
               isActive
-                ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+                ? 'bg-(--themis-primary) text-(--color-bg)'
                 : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
             )}
             title={`${d.widgets.length} widget${d.widgets.length === 1 ? '' : 's'}`}
@@ -131,7 +131,7 @@ export default function DashboardSwitcher({
       <button
         type="button"
         onClick={onNew}
-        className="flex items-center gap-1.5 rounded-md border border-dashed border-border-subtle px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-text-tertiary transition-colors hover:border-[var(--themis-primary)]/50 hover:text-text-primary"
+        className="flex items-center gap-1.5 rounded-md border border-dashed border-border-subtle px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-text-tertiary transition-colors hover:border-(--themis-primary)/50 hover:text-text-primary"
       >
         <Plus size={10} aria-hidden="true" />
         <span>New</span>

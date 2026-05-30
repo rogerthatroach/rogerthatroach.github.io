@@ -99,7 +99,7 @@ export default function AboutSection() {
             animate={{ opacity: 1, y: 0 }}
             className="lg:w-[280px]"
           >
-            <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl">
+            <div className="aspect-4/5 w-full overflow-hidden rounded-2xl">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/images/portrait.webp"

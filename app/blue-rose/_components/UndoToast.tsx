@@ -94,7 +94,7 @@ export default function UndoToast({
             <button
               type="button"
               onClick={onUndo}
-              className="flex shrink-0 items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:text-text-primary"
+              className="flex shrink-0 items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-(--themis-primary)/40 hover:text-text-primary"
             >
               <RotateCcw size={10} aria-hidden="true" />
               <span>Undo · {seconds}s</span>

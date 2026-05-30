@@ -75,7 +75,7 @@ export default function StepThrough({
         </div>
 
         {/* Step body — crossfade on change */}
-        <div className="relative min-h-[6rem]">
+        <div className="relative min-h-24">
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}

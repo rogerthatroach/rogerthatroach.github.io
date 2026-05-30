@@ -48,7 +48,7 @@ export default function SourceHighlightModal({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.18 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-xs"
         onClick={onClose}
         role="presentation"
       >
@@ -106,7 +106,7 @@ export default function SourceHighlightModal({
                 Source passage · page {entry.page}
               </p>
               <blockquote
-                className="rounded px-3 py-2 font-display text-[13px] leading-relaxed"
+                className="rounded-sm px-3 py-2 font-display text-[13px] leading-relaxed"
                 style={{
                   background: 'rgba(176, 122, 130, 0.15)',
                   borderLeft: '3px solid var(--themis-sakura)',

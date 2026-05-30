@@ -100,7 +100,7 @@ function WhyCardPaused({ submission }: { submission: Submission }) {
   const band = riskBand(submission);
   return (
     <div
-      className="mb-4 rounded-2xl border bg-[var(--themis-needs-info-bg)] px-4 py-3.5"
+      className="mb-4 rounded-2xl border bg-(--themis-needs-info-bg) px-4 py-3.5"
       style={{ borderColor: 'var(--themis-needs-info)', borderLeftWidth: 2 }}
     >
       <header className="mb-2 flex flex-wrap items-center gap-2">
@@ -148,7 +148,7 @@ function WhyCardRefusal({
   const band = riskBand(submission);
   return (
     <div
-      className="mb-4 rounded-2xl border bg-[var(--themis-needs-info-bg)] px-4 py-3.5"
+      className="mb-4 rounded-2xl border bg-(--themis-needs-info-bg) px-4 py-3.5"
       style={{ borderColor: 'var(--themis-needs-info)', borderLeftWidth: 2 }}
     >
       <header className="mb-2 flex flex-wrap items-center gap-2">
@@ -207,7 +207,7 @@ function WhyCardPopulated({
 
   return (
     <div
-      className="mb-4 rounded-2xl border bg-[var(--themis-glass-tint)] px-4 py-3.5 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)]"
+      className="mb-4 rounded-2xl border bg-(--themis-glass-tint) px-4 py-3.5 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)]"
       style={{ borderColor: 'rgba(185,168,214,0.28)' }}
     >
       {/* Verdict line — the always-visible default. Click to expand details. */}
@@ -405,7 +405,7 @@ function WhyCardPopulated({
                     <button
                       type="button"
                       onClick={() => setOverrideOpen(true)}
-                      className="font-mono text-[10px] uppercase tracking-widest text-[var(--themis-primary)] transition-colors hover:text-text-primary"
+                      className="font-mono text-[10px] uppercase tracking-widest text-(--themis-primary) transition-colors hover:text-text-primary"
                     >
                       Edit chain →
                     </button>
@@ -474,7 +474,7 @@ function CitationChip({ citation }: { citation: DianeCitation }) {
     >
       <a
         href={citation.deepLink}
-        className="rounded border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[10px] text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:text-text-primary"
+        className="rounded-sm border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[10px] text-text-secondary transition-colors hover:border-(--themis-primary)/40 hover:text-text-primary"
         aria-label={`Citation ${citation.id}: ${citation.policyId} ${citation.clauseRef}`}
       >
         [{citation.id}]

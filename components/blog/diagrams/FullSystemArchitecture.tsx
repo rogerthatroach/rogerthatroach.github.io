@@ -37,7 +37,7 @@ export default function FullSystemArchitecture() {
             type="checkbox"
             checked={showEntitlements}
             onChange={(e) => setShowEntitlements(e.target.checked)}
-            className="rounded"
+            className="rounded-sm"
           />
           Show Entitlement Filter
         </label>

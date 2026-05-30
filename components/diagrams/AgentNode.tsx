@@ -38,14 +38,14 @@ function AgentNode({ data }: NodeProps) {
       onMouseLeave={() => setHovered(false)}
       className="relative"
     >
-      <Handle type="target" position={Position.Top} className="!bg-border-subtle !border-text-tertiary !w-2 !h-2" />
-      <Handle type="source" position={Position.Bottom} className="!bg-border-subtle !border-text-tertiary !w-2 !h-2" />
+      <Handle type="target" position={Position.Top} className="bg-border-subtle! border-text-tertiary! w-2! h-2!" />
+      <Handle type="source" position={Position.Bottom} className="bg-border-subtle! border-text-tertiary! w-2! h-2!" />
 
       <motion.div
         whileHover={{ scale: 1.05 }}
         transition={{ type: 'spring', stiffness: 400, damping: 25 }}
         className={cn(
-          'rounded-xl border px-5 py-4 backdrop-blur-sm transition-shadow duration-300 min-w-[140px] max-w-[200px]',
+          'rounded-xl border px-5 py-4 backdrop-blur-xs transition-shadow duration-300 min-w-[140px] max-w-[200px]',
           !useCustomColor && style.border,
           !useCustomColor && style.bg,
           !useCustomColor && hovered && `shadow-lg ${style.glow}`
