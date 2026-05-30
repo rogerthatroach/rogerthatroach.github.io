@@ -28,7 +28,7 @@ export default function WorkflowsPage() {
       >
         <motion.div variants={fadeUp} className="mb-8">
           <span
-            className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)]"
+            className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-(--themis-glass-tint) ring-1 ring-(--themis-glass-border)"
             style={{ color: 'var(--themis-primary)' }}
             aria-hidden="true"
           >

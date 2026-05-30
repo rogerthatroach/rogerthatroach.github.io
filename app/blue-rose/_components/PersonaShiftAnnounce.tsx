@@ -105,7 +105,7 @@ export default function PersonaShiftAnnounce({
                   onSwitch(recommendedPersona.id);
                   setVisible(false);
                 }}
-                className="mt-2 flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-[var(--themis-sakura-border)] hover:text-text-primary"
+                className="mt-2 flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-(--themis-sakura-border) hover:text-text-primary"
               >
                 <span>View as {recommendedPersona.displayName.split(' ')[0]}</span>
                 <ArrowRight size={10} aria-hidden="true" />

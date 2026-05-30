@@ -1,5 +1,8 @@
 import type { MetadataRoute } from 'next';
 
+// Next 16 requires force-static on metadata routes under output:'export'.
+export const dynamic = 'force-static';
+
 // Web app manifest — declares name/theme/icons so iOS home-screen saves and
 // Android install prompts get a proper icon instead of a screenshot.
 export default function manifest(): MetadataRoute.Manifest {

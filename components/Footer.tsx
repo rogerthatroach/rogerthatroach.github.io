@@ -73,7 +73,7 @@ export default function Footer() {
               className="hidden items-center gap-1.5 normal-case tracking-normal transition-colors hover:text-accent sm:inline-flex"
               aria-label="Open search (Cmd or Ctrl K)"
             >
-              <kbd className="rounded border border-border-subtle bg-surface/50 px-1.5 py-0.5 text-[10px] tracking-normal">
+              <kbd className="rounded-sm border border-border-subtle bg-surface/50 px-1.5 py-0.5 text-[10px] tracking-normal">
                 ⌘K
               </kbd>
               <span className="text-[11px]">Search</span>

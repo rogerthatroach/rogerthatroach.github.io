@@ -241,7 +241,7 @@ export default function DianePresence({
         onSubmit={onSubmit}
         className="shrink-0 px-8 pb-6"
       >
-        <div className="mx-auto flex max-w-prose items-end gap-3 border-b border-border-subtle/60 pb-2 transition-colors focus-within:border-[var(--themis-primary)]">
+        <div className="mx-auto flex max-w-prose items-end gap-3 border-b border-border-subtle/60 pb-2 transition-colors focus-within:border-(--themis-primary)">
           <button
             type="button"
             onClick={onAttachClick}
@@ -262,7 +262,7 @@ export default function DianePresence({
                 onSubmit(e as unknown as FormEvent);
               }
             }}
-            className="min-h-[22px] flex-1 resize-none bg-transparent font-display text-[14px] leading-relaxed text-text-primary outline-none placeholder:italic placeholder:text-text-tertiary"
+            className="min-h-[22px] flex-1 resize-none bg-transparent font-display text-[14px] leading-relaxed text-text-primary outline-hidden placeholder:italic placeholder:text-text-tertiary"
           />
           <button
             type="submit"
@@ -452,8 +452,8 @@ function Chip({
       className={cn(
         'rounded-full border px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest transition-colors',
         tone === 'sakura'
-          ? 'border-[var(--themis-sakura-border)] text-[var(--themis-sakura)] hover:bg-[var(--themis-sakura-pill)]'
-          : 'border-border-subtle text-text-secondary hover:border-[var(--themis-primary)]/50 hover:bg-[var(--themis-glass-tint)] hover:text-text-primary',
+          ? 'border-(--themis-sakura-border) text-(--themis-sakura) hover:bg-(--themis-sakura-pill)'
+          : 'border-border-subtle text-text-secondary hover:border-(--themis-primary)/50 hover:bg-(--themis-glass-tint) hover:text-text-primary',
       )}
     >
       {label}

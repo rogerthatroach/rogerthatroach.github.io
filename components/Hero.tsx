@@ -18,7 +18,7 @@ const FADE_UP = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.3 + i * 0.15, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { delay: 0.3 + i * 0.15, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] as const },
   }),
 };
 
@@ -100,8 +100,8 @@ export default function Hero() {
     >
       {showParticles && <ParticleField />}
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-accent/5 via-transparent to-background" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-accent/5 via-transparent to-background" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-background/80 via-transparent to-background/80" />
 
       {/* Two stacked blocks:
             1 · Identity — portrait + [role eyebrow, name, tagline, bio].
@@ -116,7 +116,7 @@ export default function Hero() {
           <motion.div
             initial={false}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="relative order-first mx-auto aspect-[4/5] w-[155px] overflow-hidden rounded-lg sm:w-[194px] lg:mx-0 lg:w-[228px] xl:w-[244px]"
+            className="relative order-first mx-auto aspect-4/5 w-[155px] overflow-hidden rounded-lg sm:w-[194px] lg:mx-0 lg:w-[228px] xl:w-[244px]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -125,7 +125,7 @@ export default function Hero() {
               sizes="(max-width: 1024px) 194px, 244px"
               alt="Harmilap Singh Dhaliwal"
               className="h-full w-full object-cover"
-              {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
+              fetchPriority="high"
             />
           </motion.div>
 
@@ -234,7 +234,7 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }}
                 className="flex items-baseline gap-3"
               >
                 <span className="font-mono text-2xl font-bold text-text-primary sm:text-3xl">

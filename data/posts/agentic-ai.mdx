@@ -186,7 +186,7 @@ We consider a threat model where the LLM provider is an honest-but-curious adver
 
 The confidentiality guarantee holds only if the architectural boundary is enforced; i.e., no code path exists that passes data values to the LLM. In the production system, this is enforced by:
 
-1. **Interface typing:** The routing function's input type signature accepts only <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs">(query: string, system_prompt: string)</code>; no data parameters exist in the function signature
+1. **Interface typing:** The routing function's input type signature accepts only <code className="rounded-sm bg-surface px-1.5 py-0.5 font-mono text-xs">(query: string, system_prompt: string)</code>; no data parameters exist in the function signature
 2. **Network isolation:** The LLM API call originates from a service that has no database credentials and no access to data stores
 3. **Audit logging:** Every LLM invocation is logged with its full input, enabling automated verification that <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D} = \\emptyset")} />
 
@@ -232,7 +232,7 @@ The production system implements this translation as a four-stage pipeline:
 
 **Stage <InlineEquation html={tex("\\delta")} />:** Compile event sets into parameterized SQL WHERE clauses:
 
-<div className="mb-4 overflow-x-auto rounded bg-surface p-4">
+<div className="mb-4 overflow-x-auto rounded-sm bg-surface p-4">
   <code className="font-mono text-xs text-text-secondary">
     WHERE transit_id IN (SELECT transit_id FROM entitlements WHERE user_id = :current_user)
   </code>

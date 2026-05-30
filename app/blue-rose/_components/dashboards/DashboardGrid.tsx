@@ -149,9 +149,9 @@ export default function DashboardGrid({
             'group relative flex min-h-[140px] flex-col rounded-2xl border bg-surface/40 transition-all',
             draggedId === w.id && 'opacity-50',
             hoverDropId === w.id && draggedId && draggedId !== w.id
-              ? 'border-[var(--themis-primary)]/70 ring-2 ring-[var(--themis-primary)]/30'
+              ? 'border-(--themis-primary)/70 ring-2 ring-(--themis-primary)/30'
               : 'border-border-subtle',
-            editing && hoverDropId !== w.id && 'hover:border-[var(--themis-primary)]/40',
+            editing && hoverDropId !== w.id && 'hover:border-(--themis-primary)/40',
           )}
           onDragOver={(e) => onDragOver(e, w.id)}
           onDragLeave={() => onDragLeave(w.id)}
@@ -169,7 +169,7 @@ export default function DashboardGrid({
                 draggable
                 onDragStart={(e) => onDragStart(e, w.id)}
                 onDragEnd={onDragEnd}
-                className="flex h-5 w-5 shrink-0 cursor-grab items-center justify-center rounded text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary active:cursor-grabbing"
+                className="flex h-5 w-5 shrink-0 cursor-grab items-center justify-center rounded-sm text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary active:cursor-grabbing"
               >
                 <GripVertical size={12} aria-hidden="true" />
               </span>
@@ -194,9 +194,9 @@ export default function DashboardGrid({
                         aria-pressed={active}
                         title={`${preset.cols} columns`}
                         className={cn(
-                          'rounded px-1.5 py-0.5 font-mono text-[10px] tracking-wider transition-colors',
+                          'rounded-sm px-1.5 py-0.5 font-mono text-[10px] tracking-wider transition-colors',
                           active
-                            ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+                            ? 'bg-(--themis-primary) text-(--color-bg)'
                             : 'text-text-tertiary hover:bg-surface-hover hover:text-text-primary',
                         )}
                       >
@@ -219,7 +219,7 @@ export default function DashboardGrid({
                   type="button"
                   draggable={false}
                   onClick={() => remove(w.id)}
-                  className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-[var(--themis-rejected-bg)] hover:text-[var(--themis-rejected)]"
+                  className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-(--themis-rejected-bg) hover:text-(--themis-rejected)"
                   title="Remove widget"
                   aria-label="Remove widget"
                 >

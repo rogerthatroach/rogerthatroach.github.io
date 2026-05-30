@@ -58,13 +58,13 @@ export default function WhiteLodgeLayout({ children, onLock }: WhiteLodgeLayoutP
             aria-label="White Lodge — home"
           >
             <span
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)] transition-shadow group-hover:ring-[var(--themis-primary)]/50"
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-(--themis-glass-tint) ring-1 ring-(--themis-glass-border) transition-shadow group-hover:ring-(--themis-primary)/50"
               style={{ color: 'var(--themis-primary)' }}
               aria-hidden="true"
             >
               <OwlGlyph size={18} />
             </span>
-            <span className="font-display text-base font-medium uppercase tracking-[0.18em] text-text-primary transition-colors group-hover:text-[var(--themis-primary)]">
+            <span className="font-display text-base font-medium uppercase tracking-[0.18em] text-text-primary transition-colors group-hover:text-(--themis-primary)">
               White Lodge
             </span>
           </Link>

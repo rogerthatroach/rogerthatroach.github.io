@@ -94,14 +94,14 @@ export default function ComposeLedger({
                   <span className="w-6 shrink-0 font-mono text-[10px] tracking-widest text-text-tertiary">
                     {ROMAN[PAR_SECTIONS.indexOf(section)] ?? `${i + 1}`}.
                   </span>
-                  <span className="min-w-0 flex-1 truncate font-display text-[13px] font-medium text-text-primary group-hover:text-[var(--themis-primary)]">
+                  <span className="min-w-0 flex-1 truncate font-display text-[13px] font-medium text-text-primary group-hover:text-(--themis-primary)">
                     {section.title}
                   </span>
                   <RingCluster total={total} filled={filled} current={isOpen} />
                   <span
                     className={cn(
                       'font-mono text-[10px] uppercase tracking-widest',
-                      allDone ? 'text-[var(--themis-approved)]' : 'text-text-tertiary',
+                      allDone ? 'text-(--themis-approved)' : 'text-text-tertiary',
                     )}
                   >
                     {allDone ? 'done' : `${filled}/${total}`}
@@ -122,7 +122,7 @@ export default function ComposeLedger({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] }}
+                      transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] as const }}
                       className="overflow-hidden"
                     >
                       <ul className="ml-8 mt-1 space-y-0.5 pb-3">
@@ -196,7 +196,7 @@ function FieldRow({
                 setEditing(false);
               }}
               onBlur={() => setEditing(false)}
-              className="w-full border-b border-[var(--themis-primary)] bg-transparent py-1 font-display text-[12.5px] text-text-primary outline-none"
+              className="w-full border-b border-(--themis-primary) bg-transparent py-1 font-display text-[12.5px] text-text-primary outline-hidden"
             >
               <option value="">—</option>
               {field.options?.map((opt) => (
@@ -213,7 +213,7 @@ function FieldRow({
               maxLength={field.maxLength}
               onChange={(e) => setParField(field.key, e.target.value, 'user')}
               onBlur={() => setEditing(false)}
-              className="w-full resize-y border-b border-[var(--themis-primary)] bg-transparent py-1 font-display text-[12.5px] leading-relaxed text-text-primary outline-none"
+              className="w-full resize-y border-b border-(--themis-primary) bg-transparent py-1 font-display text-[12.5px] leading-relaxed text-text-primary outline-hidden"
             />
           ) : field.kind === 'number' ? (
             <input
@@ -225,7 +225,7 @@ function FieldRow({
                 setParField(field.key, Number.isNaN(n) ? '' : n, 'user');
               }}
               onBlur={() => setEditing(false)}
-              className="w-full border-b border-[var(--themis-primary)] bg-transparent py-1 font-display text-[12.5px] text-text-primary outline-none"
+              className="w-full border-b border-(--themis-primary) bg-transparent py-1 font-display text-[12.5px] text-text-primary outline-hidden"
             />
           ) : (
             <input
@@ -235,7 +235,7 @@ function FieldRow({
               maxLength={field.maxLength}
               onChange={(e) => setParField(field.key, e.target.value, 'user')}
               onBlur={() => setEditing(false)}
-              className="w-full border-b border-[var(--themis-primary)] bg-transparent py-1 font-display text-[12.5px] text-text-primary outline-none"
+              className="w-full border-b border-(--themis-primary) bg-transparent py-1 font-display text-[12.5px] text-text-primary outline-hidden"
             />
           )}
         </div>
@@ -261,7 +261,7 @@ function FieldRow({
                 onSourceClick();
               }}
               title="View source passage"
-              className="block w-full truncate text-left font-display text-[12.5px] leading-snug text-text-primary transition-colors hover:text-[var(--themis-sakura)]"
+              className="block w-full truncate text-left font-display text-[12.5px] leading-snug text-text-primary transition-colors hover:text-(--themis-sakura)"
               style={{ borderBottom: '1px dashed var(--themis-sakura-border)' }}
             >
               {display}
@@ -307,7 +307,7 @@ function FieldRow({
               e.stopPropagation();
               onAskDiane();
             }}
-            className="font-mono text-[9px] uppercase tracking-widest text-[var(--themis-primary)] hover:text-text-primary"
+            className="font-mono text-[9px] uppercase tracking-widest text-(--themis-primary) hover:text-text-primary"
           >
             ask Diane
           </button>

@@ -114,7 +114,7 @@ export default function FloatingAvatar({
       </svg>
       {presence && (
         <span
-          className="absolute right-0 bottom-0 rounded-full ring-2 ring-[var(--color-bg)]"
+          className="absolute right-0 bottom-0 rounded-full ring-2 ring-(--color-bg)"
           style={{
             width: dotSize,
             height: dotSize,

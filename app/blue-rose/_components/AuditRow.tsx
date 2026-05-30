@@ -58,7 +58,7 @@ export default function AuditRow({
     <li className="relative">
       <span
         aria-hidden="true"
-        className="absolute -left-4 top-1 h-2.5 w-2.5 rounded-full ring-2 ring-[var(--color-bg)]"
+        className="absolute -left-4 top-1 h-2.5 w-2.5 rounded-full ring-2 ring-(--color-bg)"
         style={{ background: auditKindColor(event.kind) }}
       />
       <div className="flex flex-wrap items-baseline gap-1.5">
@@ -87,7 +87,7 @@ export default function AuditRow({
                     onSubmissionClick();
                   }
                 }}
-                className="truncate text-[12px] text-text-primary transition-colors hover:text-[var(--themis-primary)]"
+                className="truncate text-[12px] text-text-primary transition-colors hover:text-(--themis-primary)"
               >
                 {submissionTitle}
               </a>
@@ -136,14 +136,14 @@ export default function AuditRow({
               <p className="text-text-primary">{reasoning.rationale}</p>
               <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                 <span
-                  className="rounded border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-text-secondary"
+                  className="rounded-sm border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-text-secondary"
                   title="MCP tool invoked"
                 >
                   {reasoning.mcpTool}
                 </span>
                 {reasoning.fieldGroup && (
                   <span
-                    className="rounded border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-text-secondary"
+                    className="rounded-sm border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-text-secondary"
                     title="Field-group retrieved"
                   >
                     {reasoning.fieldGroup}
@@ -159,7 +159,7 @@ export default function AuditRow({
                         key={c.id}
                         href={c.deepLink}
                         title={`${c.policyId} ${c.clauseRef}: ${c.quote}`}
-                        className="rounded border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[9px] text-text-secondary transition-colors hover:border-[#F59E0B]/50 hover:text-text-primary"
+                        className="rounded-sm border border-border-subtle bg-surface/70 px-1.5 py-0.5 font-mono text-[9px] text-text-secondary transition-colors hover:border-[#F59E0B]/50 hover:text-text-primary"
                       >
                         [{c.id}]
                       </a>

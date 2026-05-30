@@ -76,7 +76,7 @@ export default function MessageBubble({ message, author, personas, isSelf }: Mes
             borderRight: isSelf ? `2px solid ${tint}` : undefined,
           }}
         >
-          <div className="whitespace-pre-wrap break-words text-left">
+          <div className="whitespace-pre-wrap wrap-break-word text-left">
             {renderBody(message.body, personas)}
           </div>
         </div>

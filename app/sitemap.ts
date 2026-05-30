@@ -3,6 +3,9 @@ import { PROJECTS } from '@/data/projects';
 import { POSTS, isPostPublic } from '@/data/posts';
 import { PAPERS } from '@/data/papers';
 
+// Next 16 requires force-static on metadata routes under output:'export'.
+export const dynamic = 'force-static';
+
 const SITE_URL = 'https://rogerthatroach.github.io';
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -4,6 +4,7 @@ import { memo, useState } from 'react';
 import {
   ReactFlow,
   Background,
+  Controls,
   Handle,
   Position,
   type Node,
@@ -68,10 +69,10 @@ function DotNode({ data }: NodeProps) {
 
   return (
     <div className="relative flex items-center justify-center">
-      <Handle type="target" position={Position.Top} className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Bottom} className="!opacity-0 !w-1 !h-1" />
-      <Handle type="target" position={Position.Left} id="l" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Right} id="r" className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Bottom} className="opacity-0! w-1! h-1!" />
+      <Handle type="target" position={Position.Left} id="l" className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Right} id="r" className="opacity-0! w-1! h-1!" />
 
       <motion.div
         whileHover={{ scale: 1.3 }}
@@ -122,10 +123,10 @@ function HubNode({ data }: NodeProps) {
       className="relative flex items-center justify-center"
       style={{ width: 120, height: 120 }}
     >
-      <Handle type="target" position={Position.Top} className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Bottom} className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Left} id="l" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Right} id="r" className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Bottom} className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Left} id="l" className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Right} id="r" className="opacity-0! w-1! h-1!" />
 
       {/* orbital ring (rotates) */}
       <motion.div
@@ -141,7 +142,7 @@ function HubNode({ data }: NodeProps) {
       <motion.div
         whileHover={{ scale: 1.08 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-        className="rounded-full border-2 backdrop-blur-sm flex flex-col items-center justify-center px-2"
+        className="rounded-full border-2 backdrop-blur-xs flex flex-col items-center justify-center px-2"
         style={{
           width: 96,
           height: 96,
@@ -176,11 +177,11 @@ function RailNode({ data }: NodeProps) {
   const d = data as unknown as RailNodeData;
   return (
     <div className="relative">
-      <Handle type="target" position={Position.Top} className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Top} id="top" className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Top} id="top" className="opacity-0! w-1! h-1!" />
 
       <div
-        className="rounded-2xl border-2 px-6 py-3 backdrop-blur-sm"
+        className="rounded-2xl border-2 px-6 py-3 backdrop-blur-xs"
         style={{
           width: 720,
           backgroundColor: `${d.color}12`,
@@ -593,9 +594,12 @@ export default function AgenticArchitecturePAR() {
         minZoom={0.2}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
-        className="[&_.react-flow__background]:!bg-transparent"
+        zoomOnScroll={false}
+        preventScrolling={false}
+        className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
+        <Controls showInteractive={false} position="bottom-right" />
       </ReactFlow>
     </div>
   );

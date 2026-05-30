@@ -119,7 +119,7 @@ export default function CommandPalette() {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[15vh]"
+          className="fixed inset-0 z-80 flex items-start justify-center px-4 pt-[15vh]"
           initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
@@ -134,7 +134,7 @@ export default function CommandPalette() {
 
           {/* Panel */}
           <motion.div
-            className="relative w-full max-w-xl overflow-hidden rounded-xl border border-border-subtle bg-gradient-to-b from-surface-hover to-surface shadow-2xl"
+            className="relative w-full max-w-xl overflow-hidden rounded-xl border border-border-subtle bg-linear-to-b from-surface-hover to-surface shadow-2xl"
             initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
@@ -151,7 +151,7 @@ export default function CommandPalette() {
                 <Command.Input
                   autoFocus
                   placeholder="Search pages, projects, writings…"
-                  className="flex-1 bg-transparent text-sm text-text-primary outline-none placeholder:text-text-tertiary"
+                  className="flex-1 bg-transparent text-sm text-text-primary outline-hidden placeholder:text-text-tertiary"
                 />
                 <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
                   esc

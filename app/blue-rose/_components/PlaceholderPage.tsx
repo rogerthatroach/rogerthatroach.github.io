@@ -34,7 +34,7 @@ export default function PlaceholderPage({
         className="flex max-w-md flex-col items-center gap-5 text-center"
       >
         <span
-          className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)]"
+          className="flex h-14 w-14 items-center justify-center rounded-2xl bg-(--themis-glass-tint) ring-1 ring-(--themis-glass-border)"
           style={{ color: 'var(--themis-primary)' }}
           aria-hidden="true"
         >

@@ -4,6 +4,7 @@ import { memo, useState } from 'react';
 import {
   ReactFlow,
   Background,
+  Controls,
   Handle,
   Position,
   type Node,
@@ -72,15 +73,15 @@ function PillNode({ data }: NodeProps) {
       onMouseLeave={() => setHovered(false)}
       className="relative"
     >
-      <Handle type="target" position={Position.Top} id="t" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Bottom} id="b" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="target" position={Position.Left} id="l" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Right} id="r" className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} id="t" className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Bottom} id="b" className="opacity-0! w-1! h-1!" />
+      <Handle type="target" position={Position.Left} id="l" className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Right} id="r" className="opacity-0! w-1! h-1!" />
 
       <motion.div
         whileHover={{ scale: 1.04 }}
         transition={{ type: 'spring', stiffness: 380, damping: 24 }}
-        className={`rounded-full border-2 backdrop-blur-sm whitespace-nowrap ${padding}`}
+        className={`rounded-full border-2 backdrop-blur-xs whitespace-nowrap ${padding}`}
         style={{
           backgroundColor: `${d.color}1f`,
           borderColor: d.color,
@@ -123,8 +124,8 @@ function ChainNode({ data }: NodeProps) {
   const d = data as unknown as ChainNodeData;
   return (
     <div className="relative">
-      <Handle type="target" position={Position.Top} id="t" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Bottom} id="b" className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} id="t" className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Bottom} id="b" className="opacity-0! w-1! h-1!" />
 
       <div className="mb-1 text-center">
         <span
@@ -134,7 +135,7 @@ function ChainNode({ data }: NodeProps) {
           {d.label}
         </span>
       </div>
-      <div className="flex items-center gap-1 rounded-xl border-2 px-3 py-2 backdrop-blur-sm"
+      <div className="flex items-center gap-1 rounded-xl border-2 px-3 py-2 backdrop-blur-xs"
            style={{ backgroundColor: `${d.color}10`, borderColor: `${d.color}aa` }}>
         {d.steps.map((s, i) => (
           <div key={s} className="flex items-center gap-1">
@@ -171,9 +172,9 @@ function RailNode({ data }: NodeProps) {
   const d = data as unknown as RailNodeData;
   return (
     <div className="relative">
-      <Handle type="target" position={Position.Top} className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} className="opacity-0! w-1! h-1!" />
       <div
-        className="rounded-2xl border-2 px-5 py-3 backdrop-blur-sm"
+        className="rounded-2xl border-2 px-5 py-3 backdrop-blur-xs"
         style={{
           width: d.width ?? 1200,
           backgroundColor: `${d.color}12`,
@@ -564,9 +565,12 @@ export default function AstraeusCascade() {
         minZoom={0.2}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
-        className="[&_.react-flow__background]:!bg-transparent"
+        zoomOnScroll={false}
+        preventScrolling={false}
+        className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
+        <Controls showInteractive={false} position="bottom-right" />
       </ReactFlow>
     </div>
   );

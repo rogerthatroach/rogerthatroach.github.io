@@ -42,7 +42,7 @@ export default function ProjectReveal({
         damping: 26,
         delay: reduceMotion ? 0 : index * 0.06,
       }}
-      className="palette-border-l rounded-xl border border-l-4 border-border-subtle bg-surface/40 p-5 backdrop-blur-sm md:p-6"
+      className="palette-border-l rounded-xl border border-l-4 border-border-subtle bg-surface/40 p-5 backdrop-blur-xs md:p-6"
     >
       <div className="flex items-baseline justify-between gap-3">
         <h3 className="text-lg font-semibold text-text-primary">{project.name}</h3>

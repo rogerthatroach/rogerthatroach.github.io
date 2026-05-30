@@ -82,7 +82,7 @@ export default function MetricsRibbon() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
-              transition={{ delay: i * 0.07, duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ delay: i * 0.07, duration: 0.5, ease: [0.4, 0, 0.2, 1] as const }}
               className="flex flex-col"
             >
               {metric.numericValue !== undefined ? (

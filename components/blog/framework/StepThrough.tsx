@@ -75,14 +75,14 @@ export default function StepThrough({
         </div>
 
         {/* Step body — crossfade on change */}
-        <div className="relative min-h-[6rem]">
+        <div className="relative min-h-24">
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}
               initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
               className="text-sm leading-relaxed text-text-secondary"
             >
               {current.content}

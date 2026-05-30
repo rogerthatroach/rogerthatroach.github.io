@@ -142,8 +142,8 @@ export default function FieldThread({
           initial={{ opacity: 0, y: -4, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -4, scale: 0.97 }}
-          transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
-          className="themis-glass-pop fixed z-[100] overflow-hidden rounded-xl"
+          transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] as const }}
+          className="themis-glass-pop fixed z-100 overflow-hidden rounded-xl"
           style={{ top: pos.top, left: pos.left, width: POPOVER_WIDTH }}
         >
           <div className="flex items-center justify-between border-b border-border-subtle px-3 py-2">
@@ -182,7 +182,7 @@ export default function FieldThread({
           <div className="border-t border-border-subtle bg-background/40">
             {quotedSelection && (
               <div className="px-3 pt-2">
-                <p className="rounded-md border-l-2 border-[var(--themis-primary)]/50 bg-surface-hover/40 px-2 py-1 text-[11px] italic text-text-secondary">
+                <p className="rounded-md border-l-2 border-(--themis-primary)/50 bg-surface-hover/40 px-2 py-1 text-[11px] italic text-text-secondary">
                   &ldquo;{quotedSelection}&rdquo;
                 </p>
               </div>
@@ -219,7 +219,7 @@ export default function FieldThread({
             className={cn(
               'flex items-center gap-1 rounded-full border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
               has
-                ? 'border-[var(--themis-primary)]/40 text-[var(--themis-primary)] hover:bg-[var(--themis-glass-tint)]'
+                ? 'border-(--themis-primary)/40 text-(--themis-primary) hover:bg-(--themis-glass-tint)'
                 : 'border-border-subtle text-text-tertiary hover:bg-surface-hover',
             )}
             aria-label={
@@ -267,7 +267,7 @@ function FieldCommentCard({
             {relativeTime(comment.createdAt)}
           </span>
         </div>
-        <p className="whitespace-pre-wrap break-words text-[12px] leading-snug text-text-secondary">
+        <p className="whitespace-pre-wrap wrap-break-word text-[12px] leading-snug text-text-secondary">
           {renderBody(comment.body, personas as never)}
         </p>
       </div>

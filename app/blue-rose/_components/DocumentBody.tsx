@@ -40,7 +40,7 @@ export default function DocumentBody({ submission }: DocumentBodyProps) {
       className="space-y-3"
     >
       {isDraft && (
-        <div className="rounded-xl border border-[var(--themis-primary)]/30 bg-[var(--themis-glass-tint)] px-4 py-3">
+        <div className="rounded-xl border border-(--themis-primary)/30 bg-(--themis-glass-tint) px-4 py-3">
           <p className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--themis-primary)' }}>
             Draft · comment on any field
           </p>
@@ -155,7 +155,7 @@ function FieldValue({
     <div ref={ref} className="relative">
       <div
         className={cn(
-          'mt-1 whitespace-pre-wrap break-words text-[13.5px] leading-relaxed text-text-primary',
+          'mt-1 whitespace-pre-wrap wrap-break-word text-[13.5px] leading-relaxed text-text-primary',
           isLong && 'select-text',
         )}
       >
@@ -176,7 +176,7 @@ function FieldValue({
             setChip(null);
             window.getSelection()?.removeAllRanges();
           }}
-          className="absolute z-10 flex items-center gap-1 rounded-full border border-[var(--themis-primary)]/40 bg-background/90 px-2 py-1 font-mono text-[10px] uppercase tracking-wider shadow-md backdrop-blur-sm"
+          className="absolute z-10 flex items-center gap-1 rounded-full border border-(--themis-primary)/40 bg-background/90 px-2 py-1 font-mono text-[10px] uppercase tracking-wider shadow-md backdrop-blur-xs"
           style={{
             left: chip.x,
             top: chip.y,

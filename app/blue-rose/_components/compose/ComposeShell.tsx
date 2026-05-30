@@ -198,7 +198,7 @@ export default function ComposeShell() {
   return (
     <div className="relative h-full overflow-hidden">
       {/* Top atmosphere strip */}
-      <header className="relative z-10 flex shrink-0 items-center gap-4 border-b border-border-subtle/40 px-5 py-3 backdrop-blur-sm">
+      <header className="relative z-10 flex shrink-0 items-center gap-4 border-b border-border-subtle/40 px-5 py-3 backdrop-blur-xs">
         <button
           type="button"
           aria-label="Back"
@@ -246,7 +246,7 @@ export default function ComposeShell() {
                 <span
                   className={cn(
                     'border-b border-transparent pb-0.5',
-                    active && 'border-[var(--themis-primary)]',
+                    active && 'border-(--themis-primary)',
                   )}
                 >
                   {label}
@@ -285,7 +285,7 @@ export default function ComposeShell() {
 
       {/* Body — Diane (left/wide) + Ledger (right/slim) */}
       <div className="relative h-[calc(100%-56px)] overflow-hidden">
-        <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[1fr_minmax(320px,_38%)]">
+        <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[1fr_minmax(320px,38%)]">
           <DianePresence
             draftTitle={requestTitle}
             values={parDraft}
@@ -359,7 +359,7 @@ function ChromeAction({
       className={cn(
         'flex items-center gap-1 font-mono transition-colors',
         primary
-          ? 'text-[var(--themis-primary)] hover:text-text-primary'
+          ? 'text-(--themis-primary) hover:text-text-primary'
           : active
             ? 'text-text-primary'
             : 'text-text-tertiary hover:text-text-secondary',
@@ -369,7 +369,7 @@ function ChromeAction({
       <span
         className={cn(
           'border-b border-transparent pb-0.5',
-          active && 'border-[var(--themis-primary)]',
+          active && 'border-(--themis-primary)',
         )}
       >
         {label}

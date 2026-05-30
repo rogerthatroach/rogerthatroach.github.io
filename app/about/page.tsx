@@ -20,7 +20,7 @@ export default function AboutPage() {
           as: 'image',
           href: '/images/portrait.webp',
           type: 'image/webp',
-          fetchpriority: 'high',
+          fetchPriority: 'high',
         } as React.HTMLAttributes<HTMLLinkElement>)}
       />
       <Nav />

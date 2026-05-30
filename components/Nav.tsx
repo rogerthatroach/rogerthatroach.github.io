@@ -104,7 +104,7 @@ export default function Nav() {
             aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={menuOpen}
             aria-controls="nav-mobile-menu"
-            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-sm transition-colors hover:bg-surface-hover hover:text-text-primary"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-xs transition-colors hover:bg-surface-hover hover:text-text-primary"
           >
             <motion.div
               key={menuOpen ? 'x' : 'menu'}
@@ -124,8 +124,8 @@ export default function Nav() {
                 initial={{ opacity: 0, y: -6, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
-                className="absolute right-0 top-[calc(100%+0.5rem)] min-w-[12rem] overflow-hidden rounded-xl border border-border-subtle bg-gradient-to-b from-surface-hover to-surface shadow-2xl"
+                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] as const }}
+                className="absolute right-0 top-[calc(100%+0.5rem)] min-w-48 overflow-hidden rounded-xl border border-border-subtle bg-linear-to-b from-surface-hover to-surface shadow-2xl"
               >
                 <ul className="py-1">
                   {/* Search trigger — mobile equivalent of ⌘K. Fires the
