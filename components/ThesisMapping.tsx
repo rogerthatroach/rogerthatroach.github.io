@@ -60,12 +60,12 @@ export default function ThesisMapping() {
         <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
           The pattern, mapped
         </p>
-        <h3
+        <h2
           id="thesis-heading"
           className="mt-1 text-lg font-semibold text-text-primary sm:text-xl"
         >
           Same closed loop, four abstraction levels.
-        </h3>
+        </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-text-secondary">
           Sense the state of the system. Model it. Optimize against a goal.
           Act — and close the loop. The substrate changes; the pattern
