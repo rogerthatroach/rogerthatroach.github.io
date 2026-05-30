@@ -24,7 +24,7 @@ const VIEWPORT_PAD = 12;
 
 interface QueueFilterPanelProps {
   /** The element the panel anchors to (usually the Filter button). */
-  anchorRef: React.RefObject<HTMLElement>;
+  anchorRef: React.RefObject<HTMLElement | null>;
   open: boolean;
   onClose: () => void;
 }

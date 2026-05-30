@@ -110,18 +110,12 @@ function Particles() {
   return (
     <points ref={meshRef}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={PARTICLE_COUNT}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          count={PARTICLE_COUNT}
-          array={colors}
-          itemSize={3}
-        />
+        {/* R3F 9: bufferAttribute takes constructor args [array, itemSize]
+            (THREE.BufferAttribute(array, itemSize)); count is derived. The
+            arrays are useMemo-stable so the attribute isn't recreated, and
+            the per-frame mutation of position.array + needsUpdate still works. */}
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
       </bufferGeometry>
       <pointsMaterial
         size={0.035}
