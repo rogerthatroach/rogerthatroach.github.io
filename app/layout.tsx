@@ -126,8 +126,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // suppressHydrationWarning on <html>: the inline themeScript sets the .dark
+  // class + data-theme on <html> before hydration, so the server/client <html>
+  // attributes intentionally differ. Scoped to that one element.
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
       <head>
         {/* Best-effort hardening via <meta> (GitHub Pages can't set response
             headers). Only directives that don't break a static Next export
