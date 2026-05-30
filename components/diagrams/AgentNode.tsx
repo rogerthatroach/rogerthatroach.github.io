@@ -42,9 +42,9 @@ function AgentNode({ data }: NodeProps) {
       <Handle type="source" position={Position.Bottom} className="bg-border-subtle! border-text-tertiary! w-2! h-2!" />
 
       <motion.div
-        // Reveal-on-view: nodes fade/rise in as the diagram scrolls into the
-        // viewport. Composes with whileHover (different props); global
-        // MotionConfig reducedMotion='user' makes the rise instant when asked.
+        // Reveal-on-view: nodes snap in as the diagram scrolls into view, on the
+        // same quick spring as the hover (the snappy feel is deliberate).
+        // Composes with whileHover; global reducedMotion='user' makes it instant.
         initial={{ opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}

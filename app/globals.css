@@ -215,12 +215,24 @@
     color: var(--color-bg);
   }
 
-  /* No universal `* { transition }` rule (removed 2026-05-30): it forced a
-     style recalc on every element on every hover/theme change — an INP tax.
-     Theme switches now ride a single View Transition crossfade (started in
-     ThemePicker), with the cheap `body` color transition above as the no-VT
-     fallback. Interactive elements that need a color ease carry an explicit
-     `transition-colors` utility at the call site. */
+  /* No PERMANENT universal `* { transition }` rule (removed 2026-05-30): it
+     forced a style recalc on every element on every hover, an INP tax.
+     Instead, the smooth theme-color crossfade is enabled ONLY during an
+     explicit theme switch — ThemePicker toggles `.theme-transition` on <html>
+     for ~320ms, so the color ease is back without the permanent hover cost. */
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+  }
+  /* Exclude animated elements from the swap (they'd jitter) */
+  html.theme-transition [data-framer-motion],
+  html.theme-transition canvas,
+  html.theme-transition svg circle[r="3"] {
+    transition: none !important;
+  }
 
   /* Focus-visible styles for keyboard navigation */
   :focus-visible {
