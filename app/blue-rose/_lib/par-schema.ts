@@ -1,7 +1,7 @@
 /**
  * Project PAR — section + field schema.
  *
- * Synthetic funding-request form structure (11 sections,
+ * Mirrors the public AI/LLM Drafting Platform Phase 1 form structure (11 sections,
  * 3-state status pills) so stakeholders watching the White Lodge demo
  * recognize the same form shape they already know. White Lodge re-skins
  * the surface; the section + field taxonomy stays PAR-faithful.
