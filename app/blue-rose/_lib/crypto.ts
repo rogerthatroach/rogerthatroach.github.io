@@ -10,8 +10,9 @@
  *      passphrase + salt.
  *   3. Decrypt with AES-GCM(key, iv). On failure (wrong passphrase),
  *      `crypto.subtle.decrypt` throws — caller renders the shake.
- *   4. Cache the *derived key* in sessionStorage for the tab's lifetime
- *      so soft-reloads don't re-prompt.
+ *   4. Cache the *passphrase* in sessionStorage (tab-local, origin-scoped,
+ *      cleared on tab close / lock) for the tab's lifetime so soft-reloads
+ *      don't re-prompt. The key is re-derived from it on each use.
  *
  * No new deps — `crypto.subtle` is native.
  */
