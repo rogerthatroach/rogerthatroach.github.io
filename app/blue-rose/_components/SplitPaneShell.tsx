@@ -86,8 +86,8 @@ export default function SplitPaneShell({
         className={cn(
           'group relative flex w-1 shrink-0 cursor-col-resize select-none items-center justify-center transition-colors',
           dragging
-            ? 'bg-[var(--themis-primary)]/50'
-            : 'bg-border-subtle/40 hover:bg-[var(--themis-primary)]/40',
+            ? 'bg-(--themis-primary)/50'
+            : 'bg-border-subtle/40 hover:bg-(--themis-primary)/40',
         )}
       >
         {/* Wider invisible hit area for easier grabbing */}
@@ -102,7 +102,7 @@ export default function SplitPaneShell({
           className={cn(
             'absolute h-12 w-[2px] rounded-full transition-all',
             dragging || 'opacity-50',
-            dragging ? 'bg-[var(--themis-primary)] opacity-100' : 'bg-text-tertiary group-hover:bg-[var(--themis-primary)] group-hover:opacity-100',
+            dragging ? 'bg-(--themis-primary) opacity-100' : 'bg-text-tertiary group-hover:bg-(--themis-primary) group-hover:opacity-100',
           )}
         />
       </div>

@@ -85,7 +85,7 @@ export default function InsightsHeader({ filters, setFilters }: InsightsHeaderPr
                 className={cn(
                   'rounded-md px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors',
                   active
-                    ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+                    ? 'bg-(--themis-primary) text-(--color-bg)'
                     : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
                 )}
               >
@@ -190,7 +190,7 @@ function FilterChipGroup({
               className={cn(
                 'rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
                 active
-                  ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+                  ? 'bg-(--themis-primary) text-(--color-bg)'
                   : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
               )}
             >

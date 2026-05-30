@@ -55,7 +55,7 @@ export default function WidgetPalette({ open, onClose, onPick }: WidgetPalettePr
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-xs"
           onClick={onClose}
         >
           <motion.div
@@ -100,11 +100,11 @@ export default function WidgetPalette({ open, onClose, onPick }: WidgetPalettePr
                       }}
                       className={cn(
                         'group flex h-full w-full flex-col items-start gap-1.5 rounded-xl border border-border-subtle bg-surface/60 px-3 py-3 text-left transition-all',
-                        'hover:border-[var(--themis-primary)]/50 hover:bg-[var(--themis-glass-tint)]',
+                        'hover:border-(--themis-primary)/50 hover:bg-(--themis-glass-tint)',
                       )}
                     >
                       <span
-                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--themis-glass-tint)] text-[var(--themis-primary)]"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-(--themis-glass-tint) text-(--themis-primary)"
                         aria-hidden="true"
                       >
                         <Icon size={14} />

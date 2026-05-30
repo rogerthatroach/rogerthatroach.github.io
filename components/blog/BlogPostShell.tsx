@@ -60,10 +60,10 @@ const POST_COMPONENTS: Record<string, React.ComponentType> = {
 function PostSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="h-4 w-3/4 animate-pulse rounded bg-surface" />
-      <div className="h-4 w-full animate-pulse rounded bg-surface" />
-      <div className="h-4 w-5/6 animate-pulse rounded bg-surface" />
-      <div className="h-32 w-full animate-pulse rounded bg-surface" />
+      <div className="h-4 w-3/4 animate-pulse rounded-sm bg-surface" />
+      <div className="h-4 w-full animate-pulse rounded-sm bg-surface" />
+      <div className="h-4 w-5/6 animate-pulse rounded-sm bg-surface" />
+      <div className="h-32 w-full animate-pulse rounded-sm bg-surface" />
     </div>
   );
 }

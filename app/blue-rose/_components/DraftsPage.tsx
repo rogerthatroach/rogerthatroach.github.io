@@ -51,7 +51,7 @@ export default function DraftsPage() {
             </p>
             <Link
               href="/blue-rose/compose"
-              className="mt-2 flex items-center gap-1.5 rounded-md border border-[var(--themis-primary)]/30 bg-[var(--themis-glass-tint)] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.25em]"
+              className="mt-2 flex items-center gap-1.5 rounded-md border border-(--themis-primary)/30 bg-(--themis-glass-tint) px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.25em]"
               style={{ color: 'var(--themis-primary)' }}
             >
               <PenLine size={11} aria-hidden="true" />

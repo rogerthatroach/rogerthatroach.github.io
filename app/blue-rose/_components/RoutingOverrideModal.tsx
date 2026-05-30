@@ -87,7 +87,7 @@ export default function RoutingOverrideModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-xs"
           onClick={onClose}
           role="presentation"
         >
@@ -181,7 +181,7 @@ export default function RoutingOverrideModal({
                           type="button"
                           onClick={() => onRemove(id)}
                           title="Remove from chain"
-                          className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-[var(--themis-rejected-bg)] hover:text-[var(--themis-rejected)]"
+                          className="rounded-md p-1 text-text-tertiary transition-colors hover:bg-(--themis-rejected-bg) hover:text-(--themis-rejected)"
                           aria-label="Remove from chain"
                         >
                           <Trash2 size={11} aria-hidden="true" />
@@ -192,7 +192,7 @@ export default function RoutingOverrideModal({
                       <div className="ml-8 my-1 flex h-3 w-px flex-col items-center">
                         <ArrowDown
                           size={11}
-                          className="-ml-[5px] -mt-1 text-text-tertiary"
+                          className="ml-[-5px] -mt-1 text-text-tertiary"
                           aria-hidden="true"
                         />
                       </div>
@@ -216,7 +216,7 @@ export default function RoutingOverrideModal({
                         onClick={() => onAdd(p.id)}
                         className={cn(
                           'flex items-center gap-1.5 rounded-full border border-border-subtle px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors',
-                          'hover:border-[var(--themis-primary)]/50 hover:bg-[var(--themis-glass-tint)] hover:text-text-primary',
+                          'hover:border-(--themis-primary)/50 hover:bg-(--themis-glass-tint) hover:text-text-primary',
                         )}
                       >
                         <Plus size={10} aria-hidden="true" />

@@ -3,6 +3,7 @@
 import {
   ReactFlow,
   Background,
+  Controls,
   type Node,
   type Edge,
   useNodesState,
@@ -109,7 +110,7 @@ export default function DocumentIntelligenceDiagram() {
   const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
-    <div className="h-[400px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-sm sm:h-[500px]">
+    <div className="h-[400px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-xs sm:h-[500px]">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -122,9 +123,12 @@ export default function DocumentIntelligenceDiagram() {
         minZoom={0.25}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
-        className="[&_.react-flow__background]:!bg-transparent"
+        zoomOnScroll={false}
+        preventScrolling={false}
+        className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
+        <Controls showInteractive={false} position="bottom-right" />
       </ReactFlow>
     </div>
   );

@@ -25,7 +25,7 @@ const FADE_UP = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] as const },
   }),
 };
 
@@ -51,7 +51,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
-      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] as const }}
       className="mt-16 scroll-mt-24"
     >
       <h2 className="font-display text-xl font-bold tracking-tight text-text-primary">{title}</h2>
@@ -136,7 +136,7 @@ function CaseStudyTOCMobile() {
           <li key={s.id}>
             <a
               href={`#${s.id}`}
-              className="block rounded px-2 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
+              className="block rounded-sm px-2 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
             >
               {s.label}
             </a>
@@ -156,7 +156,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
       <main id="main-content" className="px-6 pt-24 pb-12 md:px-16">
         {/* Centered on all widths; from xl, a [sticky ToC | article] grid so
             the ToC sits in its own column instead of overlapping the article. */}
-        <div className="mx-auto max-w-content xl:flex xl:max-w-[78rem] xl:gap-12">
+        <div className="mx-auto max-w-content xl:flex xl:max-w-312 xl:gap-12">
           <CaseStudyTOC />
           <div className="min-w-0 xl:max-w-content xl:flex-1">
           {/* Breadcrumbs */}

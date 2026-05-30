@@ -182,7 +182,7 @@ export default function DianePage() {
                         <a
                           href="/blue-rose/submission"
                           onClick={() => selectSubmission(submission.id)}
-                          className="text-[12px] text-text-primary transition-colors hover:text-[var(--themis-primary)]"
+                          className="text-[12px] text-text-primary transition-colors hover:text-(--themis-primary)"
                         >
                           {submission.title}
                         </a>

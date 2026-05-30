@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
  * Inline hover/focus-revealed popover for glossary terms.
  *
  * Portal-rendered. The popover lives in document.body so it escapes any
- * ancestor stacking context (sticky containers, backdrop-blur elements,
+ * ancestor stacking context (sticky containers, backdrop-blur-sm elements,
  * etc. that were hiding it behind adjacent columns in /resume/arc).
  *
  * Position is computed from the trigger's bounding box and updated on
@@ -97,7 +97,7 @@ export default function HoverTerm({
             (e.currentTarget as HTMLSpanElement).blur();
           }
         }}
-        className="cursor-help border-b border-dotted border-accent/50 font-medium text-text-primary transition-colors hover:border-accent hover:text-accent focus:outline-none focus-visible:border-accent focus-visible:text-accent"
+        className="cursor-help border-b border-dotted border-accent/50 font-medium text-text-primary transition-colors hover:border-accent hover:text-accent focus:outline-hidden focus-visible:border-accent focus-visible:text-accent"
       >
         {children}
       </span>
@@ -111,13 +111,13 @@ export default function HoverTerm({
                 initial={{ opacity: 0, y: -4, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -4, scale: 0.96 }}
-                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] as const }}
                 style={{
                   position: 'fixed',
                   left: pos.left,
                   top: pos.top,
                 }}
-                className="pointer-events-none z-[100] block w-64 max-w-[calc(100vw-2rem)] rounded-lg border border-border-subtle bg-surface/95 p-3 text-xs font-normal not-italic leading-relaxed text-text-secondary shadow-xl backdrop-blur-md sm:w-72"
+                className="pointer-events-none z-100 block w-64 max-w-[calc(100vw-2rem)] rounded-lg border border-border-subtle bg-surface/95 p-3 text-xs font-normal not-italic leading-relaxed text-text-secondary shadow-xl backdrop-blur-md sm:w-72"
               >
                 {detail}
               </motion.span>

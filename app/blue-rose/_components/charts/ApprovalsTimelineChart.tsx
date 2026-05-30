@@ -111,7 +111,7 @@ export default function ApprovalsTimelineChart({
         <span className="flex items-center gap-1.5">
           <span
             aria-hidden="true"
-            className="block h-2 w-2 rounded-sm"
+            className="block h-2 w-2 rounded-xs"
             style={{ background: 'var(--themis-approved)' }}
           />
           <span className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">
@@ -121,7 +121,7 @@ export default function ApprovalsTimelineChart({
         <span className="flex items-center gap-1.5">
           <span
             aria-hidden="true"
-            className="block h-2 w-2 rounded-sm"
+            className="block h-2 w-2 rounded-xs"
             style={{ background: 'var(--themis-pending)' }}
           />
           <span className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">

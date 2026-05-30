@@ -43,9 +43,9 @@ export default function WhatIfPanel({
   return (
     <section
       className={cn(
-        'overflow-hidden rounded-2xl border bg-[var(--themis-glass-tint)] transition-colors',
+        'overflow-hidden rounded-2xl border bg-(--themis-glass-tint) transition-colors',
         isModified
-          ? 'border-[var(--themis-primary)]/40'
+          ? 'border-(--themis-primary)/40'
           : 'border-border-subtle',
       )}
     >
@@ -190,7 +190,7 @@ function Slider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-1.5 w-full accent-[var(--themis-primary)]"
+        className="mt-1.5 w-full accent-(--themis-primary)"
         aria-label={label}
       />
     </div>

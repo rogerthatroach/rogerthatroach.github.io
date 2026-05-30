@@ -114,7 +114,7 @@ export default function StatusDonut({
           <li key={p.status} className="flex items-center gap-1.5">
             <span
               aria-hidden="true"
-              className="block h-2 w-2 rounded-sm"
+              className="block h-2 w-2 rounded-xs"
               style={{ background: STATUS_COLOR[p.status] }}
             />
             <span className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">

@@ -68,7 +68,7 @@ export default function WidgetConfigModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 backdrop-blur-xs"
           onClick={onClose}
         >
           <motion.div
@@ -106,7 +106,7 @@ export default function WidgetConfigModal({
                   type="text"
                   value={draft.title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-none transition-colors focus:border-[var(--themis-primary)]"
+                  className="w-full rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-hidden transition-colors focus:border-(--themis-primary)"
                 />
               </Field>
 
@@ -120,7 +120,7 @@ export default function WidgetConfigModal({
                         metric: e.target.value as KPIMetric,
                       })
                     }
-                    className="w-full rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-none transition-colors focus:border-[var(--themis-primary)]"
+                    className="w-full rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-hidden transition-colors focus:border-(--themis-primary)"
                   >
                     {KPI_METRIC_OPTIONS.map((opt) => (
                       <option key={opt.metric} value={opt.metric}>
@@ -153,7 +153,7 @@ export default function WidgetConfigModal({
                         rows: Math.max(3, Math.min(20, Number(e.target.value) || 6)),
                       })
                     }
-                    className="w-24 rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-none transition-colors focus:border-[var(--themis-primary)]"
+                    className="w-24 rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-hidden transition-colors focus:border-(--themis-primary)"
                   />
                 </Field>
               )}
@@ -166,7 +166,7 @@ export default function WidgetConfigModal({
                     onChange={(e) =>
                       setConfig({ kind: 'dianeNote', question: e.target.value })
                     }
-                    className="mb-2 w-full rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-none transition-colors focus:border-[var(--themis-primary)]"
+                    className="mb-2 w-full rounded-lg border border-border-subtle bg-surface/70 px-2.5 py-1.5 text-[13px] text-text-primary outline-hidden transition-colors focus:border-(--themis-primary)"
                   />
                   <div className="flex flex-wrap gap-1.5">
                     {SUGGESTED_QUESTIONS.map((q) => (
@@ -174,7 +174,7 @@ export default function WidgetConfigModal({
                         key={q}
                         type="button"
                         onClick={() => setConfig({ kind: 'dianeNote', question: q })}
-                        className="rounded-full border border-border-subtle bg-surface/60 px-2 py-0.5 font-mono text-[10px] text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:text-text-primary"
+                        className="rounded-full border border-border-subtle bg-surface/60 px-2 py-0.5 font-mono text-[10px] text-text-secondary transition-colors hover:border-(--themis-primary)/40 hover:text-text-primary"
                       >
                         {q}
                       </button>
@@ -245,7 +245,7 @@ function DimSelector({
           className={cn(
             'flex-1 rounded-md px-2 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors',
             value === o.key
-              ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+              ? 'bg-(--themis-primary) text-(--color-bg)'
               : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
           )}
         >

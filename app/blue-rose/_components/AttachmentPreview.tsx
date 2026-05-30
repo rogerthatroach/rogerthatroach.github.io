@@ -36,7 +36,7 @@ export function AttachmentChip({
     <button
       type="button"
       onClick={onPreview}
-      className="group flex w-full items-center gap-2.5 rounded-lg border border-border-subtle bg-surface/60 px-2.5 py-2 text-left transition-colors hover:border-[var(--themis-primary)]/40 hover:bg-[var(--themis-glass-tint)]"
+      className="group flex w-full items-center gap-2.5 rounded-lg border border-border-subtle bg-surface/60 px-2.5 py-2 text-left transition-colors hover:border-(--themis-primary)/40 hover:bg-(--themis-glass-tint)"
     >
       <span
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md"
@@ -68,7 +68,7 @@ function PreviewSurface({ attachment }: { attachment: Attachment }) {
     const b = (a + 60 + Math.floor(rng() * 80)) % 360;
     return (
       <div
-        className="aspect-[4/3] w-full rounded-lg"
+        className="aspect-4/3 w-full rounded-lg"
         style={{
           background: `radial-gradient(ellipse at 30% 30%, hsl(${a} 50% 70% / 0.6), transparent 60%), radial-gradient(ellipse at 70% 70%, hsl(${b} 50% 70% / 0.6), transparent 60%), var(--color-surface)`,
         }}
@@ -114,7 +114,7 @@ function PreviewSurface({ attachment }: { attachment: Attachment }) {
   // PDF / generic — stylized "document" page
   const lineCount = 9;
   return (
-    <div className="aspect-[3/4] w-full overflow-hidden rounded-lg border border-border-subtle bg-surface/80 px-5 py-6 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)]">
+    <div className="aspect-3/4 w-full overflow-hidden rounded-lg border border-border-subtle bg-surface/80 px-5 py-6 shadow-[0_1px_0_inset_rgba(255,255,255,0.04)]">
       <div className="mb-4 h-2 w-1/2 rounded-full bg-text-primary/40" />
       <div className="mb-4 h-1.5 w-1/3 rounded-full bg-text-tertiary/40" />
       <div className="space-y-2">
@@ -160,7 +160,7 @@ export function AttachmentPreviewModal({
     <AnimatePresence>
       {attachment && (
         <motion.div
-          className="fixed inset-0 z-[70] flex items-center justify-center px-4 py-10"
+          className="fixed inset-0 z-70 flex items-center justify-center px-4 py-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
