@@ -42,7 +42,7 @@ const VENDOR_MSA_CRM: Omit<ExtractionResult, 'filename'> = {
     request_title: {
       value: 'Acme CRM Platform Onboarding',
       source:
-        'This Master Services Agreement is entered into as of February 15, 2026, between RBC Personal & Commercial Banking ("Customer") and Acme Software Inc. ("Vendor") for the provision of Acme CRM Platform — onboarding services, licenses, and integration support.',
+        'This Master Services Agreement is entered into as of February 15, 2026, between Great Northern Bank ("Customer") and Acme Software Inc. ("Vendor") for the provision of Acme CRM Platform — onboarding services, licenses, and integration support.',
       page: 1,
     },
     request_category: {
@@ -145,7 +145,7 @@ const VENDOR_MSA_CRM: Omit<ExtractionResult, 'filename'> = {
     },
     strategic_alignment: {
       value:
-        'Maps to RBC\'s "Exceptional Client Experience" enterprise priority (richer client context for sales reps). Maps to "Digital Transformation" (replaces manual workflow with platform automation). Maps to "Operational Excellence" via measurable productivity gains.',
+        'Maps to the bank\'s client-experience priority (richer client context for sales reps). Maps to a digital-transformation priority (replaces manual workflow with platform automation). Maps to operational excellence via measurable productivity gains.',
       source:
         '§7.1 Enterprise Strategic Alignment. The initiative aligns with three enterprise priorities: (i) Exceptional Client Experience — richer client context enables better service, (ii) Digital Transformation — replaces manual workflow with platform automation, (iii) Operational Excellence — productivity gains are measurable and tied to forecast accuracy.',
       page: 11,

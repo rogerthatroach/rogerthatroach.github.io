@@ -22,14 +22,16 @@ const HEADER_FIELDS_RIGHT: string[] = ['executive_sponsor', 'sponsor_delegate', 
 
 /**
  * DocumentPreviewPanel — slide-out side panel rendering the PAR draft
- * as a formal RBC EDS Workflow document.
+ * as a formal funding-request document for a FICTIONAL institution
+ * (Great Northern Bank — part of the White Lodge demo fiction; not
+ * affiliated with any real bank).
  *
- * Matches screenshot 3: branded header (RBC Enterprise Decision Support
- * + EDS Workflow / Project Funding Request title), confidentiality
+ * Branded header (Great Northern / Decision Support + Funding Workflow /
+ * Project Funding Request title), an "illustrative / synthetic data"
  * line, "All amounts in CAD", 2-column header field table, then full
- * prose sections. White Lodge restyling preserves the formal-document
- * feel (Fraunces titles, classic serif body, paper background) so a
- * stakeholder reads it as a real document, not a UI surface.
+ * prose sections. The formal-document feel (Fraunces titles, classic
+ * serif body, paper background) makes it read as a realistic artifact —
+ * all data is synthetic.
  *
  * Replaces the form pane on the right when open; the chat pane on the
  * left stays put. Close button + download icon in the panel header.
@@ -84,33 +86,33 @@ export default function DocumentPreviewPanel({
           <div className="min-h-0 flex-1 overflow-y-auto bg-[#fdfaf3] dark:bg-[#1a1620]">
             <article className="mx-auto max-w-3xl px-8 py-10 text-[#2a2526] dark:text-[#e6dfe1]">
               {/* Branded header */}
-              <header className="border-b-2 border-[#003168] pb-4 dark:border-[#5e8bcf]">
+              <header className="border-b-2 border-[#1e3a5f] pb-4 dark:border-[#7fa8d8]">
                 <div className="flex items-end justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span
                       className="flex h-10 w-10 items-center justify-center rounded font-display text-[10px] font-bold leading-tight text-white"
-                      style={{ background: '#003168' }}
+                      style={{ background: '#1e3a5f' }}
                     >
-                      RBC
+                      GN
                     </span>
-                    <div className="text-[10px] uppercase leading-tight tracking-wider text-[#003168] dark:text-[#5e8bcf]">
-                      <p>Enterprise</p>
-                      <p>Decision</p>
-                      <p>Support</p>
+                    <div className="text-[10px] uppercase leading-tight tracking-wider text-[#1e3a5f] dark:text-[#7fa8d8]">
+                      <p>Great</p>
+                      <p>Northern</p>
+                      <p>Bank</p>
                     </div>
                   </div>
                   <h1
                     className="font-display text-[26px] font-medium leading-none"
-                    style={{ color: '#003168' }}
+                    style={{ color: '#1e3a5f' }}
                   >
-                    EDS Workflow
+                    Funding Workflow
                   </h1>
-                  <span className="font-mono text-[11px] uppercase tracking-widest text-[#003168] dark:text-[#5e8bcf]">
+                  <span className="font-mono text-[11px] uppercase tracking-widest text-[#1e3a5f] dark:text-[#7fa8d8]">
                     Project Funding Request
                   </span>
                 </div>
                 <p className="mt-3 text-center text-[11px] italic text-[#5a5054] dark:text-[#9a9094]">
-                  Private &amp; Confidential — Not to be Distributed Further
+                  Illustrative document — synthetic demo data, not affiliated with any real institution
                 </p>
                 <p className="text-center text-[11px] italic text-[#5a5054] dark:text-[#9a9094]">
                   All amounts in CAD
@@ -184,7 +186,7 @@ function ProseSection({
       <section>
         <h2
           className="border-b border-[#d6cfc1] pb-1 font-display text-[16px] font-medium dark:border-[#3a3640]"
-          style={{ color: '#003168' }}
+          style={{ color: '#1e3a5f' }}
         >
           {section.title}
         </h2>
@@ -196,7 +198,7 @@ function ProseSection({
     <section>
       <h2
         className="border-b border-[#d6cfc1] pb-1 font-display text-[16px] font-medium dark:border-[#3a3640]"
-        style={{ color: '#003168' }}
+        style={{ color: '#1e3a5f' }}
       >
         {section.title}
       </h2>

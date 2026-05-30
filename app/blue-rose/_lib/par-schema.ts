@@ -81,7 +81,7 @@ export const PAR_SECTIONS: SectionSpec[] = [
       { key: 'executive_sponsor', label: 'Executive Sponsor', kind: 'text', required: true, maxLength: 400, dianeFillable: false },
       { key: 'sponsor_delegate', label: 'Sponsor Delegate', kind: 'text', required: true, maxLength: 400, dianeFillable: false, placeholder: 'SPONSOR_DELEGATE' },
       { key: 'par_contact', label: 'PAR Contact', kind: 'text', maxLength: 400, dianeFillable: true },
-      { key: 'eds_contact', label: 'EDS Contact', kind: 'text', maxLength: 400, dianeFillable: false },
+      { key: 'eds_contact', label: 'Decision Support Contact', kind: 'text', maxLength: 400, dianeFillable: false },
       {
         key: 'initiative_type',
         label: 'Initiative Type',
@@ -133,7 +133,7 @@ export const PAR_SECTIONS: SectionSpec[] = [
   {
     id: 'enterprise_strategies',
     title: 'Enterprise Level Strategies',
-    description: 'Alignment to RBC enterprise priorities — digital transformation, exceptional client experience, operational excellence, profitable growth.',
+    description: 'Alignment to enterprise priorities — digital transformation, client experience, operational excellence, profitable growth.',
     fields: [
       { key: 'strategic_alignment', label: 'Strategic Alignment', kind: 'longtext', required: true, maxLength: 3000, dianeFillable: true },
       { key: 'enterprise_priority', label: 'Enterprise Priority', kind: 'select', options: ['Digital Transformation', 'Client Experience', 'Operational Excellence', 'Profitable Growth'], dianeFillable: true },
@@ -282,7 +282,7 @@ export const SAMPLE_PAR_VALUES: Record<string, string | number> = {
   overview:
     'The current sales tracking system relies on multiple Excel spreadsheets to track customer interactions, deals, and pipeline. This creates several issues including no single source of truth, manual data entry errors, difficulty generating reports, poor pipeline visibility for management, and lost sales opportunities due to lack of follow-up tracking. The new Salesforce Sales Cloud platform will address these challenges by providing contact and account management, opportunity tracking, sales forecasting, custom dashboards and reports, mobile access for field sales reps, and integration with existing marketing automation.',
   description:
-    'Implementation of Salesforce Sales Cloud across the RBC sales organization, replacing legacy spreadsheet-based tracking. Includes data migration, integration with existing marketing automation tools, custom dashboard development, mobile access provisioning, and full user training across all sales tiers.',
+    'Implementation of Salesforce Sales Cloud across the bank\'s sales organization, replacing legacy spreadsheet-based tracking. Includes data migration, integration with existing marketing automation tools, custom dashboard development, mobile access provisioning, and full user training across all sales tiers.',
   benefits_qualitative:
     'Single source of truth for customer data, improved cross-team collaboration, better forecasting confidence, reduced manual reporting overhead, faster onboarding for new sales hires.',
   success_metrics:
@@ -293,7 +293,7 @@ export const SAMPLE_PAR_VALUES: Record<string, string | number> = {
   rationale:
     'Salesforce ecosystem already integrated with Marketo (marketing automation), Slack (collaboration), and our data warehouse. Vendor familiarity reduces training cost. Best-in-class mobile experience for field sales. Cost is mid-range across options but TCO is lowest after factoring integration savings.',
   strategic_alignment:
-    'Maps to RBC\'s "Exceptional Client Experience" enterprise priority by enabling sales reps to maintain richer client context. Maps to "Digital Transformation" priority by replacing manual workflow with platform-based automation. Maps to "Operational Excellence" via measurable productivity gains.',
+    'Maps to the bank\'s client-experience priority by enabling sales reps to maintain richer client context. Maps to a digital-transformation priority by replacing manual workflow with platform-based automation. Maps to operational excellence via measurable productivity gains.',
   enterprise_priority: 'Digital Transformation',
   segment_alignment:
     'Aligns with Global Functions Finance roadmap to consolidate sales reporting across business units onto a single platform.',
