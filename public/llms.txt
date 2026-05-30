@@ -1,0 +1,29 @@
+# Harmilap Singh Dhaliwal
+
+> AI & Data Science Lead. ~8 years of progressive AI/ML — from industrial
+> Digital Twins to bank-wide production agentic AI and multi-stage LLM
+> analytics platforms in regulated finance.
+
+## Start here
+
+- [Home](https://rogerthatroach.github.io/): Positioning, career arc, project index.
+- [Resume](https://rogerthatroach.github.io/resume): Career arc, skills, education, awards, writing.
+- [Projects](https://rogerthatroach.github.io/projects): Case studies with architecture diagrams.
+- [Writings](https://rogerthatroach.github.io/blog): Technical whitepapers and practitioner deep-dives.
+- [Papers](https://rogerthatroach.github.io/papers): Long-form papers.
+- [Platform](https://rogerthatroach.github.io/platform): How production AI is built and served.
+- [About](https://rogerthatroach.github.io/about): Thesis and background.
+
+## Project case studies
+
+- [PAR Assist](https://rogerthatroach.github.io/projects/par-assist): Bank-wide production agentic AI platform.
+- [Astraeus](https://rogerthatroach.github.io/projects/astraeus): LLM-as-router analytics platform over financial hierarchies.
+- [Aegis](https://rogerthatroach.github.io/projects/aegis): NL→SQL benchmarking system.
+- [Commodity Tax](https://rogerthatroach.github.io/projects/commodity-tax): Months → 90 minutes process automation.
+- [Document Intelligence](https://rogerthatroach.github.io/projects/document-intelligence): Document AI extraction pipeline.
+- [Combustion Tuning](https://rogerthatroach.github.io/projects/combustion-tuning): Industrial Digital Twin, $3M/yr savings.
+
+## Notes
+
+- Full sitemap: https://rogerthatroach.github.io/sitemap.xml
+- RSS feed: https://rogerthatroach.github.io/feed.xml

@@ -17,17 +17,30 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const paper = PAPERS.find((p) => p.slug === params.slug);
   if (!paper) return { title: 'Paper not found' };
+  const description = paper.subtitle ?? paper.abstract.slice(0, 180);
   return {
     title: `${paper.title} — Papers`,
     description: paper.abstract.slice(0, 180),
     alternates: { canonical: `/papers/${paper.slug}` },
     openGraph: {
       title: paper.title,
-      description: paper.subtitle ?? paper.abstract.slice(0, 180),
+      description,
+      url: `/papers/${paper.slug}`,
+      siteName: 'Harmilap Singh Dhaliwal',
+      locale: 'en_US',
       type: 'article',
+      images: ['/og-image.png'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: paper.title,
+      description,
+      images: ['/og-image.png'],
     },
   };
 }
+
+const SITE_URL = 'https://rogerthatroach.github.io';
 
 export default function PaperLandingPage({
   params,
@@ -47,8 +60,25 @@ export default function PaperLandingPage({
     timeZone: 'UTC',
   });
 
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: paper.title,
+    description: paper.abstract.slice(0, 280),
+    datePublished: citationDate,
+    author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: 'Harmilap Singh Dhaliwal' },
+    url: `${SITE_URL}/papers/${paper.slug}`,
+    mainEntityOfPage: `${SITE_URL}/papers/${paper.slug}`,
+    image: `${SITE_URL}/og-image.png`,
+    inLanguage: 'en',
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <Nav />
       <main
         id="main-content"

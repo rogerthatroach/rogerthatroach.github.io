@@ -1,7 +1,17 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+
+// Explicit metadata so the 404 doesn't inherit the homepage canonical and
+// doesn't ship the layout's index:true alongside Next's default noindex
+// (two conflicting robots metas). One coherent noindex signal, own title.
+export const metadata: Metadata = {
+  title: 'Page not found',
+  robots: { index: false, follow: false },
+  alternates: { canonical: null },
+};
 
 // Two-line mono acknowledgement + one re-entry link. No "oops!",
 // no illustration, no 404 stencil. If someone lands here, they already
