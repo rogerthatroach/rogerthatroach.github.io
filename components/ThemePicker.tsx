@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -161,8 +160,17 @@ export default function ThemePicker() {
 
   const select = (id: ThemeId) => {
     setCurrent(id);
-    applyTheme(id);
     setOpen(false);
+    // Crossfade the whole page's colors in one compositor pass via the View
+    // Transitions API (replaces the old universal `*{transition}` recalc tax).
+    // Runtime-guarded for browsers without it (Safari < 18), where the `body`
+    // color transition is the graceful fallback; skipped under reduced-motion.
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce && typeof document.startViewTransition === 'function') {
+      document.startViewTransition(() => applyTheme(id));
+    } else {
+      applyTheme(id);
+    }
   };
 
   if (!mounted) return <div className="h-11 w-11" />;
@@ -171,14 +179,13 @@ export default function ThemePicker() {
 
   return (
     <div ref={menuRef} className="relative">
-      <motion.button
+      <button
         type="button"
         onClick={() => setOpen((s) => !s)}
-        whileTap={{ scale: 0.92 }}
         aria-label="Change theme"
         aria-haspopup="menu"
         aria-expanded={open}
-        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-xs transition-colors hover:bg-surface-hover hover:text-text-primary"
+        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-xs transition duration-150 hover:bg-surface-hover hover:text-text-primary active:scale-90"
       >
         {/* Current theme shown as a tri-color ring: bg, accent, text */}
         <span className="relative flex h-5 w-5 items-center justify-center">
@@ -194,19 +201,23 @@ export default function ThemePicker() {
           />
           <Palette size={10} strokeWidth={2.5} aria-hidden="true" style={{ color: currentTheme?.swatches.bg, position: 'relative' }} />
         </span>
-      </motion.button>
+      </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            role="menu"
-            aria-label="Theme options"
-            initial={{ opacity: 0, y: -6, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.97 }}
-            transition={{ duration: 0.15, ease: [0.25, 0.1, 0.25, 1] as const }}
-            className="absolute right-0 top-[calc(100%+8px)] z-50 w-56 overflow-hidden rounded-xl border border-border-subtle bg-surface shadow-xl"
-          >
+      {/* Always mounted; open/close animates in pure CSS via @starting-style
+          (entry) + transition-discrete on `display` (exit) — no framer JS in
+          this always-rendered Nav component. `hidden` (display:none) when
+          closed keeps it out of the tab order + a11y tree. */}
+      <div
+        role="menu"
+        aria-label="Theme options"
+        className={cn(
+          'absolute right-0 top-[calc(100%+8px)] z-50 w-56 origin-top-right overflow-hidden rounded-xl border border-border-subtle bg-surface shadow-xl',
+          'transition-[opacity,transform,display] duration-150 ease-out transition-discrete',
+          open
+            ? 'opacity-100 translate-y-0 scale-100 starting:opacity-0 starting:-translate-y-1.5 starting:scale-95'
+            : 'pointer-events-none hidden -translate-y-1.5 scale-95 opacity-0'
+        )}
+      >
             <div className="border-b border-border-subtle px-3 py-1.5">
               <p className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
                 Theme
@@ -267,9 +278,7 @@ export default function ThemePicker() {
                 );
               })}
             </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -25,17 +25,21 @@ const COLORS = [
   new THREE.Color('#6b5e54'), // earth
 ];
 
-function ScrollCamera() {
+function ScrollCamera({ active }: { active: boolean }) {
   const { camera } = useThree();
   const scrollRef = useRef(0);
 
   useEffect(() => {
+    // Only listen while the field is on-screen — no scroll work once the hero
+    // has scrolled away (and the render loop is paused anyway).
+    if (!active) return;
     const onScroll = () => {
       scrollRef.current = window.scrollY / window.innerHeight;
     };
+    onScroll(); // sync immediately on (re)activation
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [active]);
 
   useFrame(() => {
     const t = scrollRef.current;
@@ -132,6 +136,8 @@ function Particles() {
 export default function ParticleField() {
   const [visible, setVisible] = useState(true);
   const [supported, setSupported] = useState(true);
+  const [active, setActive] = useState(true);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Detect WebGL availability up-front — headless Chrome under --disable-gpu
@@ -163,17 +169,32 @@ export default function ParticleField() {
     };
   }, []);
 
+  // Pause the render loop when the field scrolls out of view. frameloop="never"
+  // halts R3F's rAF entirely (no wasted off-screen WebGL); "always" resumes it.
+  useEffect(() => {
+    if (!visible || !supported) return;
+    const el = wrapperRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setActive(entry.isIntersecting),
+      { threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [visible, supported]);
+
   if (!visible || !supported) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0">
+    <div ref={wrapperRef} className="pointer-events-none absolute inset-0">
       <Canvas
+        frameloop={active ? 'always' : 'never'}
         camera={{ position: [0, 0, 5], fov: 60 }}
         dpr={[1, 1.5]}
         gl={{ alpha: true, antialias: false, powerPreference: 'low-power' }}
         style={{ background: 'transparent' }}
       >
-        <ScrollCamera />
+        <ScrollCamera active={active} />
         <Particles />
       </Canvas>
     </div>

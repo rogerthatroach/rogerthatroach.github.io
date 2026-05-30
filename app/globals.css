@@ -50,6 +50,16 @@
   }
 }
 
+/* content-visibility:auto — skip layout/paint for off-screen blocks (the long
+   case-study sections), a direct rendering-work win on tall pages. The `auto`
+   keyword in contain-intrinsic-size makes the browser remember each block's
+   real rendered size after first paint, so the 600px placeholder only ever
+   applies once and never causes a visible shift (blocks are below the fold). */
+@utility cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 600px;
+}
+
 @layer base {
   /* Light mode (default) — wabi-sabi: warm paper, sakura accent */
   :root {
@@ -205,21 +215,12 @@
     color: var(--color-bg);
   }
 
-  /* Smooth theme transitions on all themed elements */
-  *,
-  *::before,
-  *::after {
-    transition-property: background-color, border-color, color, box-shadow;
-    transition-duration: 0.2s;
-    transition-timing-function: ease;
-  }
-
-  /* Exclude animations from theme transitions */
-  [data-framer-motion],
-  canvas,
-  svg circle[r="3"] {
-    transition: none !important;
-  }
+  /* No universal `* { transition }` rule (removed 2026-05-30): it forced a
+     style recalc on every element on every hover/theme change — an INP tax.
+     Theme switches now ride a single View Transition crossfade (started in
+     ThemePicker), with the cheap `body` color transition above as the no-VT
+     fallback. Interactive elements that need a color ease carry an explicit
+     `transition-colors` utility at the call site. */
 
   /* Focus-visible styles for keyboard navigation */
   :focus-visible {
@@ -317,14 +318,14 @@ html.dark .palette-border-l {
 /* KaTeX — neutralize only the Tailwind properties that break rendering.
    `all: revert` was destroying KaTeX's own CSS (fonts, display, positioning).
    Instead, surgically undo only Tailwind preflight's border reset and
-   the universal theme transition rule. */
+   pin transitions off so a theme crossfade never animates glyph metrics. */
 .katex,
 .katex * {
   /* Undo Tailwind preflight border reset (sets border-width:0 on *) */
   border-width: revert;
   border-style: revert;
   border-color: revert;
-  /* Undo the universal theme transition applied to * */
+  /* Belt-and-suspenders: never transition KaTeX glyphs */
   transition: none !important;
   /* Ensure KaTeX's box-sizing is respected */
   box-sizing: content-box;
