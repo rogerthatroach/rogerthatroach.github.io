@@ -3,6 +3,7 @@
 import {
   ReactFlow,
   Background,
+  Controls,
   type Node,
   type Edge,
   useNodesState,
@@ -127,6 +128,7 @@ export default function DocumentIntelligenceDiagram() {
         className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
+        <Controls showInteractive={false} position="bottom-right" />
       </ReactFlow>
     </div>
   );

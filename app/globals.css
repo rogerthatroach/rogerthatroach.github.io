@@ -280,6 +280,29 @@ html.dark .palette-border-l {
 }
 
 /* Respect reduced motion preference */
+/* ReactFlow Controls (zoom + / − / fit-view). The fit-view button resets a
+   panned/zoomed diagram to its default framing. Themed to the active palette;
+   higher-specificity selectors (.react-flow .react-flow__controls*) so these
+   win over @xyflow's dist/style.css regardless of chunk load order. */
+.react-flow .react-flow__controls {
+  box-shadow: none;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+.react-flow .react-flow__controls-button {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+.react-flow .react-flow__controls-button:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+.react-flow .react-flow__controls-button svg {
+  fill: currentColor;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

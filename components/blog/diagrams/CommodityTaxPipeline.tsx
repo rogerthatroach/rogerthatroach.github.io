@@ -4,6 +4,7 @@ import { memo, useState } from 'react';
 import {
   ReactFlow,
   Background,
+  Controls,
   Handle,
   Position,
   type Node,
@@ -540,6 +541,7 @@ export default function CommodityTaxPipeline() {
         className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
+        <Controls showInteractive={false} position="bottom-right" />
       </ReactFlow>
     </div>
   );
