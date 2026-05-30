@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MoreVertical, X, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -12,6 +13,11 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  // aria-current="page" for the active nav item; treats /blog/* etc. as
+  // under their section root so deep pages still mark the right nav link.
+  const isActive = (href: string) =>
+    href !== '/' && (pathname === href || pathname.startsWith(`${href}/`));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -69,7 +75,8 @@ export default function Nav() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-xs text-text-secondary transition-colors hover:text-text-primary md:text-sm"
+                aria-current={isActive(link.href) ? 'page' : undefined}
+                className="text-xs text-text-secondary transition-colors hover:text-text-primary aria-[current=page]:text-text-primary md:text-sm"
               >
                 {link.label}
               </Link>
@@ -152,6 +159,7 @@ export default function Nav() {
                           <Link
                             href={link.href}
                             role="menuitem"
+                            aria-current={isActive(link.href) ? 'page' : undefined}
                             onClick={() => setMenuOpen(false)}
                             className={commonClass}
                           >

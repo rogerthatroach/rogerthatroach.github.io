@@ -91,7 +91,7 @@ const THEMES: ThemeOption[] = [
     name: 'Amethyst',
     description: 'Soft glass · Themis (light)',
     base: 'light',
-    swatches: { bg: '#f6f4f8', accent: '#7e6aa8', text: '#1c1822' },
+    swatches: { bg: '#f6f4f8', accent: '#6d5896', text: '#1c1822' },
   },
   {
     id: 'themis-dark',

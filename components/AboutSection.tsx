@@ -15,16 +15,18 @@ export default function AboutSection() {
   return (
     <section ref={ref} id="about" className="px-6 py-14 md:px-16 md:py-16">
       <div className="mx-auto max-w-content">
-        <motion.h2
-          // initial={false}: h2 is above the fold on mobile; letting it render
+        <motion.h1
+          // initial={false}: h1 is above the fold on mobile; letting it render
           // in its final state removes ~600ms from LCP since the mobile LCP
           // target on /about is this heading (portrait is below on narrow vw).
+          // h1 (not h2) so /about has a top-level page title — every other
+          // route does; this was the lone document-outline outlier (WCAG 1.3.1).
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 font-display text-2xl font-bold text-text-primary sm:text-3xl"
         >
           About
-        </motion.h2>
+        </motion.h1>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,42rem)_auto] lg:gap-14">
           {/* Text column */}
