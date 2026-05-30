@@ -136,6 +136,8 @@ export default function CombustionDiagram() {
         minZoom={0.3}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
+        zoomOnScroll={false}
+        preventScrolling={false}
         className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
