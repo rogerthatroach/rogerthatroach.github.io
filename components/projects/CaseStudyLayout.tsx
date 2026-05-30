@@ -25,7 +25,7 @@ const FADE_UP = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] },
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] as const },
   }),
 };
 
@@ -51,7 +51,7 @@ function Section({ id, title, children }: { id: string; title: string; children:
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
-      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] as const }}
       className="mt-16 scroll-mt-24"
     >
       <h2 className="font-display text-xl font-bold tracking-tight text-text-primary">{title}</h2>

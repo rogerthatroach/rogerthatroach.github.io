@@ -124,7 +124,7 @@ export default function Nav() {
                 initial={{ opacity: 0, y: -6, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] as const }}
                 className="absolute right-0 top-[calc(100%+0.5rem)] min-w-48 overflow-hidden rounded-xl border border-border-subtle bg-linear-to-b from-surface-hover to-surface shadow-2xl"
               >
                 <ul className="py-1">

@@ -18,7 +18,7 @@ const FADE_UP = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.3 + i * 0.15, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { delay: 0.3 + i * 0.15, duration: 0.7, ease: [0.25, 0.1, 0.25, 1] as const },
   }),
 };
 
@@ -234,7 +234,7 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }}
                 className="flex items-baseline gap-3"
               >
                 <span className="font-mono text-2xl font-bold text-text-primary sm:text-3xl">

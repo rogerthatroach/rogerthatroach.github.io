@@ -122,7 +122,7 @@ export default function ComposeLedger({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] }}
+                      transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] as const }}
                       className="overflow-hidden"
                     >
                       <ul className="ml-8 mt-1 space-y-0.5 pb-3">
