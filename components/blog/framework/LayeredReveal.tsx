@@ -91,7 +91,7 @@ function LayerPanel({
       ref={ref}
       style={style}
       className={cn(
-        'rounded-xl border border-border-subtle bg-surface/60 p-5 shadow-sm backdrop-blur-sm md:p-6'
+        'rounded-xl border border-border-subtle bg-surface/60 p-5 shadow-xs backdrop-blur-xs md:p-6'
       )}
     >
       <div className="mb-3 flex items-center justify-between gap-3">

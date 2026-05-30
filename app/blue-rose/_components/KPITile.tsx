@@ -32,10 +32,10 @@ export default function KPITile({
         : 'var(--themis-secondary)';
 
   return (
-    <div className="group relative flex flex-col rounded-2xl border border-border-subtle bg-surface/40 px-4 py-4 transition-all hover:border-[var(--themis-primary)]/30 hover:bg-[var(--themis-glass-tint)]">
+    <div className="group relative flex flex-col rounded-2xl border border-border-subtle bg-surface/40 px-4 py-4 transition-all hover:border-(--themis-primary)/30 hover:bg-(--themis-glass-tint)">
       <div className="flex items-center justify-between">
         <span
-          className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--themis-glass-tint)]"
+          className="flex h-7 w-7 items-center justify-center rounded-lg bg-(--themis-glass-tint)"
           style={{ color: accent ?? 'var(--themis-primary)' }}
           aria-hidden="true"
         >

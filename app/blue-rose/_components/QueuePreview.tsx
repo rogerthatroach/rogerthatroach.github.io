@@ -94,7 +94,7 @@ export default function QueuePreview() {
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-md border border-[var(--themis-primary)]/30 bg-[var(--themis-glass-tint)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors hover:bg-[var(--themis-primary)]/15"
+              className="rounded-md border border-(--themis-primary)/30 bg-(--themis-glass-tint) px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors hover:bg-(--themis-primary)/15"
               style={{ color: 'var(--themis-primary)' }}
             >
               Clear filters
@@ -138,8 +138,8 @@ export default function QueuePreview() {
               className={cn(
                 'group relative flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors',
                 'hover:bg-surface-hover/60',
-                unreadCount > 0 && !isActive && 'bg-[var(--themis-glass-tint)]',
-                isActive && 'bg-[var(--themis-glass-tint)]',
+                unreadCount > 0 && !isActive && 'bg-(--themis-glass-tint)',
+                isActive && 'bg-(--themis-glass-tint)',
               )}
             >
               {(unreadCount > 0 || isActive) && (
@@ -190,7 +190,7 @@ export default function QueuePreview() {
                     <Sparkles
                       size={9}
                       aria-hidden="true"
-                      className="shrink-0 translate-y-[1px]"
+                      className="shrink-0 translate-y-px"
                     />
                     <span className="min-w-0 truncate text-text-secondary">
                       {s.diane.summary}

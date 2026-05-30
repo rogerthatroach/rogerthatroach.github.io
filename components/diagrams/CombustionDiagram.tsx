@@ -123,7 +123,7 @@ export default function CombustionDiagram() {
   const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
-    <div className="h-[500px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-sm sm:h-[600px]">
+    <div className="h-[500px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-xs sm:h-[600px]">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -136,7 +136,7 @@ export default function CombustionDiagram() {
         minZoom={0.3}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
-        className="[&_.react-flow__background]:!bg-transparent"
+        className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
       </ReactFlow>

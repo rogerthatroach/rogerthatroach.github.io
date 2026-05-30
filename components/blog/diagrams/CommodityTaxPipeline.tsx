@@ -71,15 +71,15 @@ function PillNode({ data }: NodeProps) {
       onMouseLeave={() => setHovered(false)}
       className="relative"
     >
-      <Handle type="target" position={Position.Top} id="t" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Bottom} id="b" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="target" position={Position.Left} id="l" className="!opacity-0 !w-1 !h-1" />
-      <Handle type="source" position={Position.Right} id="r" className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} id="t" className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Bottom} id="b" className="opacity-0! w-1! h-1!" />
+      <Handle type="target" position={Position.Left} id="l" className="opacity-0! w-1! h-1!" />
+      <Handle type="source" position={Position.Right} id="r" className="opacity-0! w-1! h-1!" />
 
       <motion.div
         whileHover={{ scale: 1.04 }}
         transition={{ type: 'spring', stiffness: 380, damping: 24 }}
-        className={`rounded-full border-2 backdrop-blur-sm whitespace-nowrap ${padding}`}
+        className={`rounded-full border-2 backdrop-blur-xs whitespace-nowrap ${padding}`}
         style={{
           backgroundColor: `${d.color}1f`,
           borderColor: d.color,
@@ -122,9 +122,9 @@ function RailNode({ data }: NodeProps) {
   const d = data as unknown as RailNodeData;
   return (
     <div className="relative">
-      <Handle type="target" position={Position.Top} className="!opacity-0 !w-1 !h-1" />
+      <Handle type="target" position={Position.Top} className="opacity-0! w-1! h-1!" />
       <div
-        className="rounded-2xl border-2 px-5 py-3 backdrop-blur-sm"
+        className="rounded-2xl border-2 px-5 py-3 backdrop-blur-xs"
         style={{
           width: d.width ?? 820,
           backgroundColor: `${d.color}12`,
@@ -535,7 +535,7 @@ export default function CommodityTaxPipeline() {
         minZoom={0.2}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
-        className="[&_.react-flow__background]:!bg-transparent"
+        className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />
       </ReactFlow>

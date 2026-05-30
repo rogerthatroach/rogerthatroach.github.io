@@ -39,7 +39,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     strong: ({ children }) => <strong className="font-semibold text-text-primary">{children}</strong>,
     em: ({ children }) => <em>{children}</em>,
     code: ({ children }) => (
-      <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs">{children}</code>
+      <code className="rounded-sm bg-surface px-1.5 py-0.5 font-mono text-xs">{children}</code>
     ),
     pre: ({ children }) => (
       <pre className="my-4 overflow-x-auto rounded-lg bg-surface p-4 font-mono text-xs text-text-secondary">

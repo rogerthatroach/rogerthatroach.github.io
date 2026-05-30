@@ -129,7 +129,7 @@ export default function ContextTab() {
                 <dt className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
                   {f.label}
                 </dt>
-                <dd className="mt-0.5 whitespace-pre-wrap break-words text-[12.5px] leading-snug text-text-primary">
+                <dd className="mt-0.5 whitespace-pre-wrap wrap-break-word text-[12.5px] leading-snug text-text-primary">
                   {String(f.value) || (
                     <span className="font-mono text-[10px] uppercase tracking-wider text-text-tertiary">
                       empty
@@ -184,7 +184,7 @@ export default function ContextTab() {
                 {insights.anomalies.map((hint, i) => (
                   <li
                     key={i}
-                    className="flex items-start gap-2 rounded-lg border border-[var(--themis-needs-info)]/30 bg-[var(--themis-needs-info-bg)] px-2.5 py-1.5"
+                    className="flex items-start gap-2 rounded-lg border border-(--themis-needs-info)/30 bg-(--themis-needs-info-bg) px-2.5 py-1.5"
                   >
                     <AlertTriangle
                       size={11}

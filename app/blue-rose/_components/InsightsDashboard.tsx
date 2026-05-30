@@ -216,7 +216,7 @@ function ChartCard({ title, subtitle, focused, children }: ChartCardProps) {
       className={cn(
         'rounded-2xl border bg-surface/40 px-4 py-4 transition-all duration-300',
         focused
-          ? 'border-[var(--themis-primary)]/60 bg-[var(--themis-glass-tint)] shadow-[0_0_0_1px_var(--themis-primary)]'
+          ? 'border-(--themis-primary)/60 bg-(--themis-glass-tint) shadow-[0_0_0_1px_var(--themis-primary)]'
           : 'border-border-subtle',
       )}
     >

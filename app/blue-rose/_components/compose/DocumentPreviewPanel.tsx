@@ -90,7 +90,7 @@ export default function DocumentPreviewPanel({
                 <div className="flex items-end justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <span
-                      className="flex h-10 w-10 items-center justify-center rounded font-display text-[10px] font-bold leading-tight text-white"
+                      className="flex h-10 w-10 items-center justify-center rounded-sm font-display text-[10px] font-bold leading-tight text-white"
                       style={{ background: '#1e3a5f' }}
                     >
                       GN

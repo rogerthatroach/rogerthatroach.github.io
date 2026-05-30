@@ -62,7 +62,7 @@ export default function AuditPage() {
       >
         <motion.div variants={fadeUp} className="mb-8">
           <span
-            className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--themis-glass-tint)] ring-1 ring-[var(--themis-glass-border)]"
+            className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-(--themis-glass-tint) ring-1 ring-(--themis-glass-border)"
             style={{ color: 'var(--themis-primary)' }}
             aria-hidden="true"
           >
@@ -102,7 +102,7 @@ export default function AuditPage() {
                   className={cn(
                     'rounded-md px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors',
                     active
-                      ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+                      ? 'bg-(--themis-primary) text-(--color-bg)'
                       : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
                   )}
                 >
@@ -127,7 +127,7 @@ export default function AuditPage() {
                   className={cn(
                     'rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider transition-colors',
                     active
-                      ? 'bg-[var(--themis-primary)] text-[var(--color-bg)]'
+                      ? 'bg-(--themis-primary) text-(--color-bg)'
                       : 'border border-border-subtle text-text-secondary hover:bg-surface-hover hover:text-text-primary',
                   )}
                 >

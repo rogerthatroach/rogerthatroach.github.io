@@ -125,7 +125,7 @@ export default function QueueFilterPanel({ anchorRef, open, onClose }: QueueFilt
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -4, scale: 0.97 }}
           transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
-          className="themis-glass-pop fixed z-[100] flex max-h-[80vh] flex-col overflow-hidden rounded-xl"
+          className="themis-glass-pop fixed z-100 flex max-h-[80vh] flex-col overflow-hidden rounded-xl"
           style={{ top: pos.top, left: pos.left, width: PANEL_WIDTH }}
         >
           <header className="flex items-center justify-between border-b border-border-subtle px-3.5 py-2.5">
@@ -325,7 +325,7 @@ function Chip({
       className={cn(
         'group flex items-center gap-1.5 rounded-full border px-2 py-1 text-[11.5px] font-medium transition-colors',
         active
-          ? 'border-transparent bg-[var(--themis-primary)] text-[var(--color-bg)]'
+          ? 'border-transparent bg-(--themis-primary) text-(--color-bg)'
           : 'border-border-subtle bg-surface/60 text-text-secondary hover:bg-surface-hover hover:text-text-primary',
       )}
     >
@@ -368,11 +368,11 @@ function ToggleRow({
       <span
         className={cn(
           'flex h-7 w-12 items-center rounded-full px-1 transition-colors',
-          active ? 'justify-end bg-[var(--themis-primary)]' : 'justify-start bg-surface-hover',
+          active ? 'justify-end bg-(--themis-primary)' : 'justify-start bg-surface-hover',
         )}
       >
         <span
-          className="block h-5 w-5 rounded-full bg-[var(--color-bg)] shadow-sm"
+          className="block h-5 w-5 rounded-full bg-(--color-bg) shadow-xs"
           aria-hidden="true"
         />
       </span>

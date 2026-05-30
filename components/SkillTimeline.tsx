@@ -190,7 +190,7 @@ function TimelineRow({
           transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.05 }}
           className="z-10 h-4 w-4 rounded-full border-2 border-background bg-accent"
         />
-        <div className="w-px flex-1 bg-gradient-to-b from-border-subtle to-transparent" />
+        <div className="w-px flex-1 bg-linear-to-b from-border-subtle to-transparent" />
       </div>
 
       <div className={cn('ml-8 flex-1 pb-12 md:ml-0 md:flex-none', columnClasses)}>

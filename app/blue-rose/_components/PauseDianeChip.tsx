@@ -38,8 +38,8 @@ export default function PauseDianeChip() {
         className={cn(
           'inline-flex h-9 items-center gap-1.5 rounded-full border px-3 font-mono text-[10px] uppercase leading-none tracking-widest transition-colors',
           dianePaused
-            ? 'border-[var(--themis-needs-info)]/50 bg-[var(--themis-needs-info-bg)] text-[var(--themis-needs-info)] hover:brightness-105'
-            : 'border-[var(--themis-sakura-border)] bg-transparent text-[var(--themis-sakura)] hover:bg-[var(--themis-sakura-bg)]',
+            ? 'border-(--themis-needs-info)/50 bg-(--themis-needs-info-bg) text-(--themis-needs-info) hover:brightness-105'
+            : 'border-(--themis-sakura-border) bg-transparent text-(--themis-sakura) hover:bg-(--themis-sakura-bg)',
         )}
       >
         {dianePaused ? (
@@ -57,7 +57,7 @@ export default function PauseDianeChip() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 px-4 backdrop-blur-xs"
             onClick={() => setConfirming(false)}
             role="presentation"
           >

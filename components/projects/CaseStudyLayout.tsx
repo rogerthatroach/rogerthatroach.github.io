@@ -136,7 +136,7 @@ function CaseStudyTOCMobile() {
           <li key={s.id}>
             <a
               href={`#${s.id}`}
-              className="block rounded px-2 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
+              className="block rounded-sm px-2 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
             >
               {s.label}
             </a>
@@ -156,7 +156,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
       <main id="main-content" className="px-6 pt-24 pb-12 md:px-16">
         {/* Centered on all widths; from xl, a [sticky ToC | article] grid so
             the ToC sits in its own column instead of overlapping the article. */}
-        <div className="mx-auto max-w-content xl:flex xl:max-w-[78rem] xl:gap-12">
+        <div className="mx-auto max-w-content xl:flex xl:max-w-312 xl:gap-12">
           <CaseStudyTOC />
           <div className="min-w-0 xl:max-w-content xl:flex-1">
           {/* Breadcrumbs */}

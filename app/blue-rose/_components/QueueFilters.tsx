@@ -42,7 +42,7 @@ export default function QueueFilters() {
             value={queueFilters.search}
             onChange={(e) => patchFilters({ search: e.target.value })}
             placeholder="Search submissions"
-            className="block w-full rounded-md border border-border-subtle bg-surface/60 py-1.5 pl-7 pr-7 text-[12px] text-text-primary outline-none transition-colors placeholder:text-text-tertiary focus:border-[var(--themis-primary)] focus:ring-2 focus:ring-[var(--themis-primary)]/20"
+            className="block w-full rounded-md border border-border-subtle bg-surface/60 py-1.5 pl-7 pr-7 text-[12px] text-text-primary outline-hidden transition-colors placeholder:text-text-tertiary focus:border-(--themis-primary) focus:ring-2 focus:ring-(--themis-primary)/20"
           />
           {queueFilters.search && (
             <button
@@ -65,7 +65,7 @@ export default function QueueFilters() {
           className={cn(
             'relative flex h-8 shrink-0 items-center gap-1.5 rounded-md border px-2.5 transition-colors',
             count > 0
-              ? 'border-[var(--themis-primary)]/50 bg-[var(--themis-glass-tint)] text-[var(--themis-primary)]'
+              ? 'border-(--themis-primary)/50 bg-(--themis-glass-tint) text-(--themis-primary)'
               : 'border-border-subtle bg-surface/60 text-text-secondary hover:bg-surface-hover hover:text-text-primary',
           )}
         >
@@ -198,12 +198,12 @@ function ActiveChips() {
           key={c.key}
           type="button"
           onClick={c.remove}
-          className="group flex items-center gap-1 rounded-full border border-[var(--themis-primary)]/30 bg-[var(--themis-glass-tint)] py-0.5 pl-1.5 pr-0.5 text-[10.5px] transition-colors hover:bg-[var(--themis-primary)]/15"
+          className="group flex items-center gap-1 rounded-full border border-(--themis-primary)/30 bg-(--themis-glass-tint) py-0.5 pl-1.5 pr-0.5 text-[10.5px] transition-colors hover:bg-(--themis-primary)/15"
           style={{ color: 'var(--themis-primary)' }}
           aria-label={`Remove filter: ${c.label}`}
         >
           <span className="truncate">{c.label}</span>
-          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full transition-colors group-hover:bg-[var(--themis-primary)]/20">
+          <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full transition-colors group-hover:bg-(--themis-primary)/20">
             <X size={9} aria-hidden="true" />
           </span>
         </button>

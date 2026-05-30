@@ -178,7 +178,7 @@ export default function ThemePicker() {
         aria-label="Change theme"
         aria-haspopup="menu"
         aria-expanded={open}
-        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-sm transition-colors hover:bg-surface-hover hover:text-text-primary"
+        className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-xs transition-colors hover:bg-surface-hover hover:text-text-primary"
       >
         {/* Current theme shown as a tri-color ring: bg, accent, text */}
         <span className="relative flex h-5 w-5 items-center justify-center">
@@ -231,7 +231,7 @@ export default function ThemePicker() {
                       )}
                     >
                       {/* Tri-color swatch preview (compact) */}
-                      <span className="relative flex h-5 w-5 shrink-0 overflow-hidden rounded border border-border-subtle">
+                      <span className="relative flex h-5 w-5 shrink-0 overflow-hidden rounded-sm border border-border-subtle">
                         <span
                           className="absolute inset-0"
                           style={{ backgroundColor: theme.swatches.bg }}

@@ -31,7 +31,7 @@ export default function ShareDashboardButton({ dashboard }: ShareDashboardButton
       type="button"
       onClick={onShare}
       disabled={!dashboard}
-      className="relative flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/60 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-[var(--themis-primary)]/40 hover:text-text-primary disabled:opacity-50"
+      className="relative flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/60 px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider text-text-secondary transition-colors hover:border-(--themis-primary)/40 hover:text-text-primary disabled:opacity-50"
       title="Copy share link"
     >
       <AnimatePresence mode="wait">

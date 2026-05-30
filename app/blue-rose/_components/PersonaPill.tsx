@@ -58,7 +58,7 @@ export default function PersonaPill({ personas, currentPersonaId, onSwitch }: Pe
         aria-expanded={open}
         className={cn(
           'group flex items-center gap-2.5 rounded-full px-2 py-1 pl-1 pr-3 text-left',
-          'border border-border-subtle bg-surface/70 backdrop-blur-sm',
+          'border border-border-subtle bg-surface/70 backdrop-blur-xs',
           'transition-colors hover:bg-surface-hover',
         )}
       >
