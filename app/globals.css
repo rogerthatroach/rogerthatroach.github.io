@@ -97,11 +97,15 @@
     --color-surface: #ffffff;
     --color-surface-hover: #ede9f1;
     --color-border: #d8d0e2;
-    --color-accent: #7e6aa8;
+    /* accent darkened from #7e6aa8 → WCAG AA: 5.51:1 on bg, 4.91:1 on
+       accent-muted (#ede5f5). Prior value failed (4.26 / 3.79) on the
+       100+ small-text accent usages incl. the homepage hero CTA. */
+    --color-accent: #6d5896;
     --color-accent-muted: #ede5f5;
     --color-text-primary: #1c1822;
     --color-text-secondary: #5a5566;
-    --color-text-tertiary: #797184;
+    /* tertiary darkened from #797184 → 4.94:1 on bg (was 4.26, sub-AA). */
+    --color-text-tertiary: #6f6779;
     --color-diagram-grid: #d4ccdd;
   }
 
