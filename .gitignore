@@ -37,9 +37,15 @@ docs/specs/
 docs/career/
 docs/reference/
 docs/plans/
+docs/audits/
+docs/blogs/
 CLAUDE.md
+CLAUDE_CODE_HANDOFF.md
 CHANGELOG.md
 .claude/
+# Working resume sources — never publish (filenames can encode intent)
+*.docx
+docs/Resume_*
 
 # Source/working files for assets that get post-processed
 # The processed outputs (portrait.webp, rbc.svg, tcs.svg) are committed;
