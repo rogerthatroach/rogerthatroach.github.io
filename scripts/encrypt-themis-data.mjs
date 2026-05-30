@@ -26,7 +26,8 @@ const SEED_PATH = resolve(ROOT, 'data/themis/seed.json');
 const OUT_PATH = resolve(ROOT, 'public/blue-rose/data.enc.json');
 const PASSPHRASE_FILE = resolve(ROOT, '.themis-passphrase');
 
-const PBKDF2_ITERATIONS = 200_000;
+// 600k per current OWASP guidance. Must match app/blue-rose/_lib/crypto.ts.
+const PBKDF2_ITERATIONS = 600_000;
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
 const KEY_BITS = 256;

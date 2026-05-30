@@ -129,6 +129,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
       <head>
+        {/* Best-effort hardening via <meta> (GitHub Pages can't set response
+            headers). Only directives that don't break a static Next export
+            with inline hydration scripts: no script-src/default-src (would
+            block Next's inline scripts + the theme bootstrap). Clickjacking
+            (frame-ancestors / X-Frame-Options) can't be set via meta — that's
+            a residual GitHub Pages limitation. */}
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="object-src 'none'; base-uri 'self'; upgrade-insecure-requests"
+        />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           type="application/ld+json"
