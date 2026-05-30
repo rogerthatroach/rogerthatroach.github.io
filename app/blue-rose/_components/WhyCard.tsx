@@ -283,7 +283,7 @@ function WhyCardPopulated({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] as const }}
             className="overflow-hidden"
           >
             <div className="pt-3">

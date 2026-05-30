@@ -142,7 +142,7 @@ export default function FieldThread({
           initial={{ opacity: 0, y: -4, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -4, scale: 0.97 }}
-          transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+          transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] as const }}
           className="themis-glass-pop fixed z-100 overflow-hidden rounded-xl"
           style={{ top: pos.top, left: pos.left, width: POPOVER_WIDTH }}
         >

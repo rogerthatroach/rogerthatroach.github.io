@@ -82,7 +82,7 @@ export default function StepThrough({
               initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
               className="text-sm leading-relaxed text-text-secondary"
             >
               {current.content}

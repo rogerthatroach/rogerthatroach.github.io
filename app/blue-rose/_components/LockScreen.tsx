@@ -80,7 +80,7 @@ export default function LockScreen({ onUnlock, blob, blobError, cachedPassphrase
       <motion.div
         initial={reduceMotion ? { opacity: 1 } : { opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1.4, ease: [0.25, 0.1, 0.25, 1] }}
+        transition={{ duration: 1.4, ease: [0.25, 0.1, 0.25, 1] as const }}
         className={cn(
           'relative z-10 flex w-full max-w-[280px] flex-col items-center gap-8',
           shaking && 'themis-shake',
