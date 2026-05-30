@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, ArrowRight, FileText, Download, Calendar } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import ScrollProgressRail from '@/components/ui/ScrollProgressRail';
 import { PAPERS } from '@/data/papers';
 
 export function generateStaticParams() {
@@ -81,6 +82,7 @@ export default async function PaperLandingPage(
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
+      <ScrollProgressRail />
       <Nav />
       <main
         id="main-content"

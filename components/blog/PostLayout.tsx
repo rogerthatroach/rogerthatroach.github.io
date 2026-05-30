@@ -9,6 +9,7 @@ import type { BlogPostMeta, Reference, FurtherReadingItem } from '@/data/posts';
 import ReferenceList from './ReferenceList';
 import FurtherReading from './FurtherReading';
 import TableOfContents from './TableOfContents';
+import ScrollProgressRail from '@/components/ui/ScrollProgressRail';
 
 interface RelatedProject {
   title: string;
@@ -35,6 +36,8 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
   });
 
   return (
+    <>
+    <ScrollProgressRail />
     <motion.article
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -122,5 +125,6 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
         <FurtherReading items={furtherReading} />
       </div>
     </motion.article>
+    </>
   );
 }
