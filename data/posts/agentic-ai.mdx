@@ -190,7 +190,7 @@ The confidentiality guarantee holds only if the architectural boundary is enforc
 2. **Network isolation:** The LLM API call originates from a service that has no database credentials and no access to data stores
 3. **Audit logging:** Every LLM invocation is logged with its full input, enabling automated verification that <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D} = \\emptyset")} />
 
-## 5. Entitlement Model: permission-to-SQL Translation
+## 5. Entitlement Model: Permission-to-SQL Translation
 
 ### 5.1 The Translation Problem
 
@@ -251,7 +251,7 @@ The production system implements this translation as a four-stage pipeline:
   </div>
 </TheoremBlock>
 
-<VisualizationContainer minHeight={400} caption="Figure 3: permission-to-SQL translation pipeline. Toggle between two different permission sets to see how the output SQL changes at each stage.">
+<VisualizationContainer minHeight={400} caption="Figure 3: Permission-to-SQL translation pipeline. Toggle between two different permission sets to see how the output SQL changes at each stage.">
   {(isVisible) => <PermissionCascade />}
 </VisualizationContainer>
 
