@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import type { Project } from '@/data/projects';
 import type { CaseStudy } from '@/data/projectCaseStudies';
 import PageTransition from '@/components/ui/PageTransition';
+import ScrollProgressRail from '@/components/ui/ScrollProgressRail';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import { paletteStyle } from '@/lib/palette';
@@ -52,7 +53,9 @@ function Section({ id, title, children }: { id: string; title: string; children:
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] as const }}
-      className="mt-16 scroll-mt-24"
+      // cv-auto: skip paint/layout while off-screen. The whileInView reveal
+      // (IntersectionObserver) still fires — cv:auto skips paint, not the DOM.
+      className="mt-16 scroll-mt-24 cv-auto"
     >
       <h2 className="font-display text-xl font-bold tracking-tight text-text-primary">{title}</h2>
       <div className="mt-4 space-y-3 text-sm leading-relaxed text-text-secondary">
@@ -152,6 +155,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
 
   return (
     <PageTransition>
+      <ScrollProgressRail />
       <Nav />
       <main id="main-content" className="px-6 pt-24 pb-12 md:px-16">
         {/* Centered on all widths; from xl, a [sticky ToC | article] grid so
