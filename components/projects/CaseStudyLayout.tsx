@@ -86,13 +86,12 @@ function CaseStudyTOC() {
 
   return (
     <nav
-      // 2xl:block (≥1536px) — at 1280–1440 the fixed ToC at left:16px
-      // overlapped the main content column. Hide until there's real
-      // horizontal room in the margin. Below this breakpoint the ToC
-      // isn't available; once we migrate case-study layout to an in-flow
-      // grid we can reintroduce it at narrower widths (audit P0-2 C).
-      className="fixed top-28 hidden w-52 2xl:block"
-      style={{ left: 'max(1rem, calc((100vw - 64rem) / 2 - 14rem))' }}
+      // In-flow sticky sidebar from xl (≥1280px): lives in the left column of
+      // the content grid, so it never overlaps the article (the old fixed ToC
+      // could only appear ≥1536px). Below xl, CaseStudyTOCMobile renders the
+      // same links as a <details> disclosure at the top of the article.
+      aria-label="On this page"
+      className="hidden w-52 shrink-0 self-start xl:block xl:sticky xl:top-28"
     >
       <div className="max-h-[calc(100vh-8rem)] overflow-y-auto border-l border-border-subtle pl-4">
         <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
@@ -124,6 +123,30 @@ function CaseStudyTOC() {
   );
 }
 
+// Narrow-viewport ToC (< xl): a native <details> disclosure at the top of the
+// article. Same jump links as the sidebar; no JS, keyboard-accessible.
+function CaseStudyTOCMobile() {
+  return (
+    <details className="mt-8 rounded-lg border border-border-subtle bg-surface/50 xl:hidden">
+      <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">
+        On this page
+      </summary>
+      <ul className="border-t border-border-subtle px-2 py-2">
+        {TOC_SECTIONS.map((s) => (
+          <li key={s.id}>
+            <a
+              href={`#${s.id}`}
+              className="block rounded px-2 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
+            >
+              {s.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 export default function CaseStudyLayout({ project, caseStudy, diagram, showFormalBlogCta, showCompanionBlogCta }: CaseStudyLayoutProps) {
   const { sections } = caseStudy;
 
@@ -131,7 +154,11 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
     <PageTransition>
       <Nav />
       <main id="main-content" className="px-6 pt-24 pb-12 md:px-16">
-        <div className="mx-auto max-w-content">
+        {/* Centered on all widths; from xl, a [sticky ToC | article] grid so
+            the ToC sits in its own column instead of overlapping the article. */}
+        <div className="mx-auto max-w-content xl:flex xl:max-w-[78rem] xl:gap-12">
+          <CaseStudyTOC />
+          <div className="min-w-0 xl:max-w-content xl:flex-1">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-4">
             <Link
@@ -185,6 +212,8 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
               {project.caption}
             </p>
           </motion.div>
+
+          <CaseStudyTOCMobile />
 
           {/* Key stats */}
           <motion.div
@@ -256,9 +285,6 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
               </dl>
             </motion.div>
           )}
-
-          {/* TOC sidebar — xl screens only */}
-          <CaseStudyTOC />
 
           {/* Context */}
           <Section id="context" title="Context">
@@ -445,6 +471,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
               )}
             </motion.div>
           )}
+          </div>
         </div>
       </main>
       <Footer />
