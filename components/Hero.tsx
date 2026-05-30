@@ -188,7 +188,7 @@ export default function Hero() {
             />
           </Link>
           <Link
-            href="/about"
+            href="/resume"
             className="group inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-surface/50 px-5 py-2.5 text-sm font-medium text-text-primary transition-all hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
           >
             <FileBadge
