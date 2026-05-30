@@ -564,6 +564,8 @@ export default function AstraeusCascade() {
         minZoom={0.2}
         maxZoom={1.5}
         proOptions={{ hideAttribution: true }}
+        zoomOnScroll={false}
+        preventScrolling={false}
         className="[&_.react-flow__background]:bg-transparent!"
       >
         <Background color={gridColor} gap={24} size={1} />

@@ -107,7 +107,7 @@ export default function AboutSection() {
                 sizes="280px"
                 alt="Harmilap Singh Dhaliwal"
                 className="h-full w-full object-cover"
-                {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
+                fetchPriority="high"
               />
             </div>
 

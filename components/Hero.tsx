@@ -125,7 +125,7 @@ export default function Hero() {
               sizes="(max-width: 1024px) 194px, 244px"
               alt="Harmilap Singh Dhaliwal"
               className="h-full w-full object-cover"
-              {...({ fetchpriority: 'high' } as React.ImgHTMLAttributes<HTMLImageElement>)}
+              fetchPriority="high"
             />
           </motion.div>
 
