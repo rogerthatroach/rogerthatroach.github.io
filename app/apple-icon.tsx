@@ -1,5 +1,9 @@
 import { ImageResponse } from 'next/og';
 
+// Next 16 requires explicit force-static for ImageResponse metadata routes
+// under output:'export' (was implicit in 14).
+export const dynamic = 'force-static';
+
 // 180×180 home-screen icon for iOS (and a high-res icon for Android via the
 // manifest). Mirrors app/icon.tsx; opaque background since iOS masks corners.
 export const size = { width: 180, height: 180 };

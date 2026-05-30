@@ -10,11 +10,12 @@ export function generateStaticParams() {
   return PAPERS.map((p) => ({ slug: p.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const paper = PAPERS.find((p) => p.slug === params.slug);
   if (!paper) return { title: 'Paper not found' };
   const description = paper.subtitle ?? paper.abstract.slice(0, 180);
@@ -42,11 +43,12 @@ export async function generateMetadata({
 
 const SITE_URL = 'https://rogerthatroach.github.io';
 
-export default function PaperLandingPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function PaperLandingPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = await props.params;
   const paper = PAPERS.find((p) => p.slug === params.slug);
   if (!paper) notFound();
 
