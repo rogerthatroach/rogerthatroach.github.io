@@ -28,7 +28,17 @@ export const metadata: Metadata = {
     description:
       'Scrollytelling career arc with collapsible skills, education, awards, and writing links.',
     url: 'https://rogerthatroach.github.io/resume',
+    siteName: 'Harmilap Singh Dhaliwal',
+    locale: 'en_US',
     type: 'profile',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Resume — Harmilap Singh Dhaliwal',
+    description:
+      'Scrollytelling career arc with collapsible skills, education, awards, and writing links.',
+    images: ['/og-image.png'],
   },
 };
 
@@ -187,18 +197,23 @@ export default function ResumePage() {
           </div>
         </section>
 
-        {/* JSON-LD Person schema */}
+        {/* JSON-LD: ProfilePage referencing the single Person entity
+            (@id defined in app/layout.tsx) — avoids a second, conflicting
+            Person node, and intentionally does NOT expose a machine-readable
+            email (scraper-harvestable; the rest of the site doesn't either). */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
-              '@type': 'Person',
-              name: HERO.name,
-              jobTitle: HERO.title,
+              '@type': 'ProfilePage',
               url: 'https://rogerthatroach.github.io/resume',
-              sameAs: [HERO.links.linkedin, HERO.links.github],
-              email: `mailto:${HERO.links.email}`,
+              name: `Resume — ${HERO.name}`,
+              mainEntity: {
+                '@type': 'Person',
+                '@id': 'https://rogerthatroach.github.io/#person',
+                name: HERO.name,
+              },
             }),
           }}
         />
