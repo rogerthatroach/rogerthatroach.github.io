@@ -161,16 +161,18 @@ export default function ThemePicker() {
   const select = (id: ThemeId) => {
     setCurrent(id);
     setOpen(false);
-    // Crossfade the whole page's colors in one compositor pass via the View
-    // Transitions API (replaces the old universal `*{transition}` recalc tax).
-    // Runtime-guarded for browsers without it (Safari < 18), where the `body`
-    // color transition is the graceful fallback; skipped under reduced-motion.
+    // Smooth color crossfade scoped to the swap: enable the `.theme-transition`
+    // rule (globals.css) for the ~320ms it takes, then remove it — so there's
+    // no permanent hover/INP recalc tax. Skipped under reduced-motion.
+    const html = document.documentElement;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduce && typeof document.startViewTransition === 'function') {
-      document.startViewTransition(() => applyTheme(id));
-    } else {
+    if (reduce) {
       applyTheme(id);
+      return;
     }
+    html.classList.add('theme-transition');
+    applyTheme(id);
+    window.setTimeout(() => html.classList.remove('theme-transition'), 320);
   };
 
   if (!mounted) return <div className="h-11 w-11" />;
