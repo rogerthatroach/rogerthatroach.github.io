@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Fraunces } from 'next/font/google';
 import CommandPalette from '@/components/CommandPalette';
+import MotionProvider from '@/components/MotionProvider';
 import './globals.css';
 
 const inter = Inter({
@@ -58,6 +59,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
+        type: 'image/png',
         alt: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
       },
     ],
@@ -75,6 +77,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    types: {
+      'application/rss+xml': `${SITE_URL}/feed.xml`,
+    },
   },
 };
 
@@ -131,6 +136,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Person',
+              '@id': `${SITE_URL}/#person`,
               name: 'Harmilap Singh Dhaliwal',
               jobTitle: 'AI & Data Science Lead',
               url: SITE_URL,
@@ -160,10 +166,13 @@ export default function RootLayout({
         {/* Portfolio is publicly viewable. /blue-rose still has its
             own WhiteLodgeGate (AES-GCM passphrase gate) inside the
             /blue-rose route, independent of the main portfolio. */}
-        {children}
-        {/* ⌘K search — listens globally for Cmd/Ctrl+K and for the
-            `cmdk:open` custom event fired from mobile nav dropdown. */}
-        <CommandPalette />
+        {/* MotionProvider → all Framer Motion honors prefers-reduced-motion. */}
+        <MotionProvider>
+          {children}
+          {/* ⌘K search — listens globally for Cmd/Ctrl+K and for the
+              `cmdk:open` custom event fired from mobile nav dropdown. */}
+          <CommandPalette />
+        </MotionProvider>
       </body>
     </html>
   );

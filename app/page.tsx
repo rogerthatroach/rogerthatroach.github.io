@@ -32,17 +32,22 @@ export default function Home() {
 
   return (
     <main id="main-content">
-      {/* Priority-hinted preload for the LCP portrait. Next's auto-preload
-          doesn't carry fetchpriority; this one does. Next hoists <link>
-          tags inside app-router components into <head>. */}
-      <link
-        {...({
-          rel: 'preload',
-          as: 'image',
-          imagesrcset: '/images/portrait-sm.webp 700w, /images/portrait.webp 1000w',
-          imagesizes: '(max-width: 1024px) 160px, 202px',
-          fetchpriority: 'high',
-        } as React.HTMLAttributes<HTMLLinkElement>)}
+      {/* WebSite JSON-LD — reinforces the brand/site entity on the homepage.
+          The LCP portrait is preloaded automatically by Next from the Hero
+          <img fetchpriority="high" srcSet sizes> (correct 194/244 imageSizes);
+          a manual <link rel=preload> here was removed — it carried a stale
+          160/202 hint that conflicted with the real layout. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'WebSite',
+            name: 'Harmilap Singh Dhaliwal',
+            url: 'https://rogerthatroach.github.io',
+            author: { '@type': 'Person', '@id': 'https://rogerthatroach.github.io/#person' },
+          }),
+        }}
       />
       <Nav />
       <SectionProgress sections={HOME_SECTIONS} />
