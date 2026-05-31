@@ -170,6 +170,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body">
+        {/* Per-theme grain — a fixed noise layer behind all content (z-index:-1
+            under the body stacking context, so zero text-contrast impact).
+            Intensity is theme-driven via --grain-opacity; 0 on dark themes. */}
+        <div className="grain-overlay" aria-hidden="true" />
         {/* hi. curious how this was built? /colophon */}
         <a
           href="#main-content"
