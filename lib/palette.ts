@@ -17,10 +17,14 @@ export function paletteStyle(p: Pick<ProjectPalette, 'primary' | 'primaryLight'>
   return {
     '--p-d': p.primary,
     '--p-l': p.primaryLight,
-    '--p-bg-d': `${p.primary}15`,
-    '--p-bg-l': `${p.primaryLight}15`,
-    '--p-border-d': `${p.primary}30`,
-    '--p-border-l': `${p.primaryLight}30`,
+    // Tints via color-mix() rather than hex-alpha string concat. Opacities
+    // match the prior 0x15 / 0x30 hex-alpha exactly (21/255 = 8.24%,
+    // 48/255 = 18.82%), so the render is pixel-identical — just modern CSS
+    // that works for named/var colors too, not only 6-digit hex.
+    '--p-bg-d': `color-mix(in srgb, ${p.primary} 8.24%, transparent)`,
+    '--p-bg-l': `color-mix(in srgb, ${p.primaryLight} 8.24%, transparent)`,
+    '--p-border-d': `color-mix(in srgb, ${p.primary} 18.82%, transparent)`,
+    '--p-border-l': `color-mix(in srgb, ${p.primaryLight} 18.82%, transparent)`,
   } as React.CSSProperties;
 }
 
