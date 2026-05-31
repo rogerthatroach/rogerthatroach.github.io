@@ -25,5 +25,6 @@
 
 ## Notes
 
+- Machine-readable capabilities (projects + approach taxonomy): https://rogerthatroach.github.io/capabilities.json
 - Full sitemap: https://rogerthatroach.github.io/sitemap.xml
 - RSS feed: https://rogerthatroach.github.io/feed.xml
