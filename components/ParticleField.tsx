@@ -186,7 +186,14 @@ export default function ParticleField() {
   if (!visible || !supported) return null;
 
   return (
-    <div ref={wrapperRef} className="pointer-events-none absolute inset-0">
+    <div
+      ref={wrapperRef}
+      className="pointer-events-none absolute inset-0"
+      // Per-theme particle character: tilt the field's hue toward each theme's
+      // accent (cascades from --particle-hue, so it re-tints on theme change
+      // with no JS). 0deg on Sakura — its rose particles are the baseline.
+      style={{ filter: 'hue-rotate(var(--particle-hue, 0deg))' }}
+    >
       <Canvas
         frameloop={active ? 'always' : 'never'}
         camera={{ position: [0, 0, 5], fov: 60 }}
