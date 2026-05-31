@@ -10,6 +10,7 @@ import ReferenceList from './ReferenceList';
 import FurtherReading from './FurtherReading';
 import TableOfContents from './TableOfContents';
 import ScrollProgressRail from '@/components/ui/ScrollProgressRail';
+import { useHasNavigated } from '@/lib/useHasNavigated';
 
 interface RelatedProject {
   title: string;
@@ -35,11 +36,15 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
     timeZone: 'UTC',
   });
 
+  // Cold load → render the post (incl. the LCP title) at rest for fast LCP;
+  // in-app nav → fade. See useHasNavigated.
+  const hasNavigated = useHasNavigated();
+
   return (
     <>
     <ScrollProgressRail />
     <motion.article
-      initial={{ opacity: 0, y: 12 }}
+      initial={hasNavigated ? { opacity: 0, y: 12 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as const }}
       className="mx-auto max-w-content px-6 pb-16 pt-28 md:px-16"
