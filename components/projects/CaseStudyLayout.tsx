@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Calendar, Briefcase, CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useHasNavigated } from '@/lib/useHasNavigated';
 import type { Project } from '@/data/projects';
 import type { CaseStudy } from '@/data/projectCaseStudies';
 import PageTransition from '@/components/ui/PageTransition';
@@ -152,6 +153,10 @@ function CaseStudyTOCMobile() {
 
 export default function CaseStudyLayout({ project, caseStudy, diagram, showFormalBlogCta, showCompanionBlogCta }: CaseStudyLayoutProps) {
   const { sections } = caseStudy;
+  // Cold load → render the header (incl. the LCP title) at rest immediately for
+  // fast LCP; in-app nav → play the FADE_UP entrance. See useHasNavigated.
+  const hasNavigated = useHasNavigated();
+  const headerInitial = hasNavigated ? 'hidden' : false;
 
   return (
     <PageTransition>
@@ -185,7 +190,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
           <motion.div
             custom={0}
             variants={FADE_UP}
-            initial="hidden"
+            initial={headerInitial}
             animate="visible"
             className="mt-8"
           >
@@ -223,7 +228,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
           <motion.div
             custom={1}
             variants={FADE_UP}
-            initial="hidden"
+            initial={headerInitial}
             animate="visible"
             className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4"
           >
