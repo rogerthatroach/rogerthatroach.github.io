@@ -22,7 +22,9 @@ export default function ScrollProgressRail() {
   return (
     <motion.div
       aria-hidden="true"
-      style={{ scaleX }}
+      // --accent-glow gives the rail a soft accent glow on dark themes (0 on
+      // light themes), part of the per-theme "moods".
+      style={{ scaleX, boxShadow: '0 0 var(--accent-glow, 0px) var(--color-accent)' }}
       className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-0.5 origin-left bg-accent"
     />
   );

@@ -197,6 +197,21 @@
     --color-diagram-grid: #ddd6c9;
   }
 
+  /* ── Theme moods — per-theme texture, accent glow, and particle hue that
+     give each palette a distinct "feel" beyond color. Grain shows behind
+     content on the light/paper themes; glow reads on the dark themes;
+     particle-hue tilts the (desktop, home-only) ParticleField toward each
+     accent. All decorative + compositor-only. Cascade mirrors the color
+     blocks above (light default → .dark → data-theme → themis-dark). */
+  :root  { --grain-opacity: 0.05; --accent-glow: 0px;    --particle-hue: 0deg; }
+  .dark  { --grain-opacity: 0;    --accent-glow: 0.5rem; --particle-hue: 0deg; }
+  html[data-theme='nord']            { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: -30deg; }
+  html[data-theme='solarized-dark']  { --grain-opacity: 0;    --accent-glow: 0.55rem; --particle-hue: -15deg; }
+  html[data-theme='monokai']         { --grain-opacity: 0;    --accent-glow: 0.7rem;  --particle-hue: 25deg;  }
+  html[data-theme='themis']          { --grain-opacity: 0.04; --accent-glow: 0px;     --particle-hue: 20deg;  }
+  html.dark[data-theme='themis']     { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: 20deg;  }
+  html[data-theme='paper']           { --grain-opacity: 0.07; --accent-glow: 0px;     --particle-hue: 10deg;  }
+
   html {
     font-size: 110%;
     scroll-behavior: smooth;
@@ -208,11 +223,28 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: background-color 0.3s ease, color 0.3s ease;
+    /* Stacking context so the z-index:-1 grain layer paints above the body
+       background but behind all content (zero text-contrast impact). */
+    position: relative;
+    z-index: 0;
   }
 
   ::selection {
     background-color: var(--color-accent);
     color: var(--color-bg);
+  }
+
+  /* Per-theme grain layer (see app/layout.tsx). Fixed, behind content
+     (z-index:-1 under body's stacking context), desaturated fractal noise
+     tiled at 120px. Intensity = --grain-opacity (0 on dark themes). */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--grain-opacity, 0);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 120px 120px;
   }
 
   /* No PERMANENT universal `* { transition }` rule (removed 2026-05-30): it
