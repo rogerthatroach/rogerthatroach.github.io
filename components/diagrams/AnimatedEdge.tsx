@@ -18,7 +18,10 @@ function AnimatedEdge(props: EdgeProps) {
 
   return (
     <>
-      <BaseEdge path={edgePath} style={{ stroke: edgeColor, strokeWidth: 2, opacity: 0.4 }} />
+      {/* edge-draw: the stroke draws itself in once on mount (≈ when the
+          diagram lazy-mounts near the viewport); the flowing dots below keep
+          running. Reduced-motion shows the settled line (see globals.css). */}
+      <BaseEdge path={edgePath} className="edge-draw" style={{ stroke: edgeColor, strokeWidth: 2, opacity: 0.4 }} />
       <circle r="3" fill={edgeColor}>
         <animateMotion dur="2s" repeatCount="indefinite" path={edgePath} />
       </circle>

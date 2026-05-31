@@ -348,6 +348,25 @@ html.dark .palette-border-l {
   fill: currentColor;
 }
 
+/* Edge draw-on reveal (AnimatedEdge). The stroke draws itself in once on mount
+   (≈ when the diagram lazy-mounts near the viewport); the flowing-dot circles
+   keep running independently. dasharray 1000 covers the bezier edges (all
+   well under ~800px). Reduced-motion settles to the static line. */
+@keyframes edge-draw {
+  from { stroke-dashoffset: 1000; }
+  to { stroke-dashoffset: 0; }
+}
+.react-flow .edge-draw {
+  stroke-dasharray: 1000;
+  animation: edge-draw 1.4s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .react-flow .edge-draw {
+    stroke-dasharray: none;
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
