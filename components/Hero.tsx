@@ -100,6 +100,10 @@ export default function Hero() {
     >
       {showParticles && <ParticleField />}
 
+      {/* Per-theme ambient accent haze — color follows the live theme accent,
+          so switching themes visibly shifts the hero's atmosphere. Sits behind
+          the z-10 content; the vignette gradients below fade it at the edges. */}
+      <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-accent/5 via-transparent to-background" />
       <div className="pointer-events-none absolute inset-0 bg-linear-to-r from-background/80 via-transparent to-background/80" />
 
