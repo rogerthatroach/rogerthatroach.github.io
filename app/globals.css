@@ -203,14 +203,17 @@
      particle-hue tilts the (desktop, home-only) ParticleField toward each
      accent. All decorative + compositor-only. Cascade mirrors the color
      blocks above (light default → .dark → data-theme → themis-dark). */
-  :root  { --grain-opacity: 0.05; --accent-glow: 0px;    --particle-hue: 0deg; }
-  .dark  { --grain-opacity: 0;    --accent-glow: 0.5rem; --particle-hue: 0deg; }
-  html[data-theme='nord']            { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: -30deg; }
-  html[data-theme='solarized-dark']  { --grain-opacity: 0;    --accent-glow: 0.55rem; --particle-hue: -15deg; }
-  html[data-theme='monokai']         { --grain-opacity: 0;    --accent-glow: 0.7rem;  --particle-hue: 25deg;  }
-  html[data-theme='themis']          { --grain-opacity: 0.04; --accent-glow: 0px;     --particle-hue: 20deg;  }
-  html.dark[data-theme='themis']     { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: 20deg;  }
-  html[data-theme='paper']           { --grain-opacity: 0.07; --accent-glow: 0px;     --particle-hue: 10deg;  }
+  /* --ambient-glow: strength of the per-theme radial accent haze behind the
+     hero (.hero-glow). Higher on dark themes (glow reads on dark); lower on
+     light/paper themes so it stays a soft wash that never hurts text contrast. */
+  :root  { --grain-opacity: 0.05; --accent-glow: 0px;    --particle-hue: 0deg;   --ambient-glow: 15%; }
+  .dark  { --grain-opacity: 0;    --accent-glow: 0.5rem; --particle-hue: 0deg;   --ambient-glow: 22%; }
+  html[data-theme='nord']            { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: -30deg; --ambient-glow: 26%; }
+  html[data-theme='solarized-dark']  { --grain-opacity: 0;    --accent-glow: 0.55rem; --particle-hue: -15deg; --ambient-glow: 24%; }
+  html[data-theme='monokai']         { --grain-opacity: 0;    --accent-glow: 0.7rem;  --particle-hue: 25deg;  --ambient-glow: 28%; }
+  html[data-theme='themis']          { --grain-opacity: 0.04; --accent-glow: 0px;     --particle-hue: 20deg;  --ambient-glow: 16%; }
+  html.dark[data-theme='themis']     { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: 20deg;  --ambient-glow: 26%; }
+  html[data-theme='paper']           { --grain-opacity: 0.07; --accent-glow: 0px;     --particle-hue: 10deg;  --ambient-glow: 12%; }
 
   html {
     font-size: 110%;
@@ -245,6 +248,19 @@
     opacity: var(--grain-opacity, 0);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 120px 120px;
+  }
+
+  /* Per-theme ambient accent haze behind the hero content (.hero-glow div in
+     Hero.tsx). The COLOR is the live theme accent, so switching themes visibly
+     changes the atmosphere (Ember → warm pink, Aurora → cool cyan); strength is
+     --ambient-glow. Peaked upper-center behind the portrait/name and faded out
+     before the bio so it never reduces body-text contrast. Decorative. */
+  .hero-glow {
+    background: radial-gradient(
+      58% 48% at 50% 24%,
+      color-mix(in srgb, var(--color-accent) var(--ambient-glow, 15%), transparent) 0%,
+      transparent 70%
+    );
   }
 
   /* No PERMANENT universal `* { transition }` rule (removed 2026-05-30): it
