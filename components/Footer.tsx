@@ -85,9 +85,9 @@ export default function Footer() {
         </div>
 
         {/* Row 2 — copyright, centered alone. Same tertiary token as
-           Now/Papers/Colophon, dialed back ~25% so it reads as a kin
-           signal but quieter than the meta nav. Theme-aware. */}
-        <div className="mt-3 text-center text-[11px] font-light tracking-wide text-text-tertiary/75">
+           Now/Papers/Colophon (full strength — the prior /75 dialed it below
+           WCAG AA contrast, the one a11y ding site-wide). Theme-aware. */}
+        <div className="mt-3 text-center text-[11px] font-light tracking-wide text-text-tertiary">
           © {new Date().getFullYear()} {HERO.name}
         </div>
       </div>
