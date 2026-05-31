@@ -143,6 +143,8 @@ export default function RootLayout({
           content="object-src 'none'; base-uri 'self'; upgrade-insecure-requests"
         />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
+        {/* Agent-readable capabilities manifest (also linked from llms.txt). */}
+        <link rel="alternate" type="application/json" href="/capabilities.json" title="Capabilities (machine-readable)" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           type="application/ld+json"
