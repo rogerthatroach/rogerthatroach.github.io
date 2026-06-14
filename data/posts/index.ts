@@ -78,7 +78,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Agentic AI', 'LLM Routing', 'Enterprise Security', 'Entitlement Modeling'],
       readingTime: '20 min read',
       abstract:
-        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee-level events across ~9,000 organizational rollups, bringing headcount-movement queries from days (line-of-business level only) to real time at any granularity, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
+        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 cost centres across ~9,000 organizational rollups, bringing headcount-movement queries from days (line-of-business level only) to real time at any granularity, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
       status: 'published',
       projectId: 'astraeus',
       register: 'formal',
@@ -314,7 +314,9 @@ export const POSTS: BlogPost[] = [
       readingTime: '12 min read',
       abstract:
         'When Astraeus was built, the only approved foundation model in the bank was Command-A. It was unreliable: hallucinated values, ignored few-shot examples, regressed week over week. The architecture that resulted (4-stage LLM pipeline with deterministic Python orchestration and defense-in-depth gating, 5\u20138 LLM calls per query, foundation-model-agnostic by design) was shaped by the failure modes of the model we had. When GPT-4.1 received bank-wide approval for sensitive data, the migration was clean: zero architecture changes, zero prompt changes, zero instruction changes. This post is the substrate story underneath the architectural call, and what working with a failing model taught me about all model integrations.',
-      status: 'published',
+      // Draft: not yet wired into BlogPostShell POST_COMPONENTS (would render an
+      // empty page if published). Hidden until the body is finalized + wired.
+      status: 'draft',
       projectId: 'astraeus',
       register: 'builder',
     },

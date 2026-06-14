@@ -18,7 +18,7 @@ export const GLOSSARY: Record<string, string> = {
   'PAR Assist':
     'Enterprise-wide agentic AI platform guiding Project Approval Request (PAR) drafting at RBC. Pilot launched April 2026; deployed bank-wide May 2026.',
   'Astraeus':
-    'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level events with event-level ins-outs math (Cython-compiled). GPT-4.1 used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
+    'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level cost centres with event-level ins-outs math (Cython-compiled). GPT-4.1 used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
   'Aegis':
     'Strategic peer-benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 (Sr DS period): solo end-to-end build that automated extraction and matching despite quarterly SFP schema shifts, the long-standing bottleneck blocking timely peer analysis. v2 (Lead, 2025): 2-week solo build adding multi-stage RAG with multi-gate query parsing across bank / parameter / platform / time-period plus text-to-SQL, run in parallel with Astraeus and the Amplify intern program. 2025 CFO One RBC Team Award for v1.',
   'Commodity Tax':
@@ -66,8 +66,8 @@ export const GLOSSARY: Record<string, string> = {
     'The governance constraint behind PAR Assist v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
   'GPT-4.1':
     'The model used in Astraeus for all LLM calls (parse, route, metadata extract, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
-  event:
-    'Leaf-level routing record in Astraeus — the atomic unit the entitlement cascade resolves down to (~40K of them). Event-level ins-outs math (in/out transitions through cost-centre or organizational rollups) is what makes the cross-domain factorial space tractable in milliseconds. (Internally: "transit".)',
+  'cost centre':
+    'The most granular unit in Astraeus\'s org model — one cost centre = one or more teams (~40K of them). Cost centres are the shared leaves of the business-segment and geography hierarchies; a query intersects a node from each (e.g. Wealth Management × US) down to the cost-centre leaves. Employee events (hires, departures, lateral moves, promotions, demotions) and headcount net over cost centres in Cython-compiled ins-outs math, making arbitrary cross-domain slices tractable in milliseconds.',
   PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS for closed-loop boiler control.',
   'closed-loop':
     'Sense → model → optimize → act. The pattern that repeats across every role in my career, at progressively higher abstraction levels.',

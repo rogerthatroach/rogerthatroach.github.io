@@ -9,7 +9,7 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: 5 to 8 GPT-4.1 calls per query arranged in four stages (gate, parallel metadata extraction, answer, synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 employee-level events, where the equivalent headcount-movement queries previously took days and now return in real time at any granularity.
+Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: 5 to 8 GPT-4.1 calls per query arranged in four stages (gate, parallel metadata extraction, answer, synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 cost centres, where the equivalent headcount-movement queries previously took days and now return in real time at any granularity.
 
 <VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed walls separate the three bands: LLM intent (gate / parallel metadata extraction), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM answer and synthesis (1 answer call on the simple path, or 3 parallel answer calls plus 1 synthesis call on the cross-domain path). Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
   {(isVisible) => <AstraeusCascade />}
@@ -222,19 +222,19 @@ Enterprise Performance Management (EPM) systems enforce access control through m
 
 The production system implements this translation as a four-stage pipeline:
 
-<MathBlock html={tex("\\text{Domains} \\xrightarrow{\\alpha} \\text{Access Groups} \\xrightarrow{\\beta} \\text{Entity Sets} \\xrightarrow{\\gamma} \\text{Event Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
+<MathBlock html={tex("\\text{Domains} \\xrightarrow{\\alpha} \\text{Access Groups} \\xrightarrow{\\beta} \\text{Entity Sets} \\xrightarrow{\\gamma} \\text{Cost-Centre Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
 
 **Stage <InlineEquation html={tex("\\alpha")} />:** Extract permission grants from EPM as structured tuples <InlineEquation html={tex("(u, D_1, D_2, \\ldots, D_n)")} />.
 
 **Stage <InlineEquation html={tex("\\beta")} />:** Map permission grants to security group memberships. Security groups represent natural organizational boundaries (e.g., "Division A Managers") and serve as a caching layer. Permissions change slowly, so pre-computing group-to-employee mappings avoids runtime entitlement queries.
 
-**Stage <InlineEquation html={tex("\\gamma")} />:** Expand security groups to employee-level event sets. A event is the fundamental unit of the data model (see Section 6), representing an employee's assignment to an organizational position.
+**Stage <InlineEquation html={tex("\\gamma")} />:** Expand security groups to the entitled set of cost centres. The cost centre is the most granular unit of the org model — the shared leaf of the business-segment and geographical hierarchies; headcount and workforce events are measured over cost centres (see Section 6).
 
-**Stage <InlineEquation html={tex("\\delta")} />:** Compile event sets into parameterized SQL WHERE clauses:
+**Stage <InlineEquation html={tex("\\delta")} />:** Compile the cost-centre set into parameterized SQL WHERE clauses:
 
 <div className="mb-4 overflow-x-auto rounded-sm bg-surface p-4">
   <code className="font-mono text-xs text-text-secondary">
-    WHERE transit_id IN (SELECT transit_id FROM entitlements WHERE user_id = :current_user)
+    WHERE cost_centre_id IN (SELECT cost_centre_id FROM entitlements WHERE user_id = :current_user)
   </code>
 </div>
 
@@ -261,7 +261,7 @@ The production system implements this translation as a four-stage pipeline:
 
 Traditional HR analytics systems use periodic snapshot models: headcount at time <InlineEquation html={tex("t")} /> is a count of active employees in a snapshot table. This approach suffers from reconciliation errors when employees transfer between organizational units within the same reporting period.
 
-We instead model workforce movements as a stream of discrete events at the transactional employee-by-event level.
+We instead model workforce movements as a stream of discrete events at the transactional, per-employee level.
 
 <TheoremBlock variant="definition" number={6} title="Workforce Event">
   <div className="mb-2">
@@ -269,7 +269,7 @@ We instead model workforce movements as a stream of discrete events at the trans
   </div>
   <MathBlock html={tex("e = (\\text{employee}_{\\text{id}},\\; \\text{event}_{\\text{id}},\\; \\text{event\\_type},\\; \\text{timestamp},\\; \\text{source\\_rollup},\\; \\text{target\\_rollup})", true)} />
   <div>
-    where <InlineEquation html={tex("\\text{event\\_type} \\in \\{\\text{New Hire},\\; \\text{Departure},\\; \\text{Lateral Move Out},\\; \\text{Lateral Move In},\\; \\text{Promotion}\\}")} />.
+    where <InlineEquation html={tex("\\text{event\\_type} \\in \\{\\text{New Hire},\\; \\text{Departure},\\; \\text{Lateral Move Out},\\; \\text{Lateral Move In},\\; \\text{Promotion},\\; \\text{Demotion}\\}")} />.
   </div>
 </TheoremBlock>
 
@@ -359,7 +359,7 @@ The system delivers financial insights through three channels: a production-grad
 
 ### 7.1 The "Impossible" Capability
 
-Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"*) was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level events queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in real time at any granularity (the Cython compute path itself runs in milliseconds).
+Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"*) was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level cost centres queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in real time at any granularity (the Cython compute path itself runs in milliseconds).
 
 ## 8. Related Work
 

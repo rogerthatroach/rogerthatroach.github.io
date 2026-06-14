@@ -136,10 +136,29 @@ export const COMMODITY_TAX_EFFICIENCY_COMPACT = '90 min';
  */
 export const AEGIS_V2_BUILD_TIME = '2 weeks';
 
-/** Events: leaf-level routing / cost-centre records in Astraeus. (Formerly: "transits".) */
-export const ASTRAEUS_FACTORIAL_COMBINATIONS = '~40,000';
+/**
+ * Astraeus domain model — single source of truth (public wording).
+ *
+ * The CFO Group's workforce is modelled as ~40,000 COST CENTRES: the most
+ * granular org unit (one cost centre = one or more teams). Cost centres are
+ * the shared leaves of TWO hierarchies that roll the same leaves up two ways:
+ *   - business-segment hierarchy: 18 levels, ~9,000 rollup nodes
+ *   - geographical hierarchy
+ * A query names one node in each (e.g. Wealth Management × US); Astraeus
+ * intersects them down to the cost-centre leaves, retrieves from Postgres,
+ * and aggregates. It answers HR compensation costs (actual vs planned),
+ * headcount over time, and employee events (hires, departures, promotions,
+ * demotions, lateral moves) — at any granularity.
+ *
+ * PUBLIC WORDING: always "cost centres" for the leaf unit. "events" is a
+ * MEASURE over cost centres (the hires/leaves/moves netting), never the unit
+ * itself. NEVER put the internal terms "transit"/"80k"/"60k" on a public
+ * surface. Only ~40,000 cost centres and ~9,000 rollups are published as
+ * figures (no geography count — "60k" is a codename, not a count).
+ */
+export const ASTRAEUS_COST_CENTRES = '~40,000';
 
-/** Rollups: intermediate aggregation levels above leaf-level events. */
+/** Rollup nodes in the 18-level business-segment hierarchy, above the leaf cost centres. */
 export const ASTRAEUS_ROLLUPS = '~9,000';
 
 /** PAR Assist pilot launched April 2026; deployed bank-wide May 2026. */

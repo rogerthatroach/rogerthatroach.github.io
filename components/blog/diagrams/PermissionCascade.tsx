@@ -9,20 +9,20 @@ const PERMISSION_SETS = [
     domains: ['Risk × NA × FY25', 'Risk × EU × FY25'],
     groups: ['Risk-NA-Mgrs', 'Risk-EU-Mgrs'],
     entities: 842,
-    events: 1247,
-    sql: "WHERE event_id IN (\n  SELECT event_id\n  FROM entitlements\n  WHERE user_id = 'mgr_a'\n  -- 2 domains → 2 groups → 842 entities → 1,247 events\n)",
+    costCentres: 1247,
+    sql: "WHERE cost_centre_id IN (\n  SELECT cost_centre_id\n  FROM entitlements\n  WHERE user_id = 'mgr_a'\n  -- 2 domains → 2 groups → 842 entities → 1,247 cost centres\n)",
   },
   {
     label: 'Director B',
     domains: ['Risk × NA × FY25', 'Risk × EU × FY25', 'Risk × APAC × FY25', 'Ops × NA × FY25'],
     groups: ['Risk-NA-Mgrs', 'Risk-EU-Mgrs', 'Risk-APAC-All', 'Ops-NA-Dir'],
     entities: 3214,
-    events: 5891,
-    sql: "WHERE event_id IN (\n  SELECT event_id\n  FROM entitlements\n  WHERE user_id = 'dir_b'\n  -- 4 domains → 4 groups → 3,214 entities → 5,891 events\n)",
+    costCentres: 5891,
+    sql: "WHERE cost_centre_id IN (\n  SELECT cost_centre_id\n  FROM entitlements\n  WHERE user_id = 'dir_b'\n  -- 4 domains → 4 groups → 3,214 entities → 5,891 cost centres\n)",
   },
 ];
 
-const STAGES = ['Domains', 'Access Groups', 'Entities', 'Events', 'SQL Filter'];
+const STAGES = ['Domains', 'Access Groups', 'Entities', 'Cost Centres', 'SQL Filter'];
 
 export default function PermissionCascade() {
   const [permIdx, setPermIdx] = useState(0);
@@ -54,7 +54,7 @@ export default function PermissionCascade() {
             perm.domains.length,
             perm.groups.length,
             perm.entities,
-            perm.events,
+            perm.costCentres,
             1,
           ];
           const stageLabels = ['α', 'β', 'γ', 'δ'];

@@ -13,7 +13,7 @@ There is one pattern the industry reaches for here: give the LLM full access and
 
 Astraeus went the other way. 5 to 8 GPT-4.1 calls per query across four bounded stages, zero of them touching operational data. A deterministic Cython-compiled Python layer between two dashed walls. A permission-to-SQL entitlement cascade applied *before* compute, not after. This post unpacks the four architectural decisions that separate LLM-as-Router from the seductive pattern, with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The narrative of making those calls (under pressure, across stakeholders) lives in the [builder companion](/blog/astraeus-llm-as-router). The formal proofs of data-confidentiality and entitlement safety live in the [formal post](/blog/agentic-ai).
 
-<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (Stage 1 Gate, then Stage 2 three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and the event-level ins-outs math across ~40K employee-level events, Band 3 LLM answer and synthesis (Stage 3: 1 Answer call on the simple path, or 3 parallel Answer calls on the cross-domain path; Stage 4: 1 Synthesis call on the cross-domain path). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
+<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (Stage 1 Gate, then Stage 2 three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and the event-level ins-outs math across ~40K cost centres, Band 3 LLM answer and synthesis (Stage 3: 1 Answer call on the simple path, or 3 parallel Answer calls on the cross-domain path; Stage 4: 1 Synthesis call on the cross-domain path). Only parsed metadata crosses down; only structured aggregates cross up. Everything reads and writes a single Postgres backbone beneath.">
 {() => <AstraeusCascade />}
 </VisualizationContainer>
 
@@ -36,7 +36,7 @@ Four constraints shaped every decision below. Two regulatory, one hard-technical
     {
       kind: 'hard',
       label: 'Millisecond latency across 40K+ events',
-      detail: 'The interactive experience only works if arbitrary cross-domain slices return in under a second: ~40K employee-level events as the leaf-level routing unit and ~9K parent rollups across the cost-centre hierarchy. The combinatorics are factorial. Any path that touches a slow aggregation query blows the experience.',
+      detail: 'The interactive experience only works if arbitrary cross-domain slices return in under a second: ~40K cost centres as the leaf-level unit and ~9K parent rollups across the business-segment hierarchy (with a parallel geographical hierarchy over the same leaves). The combinatorics are factorial. Any path that touches a slow aggregation query blows the experience.',
     },
     {
       kind: 'soft',
@@ -126,7 +126,7 @@ The cost of this shape is that the deterministic compute layer has to be built a
 
 ### Decision 2 · Computation layer
 
-Once the LLM is out of the compute path, *what* does compute? Event-level ins-outs math across ~40K leaf-level events with factorial cross-combinations: every candidate answer needs netting semantics applied over events, not aggregates over snapshots. The compute layer is the place where a millisecond answer lives or dies.
+Once the LLM is out of the compute path, *what* does compute? Event-level ins-outs math across ~40K leaf-level cost centres with factorial cross-combinations: every candidate answer needs netting semantics applied over movement events, not aggregates over snapshots. The compute layer is the place where a millisecond answer lives or dies.
 
 <OptionsConsidered
   decision="What technology implements event-level ins-outs math at millisecond latency?"
@@ -204,7 +204,7 @@ Who is allowed to see which slice? The answer was already encoded, across years,
   options={[
     {
       name: 'EPM passthrough, pre-compute',
-      summary: 'The full EPM-derived permission cascade runs as a deterministic Python pipeline before any compute step. The user id maps through domain → access → entities → events → SQL WHERE clause. Compute only ever sees the filtered event set.',
+      summary: 'The full EPM-derived permission cascade runs as a deterministic Python pipeline before any compute step. The user id maps through domain → access → entities → cost centres → SQL WHERE clause. Compute only ever sees the filtered cost-centre set.',
       chosen: true,
       pros: [
         'Compliance is structural: compute physically cannot see a row the user is not entitled to, because no code path delivers one',
@@ -381,14 +381,14 @@ The five-step cascade is the engineering that made this architecture shippable i
 1. **Domain permissions.** The EPM organizes data into domains; the user identity resolves to a set of domain permissions. This is a direct lookup against the entitlement catalog.
 2. **Access groups.** Domain permissions map to access groups with finer-grained scope: business line, geography, grain. The mapping is maintained in EPM and pulled via a periodic catalog sync.
 3. **Entities.** Access groups map to the employee records the user is entitled to see: visible headcount, visible organizational rollups.
-4. **Events.** The atomic routing unit (the leaf-level routing record). Employee assignments resolve to the ~40K-event subset, the leaf-level units that event-level math operates on.
-5. **SQL WHERE clause.** The event set materializes into a SQL predicate that Postgres enforces at query time. Every compute query carries this predicate; no path exists that computes over a larger scope and filters later.
+4. **Cost centres.** The atomic routing unit — the most granular org node, the shared leaf of the business-segment and geography hierarchies. Queries resolve to the ~40K-cost-centre subset, the leaf-level units that event-level math operates over.
+5. **SQL WHERE clause.** The cost-centre set materializes into a SQL predicate that Postgres enforces at query time. Every compute query carries this predicate; no path exists that computes over a larger scope and filters later.
 
 The decision to reuse EPM rather than build a parallel model is what let this ship. The bank had years of governance process around the EPM catalog: review, change management, auditor sign-off. Forking the permission model outside EPM would have triggered a separate governance review on the new system, and the new system would have drifted from the old one the moment EPM changed.
 
 ## Why 40K is a factorial number
 
-The scale callout in the architecture diagram reads *"40K! factorial combinations."* The exclamation mark is not emphasis. It is the factorial operator. Any cross-domain query can, in the limit, slice the ~40K leaf-level event set in any permutation consistent with the entitlement filter. Previously the finance organization could not ask those questions interactively at all; the analyst time to produce one such slice was measured in days of spreadsheet work.
+The scale callout in the architecture diagram reads *"40K! factorial combinations."* The exclamation mark is not emphasis. It is the factorial operator. Any cross-domain query can, in the limit, slice the ~40K leaf-level cost-centre set in any permutation consistent with the entitlement filter. Previously the finance organization could not ask those questions interactively at all; the analyst time to produce one such slice was measured in days of spreadsheet work.
 
 Cython's role in this is blunt: the event-level netting math inside the hot loop runs in C. The rest of the layer (IO, entitlement resolution, serialization) stays in idiomatic Python. Profiling showed the hot loop was responsible for the majority of runtime on cross-domain queries, so that's where the Cython annotations concentrate.
 
