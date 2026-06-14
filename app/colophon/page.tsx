@@ -14,7 +14,7 @@ const BUILD_DATE = new Date().toLocaleDateString('en-US', {
 const ROWS: { label: string; value: React.ReactNode }[] = [
   {
     label: 'Framework',
-    value: 'Next.js 14 (app router, static export). React 18. TypeScript in strict mode.',
+    value: 'Next.js 16 (app router, static export). React 19. TypeScript in strict mode.',
   },
   {
     label: 'Styling',

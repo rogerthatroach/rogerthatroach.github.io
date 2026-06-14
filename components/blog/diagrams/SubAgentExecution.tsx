@@ -11,7 +11,7 @@ const QUERY_TYPES = [
 
 const AGENTS = [
   { label: 'EPM Agent', sublabel: 'Cost & Entitlements' },
-  { label: 'HC Agent', sublabel: 'Headcount & Transits' },
+  { label: 'HC Agent', sublabel: 'Headcount & Cost Centres' },
   { label: 'OP Agent', sublabel: 'Open Positions' },
 ];
 

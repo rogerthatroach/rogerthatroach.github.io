@@ -397,7 +397,7 @@ const initialNodes: Node[] = [
     position: { x: 580, y: 525 },
     data: {
       text: '40K! factorial combinations',
-      sub: '~40K leaf-level events · ~9K parent rollups · ms latency',
+      sub: '~40K cost centres · ~9K parent rollups · ms latency',
       color: HERO,
       size: 'sm',
       dashedBorder: true,
