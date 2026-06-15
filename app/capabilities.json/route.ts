@@ -46,7 +46,7 @@ export function GET(): Response {
     evaluation:
       'RAG/LLM evaluation = LLM-as-judge plus extensive human testing, feeding mandatory Model Risk (MRM) documentation. Bespoke logging and monitoring; no third-party eval libraries.',
     dataBoundary:
-      'In Astraeus the LLM never touches operational data by construction — GPT is used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access.',
+      'In Astraeus the LLM never touches operational data by construction — GPT is used only for gate / metadata extraction / answer / synthesis; deterministic code handles all data access.',
   };
 
   const manifest = {

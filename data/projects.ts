@@ -135,8 +135,8 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     description:
       'Production-grade platform for CFO-level financial insights — headcount analytics, HR costs, open positions — delivered via dashboard, chatbot, and inbox-ready reports.',
     highlights: [
-      'Two-wall architecture: GPT-4.1 handles parse / route / metadata extraction / synthesis; deterministic Cython-compiled Python handles entitlement + compute. LLM never sees operational data.',
-      'Up to 6 LLM calls per query (1 parse + 1 route + up to 3 metadata + 1–3 synthesis) — all on schemas and aggregates, never on rows. In-scope queries fan out to up to 3 final parallel subagents (entitlement / Headcount / Open Positions) then combined.',
+      'Two-wall architecture: GPT-4.1 handles gate / metadata extraction / answer / synthesis; deterministic Cython-compiled Python handles entitlement + compute. LLM never sees operational data.',
+      '5 to 8 GPT-4.1 calls per query across four stages (1 gate + 3 parallel metadata extractions + 1-or-3 answer + 0-or-1 synthesis) — all on schemas and aggregates, never on rows. Cross-domain queries fan out to 3 parallel Answer-stage calls (Headcount / HR Costs / Open Positions) before a final synthesis.',
       'Event-level ins-outs math: employees modeled as join / leave / transfer events, netting semantics fold intra-rollup moves to net-zero. Enables dynamic arbitrary-combination analysis previously deemed impossible at this scale.',
       'Permission cascade (domain permissions → access groups → employees → leaf-level cost centres → SQL tables) applied before compute — users see only what they\'re authorized to see, structurally.',
       '~40K leaf-level cost centres and ~9K parent rollups, with millisecond-level slicing across any time window.',

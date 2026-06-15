@@ -109,7 +109,7 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
         <span className="font-mono">pgvector</span> + two-stage
         field-group retrieval (
         <Link
-          href="/blog/enterprise-agentic-ai"
+          href="/blog/enterprise-agentic-ai-architecture"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
           formal post
