@@ -220,7 +220,7 @@ Enterprise Performance Management (EPM) systems enforce access control through m
 
 ### 5.3 The Translation Pipeline
 
-The production system implements this translation as a four-stage pipeline:
+The production system implements this translation as a five-stage pipeline:
 
 <MathBlock html={tex("\\text{Domains} \\xrightarrow{\\alpha} \\text{Access Groups} \\xrightarrow{\\beta} \\text{Entity Sets} \\xrightarrow{\\gamma} \\text{Cost-Centre Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
 
@@ -320,7 +320,7 @@ The architecture has been deployed in production at a major bank's CFO Group sin
         <td className="py-2 font-mono">Cython-compiled Python</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Employee events processed</td>
+        <td className="py-2 pr-4">Cost centres (leaf unit)</td>
         <td className="py-2 font-mono">~40,000 (leaves; arbitrary-combination queryable)</td>
       </tr>
       <tr className="border-b border-border-subtle/50">

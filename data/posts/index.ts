@@ -97,7 +97,6 @@ export const POSTS: BlogPost[] = [
       { id: 11, authors: 'Wu, Q. et al.', title: 'AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation', venue: 'arXiv preprint arXiv:2308.08155', year: 2023, url: 'https://arxiv.org/abs/2308.08155' },
     ],
     furtherReading: [
-      { title: 'Building Astraeus around a model that wasn’t working', url: '/blog/astraeus-building-around-failing-model', description: 'The substrate story underneath the formal architecture: Command-A failure modes, foundation-model-agnostic design, and the GPT-4.1 migration that proved the bet.' },
       { title: 'LangChain Documentation', url: 'https://docs.langchain.com/', description: 'Framework for building LLM-powered applications with tool use and agent orchestration.' },
       { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for connecting AI assistants to external data sources and tools.' },
       { title: 'Microsoft Responsible AI Standard', url: 'https://www.microsoft.com/en-us/ai/responsible-ai', description: 'Framework for responsible AI development in enterprise contexts.' },
@@ -292,11 +291,6 @@ export const POSTS: BlogPost[] = [
         description: 'The same pattern applied to a different system \u2014 typed MCP tool contracts as the audit layer instead of sub-agent isolation.',
       },
       {
-        title: 'Building Astraeus around a model that wasn\u2019t working',
-        url: '/blog/astraeus-building-around-failing-model',
-        description: 'The substrate story underneath: Command-A failure modes, the foundation-model-agnostic bet, and the GPT-4.1 migration that proved it (zero architecture changes).',
-      },
-      {
         title: 'Astraeus \u2014 Case Study',
         url: '/projects/astraeus',
         description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
@@ -370,11 +364,6 @@ export const POSTS: BlogPost[] = [
         title: 'Why I Chose LLM-as-Router Over a Monolithic Agent (the builder story)',
         url: '/blog/astraeus-llm-as-router',
         description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
-      },
-      {
-        title: 'Building Astraeus around a model that wasn\u2019t working (deep-dive)',
-        url: '/blog/astraeus-building-around-failing-model',
-        description: 'Why the four decisions in this post look the way they do: the Command-A failure modes that shaped the bounds on every stage, and the GPT-4.1 migration that proved foundation-model-agnostic by design.',
       },
       {
         title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (PAR Assist)',
