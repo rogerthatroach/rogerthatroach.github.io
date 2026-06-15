@@ -6,20 +6,20 @@ import Footer from '@/components/Footer';
 
 // Update this file every ~6 weeks. Sivers convention: three bullets,
 // concrete, present-tense. https://nownownow.com
-const UPDATED = 'May 2026';
+const UPDATED = 'June 2026';
 
 const BULLETS: { heading: string; body: string }[] = [
   {
     heading: 'Shipping',
-    body: 'PAR Assist — the first true agentic framework approved for production at RBC. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls. Early design for v2: multi-agent "skills" composed over the v1 substrate.',
+    body: 'PAR Assist in production — the first true agentic framework approved for production at RBC. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls.',
   },
   {
-    heading: 'Writing',
-    body: 'Sanitized PAR Assist across every surface (formal math post, practitioner rewrite, builder story, case study, homepage, resume, glossary) in one pass after an audit caught a fabricated three-layer RAG claim sitting unchallenged for weeks. PAR is now the benchmark; applying the same pass to Astraeus next.',
+    heading: 'Building',
+    body: 'The next phase of the drafter: turning PAR Assist\'s single-agent envelope into a config-driven multi-agent framework. The orchestration, typed MCP tool registry, and field-group retrieval stay fixed — what changes for a new business problem is configuration, not code. Solidifying that architecture now, so the next drafting product is a config, not a rebuild.',
   },
   {
     heading: 'Thinking about',
-    body: 'How v1 substrates become v2 substrates. The single-agent envelope at PAR Assist was constrained by governance, not by engineering — but the constraint forced a structure (typed MCP tool registry, unified Postgres store, field-group taxonomy) that v2 skills compose on without rewrite. Every envelope you build should make its next envelope cheaper.',
+    body: 'Product as configuration. If the drafter architecture is right, a second business problem shouldn\'t need a second system — it should need a different config over the same orchestration, tools, and retrieval. The hard part is keeping the framework general without letting it drift into abstraction. Every envelope you build should make the next one cheaper.',
   },
 ];
 
