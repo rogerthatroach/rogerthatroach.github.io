@@ -6,21 +6,15 @@ import Footer from '@/components/Footer';
 
 // Update this file every ~6 weeks. Sivers convention: three bullets,
 // concrete, present-tense. https://nownownow.com
-const UPDATED = 'May 2026';
+const UPDATED = 'June 2026';
 
 const BULLETS: { heading: string; body: string }[] = [
   {
     heading: 'Shipping',
-    body: 'AI/LLM Drafting Platform — the first true agentic framework approved for production at RBC. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel approved foundation model extraction calls. Early design for v2: multi-agent "skills" composed over the v1 substrate.',
+    body: 'AI/LLM Drafting Platform in production — the first true agentic framework approved for production at RBC. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel approved foundation model extraction calls.',
   },
-  {
-    heading: 'Writing',
-    body: 'Sanitized AI/LLM Drafting Platform across every surface (formal math post, practitioner rewrite, builder story, case study, homepage, resume, glossary) in one pass after an audit caught a fabricated three-layer RAG claim sitting unchallenged for weeks. PAR is now the benchmark; applying the same pass to WorkforceAnalytics next.',
-  },
-  {
-    heading: 'Thinking about',
-    body: 'How v1 substrates become v2 substrates. The single-agent envelope at AI/LLM Drafting Platform was constrained by governance, not by engineering — but the constraint forced a structure (typed MCP tool registry, unified Postgres store, field-group taxonomy) that v2 skills compose on without rewrite. Every envelope you build should make its next envelope cheaper.',
-  },
+  
+  
 ];
 
 export const metadata: Metadata = {
