@@ -35,13 +35,13 @@ Four constraints shaped every decision below. Two regulatory, one hard-technical
     },
     {
       kind: 'hard',
-      label: 'Millisecond latency across 40K+ events',
+      label: 'Millisecond latency across 40K+ cost centres',
       detail: 'The interactive experience only works if arbitrary cross-domain slices return in under a second: ~40K cost centres as the leaf-level unit and ~9K parent rollups across the business-segment hierarchy (with a parallel geographical hierarchy over the same leaves). The combinatorics are factorial. Any path that touches a slow aggregation query blows the experience.',
     },
     {
       kind: 'soft',
       label: 'Entitlement catalogs already live in EPM',
-      detail: 'The bank already runs an Enterprise Performance Management system where domain permissions, access groups, employee assignments, and events are maintained. Rebuilding that model outside EPM would fork the source of truth. The solution has to enforce entitlement by reusing the catalog, not by re-implementing it.',
+      detail: 'The bank already runs an Enterprise Performance Management system where domain permissions, access groups, employee assignments, and cost centres are maintained. Rebuilding that model outside EPM would fork the source of truth. The solution has to enforce entitlement by reusing the catalog, not by re-implementing it.',
     },
   ]}
 />
@@ -119,7 +119,7 @@ Three reasons, in order. First: **confidentiality by construction**. Every alter
 
 Second: **determinism as a pre-condition for use.** Finance cannot accept two different numbers for the same question. The compute layer has to be deterministic. Once you accept that, the question becomes: do I want the LLM upstream of determinism (it routes requests into deterministic compute) or downstream (it reads the deterministic output to *interpret* it)? Upstream is safer for audit: routing errors are visible and recoverable; interpretation errors contaminate the answer.
 
-Third: **entitlement becomes enforceable before compute runs.** Because deterministic code owns the data path, the permission-to-SQL entitlement cascade gets to run *before* the compute step, not woven into an LLM prompt. The audit story is short: *here is the user, here is the cube-permission lookup, here is the security group, here is the employee set, here are the events they can see, here is the SQL WHERE clause.* Every step is a function call, logged, typed, replayable.
+Third: **entitlement becomes enforceable before compute runs.** Because deterministic code owns the data path, the permission-to-SQL entitlement cascade gets to run *before* the compute step, not woven into an LLM prompt. The audit story is short: *here is the user, here is the cube-permission lookup, here is the security group, here is the employee set, here are the cost centres they can see, here is the SQL WHERE clause.* Every step is a function call, logged, typed, replayable.
 
 The cost of this shape is that the deterministic compute layer has to be built and maintained. That cost was obviously the right trade, but it was the part that took real engineering.
 </DecisionRationale>
@@ -197,7 +197,7 @@ The SQL-only path was genuinely considered and ruled out during implementation: 
 
 ### Decision 3 · Entitlement enforcement shape
 
-Who is allowed to see which slice? The answer was already encoded, across years, in EPM: domain permissions → access groups → entities → events → SQL. The question was *where* to apply it.
+Who is allowed to see which slice? The answer was already encoded, across years, in EPM: domain permissions → access groups → entities → cost centres → SQL. The question was *where* to apply it.
 
 <OptionsConsidered
   decision="Where in the pipeline does the entitlement check run?"
@@ -250,7 +250,7 @@ Who is allowed to see which slice? The answer was already encoded, across years,
         'Applies to every query path, not just the application',
       ],
       cons: [
-        'enterprise permission logic is a five-step cascade with business-rule layers that do not map cleanly to RLS policies',
+        'Enterprise permission logic is a five-step cascade with business-rule layers that do not map cleanly to RLS policies',
         'Would force duplicating EPM model into database policies, drifting from the catalog',
         'Debugging a denied query becomes a database-administration task, not a development task',
       ],
@@ -259,11 +259,11 @@ Who is allowed to see which slice? The answer was already encoded, across years,
 />
 
 <DecisionRationale option="EPM passthrough, pre-compute">
-The deciding property was **reuse of the source of truth**. The bank had spent years curating the EPM catalog (domain permissions, security groups, employee assignments, events) with a review and change-management process that already satisfied auditors. Any entitlement model that did not reuse that catalog forked the source of truth and introduced a drift risk that regulated finance will not accept.
+The deciding property was **reuse of the source of truth**. The bank had spent years curating the EPM catalog (domain permissions, security groups, employee assignments, cost centres) with a review and change-management process that already satisfied auditors. Any entitlement model that did not reuse that catalog forked the source of truth and introduced a drift risk that regulated finance will not accept.
 
 Pre-compute placement came from a narrower argument: *least privilege.* A query result that was post-filtered from a larger computation means the computation briefly ran over data the user was not entitled to, and the audit story has to either explain that away or prove that no information leaked through the differential. Pre-compute filtering makes the audit trivial: the computation input itself is the entitled set.
 
-The five-step cascade (domain → access → entities → events → SQL) was the real engineering. Each step is a function call with typed inputs and outputs; each is tested; each writes to the Postgres audit log. Any question of the form "could user X ever have seen value Y?" reduces to replaying the cascade.
+The five-step cascade (domain → access → entities → cost centres → SQL) was the real engineering. Each step is a function call with typed inputs and outputs; each is tested; each writes to the Postgres audit log. Any question of the form "could user X ever have seen value Y?" reduces to replaying the cascade.
 </DecisionRationale>
 
 ### Decision 4 · Answer and synthesis strategy
@@ -353,8 +353,8 @@ A concrete CFO query (*"show me headcount by division, crossed with open positio
     },
     {
       title: 'Step 3 · Entitlement cascade (deterministic, no LLM)',
-      caption: 'domain to access to entities to events to SQL',
-      content: "The user's identity flows through the five-step permission cascade. Domain permissions: which Astraeus domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Events: which ~40K subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged. Re-gating runs at this handoff: privilege checks confirm the user is still authorized for the resolved scope.",
+      caption: 'domain to access to entities to cost centres to SQL',
+      content: "The user's identity flows through the five-step permission cascade. Domain permissions: which Astraeus domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Cost centres: which ~40K subset does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Every step logged. Re-gating runs at this handoff: privilege checks confirm the user is still authorized for the resolved scope.",
     },
     {
       title: 'Step 4 · Compute (Cython, no LLM)',
@@ -462,4 +462,4 @@ The pattern scales across system types because the constraints are shared. The s
 
 ### Reference implementation
 
-The 5-stage cascade with the `User -> AccessGroup -> Domain -> Entity -> Event` permission graph is implemented at [`rogerthatroach/astraeus-llm-as-router`](https://github.com/rogerthatroach/astraeus-llm-as-router), useful as a worked example when adapting this pattern to other domains. 27 tests cover the framework's safety invariants explicitly.
+The five-step permission cascade is implemented at [`rogerthatroach/astraeus-llm-as-router`](https://github.com/rogerthatroach/astraeus-llm-as-router), useful as a worked example when adapting this pattern to other domains. 27 tests cover the framework's safety invariants explicitly.

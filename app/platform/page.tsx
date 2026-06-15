@@ -9,9 +9,9 @@ const STACK: { title: string; body: React.ReactNode }[] = [
     title: 'Lumina (LLM gateway)',
     body: (
       <>
-        Internal API gateway. Every LLM call from every production AI
-        system at RBC routes through Lumina &mdash; authentication, rate
-        limiting, audit logging, and provider selection in one layer.
+        Internal API gateway. Production AI systems at RBC route their
+        LLM calls through Lumina &mdash; authentication, rate limiting,
+        audit logging, and provider selection in one layer.
         Behind Lumina:{' '}
         <span className="font-mono">Azure OpenAI</span> (GPT-4o,
         GPT-4.1) and <span className="font-mono">AWS Bedrock</span>{' '}
