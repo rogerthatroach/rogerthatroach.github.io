@@ -9,13 +9,13 @@ import VisualizationContainer from '@/components/blog/VisualizationContainer'
 
 ## The problem we started with
 
-RBC's CFO Group needed to answer questions like *"how many people moved into the Capital Markets technology rollup last quarter, broken down by hiring vs lateral move?"* — across an 18-level cost-center hierarchy with roughly 40,000 leaf-level cost centres (we call them transits) rolling up through ~9,000 aggregation levels.
+RBC's CFO Group needed to answer questions like *"how many people moved into the Capital Markets technology rollup last quarter, broken down by hiring vs lateral move?"* — across an 18-level business-segment hierarchy with roughly 40,000 leaf-level cost centres rolling up through ~9,000 aggregation nodes (with a parallel geographical hierarchy over the same cost centres).
 
 The state of the art before Astraeus: queries like that took **days**, and only at the highest line-of-business level. Anyone wanting a different cut of the data had to wait, file a request, get a custom report. The data was there. The structure was there. What we didn't have was a way to let people ask their own questions and get answers in real time.
 
 We needed:
 
-- **Real time at any granularity.** Transit-level, any rollup level, any time window.
+- **Real time at any granularity.** Cost-centre level, any rollup level, any time window.
 - **Three financial domains.** EPM (running on IBM Cognos TM1), Headcount, and Open Positions.
 - **Regulated-environment quality bar.** Auditability of every decision, no third-party LLM exposure to sensitive bank data, defense-in-depth on entitlement.
 - **CFO-ready.** Leadership had to trust this. Not just trust the answer, trust the architecture that produced it.
@@ -28,7 +28,7 @@ The model was not fine.
 
 I'll be direct, because the architecture story doesn't make sense otherwise: **Command-A was unreliable for this use case.** Specifically:
 
-- It hallucinated values. We'd ask about transits and rollups it had been given context for, and it would invent numbers.
+- It hallucinated values. We'd ask about cost centres and rollups it had been given context for, and it would invent numbers.
 - It assumed. It would fill in things we hadn't asked for, returning answers shaped by what it thought the question *should* be.
 - It was inaccurate at parsing query structure. Same query phrased two slightly different ways could produce structurally different outputs.
 - It ignored few-shot examples. Even with explicit examples in the prompt demonstrating the exact output shape we wanted, it would drift.
@@ -50,7 +50,7 @@ Four stages:
 
 **Stage 1: Gate.** One LLM call that validates the incoming query. Is this relevant to what Astraeus answers? Is it an injection attempt? Is it within scope? If any check fails, the query is rejected at the door. If it passes, we proceed.
 
-**Stage 2: Parallel metadata extraction.** Three LLM calls fired in parallel, one per domain (EPM, Headcount, Open Positions). Each extracts rich, domain-specific metadata: which transits or rollups the question touches, which time windows, which aggregation levels, which filters apply. The three calls are independent, so they run concurrently. Total latency is the max of the three, not the sum.
+**Stage 2: Parallel metadata extraction.** Three LLM calls fired in parallel, one per domain (EPM, Headcount, Open Positions). Each extracts rich, domain-specific metadata: which cost centres or rollups the question touches, which time windows, which aggregation levels, which filters apply. The three calls are independent, so they run concurrently. Total latency is the max of the three, not the sum.
 
 **Stage 3: Answer.** Now the orchestration branches by complexity. If the query is single-domain or simple, one LLM call resolves it using the extracted metadata. If it's cross-domain or complex, three more LLM calls fire in parallel, one per domain.
 
@@ -65,13 +65,13 @@ Between stages, the deterministic Python layer handles:
 - **Re-gating.** Privilege checks happen at multiple levels, not just at the front door. A user who's entitled to ask about Headcount but not about Open Positions can't get an Open Positions answer through a cross-domain query. The gates between stages catch that.
 - **Validation contracts.** Each stage produces typed JSON that the next stage expects. The contract is enforced at the boundary, not inside the LLM call.
 
-The deterministic compute over the cost-center hierarchy (the actual graph traversal across 9,000 rollups, the netting of employee-by-transit events, the SQL-level entitlement enforcement) happens in milliseconds. The LLM pipeline sits on top of that compute. The "real time" answer is the deterministic compute time plus the pipeline latency. We measure both, and we tune for both.
+The deterministic compute over the cost-center hierarchy (the actual graph traversal across 9,000 rollups, the netting of employee movement events, the SQL-level entitlement enforcement) happens in milliseconds. The LLM pipeline sits on top of that compute. The "real time" answer is the deterministic compute time plus the pipeline latency. We measure both, and we tune for both.
 
 ## EPM-to-SQL entitlement: the data-rights backbone
 
 Underneath the LLM pipeline is a layer that doesn't get mentioned in casual descriptions of Astraeus but is doing essential work: the **EPM-to-SQL entitlement layer.**
 
-The challenge: IBM EPM's permission model is cube-based. SQL's permission model is row- and column-based. We needed any user given access to Astraeus to be able to ask any question, but only see what they're entitled to see. That meant translating EPM's cube permissions, down through security groups, through employees, through transits, into SQL clauses that constrain what data the deterministic compute path returns.
+The challenge: IBM EPM's permission model is cube-based. SQL's permission model is row- and column-based. We needed any user given access to Astraeus to be able to ask any question, but only see what they're entitled to see. That meant translating EPM's cube permissions, down through security groups, through employees, through cost centres, into SQL clauses that constrain what data the deterministic compute path returns.
 
 That layer enforces least-privilege uniformly across three different surfaces: the dashboard UI, the chatbot, and the HTML reporting output. The user-facing AI surface doesn't need to know about either permission model. The entitlement layer is the bridge.
 

@@ -34,7 +34,7 @@ const LEVELS = [
     label: 'Intelligent',
     years: '2024–present',
     color: '#3b82f6',
-    metric: '40K transits',
+    metric: '40K cost centres',
     nodes: ['Policy/Data Ingest', 'LangGraph Agents', 'RAG/MCP Optimization', 'Guided Decisions'],
     tech: ['Embeddings', 'LangGraph, MCP', 'RAG, Text-to-SQL', 'Agentic platform'],
   },

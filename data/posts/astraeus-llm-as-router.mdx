@@ -15,7 +15,7 @@ This is the story of why, and what it took to build.
 
 ## The problem
 
-RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions (&ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo;) and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (Enterprise Performance Management): ~40,000 employee-level events as the leaf-level routing unit and ~9,000 parent rollups across the cost-centre hierarchy, with strict entitlement controls at every level.
+RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions (&ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo;) and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (Enterprise Performance Management): ~40,000 cost centres as the leaf-level unit (one cost centre = one or more teams) and ~9,000 parent rollups, the shared leaves of a business-segment hierarchy and a geographical hierarchy, with strict entitlement controls at every level.
 
 No interactive system could answer those questions in under a day. No off-the-shelf product understood the CFO Group&rsquo;s permission model. And every off-the-shelf AI tool that might have helped required giving the LLM full access to the data.
 
@@ -40,7 +40,7 @@ The seductive option fails all four.
 The pattern I landed on is straightforward to describe and fiddly to build:
 
 - GPT-4.1 is used *strictly* for intent work and answer-shaping, across four bounded stages: a Gate call (relevance / injection / scope), three parallel domain-specific metadata extractions, one Answer call on the simple path (or three parallel Answer calls on the cross-domain path), and a final Synthesis call on the cross-domain path. 5 to 8 LLM calls per query, total.
-- Between two dashed walls, a deterministic Cython-compiled Python layer does the real work: permission cascade (domain → access → entities → events → SQL), then event-level ins-outs math over ~40K leaf-level events. The deterministic layer also handles dispatch, parallelization, re-gating between stages, and typed JSON validation contracts at every stage boundary.
+- Between two dashed walls, a deterministic Cython-compiled Python layer does the real work: permission cascade (domain → access → entities → cost centres → SQL), then event-level ins-outs math over ~40K leaf-level cost centres. The deterministic layer also handles dispatch, parallelization, re-gating between stages, and typed JSON validation contracts at every stage boundary.
 - Aggregates cross back up; the Answer-stage and Synthesis-stage calls shape them into the user-facing response.
 - The LLM never sees raw data. It sees classification decisions on the way down and aggregates on the way up.
 - Single Postgres backbone beneath everything: state, entitlements, hierarchies, audit log.
@@ -51,7 +51,7 @@ This is LLM-as-Router. The LLM does what language models are good at (classify i
 {() => <AstraeusCascade />}
 </VisualizationContainer>
 
-The permission-to-SQL entitlement modeling alone took weeks of domain immersion: domain permissions map to access groups, which map to employees, which map to events (the atomic unit of the data model), which map to SQL WHERE clauses. That mapping had to be bulletproof, not best-effort. No prompt was going to get it right.
+The permission-to-SQL entitlement modeling alone took weeks of domain immersion: domain permissions map to access groups, which map to employees, which map to cost centres (the atomic unit of the data model), which map to SQL WHERE clauses. That mapping had to be bulletproof, not best-effort. No prompt was going to get it right.
 
 ## What it took to build
 
@@ -65,7 +65,7 @@ Three things, in the order they mattered:
 
 ## The result
 
-- ~40K employee-level events with ~9K parent rollups, sliced in real time at any granularity across any cross-domain combination (millisecond backend compute path)
+- ~40K cost centres with ~9K parent rollups, sliced in real time at any granularity across any cross-domain combination (millisecond backend compute path)
 - Three delivery channels from a single architecture: dashboard, chatbot, and HTML reports generated for executive consumption
 - Days of email replaced by seconds-level answers
 - Zero sensitive data ever reaching the language model

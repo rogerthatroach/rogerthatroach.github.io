@@ -128,7 +128,7 @@ export const TIMELINE: TimelineNode[] = [
           'Conceived, architected, and built end-to-end: production analytics platform for CFO Group delivering dynamic headcount, HR costs, and open positions at bank scale with millisecond slicing. Production since Nov 2025.',
         decisionRationale:
           'Two-wall architecture. GPT-4.1 on the intent side handles parse, route, metadata extract, and synthesis; never touches data. Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Bounded, parallel domain-specific metadata extraction across EPM, Headcount, and Open Positions, with defense-in-depth gating between stages — each LLM call has less surface area for failure, and the whole pipeline stays foundation-model-agnostic. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail. Production deployment runs through GFT on OpenShift via CI/CD.',
-        metric: { value: '~40K leaf-level events', label: 'arbitrary combinations, ms latency' },
+        metric: { value: '~40K leaf-level cost centres', label: 'arbitrary combinations, ms latency' },
         caseStudyLink: '/projects/astraeus',
       },
       {

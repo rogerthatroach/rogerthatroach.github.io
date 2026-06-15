@@ -3,7 +3,7 @@ import {
   HUMANA_ACCURACY,
   COMMODITY_TAX_EFFICIENCY,
   AEGIS_V2_BUILD_TIME,
-  ASTRAEUS_FACTORIAL_COMBINATIONS,
+  ASTRAEUS_COST_CENTRES,
   PAR_ASSIST_SCALE,
 } from './canonical';
 
@@ -129,17 +129,17 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     subtitle: 'Financial Insights & Analysis Suite — RBC CFO Group',
     role: 'Conceived, architected, and built end-to-end',
     stack: ['GPT-4.1', 'Custom Python router', 'Cython compute', 'Postgres', 'EPM'],
-    heroMetric: { value: ASTRAEUS_FACTORIAL_COMBINATIONS, label: 'Factorial Combinations' },
+    heroMetric: { value: ASTRAEUS_COST_CENTRES, label: 'Cost centres' },
     caption:
-      'Production analytics platform for RBC\'s CFO Group. Days of email back-and-forth replaced by seconds-level answers — across headcount, HR costs, and open positions at bank scale. LLM never touches operational data by construction; event-level ins-outs math runs in Cython-compiled Python, milliseconds over ~40K leaf-level events.',
+      'Production analytics platform for RBC\'s CFO Group. Days of email back-and-forth replaced by seconds-level answers — across headcount, HR costs, and open positions at bank scale. LLM never touches operational data by construction; event-level ins-outs math runs in Cython-compiled Python, milliseconds over ~40K leaf-level cost centres.',
     description:
       'Production-grade platform for CFO-level financial insights — headcount analytics, HR costs, open positions — delivered via dashboard, chatbot, and inbox-ready reports.',
     highlights: [
       'Two-wall architecture: GPT-4.1 handles parse / route / metadata extraction / synthesis; deterministic Cython-compiled Python handles entitlement + compute. LLM never sees operational data.',
       'Up to 6 LLM calls per query (1 parse + 1 route + up to 3 metadata + 1–3 synthesis) — all on schemas and aggregates, never on rows. In-scope queries fan out to up to 3 final parallel subagents (entitlement / Headcount / Open Positions) then combined.',
       'Event-level ins-outs math: employees modeled as join / leave / transfer events, netting semantics fold intra-rollup moves to net-zero. Enables dynamic arbitrary-combination analysis previously deemed impossible at this scale.',
-      'Permission cascade (domain permissions → access groups → employees → leaf-level events → SQL tables) applied before compute — users see only what they\'re authorized to see, structurally.',
-      '~40K leaf-level events and ~9K parent rollups, with millisecond-level slicing across any time window.',
+      'Permission cascade (domain permissions → access groups → employees → leaf-level cost centres → SQL tables) applied before compute — users see only what they\'re authorized to see, structurally.',
+      '~40K leaf-level cost centres and ~9K parent rollups, with millisecond-level slicing across any time window.',
       'Single Postgres backbone for event log, entitlement catalog, hierarchies, and audit trail.',
     ],
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
