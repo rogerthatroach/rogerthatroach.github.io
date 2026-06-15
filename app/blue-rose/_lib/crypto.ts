@@ -6,7 +6,7 @@
  *
  * Browser unlock flow:
  *   1. Fetch ciphertext.
- *   2. Derive AES-256 key via PBKDF2(SHA-256, 200k iterations) over the
+ *   2. Derive AES-256 key via PBKDF2(SHA-256, 600k iterations) over the
  *      passphrase + salt.
  *   3. Decrypt with AES-GCM(key, iv). On failure (wrong passphrase),
  *      `crypto.subtle.decrypt` throws — caller renders the shake.

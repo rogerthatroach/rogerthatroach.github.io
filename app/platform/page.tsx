@@ -9,9 +9,9 @@ const STACK: { title: string; body: React.ReactNode }[] = [
     title: 'ModelGateway (LLM gateway)',
     body: (
       <>
-        Internal API gateway. Every LLM call from every production AI
-        system at RBC routes through ModelGateway &mdash; authentication, rate
-        limiting, audit logging, and provider selection in one layer.
+        Internal API gateway. Production AI systems at RBC route their
+        LLM calls through ModelGateway &mdash; authentication, rate limiting,
+        audit logging, and provider selection in one layer.
         Behind ModelGateway:{' '}
         <span className="font-mono">approved foundation model</span> (approved foundation model,
         approved foundation model) and <span className="font-mono">approved foundation model</span>{' '}

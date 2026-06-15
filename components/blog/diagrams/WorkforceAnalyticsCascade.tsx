@@ -368,7 +368,7 @@ const initialNodes: Node[] = [
     position: { x: 185, y: 415 },
     data: {
       label: 'permission cascade (applied before compute)',
-      steps: ['domain', 'access', 'entities', 'events', 'SQL'],
+      steps: ['domain', 'access', 'entities', 'cost centres', 'SQL'],
       color: ENTITLE,
     } satisfies ChainNodeData,
     draggable: false,
@@ -382,7 +382,7 @@ const initialNodes: Node[] = [
     data: {
       badge: 'Hero',
       label: 'Event-level ins-outs math',
-      sub: 'Cython · netting · ms over 40K events',
+      sub: 'Cython · netting · ms over 40K cost centres',
       color: COMPUTE,
       size: 'lg',
       glow: true,
@@ -397,7 +397,7 @@ const initialNodes: Node[] = [
     position: { x: 580, y: 525 },
     data: {
       text: '40K! factorial combinations',
-      sub: '~40K leaf-level events · ~9K parent rollups · ms latency',
+      sub: '~40K cost centres · ~9K parent rollups · ms latency',
       color: HERO,
       size: 'sm',
       dashedBorder: true,

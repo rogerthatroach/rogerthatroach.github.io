@@ -9,7 +9,7 @@ diagrams.
 
 ## Stack
 
-- **Next.js 14** (App Router) with `output: 'export'` → fully static
+- **Next.js 16** (App Router) with `output: 'export'` → fully static
 - **TypeScript** (strict) · **Tailwind CSS** · **Framer Motion**
 - **MDX** blog/papers · **@xyflow/react** (ReactFlow) architecture diagrams ·
   **Three.js** hero particle field · **KaTeX** math (pre-rendered at build)

@@ -78,7 +78,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Agentic AI', 'LLM Routing', 'Enterprise Security', 'Entitlement Modeling'],
       readingTime: '20 min read',
       abstract:
-        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 employee-level events across ~9,000 organizational rollups, bringing headcount-movement queries from days (line-of-business level only) to real time at any granularity, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
+        'We propose a separation-of-concerns architecture — LLM-as-Router — that combines intelligent natural-language understanding with deterministic, auditable computation. The system processes ~40,000 cost centres across ~9,000 organizational rollups, bringing headcount-movement queries from days (line-of-business level only) to real time at any granularity, while maintaining formal guarantees on data confidentiality and entitlement enforcement.',
       status: 'published',
       projectId: 'workforceAnalytics',
       register: 'formal',
