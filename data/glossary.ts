@@ -18,7 +18,7 @@ export const GLOSSARY: Record<string, string> = {
   'AI/LLM Drafting Platform':
     'Enterprise-wide agentic AI platform guiding project funding request (PAR) drafting at RBC. Pilot launched April 2026; deployed bank-wide May 2026.',
   'WorkforceAnalytics':
-    'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level cost centres with event-level ins-outs math (Cython-compiled). approved foundation model used only for parse / route / metadata extraction / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
+    'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level cost centres with event-level ins-outs math (Cython-compiled). approved foundation model used only for gate / metadata extraction / answer / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
   'FinancialBenchmarking':
     'Strategic peer-benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 (Sr DS period): solo end-to-end build that automated extraction and matching despite quarterly SFP schema shifts, the long-standing bottleneck blocking timely peer analysis. v2 (Lead, 2025): 2-week solo build adding multi-stage RAG with multi-gate query parsing across bank / parameter / platform / time-period plus text-to-SQL, run in parallel with WorkforceAnalytics and the Amplify intern program. 2025 CFO One RBC Team Award for v1.',
   'Commodity Tax':
@@ -65,7 +65,7 @@ export const GLOSSARY: Record<string, string> = {
   'single-agent envelope':
     'The governance constraint behind AI/LLM Drafting Platform v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
   'approved foundation model':
-    'The model used in WorkforceAnalytics for all LLM calls (parse, route, metadata extract, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
+    'The model used in WorkforceAnalytics for all LLM calls (gate, metadata extraction, answer, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
   'cost centre':
     'The most granular unit in WorkforceAnalytics\'s org model — one cost centre = one or more teams (~40K of them). Cost centres are the shared leaves of the business-segment and geography hierarchies; a query intersects a node from each (e.g. Wealth Management × US) down to the cost-centre leaves. Employee events (hires, departures, lateral moves, promotions, demotions) and headcount net over cost centres in Cython-compiled ins-outs math, making arbitrary cross-domain slices tractable in milliseconds.',
   PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS for closed-loop boiler control.',
