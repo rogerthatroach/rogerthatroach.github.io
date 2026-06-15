@@ -98,7 +98,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived, architected, and built AI/LLM Drafting Platform end-to-end (pilot April 2026; deployed bank-wide May 2026). Conceived, architected, and built WorkforceAnalytics end-to-end (production since Nov 2025). Designed and built FinancialBenchmarking v2 in a 2-week solo sprint while running WorkforceAnalytics and the Amplify intern program in parallel. Led the 2025 Amplify intern cohort. ~70% hands-on.',
+      'Architecting enterprise agentic AI. Conceived, architected, and built AI/LLM Drafting Platform end-to-end (pilot April 2026; deployed bank-wide May 2026), and did the same for WorkforceAnalytics (production since Nov 2025). Designed and built FinancialBenchmarking v2 in a 2-week solo sprint while running WorkforceAnalytics and the Amplify intern program in parallel. Led the 2025 Amplify intern cohort. ~70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
@@ -127,7 +127,7 @@ export const TIMELINE: TimelineNode[] = [
         oneLiner:
           'Conceived, architected, and built end-to-end: production analytics platform for CFO Group delivering dynamic headcount, HR costs, and open positions at bank scale with millisecond slicing. Production since Nov 2025.',
         decisionRationale:
-          'Two-wall architecture. approved foundation model on the intent side handles parse, route, metadata extract, and synthesis; never touches data. Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Bounded, parallel domain-specific metadata extraction across EPM, Headcount, and Open Positions, with defense-in-depth gating between stages — each LLM call has less surface area for failure, and the whole pipeline stays foundation-model-agnostic. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail. Production deployment runs through GFT on OpenShift via CI/CD.',
+          'Two-wall architecture. approved foundation model on the intent side handles gate, metadata extraction, answer, and synthesis; never touches data. Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Bounded, parallel domain-specific metadata extraction across EPM, Headcount, and Open Positions, with defense-in-depth gating between stages — each LLM call has less surface area for failure, and the whole pipeline stays foundation-model-agnostic. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail. Production deployment runs through GFT on OpenShift via CI/CD.',
         metric: { value: '~40K leaf-level cost centres', label: 'arbitrary combinations, ms latency' },
         caseStudyLink: '/projects/workforceAnalytics',
       },
