@@ -92,16 +92,14 @@ export function computeYearsExperience(asOf: Date = new Date()): number {
 }
 
 /**
- * Format raw years as a display string. Uses "~N" with N = round(value).
- * Tilde keeps the conservative-rounding semantics of the previous "nearly N"
- * framing but reads cleaner inline on portfolio surfaces (e.g., "~8 years"
- * vs "nearly 8 years"). The resume keeps the spelled-out "nearly 8" form
- * because that register is prose-only; the portfolio is scannable.
- * Slightly past an integer (e.g., 8.02) still reads as "~8" until the value
- * crosses N.5, at which point it shifts to "~N+1". Re-evaluated per build.
+ * Format raw years as a display string. Uses "N+" with N = floor(value) — the
+ * at-least-N convention (e.g. "8+ years"), which also mirrors the "8+ years"
+ * bar common in job descriptions. Past an integer the value reads as that
+ * integer "+", and advances to "9+" only once a full ninth year completes.
+ * Honest because the count is genuinely past N; re-evaluated per build.
  */
 export function formatYearsExperience(years: number = computeYearsExperience()): string {
-  return `~${Math.round(years)}`;
+  return `${Math.floor(years)}+`;
 }
 
 /** Display string. Re-evaluated at module load (build time for static export). */
