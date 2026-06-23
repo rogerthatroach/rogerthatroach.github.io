@@ -11,7 +11,7 @@ const UPDATED = 'June 2026';
 const BULLETS: { heading: string; body: string }[] = [
   {
     heading: 'Shipping',
-    body: 'PAR Assist in production — the first true agentic framework approved for production at RBC. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls.',
+    body: 'PAR Assist in production — RBC\'s first bank-wide production AI agent. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls.',
   },
   {
     heading: 'Building',
