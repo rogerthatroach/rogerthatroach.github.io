@@ -3,7 +3,6 @@
 import {
   ReactFlow,
   Background,
-  Controls,
   type Node,
   type Edge,
   useNodesState,
@@ -13,6 +12,8 @@ import '@xyflow/react/dist/style.css';
 import AgentNode from './AgentNode';
 import AnimatedEdge from './AnimatedEdge';
 import type { AgentNodeData } from './AgentNode';
+import DiagramViewport from './DiagramViewport';
+import { PROJECT_DIAGRAM_REACT_FLOW_PROPS } from './diagramCapabilities';
 import { useThemeColor } from '@/lib/useThemeColor';
 import SemanticDiagramFallback from '@/components/blog/diagrams/SemanticDiagramFallback';
 
@@ -145,31 +146,31 @@ export default function CombustionDiagram() {
           'The program was credited with approximately $3 million per year in savings.',
         ]}
       />
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        nodesFocusable={false}
-        edgesFocusable={false}
-        elementsSelectable={false}
-        deleteKeyCode={null}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        fitView
+      <DiagramViewport
+        initialNodes={initialNodes}
+        initialEdges={initialEdges}
+        initialWidth={900}
+        initialHeight={600}
         fitViewOptions={{ padding: 0.15 }}
-        minZoom={0.3}
-        maxZoom={1.5}
-        proOptions={{ hideAttribution: true }}
-        zoomOnScroll={false}
-        preventScrolling={false}
-        className="[&_.react-flow__background]:bg-transparent!"
       >
-        <Background color={gridColor} gap={24} size={1} />
-        <Controls showInteractive={false} position="bottom-right" />
-      </ReactFlow>
+        <ReactFlow
+          {...PROJECT_DIAGRAM_REACT_FLOW_PROPS}
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          fitView
+          fitViewOptions={{ padding: 0.15 }}
+          minZoom={0.3}
+          maxZoom={1.5}
+          proOptions={{ hideAttribution: true }}
+          className="[&_.react-flow__background]:bg-transparent!"
+        >
+          <Background color={gridColor} gap={24} size={1} />
+        </ReactFlow>
+      </DiagramViewport>
     </div>
   );
 }

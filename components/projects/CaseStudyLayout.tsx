@@ -383,9 +383,6 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
 
           {/* Architecture Diagram */}
           <Section id="architecture" title="Architecture">
-            <p className="mb-4 text-xs text-text-tertiary">
-              Explore the diagram; selection, pan, zoom, and semantic controls are available where supported
-            </p>
             {diagram}
           </Section>
 

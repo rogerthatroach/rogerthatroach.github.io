@@ -47,7 +47,7 @@ export default function ClosedLoopCycle() {
   return (
     <div className="flex flex-col gap-4 p-6">
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Operating-context example">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Choose an operating-context example">
         {LEVELS.map((l, i) => (
           <button
             key={l.id}
@@ -55,7 +55,7 @@ export default function ClosedLoopCycle() {
             onClick={() => setActiveLevel(i)}
             aria-pressed={i === activeLevel}
             aria-controls="closed-loop-cycle-chart"
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
+            className={`min-h-11 rounded-md px-3 py-2 text-xs font-medium transition-all ${
               i === activeLevel
                 ? 'text-white'
                 : 'bg-surface text-text-secondary hover:bg-surface-hover'

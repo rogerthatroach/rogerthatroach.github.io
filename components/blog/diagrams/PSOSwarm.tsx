@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
+import { useReducedMotion } from 'framer-motion';
 
 interface Particle {
   x: number;
@@ -43,6 +44,7 @@ const PARTICLE_COUNT = 30;
 const PSO_SEED = 20260801;
 const HISTORY_LIMIT = 240;
 const STATUS_INTERVAL = 30;
+const MAX_ITERATIONS = 120;
 const INITIAL_BEST = Math.min(
   ...initParticles(PARTICLE_COUNT, 5.12, createSeededRandom(PSO_SEED)).map(
     (particle) => particle.bestVal
@@ -50,6 +52,7 @@ const INITIAL_BEST = Math.min(
 );
 
 export default function PSOSwarm() {
+  const shouldReduceMotion = useReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const heatmapRef = useRef<ImageData | null>(null);
   const particlesRef = useRef<Particle[]>([]);
@@ -104,6 +107,7 @@ export default function PSOSwarm() {
   }, []);
 
   const reset = useCallback(() => {
+    setPlaying(false);
     randomRef.current = createSeededRandom(PSO_SEED);
     particlesRef.current = initParticles(PARTICLE_COUNT, RANGE, randomRef.current);
     globalBestRef.current = { x: 0, y: 0, val: Infinity };
@@ -266,6 +270,17 @@ export default function PSOSwarm() {
       return;
     }
 
+    if (shouldReduceMotion) {
+      while (iterRef.current < MAX_ITERATIONS) step();
+      draw();
+      setRunStatus({
+        iteration: iterRef.current,
+        best: globalBestRef.current.val,
+      });
+      setPlaying(false);
+      return;
+    }
+
     let frameCount = 0;
     const loop = () => {
       frameCount++;
@@ -273,11 +288,19 @@ export default function PSOSwarm() {
         step();
       }
       draw();
+      if (iterRef.current >= MAX_ITERATIONS) {
+        setRunStatus({
+          iteration: iterRef.current,
+          best: globalBestRef.current.val,
+        });
+        setPlaying(false);
+        return;
+      }
       rafRef.current = requestAnimationFrame(loop);
     };
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [playing, inViewport, step, draw, speed]);
+  }, [playing, inViewport, shouldReduceMotion, step, draw, speed]);
 
   // Draw initial state
   useEffect(() => { draw(); }, [draw]);
@@ -287,6 +310,7 @@ export default function PSOSwarm() {
       <p id="pso-simulation-description" className="text-xs text-text-tertiary">
         Deterministic, seeded particle-swarm illustration over the two-dimensional Rastrigin test function.
         The star marks the best sampled point found so far; it does not imply a global-optimum guarantee.
+        Each run stops after {MAX_ITERATIONS} iterations.
       </p>
 
       <noscript>
@@ -325,19 +349,19 @@ export default function PSOSwarm() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div>
           <label htmlFor="pso-inertia" className="text-[10px] text-text-tertiary">Inertia w: {w.toFixed(2)}</label>
-          <input id="pso-inertia" type="range" min={0.2} max={1} step={0.05} value={w} onChange={(e) => setW(Number(e.target.value))} className="w-full" />
+          <input id="pso-inertia" type="range" min={0.2} max={1} step={0.05} value={w} onChange={(e) => setW(Number(e.target.value))} className="min-h-11 w-full" />
         </div>
         <div>
           <label htmlFor="pso-cognitive" className="text-[10px] text-text-tertiary">Cognitive c₁: {c1.toFixed(1)}</label>
-          <input id="pso-cognitive" type="range" min={0} max={3} step={0.1} value={c1} onChange={(e) => setC1(Number(e.target.value))} className="w-full" />
+          <input id="pso-cognitive" type="range" min={0} max={3} step={0.1} value={c1} onChange={(e) => setC1(Number(e.target.value))} className="min-h-11 w-full" />
         </div>
         <div>
           <label htmlFor="pso-social" className="text-[10px] text-text-tertiary">Social c₂: {c2.toFixed(1)}</label>
-          <input id="pso-social" type="range" min={0} max={3} step={0.1} value={c2} onChange={(e) => setC2(Number(e.target.value))} className="w-full" />
+          <input id="pso-social" type="range" min={0} max={3} step={0.1} value={c2} onChange={(e) => setC2(Number(e.target.value))} className="min-h-11 w-full" />
         </div>
         <div>
           <label htmlFor="pso-speed" className="text-[10px] text-text-tertiary">Playback speed: {speed}×</label>
-          <input id="pso-speed" type="range" min={1} max={3} step={1} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="w-full" />
+          <input id="pso-speed" type="range" min={1} max={3} step={1} value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="min-h-11 w-full" />
         </div>
       </div>
 
@@ -350,20 +374,22 @@ export default function PSOSwarm() {
                 iteration: iterRef.current,
                 best: globalBestRef.current.val,
               });
+            } else if (iterRef.current >= MAX_ITERATIONS) {
+              reset();
             }
             setPlaying(!playing);
           }}
           aria-pressed={playing}
           aria-controls="pso-simulation-canvas"
-          className="rounded-md bg-accent px-4 py-1.5 text-xs font-medium text-white"
+          className="min-h-11 rounded-md bg-accent px-4 py-2 text-xs font-medium text-white"
         >
-          {playing ? 'Pause' : 'Play'}
+          {playing ? 'Pause' : runStatus.iteration >= MAX_ITERATIONS ? 'Run again' : 'Run'}
         </button>
         <button
           type="button"
           onClick={() => { reset(); draw(); }}
           aria-controls="pso-simulation-canvas"
-          className="rounded-md bg-surface px-4 py-1.5 text-xs font-medium text-text-secondary hover:bg-surface-hover"
+          className="min-h-11 rounded-md bg-surface px-4 py-2 text-xs font-medium text-text-secondary hover:bg-surface-hover"
         >
           Reset
         </button>

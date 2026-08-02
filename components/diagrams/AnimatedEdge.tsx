@@ -19,14 +19,31 @@ function AnimatedEdge(props: EdgeProps) {
   return (
     <>
       {/* edge-draw: the stroke draws itself in once on mount (≈ when the
-          diagram lazy-mounts near the viewport); the flowing dots below keep
-          running. Reduced-motion shows the settled line (see globals.css). */}
+          diagram lazy-mounts near the viewport). Each dot traverses the edge
+          once and fades; reduced-motion shows only the settled line. */}
       <BaseEdge path={edgePath} className="edge-draw" style={{ stroke: edgeColor, strokeWidth: 2, opacity: 0.4 }} />
-      <circle r="3" fill={edgeColor}>
-        <animateMotion dur="2s" repeatCount="indefinite" path={edgePath} />
+      <circle aria-hidden="true" className="edge-flow-dot" r="3" fill={edgeColor}>
+        <animateMotion dur="2s" repeatCount="1" path={edgePath} />
+        <animate
+          attributeName="opacity"
+          values="1;1;0"
+          keyTimes="0;0.9;1"
+          dur="2s"
+          repeatCount="1"
+          fill="freeze"
+        />
       </circle>
-      <circle r="3" fill={edgeColor} opacity="0.4">
-        <animateMotion dur="2s" repeatCount="indefinite" path={edgePath} begin="1s" />
+      <circle aria-hidden="true" className="edge-flow-dot" r="3" fill={edgeColor} opacity="0.4">
+        <animateMotion dur="2s" repeatCount="1" path={edgePath} begin="1s" />
+        <animate
+          attributeName="opacity"
+          values="0.4;0.4;0"
+          keyTimes="0;0.9;1"
+          dur="2s"
+          begin="1s"
+          repeatCount="1"
+          fill="freeze"
+        />
       </circle>
     </>
   );

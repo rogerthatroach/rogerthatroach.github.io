@@ -62,7 +62,7 @@ export default function AbstractionLadder() {
           onClick={() => setShowTech(!showTech)}
           aria-expanded={showTech}
           aria-controls="abstraction-ladder-chart"
-          className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`min-h-11 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
             showTech ? 'bg-accent text-white' : 'bg-surface text-text-secondary hover:bg-surface-hover'
           }`}
         >

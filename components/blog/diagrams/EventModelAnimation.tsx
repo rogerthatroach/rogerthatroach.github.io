@@ -34,9 +34,11 @@ export default function EventModelAnimation() {
   const rollupCounts = rollups.map((r) =>
     positions.filter((p) => p.rollup === r).reduce((s, p) => s + p.count, 0)
   );
+  const selectedSource = positions.find((position) => position.id === selectedFrom);
 
   const handleClick = (posId: string) => {
     if (!selectedFrom) {
+      if ((positions.find((position) => position.id === posId)?.count ?? 0) <= 0) return;
       setSelectedFrom(posId);
       return;
     }
@@ -112,33 +114,46 @@ export default function EventModelAnimation() {
             <div className="space-y-2">
               {positions
                 .filter((p) => p.rollup === rollup)
-                .map((pos) => (
-                  <motion.button
-                    key={pos.id}
-                    type="button"
-                    onClick={() => handleClick(pos.id)}
-                    aria-pressed={selectedFrom === pos.id}
-                    aria-label={`${pos.label}, illustrative headcount ${pos.count}${selectedFrom === pos.id ? ', selected as transfer source' : ''}`}
-                    className={`w-full rounded-md border p-2 text-left transition-colors ${
-                      selectedFrom === pos.id
-                        ? 'border-accent bg-accent-muted'
-                        : 'border-border-subtle hover:bg-surface-hover'
-                    }`}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-text-secondary">{pos.label}</span>
-                      <motion.span
-                        key={pos.count}
-                        initial={false}
-                        animate={{ scale: 1 }}
-                        className="font-mono text-xs font-bold text-text-primary"
-                      >
-                        {pos.count}
-                      </motion.span>
-                    </div>
-                  </motion.button>
-                ))}
+                .map((pos) => {
+                  const isSelected = selectedFrom === pos.id;
+                  const isUnavailableSource = !selectedSource && pos.count <= 0;
+                  const actionLabel = isSelected
+                    ? 'Cancel source selection'
+                    : selectedSource
+                      ? `Transfer one illustrative employee from ${selectedSource.label} to ${pos.label}`
+                      : isUnavailableSource
+                        ? 'Unavailable as a transfer source because its illustrative headcount is zero'
+                        : 'Select as transfer source';
+
+                  return (
+                    <motion.button
+                      key={pos.id}
+                      type="button"
+                      onClick={() => handleClick(pos.id)}
+                      disabled={isUnavailableSource}
+                      aria-pressed={isSelected}
+                      aria-label={`${pos.label}, illustrative headcount ${pos.count}. ${actionLabel}.`}
+                      className={`min-h-11 w-full rounded-md border p-2 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                        isSelected
+                          ? 'border-accent bg-accent-muted'
+                          : 'border-border-subtle hover:bg-surface-hover'
+                      }`}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-text-secondary">{pos.label}</span>
+                        <motion.span
+                          key={pos.count}
+                          initial={false}
+                          animate={{ scale: 1 }}
+                          className="font-mono text-xs font-bold text-text-primary"
+                        >
+                          {pos.count}
+                        </motion.span>
+                      </div>
+                    </motion.button>
+                  );
+                })}
             </div>
           </div>
         ))}
@@ -148,7 +163,14 @@ export default function EventModelAnimation() {
       <div className="rounded-lg border border-border-subtle bg-surface/30 p-3">
         <div className="mb-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-text-primary">Event Log</span>
-          <button type="button" onClick={reset} className="text-[10px] text-accent hover:underline">Reset</button>
+          <button
+            type="button"
+            onClick={reset}
+            aria-label="Reset illustrative transfers and headcounts"
+            className="min-h-11 rounded-md px-3 text-xs text-accent hover:underline"
+          >
+            Reset
+          </button>
         </div>
         <div className="max-h-32 space-y-1 overflow-y-auto" role="log" aria-live="polite" aria-relevant="additions">
           <AnimatePresence>

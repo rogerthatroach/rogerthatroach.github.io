@@ -112,7 +112,7 @@ export default function EmbeddingSpace() {
           onChange={(event) => setQuery(event.target.value)}
           aria-describedby="lexical-demo-note lexical-demo-status"
           placeholder="e.g., interest margin, CET1, efficiency..."
-          className="flex-1 rounded-md border border-border-subtle bg-surface px-3 py-1.5 text-xs text-text-primary placeholder:text-text-tertiary"
+          className="min-h-11 flex-1 rounded-md border border-border-subtle bg-surface px-3 py-2 text-xs text-text-primary placeholder:text-text-tertiary"
         />
       </div>
 

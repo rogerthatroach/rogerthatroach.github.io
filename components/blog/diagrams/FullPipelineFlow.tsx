@@ -38,7 +38,7 @@ export default function FullPipelineFlow() {
       <p className="text-xs text-text-tertiary">
         Illustrative pipeline states; confidence language is qualitative rather than production telemetry.
       </p>
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Pipeline example">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Choose a pipeline example">
         {EXAMPLE_QUERIES.map((q, i) => (
           <button
             key={i}
@@ -46,7 +46,7 @@ export default function FullPipelineFlow() {
             onClick={() => setQueryIdx(i)}
             aria-pressed={i === queryIdx}
             aria-controls="pipeline-example-stages"
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`min-h-11 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
               i === queryIdx ? 'bg-accent text-white' : 'bg-surface text-text-secondary hover:bg-surface-hover'
             }`}
           >

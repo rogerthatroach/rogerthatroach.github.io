@@ -35,7 +35,7 @@ export default function PermissionCascade() {
       </p>
 
       {/* Toggle */}
-      <div className="flex gap-2" role="group" aria-label="Permission example">
+      <div className="flex gap-2" role="group" aria-label="Choose a synthetic permission example">
         {PERMISSION_SETS.map((p, i) => (
           <button
             key={i}
@@ -43,7 +43,7 @@ export default function PermissionCascade() {
             onClick={() => setPermIdx(i)}
             aria-pressed={i === permIdx}
             aria-controls="permission-cascade-example"
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`min-h-11 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
               i === permIdx
                 ? 'bg-accent text-white'
                 : 'bg-surface text-text-secondary hover:bg-surface-hover'
@@ -58,63 +58,69 @@ export default function PermissionCascade() {
         Synthetic illustration: all names, domains, groups, identities, and counts below are fictional.
       </p>
 
-      {/* Pipeline */}
-      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-        {STAGES.map((stage, i) => {
-          const counts = [
-            perm.domains.length,
-            perm.groups.length,
-            perm.entities,
-            perm.costCentres,
-            1,
-          ];
-          const stageLabels = ['α', 'β', 'γ', 'δ'];
+      <div id="permission-cascade-example" className="space-y-3">
+        {/* Pipeline */}
+        <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+          {STAGES.map((stage, i) => {
+            const counts = [
+              perm.domains.length,
+              perm.groups.length,
+              perm.entities,
+              perm.costCentres,
+              1,
+            ];
+            const stageLabels = ['α', 'β', 'γ', 'δ'];
 
-          return (
-            <div key={stage} className="flex flex-1 items-center gap-2">
-              <motion.div
-                layout
-                className="flex-1 rounded-lg border border-border-subtle bg-surface/80 p-3"
-              >
-                <p className="text-xs font-semibold text-accent">{stage}</p>
-                <motion.p
-                  key={`${permIdx}-${i}`}
-                  initial={false}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="mt-1 font-mono text-lg font-bold text-text-primary"
+            return (
+              <div key={stage} className="flex flex-1 items-center gap-2">
+                <motion.div
+                  layout
+                  className="flex-1 rounded-lg border border-border-subtle bg-surface/80 p-3"
                 >
-                  {i < 2 ? counts[i] : counts[i].toLocaleString()}
-                </motion.p>
-                {i < 2 && (
-                  <div className="mt-1 space-y-0.5">
-                    {(i === 0 ? perm.domains : perm.groups).map((item) => (
-                      <p key={item} className="truncate text-[9px] text-text-tertiary">{item}</p>
-                    ))}
+                  <p className="text-xs font-semibold text-accent">{stage}</p>
+                  <motion.p
+                    key={`${permIdx}-${i}`}
+                    initial={false}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-1 font-mono text-lg font-bold text-text-primary"
+                  >
+                    {i < 2 ? counts[i] : counts[i].toLocaleString()}
+                  </motion.p>
+                  {i < 2 && (
+                    <div className="mt-1 space-y-0.5">
+                      {(i === 0 ? perm.domains : perm.groups).map((item) => (
+                        <p key={item} className="break-words text-[9px] text-text-tertiary">{item}</p>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+                {i < STAGES.length - 1 && (
+                  <div className="hidden flex-col items-center sm:flex">
+                    <span className="text-[9px] text-accent">{stageLabels[i]}</span>
+                    <span className="text-text-tertiary">→</span>
                   </div>
                 )}
-              </motion.div>
-              {i < STAGES.length - 1 && (
-                <div className="hidden flex-col items-center sm:flex">
-                  <span className="text-[9px] text-accent">{stageLabels[i]}</span>
-                  <span className="text-text-tertiary">→</span>
-                </div>
-              )}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* SQL Output */}
+        <motion.pre
+          key={permIdx}
+          initial={false}
+          animate={{ opacity: 1 }}
+          className="overflow-x-auto rounded-lg bg-surface p-4 font-mono text-xs text-text-secondary"
+        >
+          <code>{perm.sql}</code>
+        </motion.pre>
       </div>
 
-      {/* SQL Output */}
-      <motion.pre
-        id="permission-cascade-example"
-        key={permIdx}
-        initial={false}
-        animate={{ opacity: 1 }}
-        aria-live="polite"
-        className="overflow-x-auto rounded-lg bg-surface p-4 font-mono text-xs text-text-secondary"
-      >
-        <code>{perm.sql}</code>
-      </motion.pre>
+      <p className="sr-only" role="status" aria-live="polite">
+        {perm.label}: {perm.domains.length} domains, {perm.groups.length} access groups,{' '}
+        {perm.entities.toLocaleString()} entities, {perm.costCentres.toLocaleString()} cost centres,
+        then one SQL filter.
+      </p>
 
       <noscript>
         <div className="rounded-lg border border-border-subtle bg-surface/50 p-4">
