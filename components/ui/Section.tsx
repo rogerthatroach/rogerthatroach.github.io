@@ -15,7 +15,7 @@ export default function Section({ id, title, children, className }: SectionProps
     <section id={id} className={cn('px-6 py-14 md:px-16', className)}>
       <div className="mx-auto max-w-content">
         <motion.h2
-          initial={{ opacity: 0, y: 20 }}
+          initial={false}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
           transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] as const }}

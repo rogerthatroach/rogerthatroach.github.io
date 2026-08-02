@@ -1,72 +1,40 @@
-'use client';
-
-import dynamic from 'next/dynamic';
 import type { BlogPostMeta } from '@/data/posts';
 import { POSTS } from '@/data/posts';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
 import { PROJECTS } from '@/data/projects';
 import PostLayout from './PostLayout';
+import AgenticAiPost from '@/data/posts/agentic-ai.mdx';
+import TextToSqlPost from '@/data/posts/text-to-sql.mdx';
+import ClosedLoopPost from '@/data/posts/closed-loop.mdx';
+import EnterpriseAgenticAiPost from '@/data/posts/enterprise-agentic-ai.mdx';
+import EnterpriseAgenticAiFrameworkPost from '@/data/posts/enterprise-agentic-ai-framework.mdx';
+import FundingRequestBuildingPost from '@/data/posts/funding-request-drafting-platform-building.mdx';
+import CommodityTaxCfoTrustPost from '@/data/posts/commodity-tax-cfo-trust.mdx';
+import CommodityTaxCfoTrustFrameworkPost from '@/data/posts/commodity-tax-cfo-trust-framework.mdx';
+import WorkforceAnalyticsRouterPost from '@/data/posts/workforce-analytics-llm-as-router.mdx';
+import WorkforceAnalyticsRouterFrameworkPost from '@/data/posts/workforce-analytics-routing-framework.mdx';
+import FinancialBenchmarkingVelocityPost from '@/data/posts/financial-benchmarking-refactor-velocity.mdx';
+import FinancialBenchmarkingFrameworkPost from '@/data/posts/financial-benchmarking-decomposition-framework.mdx';
+import CommodityTaxProvenancePost from '@/data/posts/commodity-tax-provenance.mdx';
 
-// Post content components — SSR enabled so equations render into static HTML.
-// Interactive diagrams inside each post use their own ssr:false via next/dynamic.
+// Only published post bodies are imported into this server-side registry. Keeping
+// the registry static ensures the complete article appears in exported/no-JS HTML
+// without reintroducing draft bodies into a shared client bundle.
 const POST_COMPONENTS: Record<string, React.ComponentType> = {
-  'agentic-ai': dynamic(() => import('@/data/posts/agentic-ai.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'text-to-sql': dynamic(() => import('@/data/posts/text-to-sql.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'closed-loop': dynamic(() => import('@/data/posts/closed-loop.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'enterprise-agentic-ai-architecture': dynamic(() => import('@/data/posts/enterprise-agentic-ai.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'enterprise-agentic-ai-framework': dynamic(() => import('@/data/posts/enterprise-agentic-ai-framework.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'funding-request-drafting-platform-building': dynamic(() => import('@/data/posts/funding-request-drafting-platform-building.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'commodity-tax-cfo-trust': dynamic(() => import('@/data/posts/commodity-tax-cfo-trust.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'commodity-tax-cfo-trust-framework': dynamic(() => import('@/data/posts/commodity-tax-cfo-trust-framework.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'workforce-analytics-llm-as-router': dynamic(() => import('@/data/posts/workforce-analytics-llm-as-router.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'workforce-analytics-routing-framework': dynamic(() => import('@/data/posts/workforce-analytics-routing-framework.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'combustion-tuning-operators': dynamic(() => import('@/data/posts/combustion-tuning-operators.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'document-intelligence-accuracy-cliff': dynamic(() => import('@/data/posts/document-intelligence-accuracy-cliff.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'financial-benchmarking-refactor-velocity': dynamic(() => import('@/data/posts/financial-benchmarking-refactor-velocity.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'financial-benchmarking-decomposition-framework': dynamic(() => import('@/data/posts/financial-benchmarking-decomposition-framework.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
-  'commodity-tax-provenance': dynamic(() => import('@/data/posts/commodity-tax-provenance.mdx'), {
-    loading: () => <PostSkeleton />,
-  }),
+  'agentic-ai': AgenticAiPost,
+  'text-to-sql': TextToSqlPost,
+  'closed-loop': ClosedLoopPost,
+  'enterprise-agentic-ai-architecture': EnterpriseAgenticAiPost,
+  'enterprise-agentic-ai-framework': EnterpriseAgenticAiFrameworkPost,
+  'funding-request-drafting-platform-building': FundingRequestBuildingPost,
+  'commodity-tax-cfo-trust': CommodityTaxCfoTrustPost,
+  'commodity-tax-cfo-trust-framework': CommodityTaxCfoTrustFrameworkPost,
+  'workforce-analytics-llm-as-router': WorkforceAnalyticsRouterPost,
+  'workforce-analytics-routing-framework': WorkforceAnalyticsRouterFrameworkPost,
+  'financial-benchmarking-refactor-velocity': FinancialBenchmarkingVelocityPost,
+  'financial-benchmarking-decomposition-framework': FinancialBenchmarkingFrameworkPost,
+  'commodity-tax-provenance': CommodityTaxProvenancePost,
 };
-
-function PostSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="h-4 w-3/4 animate-pulse rounded-sm bg-surface" />
-      <div className="h-4 w-full animate-pulse rounded-sm bg-surface" />
-      <div className="h-4 w-5/6 animate-pulse rounded-sm bg-surface" />
-      <div className="h-32 w-full animate-pulse rounded-sm bg-surface" />
-    </div>
-  );
-}
 
 interface BlogPostShellProps {
   slug: string;

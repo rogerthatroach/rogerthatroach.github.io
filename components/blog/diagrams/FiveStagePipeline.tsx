@@ -29,7 +29,7 @@ const STAGES = [
     output: 'Resolved KPI',
     usesLLM: true,
     color: '#3b82f6',
-    detail: 'LLM-assisted selection with confidence scoring. If confidence < threshold, requests clarification instead of guessing. Never sees KPI values.',
+    detail: 'LLM-assisted selection with confidence scoring. If confidence < threshold, requests clarification instead of guessing. Its declared payload is limited to candidate metadata and the user query.',
   },
   {
     id: 's4',
@@ -38,7 +38,7 @@ const STAGES = [
     output: 'Validated SQL',
     usesLLM: false,
     color: '#22c55e',
-    detail: 'Template selection + parameterization. Four validation gates: whitelist, operation check, structure check, type check. Injection impossible by construction.',
+    detail: 'Reviewed templates + parameter binding. Allow-list, operation, structure, type, and deny-list checks constrain the query surface before execution.',
   },
   {
     id: 's5',
@@ -64,7 +64,10 @@ export default function FiveStagePipeline() {
           <div key={stage.id} className="flex flex-1 flex-col items-center gap-1">
             {/* Stage box */}
             <motion.button
+              type="button"
               onClick={() => setExpanded(expanded === i ? null : i)}
+              aria-expanded={expanded === i}
+              aria-controls={`five-stage-detail-${stage.id}`}
               className="w-full rounded-lg border p-3 text-left transition-colors"
               style={{
                 borderColor: expanded === i ? stage.color : 'var(--color-border)',
@@ -99,6 +102,7 @@ export default function FiveStagePipeline() {
       <AnimatePresence>
         {expanded !== null && (
           <motion.div
+            id={`five-stage-detail-${STAGES[expanded].id}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -113,6 +117,21 @@ export default function FiveStagePipeline() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <noscript>
+        <ol className="space-y-3 rounded-lg border border-border-subtle bg-surface/50 p-4">
+          {STAGES.map((stage, stageIndex) => (
+            <li key={stage.id}>
+              <p className="text-xs font-semibold text-text-primary">
+                Stage {stageIndex + 1}: {stage.label}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-text-secondary">
+                {stage.detail}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </noscript>
     </div>
   );
 }

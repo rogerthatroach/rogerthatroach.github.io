@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
-import { Linkedin, ArrowRight, Download, FileText, LayoutList } from 'lucide-react';
+import { Linkedin, ArrowRight, LayoutList } from 'lucide-react';
 import { ABOUT } from '@/data/about';
 import { HERO } from '@/data/hero';
 import ThesisMapping from './ThesisMapping';
@@ -31,10 +31,8 @@ export default function AboutSection() {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,42rem)_auto] lg:gap-14">
           {/* Text column */}
           <div>
-            {/* Thesis mapping — the four abstraction levels made explicit.
-                Leads the page: the "Three things I've learned..." opener
-                below is a teaser for the three beliefs, so keeping the
-                mapping between opener and beliefs broke that flow. */}
+            {/* Cross-domain heuristic map. It leads the page so the opener
+                and belief list below remain one uninterrupted argument. */}
             <ThesisMapping />
 
             {/* Opener — the thesis. Above-the-fold on mobile and a likely
@@ -111,10 +109,8 @@ export default function AboutSection() {
               />
             </div>
 
-            {/* Contact + resume stack — parallel button treatment so the
-                interactive resume, PDF download, and LinkedIn read as
-                equally-weighted next steps. Interactive resume leads
-                because it's the richest entry point. */}
+            {/* Contact + resume stack. Interactive resume leads because it is
+                the richest entry point. */}
             <div className="mt-5 space-y-2.5">
               <Link
                 href="/resume"
@@ -140,32 +136,6 @@ export default function AboutSection() {
                 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </a>
 
-              <a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                download
-                className="group flex items-center justify-between rounded-lg border border-border-subtle bg-surface/50 px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <Download size={16} />
-                  Download PDF
-                </span>
-                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-              </a>
-
-              <a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center justify-between rounded-lg border border-border-subtle bg-surface/50 px-4 py-2.5 text-sm font-medium text-text-secondary transition-colors hover:border-accent/40 hover:bg-surface-hover hover:text-accent"
-              >
-                <span className="inline-flex items-center gap-2">
-                  <FileText size={16} />
-                  Open PDF in browser
-                </span>
-                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-              </a>
             </div>
           </motion.aside>
         </div>

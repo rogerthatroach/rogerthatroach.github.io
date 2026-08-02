@@ -41,7 +41,7 @@ const REGISTER_GLYPH: Record<Register, string> = {
 };
 
 const REGISTER_GLOSS: Record<Register, string> = {
-  formal: 'theorem · proof · math',
+  formal: 'definitions · assumptions · math',
   practitioner: 'decisions · options considered · rationale',
   builder: 'story · lessons · leadership',
 };
@@ -95,9 +95,9 @@ export default function BlogIndexClient({ groups }: { groups: AccordionGroup[] }
       <div className="sticky top-16 z-20 -mx-6 border-b border-border-subtle/40 bg-background/85 px-6 pb-5 pt-3 backdrop-blur-md md:-mx-16 md:px-16">
         <h1 className="font-display text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
         <p className="mt-2 max-w-2xl text-base text-text-secondary">
-          Technical explorations — architecture patterns, formal guarantees, and the systems
-          thinking behind the work. Grouped by project so posts about the same system read as
-          a set.
+          Technical explorations — architecture patterns, control assumptions, and the systems
+          thinking behind the work. Grouped by project so posts about the same system read as a
+          set.
         </p>
 
         {/* Register chips — selecting filter. Default empty = show all

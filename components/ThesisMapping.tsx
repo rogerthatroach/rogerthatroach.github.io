@@ -4,19 +4,12 @@ import { TIMELINE, type TimelineNode } from '@/data/timeline';
 import { cn } from '@/lib/utils';
 
 /**
- * Four-abstraction-level thesis mapping for /about.
+ * Four-domain design-heuristic map for /about.
  *
- * Renders the sense → model → optimize → act pattern at ascending
- * abstraction levels (Physical → Cloud → Financial → Intelligent), each
- * row anchored to the role where that level was shipped. The audit's
- * P1-6 brief: "Thesis visible on /about without scrolling on desktop.
- * Each row links to a case study or blog post."
- *
- * Reads role data from data/timeline.ts so period / logo / link stay
- * canonical. Level labels are a presentation layer — the audit framing
- * (Physical / Cloud / Financial / Intelligent) is clearer for a
- * director-audience than the role-era strings (Foundation / Cloud ML /
- * Enterprise Analytics / Intelligent Systems) used elsewhere.
+ * Each row links recurring observe → estimate → choose → act questions to
+ * a project without implying that objectives or guarantees transfer between
+ * domains. Role data comes from data/timeline.ts so dates and links stay
+ * canonical.
  */
 
 interface LevelMap {
@@ -30,19 +23,19 @@ const LEVELS: LevelMap[] = [
   {
     level: 'Physical',
     id: 'tcs',
-    highlight: '84 ML models · PSO · $3M/yr saved at 900MW Maizuru',
+    highlight: '84 ML models · PSO · $3M/yr saved on a 900MW Maizuru unit',
     href: '/projects/combustion-tuning',
   },
   {
     level: 'Cloud',
     id: 'quantiphi',
-    highlight: '~70% → 99.95% accuracy on Humana documents',
+    highlight: '~70% → 99.95% checkbox-detection accuracy for Humana',
     href: '/projects/document-intelligence',
   },
   {
     level: 'Financial',
     id: 'rbc-senior',
-    highlight: 'months → 90 min on $600M+ commodity-tax allocations',
+    highlight: 'months → 90 min on a roughly $600M commodity-tax allocation',
     href: '/projects/commodity-tax',
   },
   {
@@ -58,18 +51,18 @@ export default function ThesisMapping() {
     <section aria-labelledby="thesis-heading" className="my-10">
       <div className="mb-5">
         <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
-          The pattern, mapped
+          The heuristic, mapped
         </p>
         <h2
           id="thesis-heading"
           className="mt-1 text-lg font-semibold text-text-primary sm:text-xl"
         >
-          Same closed loop, four abstraction levels.
+          Four domains, four recurring questions.
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-text-secondary">
-          Sense the state of the system. Model it. Optimize against a goal.
-          Act — and close the loop. The substrate changes; the pattern
-          doesn&rsquo;t.
+          What is observed? What is estimated? What choice follows? Who or
+          what acts? The questions recur; each domain keeps its own evidence,
+          controls, and failure modes.
         </p>
       </div>
 

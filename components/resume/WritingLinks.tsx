@@ -14,7 +14,7 @@ const LINKS = [
     icon: ScrollText,
     title: 'Long-form papers (in progress)',
     summary:
-      'Operating-model drafts on AI inside bank CFO functions. Abstract + ToC + BibTeX surfaced; full drafts ship as they land.',
+      'Clearly labeled working notes on AI inside bank CFO functions. Drafts are not presented as published or citable work.',
   },
 ];
 

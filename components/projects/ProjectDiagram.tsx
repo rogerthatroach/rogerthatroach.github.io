@@ -1,26 +1,19 @@
-'use client';
+import CombustionDiagram from '@/components/diagrams/CombustionDiagram';
+import DocumentIntelligenceDiagram from '@/components/diagrams/DocumentIntelligenceDiagram';
+import CommodityTaxDiagram from '@/components/diagrams/CommodityTaxDiagram';
+import FinancialBenchmarkingDiagram from '@/components/diagrams/FinancialBenchmarkingDiagram';
+import WorkforceAnalyticsDiagram from '@/components/diagrams/WorkforceAnalyticsDiagram';
+import FundingRequestDiagram from '@/components/diagrams/FundingRequestDiagram';
 
-import dynamic from 'next/dynamic';
-
-function DiagramSkeleton() {
-  return (
-    <div className="flex h-[400px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface/50 sm:h-[500px]">
-      <span className="text-xs text-text-tertiary">Loading diagram...</span>
-    </div>
-  );
-}
-
-// next/dynamic with { ssr: false } must live in a Client Component as of
-// Next 16 (it was allowed in Server Components through Next 14). The ReactFlow
-// architecture diagrams are client-only, so this wrapper owns the lazy map and
-// the case-study page (a Server Component) just passes the slug.
+// Static registry: each leaf remains a Client Component, but Next can render its
+// semantic fallback into the exported case-study HTML.
 const DIAGRAMS: Record<string, React.ComponentType> = {
-  'combustion-tuning': dynamic(() => import('@/components/diagrams/CombustionDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'document-intelligence': dynamic(() => import('@/components/diagrams/DocumentIntelligenceDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'commodity-tax': dynamic(() => import('@/components/diagrams/CommodityTaxDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'financialBenchmarking': dynamic(() => import('@/components/diagrams/FinancialBenchmarkingDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'workforceAnalytics': dynamic(() => import('@/components/diagrams/WorkforceAnalyticsDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'funding-request-drafting': dynamic(() => import('@/components/diagrams/FundingRequestDiagram'), { ssr: false, loading: DiagramSkeleton }),
+  'combustion-tuning': CombustionDiagram,
+  'document-intelligence': DocumentIntelligenceDiagram,
+  'commodity-tax': CommodityTaxDiagram,
+  'financialBenchmarking': FinancialBenchmarkingDiagram,
+  'workforceAnalytics': WorkforceAnalyticsDiagram,
+  'funding-request-drafting': FundingRequestDiagram,
 };
 
 export default function ProjectDiagram({ slug }: { slug: string }) {

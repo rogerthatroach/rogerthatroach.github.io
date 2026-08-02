@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -37,26 +37,55 @@ export default function RoleOverlay({
 }) {
   const era = ERA_PALETTES[node.era];
   const eraStyle = era ? paletteStyle(era) : undefined;
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+
+      const focusable = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      );
+      if (focusable.length === 0) {
+        e.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     // Body scroll lock
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', onKey);
+    const focusTarget = dialogRef.current?.querySelector<HTMLElement>('button, a[href]');
+    (focusTarget ?? dialogRef.current)?.focus();
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener('keydown', onKey);
+      if (previouslyFocused?.isConnected) previouslyFocused.focus();
     };
   }, [onClose]);
 
   return (
     <motion.div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="role-overlay-title"
+      tabIndex={-1}
       className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8 print:hidden"
       onClick={onClose}
     >

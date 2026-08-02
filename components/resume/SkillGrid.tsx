@@ -61,9 +61,12 @@ export default function SkillGrid() {
                       {skill.name}
                     </strong>
                     {skill.firstShipped && (
-                      <span className="font-mono text-[10px] text-text-tertiary">
-                        since {skill.firstShipped}
-                      </span>
+                      <>
+                        <span className="sr-only">, </span>
+                        <span className="font-mono text-[10px] text-text-tertiary">
+                          since {skill.firstShipped}
+                        </span>
+                      </>
                     )}
                   </div>
                   {skill.anchorProject && (
@@ -82,7 +85,7 @@ export default function SkillGrid() {
                 <motion.li
                   key={`${skill.category}-${skill.name}`}
                   layout
-                  initial={{ opacity: 0, scale: 0.95 }}
+                  initial={false}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}

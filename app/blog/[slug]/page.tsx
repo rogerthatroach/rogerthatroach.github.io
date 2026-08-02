@@ -6,6 +6,17 @@ import Footer from '@/components/Footer';
 import BlogPostShell from '@/components/blog/BlogPostShell';
 
 const SITE_URL = 'https://rogerthatroach.github.io';
+const MAX_META_DESCRIPTION_LENGTH = 160;
+
+function truncateDescription(text: string): string {
+  const normalized = text.trim().replace(/\s+/g, ' ');
+  if (normalized.length <= MAX_META_DESCRIPTION_LENGTH) return normalized;
+
+  const candidate = normalized.slice(0, MAX_META_DESCRIPTION_LENGTH - 1);
+  const lastBoundary = candidate.lastIndexOf(' ');
+  const truncated = lastBoundary > 0 ? candidate.slice(0, lastBoundary) : candidate;
+  return `${truncated.trimEnd()}…`;
+}
 
 export function generateStaticParams() {
   return POSTS.filter((p) => isPostPublic(p)).map((p) => ({
@@ -16,20 +27,23 @@ export function generateStaticParams() {
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
   const post = POSTS.find((p) => p.meta.slug === params.slug);
-  if (!post) return {};
+  if (!post || !isPostPublic(post)) return {};
+
+  const description = truncateDescription(post.meta.abstract);
 
   return {
     title: post.meta.title,
-    description: post.meta.abstract,
+    description,
     alternates: { canonical: `/blog/${params.slug}` },
     openGraph: {
       title: post.meta.title,
-      description: post.meta.abstract,
+      description,
       url: `/blog/${params.slug}`,
       siteName: 'Harmilap Singh Dhaliwal',
       locale: 'en_US',
       type: 'article',
       publishedTime: post.meta.date,
+      modifiedTime: post.meta.updated ?? post.meta.date,
       authors: ['Harmilap Singh Dhaliwal'],
       tags: post.meta.tags,
       images: ['/og-image.png'],
@@ -37,7 +51,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
     twitter: {
       card: 'summary_large_image',
       title: post.meta.title,
-      description: post.meta.abstract,
+      description,
       images: ['/og-image.png'],
     },
   };
@@ -56,7 +70,7 @@ function blogPostingJsonLd(slug: string) {
     headline: post.meta.title,
     description: post.meta.abstract,
     datePublished: post.meta.date,
-    dateModified: post.meta.date,
+    dateModified: post.meta.updated ?? post.meta.date,
     author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: 'Harmilap Singh Dhaliwal' },
     keywords: post.meta.tags.join(', '),
     url,

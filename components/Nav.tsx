@@ -46,7 +46,9 @@ export default function Nav() {
   return (
     <motion.nav
       aria-label="Main navigation"
-      initial={{ y: -20, opacity: 0 }}
+      // Navigation must remain visible in server-rendered and no-JS output.
+      // Other interactive behavior still enhances after hydration.
+      initial={false}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.5, duration: 0.5 }}
       className={cn(
@@ -96,7 +98,7 @@ export default function Nav() {
         {/* Mobile — kebab (left) + theme toggle (right), dropdown holds links.
             Kebab shares the circular-chip design language of ThemePicker; the
             dropdown panel mirrors RoleOverlay's frosted-glass treatment. */}
-        <div ref={menuRef} className="relative flex items-center gap-2 md:hidden">
+        <div ref={menuRef} className="js-mobile-nav relative flex items-center gap-2 md:hidden">
           <motion.button
             type="button"
             onClick={() => setMenuOpen((s) => !s)}
@@ -183,6 +185,27 @@ export default function Nav() {
             )}
           </AnimatePresence>
         </div>
+
+        <noscript>
+          <style>{'.js-mobile-nav{display:none!important}'}</style>
+          <details className="relative md:hidden">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-full border border-border-subtle bg-surface px-4 text-sm font-medium text-text-secondary">
+              Navigation
+            </summary>
+            <ul className="absolute right-0 top-[calc(100%+0.5rem)] min-w-48 overflow-hidden rounded-xl border border-border-subtle bg-surface py-1 shadow-2xl">
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="block px-4 py-2.5 text-sm text-text-secondary"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </noscript>
       </div>
     </motion.nav>
   );

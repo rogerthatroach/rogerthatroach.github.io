@@ -2,118 +2,39 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Check, Palette } from 'lucide-react';
+import {
+  DEFAULT_THEME_ID,
+  THEMES,
+  getTheme,
+  isThemeId,
+  type ThemeId,
+} from '@/data/themes';
 import { cn } from '@/lib/utils';
 
 /**
- * Site-wide theme picker. Replaces ThemeToggle with a 6-option dropdown.
+ * Site-wide theme picker backed by the canonical theme registry.
  *
  * Themes fall into two bases:
  *   - Dark-base (adds .dark class so Tailwind dark: variants still fire):
- *     sakura-dark, nord, solarized-dark, monokai
- *   - Light-base (no .dark class): sakura-light, paper
+ *     each registry entry whose `base` is `dark`
+ *   - Light-base (no .dark class): each entry whose `base` is `light`
  *
- * All themes except sakura-light/sakura-dark also set a `data-theme=X`
- * attribute on <html> so the CSS blocks in globals.css override the
- * Sakura color tokens.
+ * A registry entry can also set a `data-theme` attribute on <html> so the CSS
+ * theme block in globals.css overrides the Sakura color tokens.
  *
  * Bootstrap for FOUC prevention lives in app/layout.tsx (inline script
  * that runs before React hydrates).
  */
 
-export type ThemeId =
-  | 'sakura-light'
-  | 'sakura-dark'
-  | 'nord'
-  | 'solarized-dark'
-  | 'monokai'
-  | 'paper'
-  | 'themis'
-  | 'themis-dark';
-
-interface ThemeOption {
-  id: ThemeId;
-  name: string;
-  description: string;
-  base: 'light' | 'dark';
-  swatches: {
-    bg: string;
-    accent: string;
-    text: string;
-  };
-}
-
-const THEMES: ThemeOption[] = [
-  {
-    id: 'sakura-light',
-    name: 'Sakura Light',
-    description: 'Warm paper · rose accent',
-    base: 'light',
-    swatches: { bg: '#f8f5f2', accent: '#8a5560', text: '#1a1412' },
-  },
-  {
-    id: 'sakura-dark',
-    name: 'Sakura Dark',
-    description: 'Warm near-black · muted rose',
-    base: 'dark',
-    swatches: { bg: '#0c0a0a', accent: '#d4a0a7', text: '#f0ebe8' },
-  },
-  {
-    id: 'nord',
-    name: 'Aurora',
-    description: 'Arctic blue · aurora borealis (née Nord)',
-    base: 'dark',
-    swatches: { bg: '#2e3440', accent: '#88c0d0', text: '#eceff4' },
-  },
-  {
-    id: 'solarized-dark',
-    name: 'Obsidian',
-    description: 'CIELAB-precise · volcanic glass (née Solarized Dark)',
-    base: 'dark',
-    swatches: { bg: '#002b36', accent: '#4fb3f5', text: '#fdf6e3' },
-  },
-  {
-    id: 'monokai',
-    name: 'Ember',
-    description: 'Warm black · pink spark (née Monokai)',
-    base: 'dark',
-    swatches: { bg: '#272822', accent: '#ff6b9d', text: '#f8f8f2' },
-  },
-  {
-    id: 'paper',
-    name: 'Papyrus',
-    description: 'Editorial cream · iron-gall ink (née Paper)',
-    base: 'light',
-    swatches: { bg: '#f4efe6', accent: '#7a4e28', text: '#1a1a1a' },
-  },
-  {
-    id: 'themis',
-    name: 'Amethyst',
-    description: 'Soft glass · Themis (light)',
-    base: 'light',
-    swatches: { bg: '#f6f4f8', accent: '#6d5896', text: '#1c1822' },
-  },
-  {
-    id: 'themis-dark',
-    name: 'Amethyst Dark',
-    description: 'Deep amethyst · Themis (dark)',
-    base: 'dark',
-    swatches: { bg: '#0d0b14', accent: '#b9a8d6', text: '#ece7f3' },
-  },
-];
-
 function applyTheme(id: ThemeId) {
-  const theme = THEMES.find((t) => t.id === id);
-  if (!theme) return;
+  const theme = getTheme(id);
   const html = document.documentElement;
   if (theme.base === 'dark') html.classList.add('dark');
   else html.classList.remove('dark');
-  if (id === 'sakura-light' || id === 'sakura-dark') {
+  if (theme.dataTheme === null) {
     html.removeAttribute('data-theme');
   } else {
-    // 'themis' and 'themis-dark' both apply data-theme="themis" — the
-    // .dark class is what differentiates the two bases.
-    const attr = id === 'themis-dark' ? 'themis' : id;
-    html.setAttribute('data-theme', attr);
+    html.setAttribute('data-theme', theme.dataTheme);
   }
   localStorage.setItem('theme-pack', id);
   // Cleanup legacy key; we'll keep writing new one
@@ -121,17 +42,17 @@ function applyTheme(id: ThemeId) {
 }
 
 function readStoredTheme(): ThemeId {
-  if (typeof window === 'undefined') return 'sakura-light';
-  const pack = localStorage.getItem('theme-pack') as ThemeId | null;
-  if (pack && THEMES.some((t) => t.id === pack)) return pack;
+  if (typeof window === 'undefined') return DEFAULT_THEME_ID;
+  const pack = localStorage.getItem('theme-pack');
+  if (isThemeId(pack)) return pack;
   // Legacy support: map old 'theme' key to sakura-dark if set to 'dark'
   const legacy = localStorage.getItem('theme');
-  return legacy === 'dark' ? 'sakura-dark' : 'sakura-light';
+  return legacy === 'dark' ? 'sakura-dark' : DEFAULT_THEME_ID;
 }
 
 export default function ThemePicker() {
   const [mounted, setMounted] = useState(false);
-  const [current, setCurrent] = useState<ThemeId>('sakura-light');
+  const [current, setCurrent] = useState<ThemeId>(DEFAULT_THEME_ID);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -177,7 +98,7 @@ export default function ThemePicker() {
 
   if (!mounted) return <div className="h-11 w-11" />;
 
-  const currentTheme = THEMES.find((t) => t.id === current);
+  const currentTheme = getTheme(current);
 
   return (
     <div ref={menuRef} className="relative">
@@ -193,15 +114,15 @@ export default function ThemePicker() {
         <span className="relative flex h-5 w-5 items-center justify-center">
           <span
             className="absolute inset-0 rounded-full"
-            style={{ backgroundColor: currentTheme?.swatches.bg }}
+            style={{ backgroundColor: currentTheme.swatches.bg }}
             aria-hidden="true"
           />
           <span
             className="absolute inset-0.5 rounded-full"
-            style={{ backgroundColor: currentTheme?.swatches.accent }}
+            style={{ backgroundColor: currentTheme.swatches.accent }}
             aria-hidden="true"
           />
-          <Palette size={10} strokeWidth={2.5} aria-hidden="true" style={{ color: currentTheme?.swatches.bg, position: 'relative' }} />
+          <Palette size={10} strokeWidth={2.5} aria-hidden="true" style={{ color: currentTheme.swatches.bg, position: 'relative' }} />
         </span>
       </button>
 

@@ -9,8 +9,8 @@ import type { CaseStudy } from '@/data/projectCaseStudies';
  * Project · Role · Outcome) with the palette era pill + palette-colored
  * hero metric retained so identity doesn't flatten.
  *
- * Builds on FilmographyTable (audit P1-5 spec) but keeps the per-project
- * palette that the pure filmography dropped.
+ * Uses a compact filmography-style layout while retaining each project’s
+ * visual palette and headline metric.
  */
 export default function ProjectsHybridTable({
   rows,
@@ -80,6 +80,7 @@ export default function ProjectsHybridTable({
                       >
                         {project.heroMetric.value}
                       </span>
+                      <span className="sr-only"> — </span>
                       <span className="block whitespace-nowrap text-[10px] text-text-tertiary">
                         {project.heroMetric.label}
                       </span>
@@ -132,6 +133,7 @@ export default function ProjectsHybridTable({
                 >
                   {project.heroMetric.value}
                 </span>
+                <span className="sr-only"> — </span>
                 <span className="text-[11px] text-text-tertiary">
                   {project.heroMetric.label}
                 </span>

@@ -45,7 +45,7 @@ function AgentNode({ data }: NodeProps) {
         // Reveal-on-view: nodes snap in as the diagram scrolls into view, on the
         // same quick spring as the hover (the snappy feel is deliberate).
         // Composes with whileHover; global reducedMotion='user' makes it instant.
-        initial={{ opacity: 0, y: 8 }}
+        initial={false}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         whileHover={{ scale: 1.05 }}

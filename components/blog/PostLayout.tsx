@@ -35,6 +35,14 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
     day: 'numeric',
     timeZone: 'UTC',
   });
+  const formattedUpdated = meta.updated && meta.updated !== meta.date
+    ? new Date(meta.updated).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'UTC',
+      })
+    : null;
 
   // Cold load → render the post (incl. the LCP title) at rest for fast LCP;
   // in-app nav → fade. See useHasNavigated.
@@ -77,7 +85,7 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
         <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-text-tertiary">
           <span className="flex items-center gap-1.5">
             <Calendar size={14} />
-            {formattedDate}
+            Published {formattedDate}{formattedUpdated ? ` · Updated ${formattedUpdated}` : ''}
           </span>
           <span className="flex items-center gap-1.5">
             <Clock size={14} />

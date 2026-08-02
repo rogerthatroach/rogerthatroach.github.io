@@ -8,13 +8,13 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-This paper examines a structural pattern, **closed-loop optimization** (sense &rarr; model &rarr; optimize &rarr; act), as it manifests across four distinct application domains at ascending levels of abstraction: industrial emissions control via Particle Swarm Optimization at a 900MW coal power plant, cloud-based document processing pipelines, financial process automation, and enterprise agentic AI platforms. We present the formal PSO framework as applied to multi-output combustion tuning (84 simultaneous regression models across 90+ sensor inputs), derive the multi-objective optimization formulation for pollutant minimization under operational constraints, and demonstrate that the same four-phase architectural pattern recurs in each subsequent system despite fundamentally different technologies, domains, and abstraction levels. The paper argues that recognizing this structural isomorphism is itself a design methodology, one that accelerates architecture decisions in novel domains by drawing on proven patterns from prior ones.
+This article examines **closed-loop thinking** (observe &rarr; estimate &rarr; choose &rarr; act) across four distinct application domains: industrial combustion tuning, cloud document processing, financial process automation, and enterprise agentic AI. It presents the PSO mechanics used with 84 independent regression models and then uses the four-part loop as a bounded design heuristic for the later systems. The comparison is an analogy, not a mathematical isomorphism or a claim that guarantees transfer between domains.
 
 ## 1. Introduction
 
-Applied AI practitioners often describe their careers as a sequence of projects, each with its own technologies, clients, and challenges. This framing obscures a deeper structural truth: the most impactful AI systems share common architectural patterns regardless of domain. Recognizing these patterns is not merely an academic exercise. It is a practical design methodology that reduces architecture risk in novel applications.
+Applied AI practitioners often describe their careers as a sequence of projects, each with its own technologies, clients, and challenges. That framing can obscure recurring design questions: what is observed, what is estimated, what choice is made, who or what acts, and how outcomes are reviewed. Reusing those questions can accelerate design, but it does not erase domain-specific objectives, evidence standards, or failure modes.
 
-This paper traces one such pattern, **closed-loop optimization**, through four instantiations spanning over eight years of applied work:
+This article starts with one actual **closed-loop optimization** system, then compares its design questions with three later projects spanning more than eight years of applied work:
 
 <div className="my-6 overflow-x-auto">
   <table className="w-full text-sm">
@@ -55,11 +55,11 @@ This paper traces one such pattern, **closed-loop optimization**, through four i
   </table>
 </div>
 
-The formal treatment focuses on Level 1 (PSO for combustion tuning), where the mathematics is most explicit, and then demonstrates how the structural pattern abstracts to each subsequent level.
+The mathematical treatment applies to Level 1 (PSO for combustion tuning). The later sections use the loop only as an engineering comparison.
 
-## 2. The Closed-Loop Optimization Pattern
+## 2. Closed-Loop Optimization at Level 1
 
-### 2.1 Formal Definition
+### 2.1 Working Definition
 
 <TheoremBlock variant="definition" number={1} title="Closed-Loop Optimization System">
   <div className="mb-2">
@@ -70,23 +70,23 @@ The formal treatment focuses on Level 1 (PSO for combustion tuning), where the m
   <ul className="list-inside list-disc space-y-1">
     <li>
       <InlineEquation html={tex("\\mathcal{Z}: \\text{Environment} \\rightarrow \\mathcal{X}")} /> is
-      the <strong>sensing function</strong>, mapping environmental state to an observation
-      space <InlineEquation html={tex("\\mathcal{X} \\subseteq \\mathbb{R}^n")} />
+      the <strong>sensing function</strong>, mapping environmental state to observed and engineered features
+      <InlineEquation html={tex("\\mathcal{X} \\subseteq \\mathbb{R}^n")} />
     </li>
     <li>
-      <InlineEquation html={tex("\\mathcal{M}: \\mathcal{X} \\rightarrow \\hat{\\mathcal{Y}}")} /> is
-      the <strong>modeling function</strong>, mapping observations to predicted outputs
+      <InlineEquation html={tex("\\mathcal{M}: (\\mathcal{Z}_{\\text{state}}, \\mathcal{U}) \\rightarrow \\hat{\\mathcal{Y}}")} /> is
+      the <strong>modeling function</strong>, mapping observed state and candidate controllable settings to predicted outputs
       <InlineEquation html={tex("\\hat{\\mathcal{Y}} \\subseteq \\mathbb{R}^m")} />
     </li>
     <li>
-      <InlineEquation html={tex("\\mathcal{O}: \\hat{\\mathcal{Y}} \\times \\mathcal{C} \\rightarrow \\mathcal{X}^*")} />
-      is the <strong>optimization function</strong>, finding optimal inputs
-      <InlineEquation html={tex("\\mathcal{X}^* \\subseteq \\mathcal{X}")} /> subject to constraints
+      <InlineEquation html={tex("\\mathcal{O}: \\mathcal{Z}_{\\text{state}} \\times \\mathcal{C} \\rightarrow \\mathcal{U}^*")} />
+      is the <strong>optimization function</strong>, searching for candidate controllable settings
+      <InlineEquation html={tex("\\mathcal{U}^*")} /> subject to constraints
       <InlineEquation html={tex("\\mathcal{C}")} />
     </li>
     <li>
-      <InlineEquation html={tex("\\mathcal{A}: \\mathcal{X}^* \\rightarrow \\text{Environment}")} />
-      is the <strong>actuation function</strong>, applying optimized inputs to the environment
+      <InlineEquation html={tex("\\mathcal{A}: \\mathcal{U}^* \\rightarrow \\text{Environment}")} />
+      is the <strong>actuation function</strong>, applying approved candidate settings to the environment
     </li>
   </ul>
 </TheoremBlock>
@@ -94,49 +94,31 @@ The formal treatment focuses on Level 1 (PSO for combustion tuning), where the m
 The system forms a closed loop because actuation modifies the environment, which is then re-sensed:
 
 <MathBlock
-  html={tex("\\text{Environment} \\xrightarrow{\\mathcal{Z}} \\mathcal{X} \\xrightarrow{\\mathcal{M}} \\hat{\\mathcal{Y}} \\xrightarrow{\\mathcal{O}} \\mathcal{X}^* \\xrightarrow{\\mathcal{A}} \\text{Environment} \\xrightarrow{\\mathcal{Z}} \\cdots", true)}
+  html={tex("\\text{Environment} \\xrightarrow{\\mathcal{Z}} (\\mathcal{Z}_{\\text{state}}, \\mathcal{U}) \\xrightarrow{\\mathcal{M}} \\hat{\\mathcal{Y}} \\xrightarrow{\\mathcal{O}} \\mathcal{U}^* \\xrightarrow{\\mathcal{A}} \\text{Environment} \\xrightarrow{\\mathcal{Z}} \\cdots", true)}
 />
 
 <VisualizationContainer
   minHeight={420}
   caption="Figure 1: The closed-loop optimization cycle — select a tab to see domain-specific instantiations"
 >
-  {() => <ClosedLoopCycle />}
+  <ClosedLoopCycle />
 </VisualizationContainer>
 
-### 2.2 Properties
+### 2.2 Operating Conditions
 
-<TheoremBlock variant="proposition" number={1} title="Feedback">
-  <div>
-    The system improves over time because actuation changes the environment, producing new
-    observations that update the model:
-  </div>
-  <MathBlock html={tex("\\mathcal{M}_{t+1} = \\text{update}(\\mathcal{M}_t,\\; \\mathcal{Z}(\\text{Environment}_{t+1}))", true)} />
-</TheoremBlock>
+**Feedback is data, not automatic improvement.** Actuation changes the environment and creates new observations. When outcomes are captured, reviewed, and deliberately incorporated, those observations can support monitoring or model updates.
 
-<TheoremBlock variant="proposition" number={2} title="Constraint Satisfaction">
-  <div>
-    The optimization function operates within a feasible set defined by operational,
-    regulatory, or safety constraints:
-  </div>
-  <MathBlock html={tex("\\mathcal{X}^* = \\underset{x \\in \\mathcal{F}}{\\text{argmin}}\\; J(x) \\quad \\text{where} \\quad \\mathcal{F} = \\{x \\in \\mathcal{X} \\mid c_j(x) \\leq 0,\\; j = 1, \\ldots, p\\}", true)} />
-</TheoremBlock>
+**Optimization is constrained.** Candidate controllable settings are searched only inside a feasible set defined by operational and safety constraints:
 
-<TheoremBlock variant="proposition" number={3} title="Human-in-the-Loop">
-  <div>
-    In high-stakes domains,
-    <InlineEquation html={tex("\\mathcal{A}")} /> includes a human judgment gate:
-  </div>
-  <MathBlock html={tex("\\mathcal{A}(x^*) = \\begin{cases} \\text{apply}(x^*) & \\text{if human approves} \\\\ \\text{hold}(x^*) & \\text{otherwise} \\end{cases}", true)} />
-</TheoremBlock>
+<MathBlock html={tex("\\mathcal{U}^* = \\underset{u \\in \\mathcal{F}}{\\text{argmin}}\\; J(u \\mid z) \\quad \\text{where} \\quad \\mathcal{F} = \\{u \\in \\mathcal{U} \\mid c_j(u,z) \\leq 0,\\; j = 1, \\ldots, p\\}", true)} />
 
-This is not a limitation but a design feature. The system recommends; the human validates against context the model doesn't capture.
+**Actuation can remain human-gated.** In a high-stakes physical system, the optimizer proposes settings and an operator decides whether to apply or hold them. The gate brings context that the model and recorded features do not capture.
 
 ## 3. Level 1: Particle Swarm Optimization for Combustion Tuning
 
 ### 3.1 Physical System
 
-The Maizuru 900MW coal-fired power plant (operated by Mitsubishi Hitachi Power Systems) combusts pulverized coal in a boiler to generate steam. The combustion process produces three primary pollutants: nitrogen oxides (NOx), sulfur oxides (SOx), and carbon monoxide (CO). Their concentrations depend on boiler input settings: fuel mix ratios, air flow rates, damper positions, and secondary air distributions.
+Kansai Electric owns and operates the 1,800MW Maizuru coal-fired power station in Japan. This work focused on one of its two 900MW generating units. Pulverized coal is combusted in a boiler to generate steam, producing nitrogen oxides (NOx), sulfur oxides (SOx), and carbon monoxide (CO). Their concentrations depend on boiler input settings: fuel mix ratios, air flow rates, damper positions, and secondary air distributions. MHPS participated as an engineering and equipment partner, not as the station operator.
 
 ### 3.2 Sensing: The Input Space
 
@@ -148,15 +130,17 @@ The plant instruments 90+ sensors measuring:
 - Emissions concentrations at stack outlets
 - Operational parameters (load, efficiency)
 
-After feature engineering (domain-specific transformations, temporal aggregations, interaction terms developed in consultation with a mechanical engineer on the team), the input space is:
+After feature engineering (domain-specific transformations, temporal aggregations, and interaction terms developed with the mechanical engineer on the team), the model input separates observed or exogenous state <InlineEquation html={tex("z")} /> from controllable boiler settings <InlineEquation html={tex("u")} />:
 
-<MathBlock html={tex("\\mathbf{x} \\in \\mathbb{R}^n, \\quad n \\approx 90+", true)} />
+<MathBlock html={tex("\\mathbf{x} = (\\mathbf{z}, \\mathbf{u}) \\in \\mathbb{R}^n", true)} />
+
+Only <InlineEquation html={tex("u")} /> is searched by the optimizer. Sensor readings and exogenous conditions in <InlineEquation html={tex("z")} /> condition the prediction but are not treated as actuator settings.
 
 ### 3.3 Modeling: 84 Simultaneous Regression Models
 
 Each output variable of interest (emissions at different measurement points, temperature readings, efficiency indicators) receives its own regression model. Let <InlineEquation html={tex("y_i")} /> denote the <InlineEquation html={tex("i")} />-th output variable:
 
-<MathBlock html={tex("\\hat{y}_i = f_i(\\mathbf{x};\\; \\boldsymbol{\\beta}_i), \\quad i = 1, 2, \\ldots, 84", true)} />
+<MathBlock html={tex("\\hat{y}_i = f_i(\\mathbf{z}, \\mathbf{u};\\; \\boldsymbol{\\beta}_i), \\quad i = 1, 2, \\ldots, 84", true)} />
 
 The modeling task is to learn 84 parameter vectors <InlineEquation html={tex("\\{\\boldsymbol{\\beta}_1, \\boldsymbol{\\beta}_2, \\ldots, \\boldsymbol{\\beta}_{84}\\}")} /> from historical sensor data.
 
@@ -225,20 +209,20 @@ where <InlineEquation html={tex("R^2_{i,k}")} /> is the <InlineEquation html={te
   <MathBlock html={tex("f_i^* = \\underset{f \\in \\mathcal{F}}{\\text{argmax}}\\; R^2_i(f) \\quad \\text{subject to} \\quad \\sigma^2_{\\text{fold},i}(f) < \\sigma_{\\max}", true)} />
 </TheoremBlock>
 
-The stability constraint (<InlineEquation html={tex("\\sigma^2_{\\text{fold}} < \\sigma_{\\max}")} />) is critical and frequently omitted in practice. A model with high <InlineEquation html={tex("R^2")} /> but high inter-fold variance has memorized training-set patterns rather than learning generalizable relationships. For a system where model predictions directly drive physical control recommendations, a stable model with slightly lower accuracy is preferable to an unstable model with higher peak accuracy.
+The stability constraint (<InlineEquation html={tex("\\sigma^2_{\\text{fold}} < \\sigma_{\\max}")} />) keeps fold-to-fold variability visible during model selection. High inter-fold variance indicates unstable out-of-sample behavior; it does not by itself diagnose memorization. For a system where predictions inform physical-control recommendations, a more stable model with slightly lower peak performance can be preferable to one whose validation performance varies sharply by fold.
 
 <VisualizationContainer
   minHeight={420}
   caption="Figure 2: Model selection dashboard — R² vs. inter-fold variance with adjustable stability threshold"
 >
-  {() => <ModelSelectionScatter />}
+  <ModelSelectionScatter />
 </VisualizationContainer>
 
 ### 3.4 Optimization: Particle Swarm Optimization
 
 #### 3.4.1 PSO Fundamentals
 
-Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart <CitationRef id={1} />, is a population-based metaheuristic inspired by collective behavior in biological swarms. A population of <InlineEquation html={tex("N")} /> particles navigates an <InlineEquation html={tex("n")} />-dimensional search space, each evaluating a candidate solution at its position.
+Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart <CitationRef id={1} />, is a population-based metaheuristic inspired by collective behavior in biological swarms. A population of <InlineEquation html={tex("N")} /> particles navigates the controllable-setting space, each evaluating a candidate solution at its position while the observed state <InlineEquation html={tex("z")} /> is held fixed for that recommendation cycle.
 
 <TheoremBlock variant="definition" number={3} title="Particle State">
   <div className="mb-2">
@@ -246,7 +230,7 @@ Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart <CitationR
   </div>
   <ul className="list-inside list-disc space-y-1">
     <li>
-      Position: <InlineEquation html={tex("\\mathbf{x}_i^{(t)} \\in \\mathbb{R}^n")} /> (a candidate
+      Position: <InlineEquation html={tex("\\mathbf{u}_i^{(t)} \\in \\mathcal{U}")} /> (a candidate
       set of boiler input settings)
     </li>
     <li>
@@ -255,11 +239,11 @@ Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart <CitationR
     </li>
     <li>
       Personal best:
-      <InlineEquation html={tex("\\mathbf{p}_i^{(t)} = \\underset{s \\leq t}{\\text{argmin}}\\; J(\\mathbf{x}_i^{(s)})")} />
+      <InlineEquation html={tex("\\mathbf{p}_i^{(t)} = \\underset{s \\leq t}{\\text{argmin}}\\; J(\\mathbf{u}_i^{(s)} \\mid z)")} />
     </li>
     <li>
       Global best:
-      <InlineEquation html={tex("\\mathbf{g}^{(t)} = \\underset{i,\\, s \\leq t}{\\text{argmin}}\\; J(\\mathbf{x}_i^{(s)})")} />
+      <InlineEquation html={tex("\\mathbf{g}^{(t)} = \\underset{i,\\, s \\leq t}{\\text{argmin}}\\; J(\\mathbf{u}_i^{(s)} \\mid z)")} />
     </li>
   </ul>
 </TheoremBlock>
@@ -269,12 +253,12 @@ Particle Swarm Optimization (PSO), introduced by Kennedy and Eberhart <CitationR
 The velocity and position update rules are:
 
 <MathBlock
-  html={tex("\\mathbf{v}_i^{(t+1)} = w \\cdot \\mathbf{v}_i^{(t)} + c_1 r_1 \\cdot (\\mathbf{p}_i^{(t)} - \\mathbf{x}_i^{(t)}) + c_2 r_2 \\cdot (\\mathbf{g}^{(t)} - \\mathbf{x}_i^{(t)})", true)}
+  html={tex("\\mathbf{v}_i^{(t+1)} = w \\cdot \\mathbf{v}_i^{(t)} + c_1 r_1 \\cdot (\\mathbf{p}_i^{(t)} - \\mathbf{u}_i^{(t)}) + c_2 r_2 \\cdot (\\mathbf{g}^{(t)} - \\mathbf{u}_i^{(t)})", true)}
   label="(7)"
 />
 
 <MathBlock
-  html={tex("\\mathbf{x}_i^{(t+1)} = \\mathbf{x}_i^{(t)} + \\mathbf{v}_i^{(t+1)}", true)}
+  html={tex("\\mathbf{u}_i^{(t+1)} = \\mathbf{u}_i^{(t)} + \\mathbf{v}_i^{(t+1)}", true)}
   label="(8)"
 />
 
@@ -285,22 +269,13 @@ where:
 - <InlineEquation html={tex("c_2")} /> is the **social coefficient** (attraction to global best)
 - <InlineEquation html={tex("r_1, r_2 \\sim \\text{Uniform}(0, 1)")} /> are stochastic scaling factors
 
-<TheoremBlock variant="proposition" number={5} title="Convergence Behavior">
-  <div>
-    Under the condition <InlineEquation html={tex("w < 1")} /> and
-    <InlineEquation html={tex("c_1 + c_2 > 0")} />, the swarm contracts toward a region containing
-    <InlineEquation html={tex("\\mathbf{g}^{(t)}")} /> <CitationRef id={2} />. With linearly decreasing inertia weight
-    <InlineEquation html={tex("w(t) = w_{\\max} - (w_{\\max} - w_{\\min}) \\cdot t/t_{\\max}")} />,
-    the swarm transitions from exploration (high <InlineEquation html={tex("w")} />, broad search)
-    to exploitation (low <InlineEquation html={tex("w")} />, local refinement).
-  </div>
-</TheoremBlock>
+The inertia and acceleration parameters control the empirical balance between broad search and local refinement <CitationRef id={2} />. A decreasing inertia schedule can shift that balance over the run, but these settings do not establish a global-optimum guarantee; convergence behavior depends on the objective, constraints, initialization, and stopping rule.
 
 <VisualizationContainer
   minHeight={500}
-  caption="Figure 3: Interactive PSO swarm — adjust inertia, cognitive/social coefficients, and swarm size to observe convergence behavior"
+  caption="Figure 3: Seeded PSO illustration — adjust inertia, cognitive/social coefficients, and playback speed to observe search behavior"
 >
-  {(isVisible) => <PSOSwarm isVisible={isVisible} />}
+  <PSOSwarm />
 </VisualizationContainer>
 
 #### 3.4.3 Multi-Objective Formulation
@@ -308,14 +283,14 @@ where:
 The combustion tuning objective is to minimize pollutant emissions simultaneously:
 
 <MathBlock
-  html={tex("\\text{minimize} \\quad J(\\mathbf{x}) = \\alpha_1 \\cdot \\hat{y}_{\\text{NOx}}(\\mathbf{x}) + \\alpha_2 \\cdot \\hat{y}_{\\text{SOx}}(\\mathbf{x}) + \\alpha_3 \\cdot \\hat{y}_{\\text{CO}}(\\mathbf{x})", true)}
+  html={tex("\\text{minimize}_{\\mathbf{u}} \\quad J(\\mathbf{u} \\mid \\mathbf{z}) = \\alpha_1 \\cdot \\hat{y}_{\\text{NOx}}(\\mathbf{z},\\mathbf{u}) + \\alpha_2 \\cdot \\hat{y}_{\\text{SOx}}(\\mathbf{z},\\mathbf{u}) + \\alpha_3 \\cdot \\hat{y}_{\\text{CO}}(\\mathbf{z},\\mathbf{u})", true)}
   label="(9)"
 />
 
 subject to:
 
 <MathBlock
-  html={tex("\\begin{aligned} x_j^{\\min} &\\leq x_j \\leq x_j^{\\max} & \\forall j &= 1, \\ldots, n & &\\text{(operational bounds)} \\\\ y_{\\text{load}}(\\mathbf{x}) &\\geq y_{\\text{load}}^{\\min} & & & &\\text{(minimum load constraint)} \\\\ T_{\\text{boiler}}(\\mathbf{x}) &\\leq T_{\\max} & & & &\\text{(safety constraint)} \\end{aligned}", true)}
+  html={tex("\\begin{aligned} u_j^{\\min} &\\leq u_j \\leq u_j^{\\max} & \\forall j & & &\\text{(validated setting bounds)} \\\\ y_{\\text{load}}(\\mathbf{z},\\mathbf{u}) &\\geq y_{\\text{load}}^{\\min} & & & &\\text{(minimum load constraint)} \\\\ T_{\\text{boiler}}(\\mathbf{z},\\mathbf{u}) &\\leq T_{\\max} & & & &\\text{(safety constraint)} \\end{aligned}", true)}
   label="(10)"
 />
 
@@ -323,70 +298,27 @@ where <InlineEquation html={tex("\\alpha_1, \\alpha_2, \\alpha_3")} /> are weigh
 
 Why PSO over gradient-based methods?
 
-<TheoremBlock variant="theorem" number={5} title="Non-Convexity Robustness">
-  <div>
-    For a non-convex objective <InlineEquation html={tex("J")} /> with multiple local minima,
-    gradient-based methods converge to the nearest local minimum from initialization. PSO, as
-    a population-based stochastic optimizer, samples from multiple basins of attraction
-    simultaneously, providing probabilistic guarantees of finding the global minimum that
-    gradient methods cannot <CitationRef id={3} />.
-  </div>
-</TheoremBlock>
-
-<TheoremBlock variant="proof">
-  <div className="mb-2">
-    <em>Sketch of argument.</em> Consider a landscape with <InlineEquation html={tex("B")} /> basins
-    of attraction. A single gradient descent trajectory explores exactly one basin. A PSO
-    swarm of <InlineEquation html={tex("N")} /> particles, initialized uniformly, places approximately
-    <InlineEquation html={tex("N/B")} /> particles in each basin (for large
-    <InlineEquation html={tex("N")} />). The global best
-    <InlineEquation html={tex("\\mathbf{g}^{(t)}")} /> tracks the best solution across all basins.
-    As long as at least one particle initializes in the basin containing the global minimum,
-    the swarm will eventually converge there (under appropriate
-    <InlineEquation html={tex("w, c_1, c_2")} /> settings). The probability of at least one particle
-    initializing in the global basin approaches 1 as <InlineEquation html={tex("N")} /> grows:
-  </div>
-  <MathBlock html={tex("P(\\text{global basin covered}) = 1 - \\left(1 - \\frac{V_{\\text{global}}}{V_{\\text{total}}}\\right)^N", true)} />
-  <div>
-    where <InlineEquation html={tex("V_{\\text{global}}")} /> is the volume of the global basin
-    relative to the total search space <InlineEquation html={tex("V_{\\text{total}}")} />.
-  </div>
-</TheoremBlock>
+PSO was a practical fit for a nonlinear objective without a convenient analytic gradient and for exploring multiple candidate regions in parallel <CitationRef id={3} />. It remains a stochastic heuristic, not a proof of global optimality. Multiple seeds, constraint checks, sensitivity review, and operator judgment are part of using its recommendations safely.
 
 ### 3.5 Actuation: Human-in-the-Loop
 
-The PSO output is a set of optimal boiler input settings: specific fuel ratios, air flow rates, and damper positions. These recommendations were delivered to plant operators who made the physical adjustments.
+The PSO output is a set of model-recommended candidate boiler settings: specific fuel ratios, air-flow rates, and damper positions. Plant operators reviewed the recommendations and decided whether to make the physical adjustments.
 
-The human-in-the-loop design was deliberate. In a 900MW power plant, automated control changes carry catastrophic risk: incorrect settings could damage equipment worth hundreds of millions of dollars or cause safety incidents. The operators provided a validation layer the model could not: awareness of transient plant states, equipment wear, and operational context not captured in sensor data.
+The human-in-the-loop design was deliberate. On a 900MW generating unit, automated control changes carry catastrophic risk: incorrect settings could damage equipment worth hundreds of millions of dollars or cause safety incidents. The operators provided a validation layer the model could not: awareness of transient plant states, equipment wear, and operational context not captured in sensor data.
 
 ### 3.6 Results
 
 The system achieved:
 
-- **$3M annual cost savings** through optimized fuel consumption and reduced emissions penalties
-- **Measurable reduction in NOx, SOx, and CO concentrations** at stack outlets
-- **R&D positioning:** Digital Twin / combustion tuning was nascent technology in 2017–2018; this work positioned the consultancy as an innovator in industrial AI
+- **$3M annual cost savings** attributed to the optimization program
+- **Operator-reviewed recommendations** over controllable boiler settings, conditioned on observed plant state
+- **A reusable operating pattern:** combine predictive models, bounded search, constraint checks, and operator judgment
 
 ## 4. The Pattern at Higher Abstraction Levels
 
-### 4.1 Structural Isomorphism
+### 4.1 A Bounded Analogy
 
-<TheoremBlock variant="definition" number={4} title="Structural Isomorphism">
-  <div className="mb-2">
-    Two closed-loop optimization systems
-    <InlineEquation html={tex("\\mathcal{S}_1 = (\\mathcal{Z}_1, \\mathcal{M}_1, \\mathcal{O}_1, \\mathcal{A}_1)")} />
-    and
-    <InlineEquation html={tex("\\mathcal{S}_2 = (\\mathcal{Z}_2, \\mathcal{M}_2, \\mathcal{O}_2, \\mathcal{A}_2)")} />
-    are structurally isomorphic if there exist bijective mappings
-    <InlineEquation html={tex("\\phi_Z, \\phi_M, \\phi_O, \\phi_A")} /> such that the compositional
-    structure is preserved:
-  </div>
-  <MathBlock html={tex("\\phi_A \\circ \\phi_O \\circ \\phi_M \\circ \\phi_Z(\\mathcal{S}_1) \\cong \\mathcal{S}_2", true)} />
-  <div>
-    That is, the four-phase flow (sense &rarr; model &rarr; optimize &rarr; act) is the same
-    in both systems, even if the concrete implementations differ entirely.
-  </div>
-</TheoremBlock>
+These systems are not mathematically isomorphic. I reuse four questions&mdash;what is observed, how is it estimated, what is chosen, and how does action occur&mdash;as a design heuristic. Objectives, guarantees, feedback mechanisms, and failure modes remain domain-specific. In the later examples, “choose” often means applying a policy, threshold, or workflow objective rather than solving an optimization problem.
 
 ### 4.2 Level 2: Cloud Document Processing (2021–2022)
 
@@ -419,11 +351,11 @@ The system achieved:
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">
-          <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
+          <InlineEquation html={tex("\\mathcal{O}")} /> (Choose)
         </td>
         <td className="py-2">
-          Reduce manual review cycles: maximize extraction accuracy to minimize human
-          intervention
+          Improvement objective: reduce review effort while measuring extraction quality;
+          this was not an online optimizer
         </td>
       </tr>
       <tr>
@@ -467,7 +399,7 @@ The system achieved:
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">
-          <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
+          <InlineEquation html={tex("\\mathcal{O}")} /> (Choose)
         </td>
         <td className="py-2">
           Process time reduction: months &rarr; 90 minutes
@@ -478,14 +410,14 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{A}")} /> (Act)
         </td>
         <td className="py-2">
-          Automated tax returns + Tableau dashboards for CFO Group decision-making
+          Tax-allocation workflow outputs + Tableau dashboards for CFO Group review
         </td>
       </tr>
     </tbody>
   </table>
 </div>
 
-### 4.4 Level 4: Agentic AI Platforms (2024–present)
+### 4.4 Level 4: Model-Assisted Enterprise Workflows (2024–present)
 
 <div className="my-6 overflow-x-auto">
   <table className="w-full text-sm">
@@ -510,17 +442,17 @@ The system achieved:
           <InlineEquation html={tex("\\mathcal{M}")} /> (Model)
         </td>
         <td className="py-2">
-          LangGraph agentic orchestration: intent detection, sub-agent routing, RAG
+          LangGraph orchestration: intent detection, scoped tool routing, RAG
           retrieval
         </td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">
-          <InlineEquation html={tex("\\mathcal{O}")} /> (Optimize)
+          <InlineEquation html={tex("\\mathcal{O}")} /> (Choose)
         </td>
         <td className="py-2">
-          RAG relevance optimization, MCP tool selection, disambiguation: maximizing
-          response accuracy under entitlement constraints
+          Retrieval and tool-selection policies, followed by clarification or abstention
+          under entitlement constraints
         </td>
       </tr>
       <tr>
@@ -541,15 +473,15 @@ The system achieved:
 **Observation.** As the abstraction level increases:
 
 1. **The sensing function becomes more semantic.** Physical sensors (<InlineEquation html={tex("\\mathbb{R}^n")} />) &rarr; document parsers &rarr; data pipelines &rarr; embedding models (<InlineEquation html={tex("\\mathbb{R}^d")} />). The inputs evolve from physical measurements to semantic representations.
-2. **The modeling function becomes more compositional.** Single regression models &rarr; extraction pipelines &rarr; transformation chains &rarr; multi-agent orchestration. Each level composes more sub-models.
-3. **The optimization function becomes more constrained.** Operational bounds &rarr; accuracy thresholds &rarr; process SLAs &rarr; entitlement rules + regulatory compliance + data confidentiality. The constraint space grows richer.
+2. **The modeling function becomes more compositional.** Single regression models &rarr; extraction pipelines &rarr; transformation chains &rarr; model-assisted graph orchestration. Each level composes more processing stages.
+3. **The choice function changes form.** Bounded numerical search &rarr; quality objectives &rarr; process targets &rarr; retrieval, tool, clarification, and abstention policies. Later stages should not be mistaken for numerical optimizers.
 4. **The actuation function becomes more autonomous.** Human-operated controls &rarr; semi-automated pipelines &rarr; automated reports &rarr; AI-guided decisions with human oversight. But full autonomy is never the goal. Human judgment remains in the loop.
 
 <VisualizationContainer
   minHeight={480}
-  caption="Figure 4: The Abstraction Ladder — four levels of the closed-loop pattern, from physical sensors to agentic AI"
+  caption="Figure 4: A four-question comparison, from physical sensors to model-assisted enterprise workflows"
 >
-  {() => <AbstractionLadder />}
+  <AbstractionLadder />
 </VisualizationContainer>
 
 ## 5. Pattern Recognition as Design Methodology
@@ -558,15 +490,15 @@ The system achieved:
 
 Recognizing the closed-loop pattern in a new domain provides immediate architectural scaffolding:
 
-**Accelerated design.** When approaching a new enterprise AI problem, asking "What is the sensing function? What is the model? What is the optimization objective? What is the actuation mechanism?" immediately structures the solution space and reveals design choices.
+**Accelerated design.** When approaching a new enterprise AI problem, asking “What is observed? What estimates are produced? What choice follows? Who or what acts?” structures the solution space and reveals design choices.
 
-**Risk reduction.** Patterns that have been validated at one level of abstraction carry structural guarantees to the next. The insight that "human-in-the-loop improves system trust" transfers from physical plant operators to enterprise knowledge workers.
+**Risk discovery.** The questions transfer; the guarantees do not. Asking where human review belongs, what the reviewer can actually observe, and how disagreement is recorded can reveal missing controls. Whether those controls improve outcomes must be tested in each domain.
 
-**Communication.** Explaining a complex agentic AI system as "the same closed-loop architecture as industrial optimization, but operating on policies instead of sensors" makes the design accessible to non-technical stakeholders.
+**Communication.** The four-question frame can make a complex AI workflow easier to discuss with non-technical stakeholders, provided the analogy is not presented as evidence that the systems share control properties.
 
 ### 5.2 Limitations
 
-The pattern is structural, not implementational. Knowing that an agentic AI platform follows sense &rarr; model &rarr; optimize &rarr; act does not tell you which embedding model to use, how to design the agent orchestration, or how to enforce entitlements. The pattern provides the skeleton; domain expertise provides the flesh.
+This is a comparison tool, not a control theorem. Mapping a workflow to observe &rarr; estimate &rarr; choose &rarr; act does not tell you which embedding model to use, how to design orchestration, how to enforce entitlements, or whether feedback improves the system. Those questions require domain-specific evidence and controls.
 
 ## 6. Related Work
 
@@ -576,14 +508,14 @@ The pattern is structural, not implementational. Knowing that an agentic AI plat
 
 **Multi-Objective Optimization.** Coello Coello et al. <CitationRef id={7} /> survey evolutionary approaches to multi-objective optimization, including Pareto-based methods. Our weighted-sum approach is a simplification; Pareto-optimal methods (NSGA-II <CitationRef id={8} />) would allow exploring the full tradeoff frontier between pollutant types.
 
-**Agentic AI Architectures.** LangGraph <CitationRef id={9} />, AutoGen <CitationRef id={10} />, and CrewAI provide orchestration frameworks. Our contribution is the recognition that these systems implement the same closed-loop pattern as classical control systems, which provides formal grounding for architectural decisions.
+**Agentic AI Architectures.** LangGraph <CitationRef id={9} />, AutoGen <CitationRef id={10} />, and CrewAI provide orchestration frameworks. Their observe-route-evaluate cycles are useful comparison points, but they are not equivalent to classical feedback control and do not inherit its guarantees.
 
-**Architectural Patterns in Software.** Gamma et al. <CitationRef id={11} /> established design patterns as a communication and design tool. We extend this idea to AI system architecture, arguing that cross-domain structural patterns (like closed-loop optimization) serve the same function at the system level that GoF patterns serve at the code level.
+**Architectural Patterns in Software.** Gamma et al. <CitationRef id={11} /> established design patterns as a communication and design tool. This article applies that communicative idea at the system level while keeping the cross-domain comparison explicitly heuristic.
 
 ## 7. Conclusion
 
-The closed-loop optimization pattern (sense, model, optimize, act) is not merely a useful abstraction. It is a structural invariant that appears in systems as different as industrial combustion control and enterprise agentic AI. Recognizing this invariant provides a design methodology: decompose the new system into its four phases, identify what each phase looks like in the new domain, and apply the structural lessons learned from prior instantiations.
+Closed-loop thinking is a bounded design heuristic: observe, estimate, choose, act. It can help decompose systems as different as industrial combustion control and enterprise AI, but the resemblance is analogical. Each system still needs its own objective, evidence, controls, and failure analysis.
 
-The most important structural lesson is this: **the "act" step defines the system's value.** A model that predicts emissions without recommending settings is a dashboard. A system that recommends optimal settings is a decision engine. An agentic platform that ingests policies without guiding decisions is a search tool. A platform that guides structured enterprise decisions is a transformation engine. The leap from descriptive to prescriptive, from informing to acting, is where the impact lives at every abstraction level.
+The most useful question is what happens after a model produces an estimate. In the plant system, operators reviewed model-recommended candidate settings. In enterprise workflows, people may review a structured draft, a calculation, or a comparison. Making that action boundary explicit clarifies both the intended value and the controls the system still needs.
 
 {/* References and Further Reading rendered by PostLayout from data/posts/index.ts */}

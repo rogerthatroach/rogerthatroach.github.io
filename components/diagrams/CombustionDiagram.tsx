@@ -14,6 +14,7 @@ import AgentNode from './AgentNode';
 import AnimatedEdge from './AnimatedEdge';
 import type { AgentNodeData } from './AgentNode';
 import { useThemeColor } from '@/lib/useThemeColor';
+import SemanticDiagramFallback from '@/components/blog/diagrams/SemanticDiagramFallback';
 
 const nodeTypes = { agent: AgentNode };
 const edgeTypes = { animated: AnimatedEdge };
@@ -64,7 +65,7 @@ const initialNodes: Node[] = [
     position: { x: 220, y: 330 },
     data: {
       label: 'PSO Optimizer',
-      description: 'Particle Swarm — explores input space to minimize emissions',
+      description: 'Particle Swarm explores bounded candidate settings under the configured objective',
       icon: '🌀',
       category: 'process',
       accentColor: CORAL,
@@ -75,8 +76,8 @@ const initialNodes: Node[] = [
     type: 'agent',
     position: { x: 80, y: 440 },
     data: {
-      label: 'Optimal Settings',
-      description: 'Computed control parameters',
+      label: 'Candidate Settings',
+      description: 'Bounded control parameters',
       icon: '🎛️',
       category: 'output',
       accentColor: AMBER,
@@ -88,7 +89,7 @@ const initialNodes: Node[] = [
     position: { x: 360, y: 440 },
     data: {
       label: 'Plant Operators',
-      description: 'Adjust boiler controls',
+      description: 'Review candidate settings and retain control of plant adjustments',
       icon: '👷',
       category: 'output',
       accentColor: AMBER,
@@ -100,7 +101,7 @@ const initialNodes: Node[] = [
     position: { x: 220, y: 550 },
     data: {
       label: '$3M/yr Saved',
-      description: 'Reduced NOx, SOx, CO + cost savings',
+      description: 'Savings attributed to the program',
       icon: '💰',
       category: 'output',
       accentColor: AMBER,
@@ -124,10 +125,35 @@ export default function CombustionDiagram() {
   const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
-    <div className="h-[500px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-xs sm:h-[600px]">
+    <div
+      className="relative h-[500px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-xs sm:h-[600px]"
+      role="group"
+      aria-label="Combustion-tuning recommendation flow"
+    >
+      <SemanticDiagramFallback
+        title="Combustion-tuning recommendation flow"
+        summary="Plant observations feed engineered features and 84 regression models. Particle Swarm Optimization explores bounded candidate settings, which remain subject to plant-operator review and control."
+        steps={[
+          { title: 'Observe', detail: 'More than 90 plant sensors record temperature, pressure, flow, and emissions-related operating signals.' },
+          { title: 'Prepare features', detail: 'Domain transformations and aggregations turn the time-series inputs into model-ready features.' },
+          { title: 'Estimate', detail: 'Eighty-four independent regression models estimate combustion behavior under candidate inputs.' },
+          { title: 'Explore candidates', detail: 'Particle Swarm Optimization searches the bounded setting space under the configured objective and constraints.' },
+          { title: 'Review and act', detail: 'Plant operators assess candidate settings and retain authority over any control adjustment.' },
+        ]}
+        notes={[
+          'The optimizer proposes candidates; it does not replace operator judgment or guarantee a global optimum.',
+          'The program was credited with approximately $3 million per year in savings.',
+        ]}
+      />
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        nodesFocusable={false}
+        edgesFocusable={false}
+        elementsSelectable={false}
+        deleteKeyCode={null}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}

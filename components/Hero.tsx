@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, FileBadge } from 'lucide-react';
@@ -25,45 +25,35 @@ const FADE_UP = {
 export default function Hero() {
   const [frame, setFrame] = useState(0);
   const [sequenceDone, setSequenceDone] = useState(false);
-  // Defer ParticleField (Three.js bundle, ~100KB compressed) until after
-  // the main thread is idle post-LCP. Lighthouse mobile flagged 990ms of
-  // unused JS on the homepage; the ParticleField is dynamically imported
-  // but its bundle still gets parsed during initial hydration. Gating on
-  // a post-mount requestIdleCallback (with setTimeout fallback) pushes
-  // the bundle download past LCP entirely on slow networks.
+  // Defer the decorative Three.js field until the main thread is idle so its
+  // bundle does not compete with primary content during initial rendering.
   const [showParticles, setShowParticles] = useState(false);
   const prefersReducedMotion = useReducedMotion();
-
-  const advance = useCallback(() => {
-    setFrame((prev) => {
-      const next = prev + 1;
-      if (next >= NUMBER_SEQUENCE.length) {
-        setSequenceDone(true);
-        return prev;
-      }
-      return next;
-    });
-  }, []);
 
   useEffect(() => {
     if (prefersReducedMotion) {
       setSequenceDone(true);
       return;
     }
-    // Start number cycling after identity has landed
-    const startDelay = setTimeout(() => {
-      const timer = setInterval(advance, FRAME_DURATION);
-      return () => clearInterval(timer);
-    }, 2000);
-    return () => clearTimeout(startDelay);
-  }, [advance, prefersReducedMotion]);
+    if (sequenceDone) return;
 
-  useEffect(() => {
-    if (frame > 0 && !sequenceDone) {
-      const timer = setInterval(advance, FRAME_DURATION);
-      return () => clearInterval(timer);
-    }
-  }, [frame, advance, sequenceDone]);
+    // Keep one cleanup-owned timer per frame. The previous nested interval's
+    // cleanup was returned from inside setTimeout (and therefore ignored),
+    // while a second effect started an overlapping interval after frame one.
+    // The first frame retains the original 2 s landing delay plus its normal
+    // display duration; subsequent frames each remain for FRAME_DURATION.
+    const delay = frame === 0 ? 2000 + FRAME_DURATION : FRAME_DURATION;
+    const timer = setTimeout(() => {
+      const next = frame + 1;
+      if (next >= NUMBER_SEQUENCE.length) {
+        setSequenceDone(true);
+      } else {
+        setFrame(next);
+      }
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [frame, prefersReducedMotion, sequenceDone]);
 
   useEffect(() => {
     if (prefersReducedMotion) return; // reduced-motion: never load the particle bundle
@@ -167,16 +157,12 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* === 3 · CTAs — primary "Read case studies" + secondary "Contact / CV".
-            Middle ground between the audit's pitch-first hero and the prior
-            identity-heavy context block: keeps the portrait + name + tagline
-            + bio above (individuality), drops industries/experience/socials
-            (clutter), adds two explicit next-steps. Social links live in
-            the Footer. === */}
+        {/* Primary case-study CTA plus secondary contact/CV actions. Social
+            links remain in the footer to keep the hero focused. */}
         <motion.div
           custom={4}
           variants={FADE_UP}
-          initial="hidden"
+          initial={false}
           animate="visible"
           className="flex flex-wrap items-center gap-5 pt-2"
         >
@@ -210,7 +196,7 @@ export default function Hero() {
         <motion.p
           custom={5}
           variants={FADE_UP}
-          initial="hidden"
+          initial={false}
           animate="visible"
           className="mt-1 inline-flex items-center gap-2 text-xs text-text-tertiary"
         >
@@ -220,10 +206,16 @@ export default function Hero() {
           </span>
           <span>
             <span className="text-text-secondary">Based in {HERO.location}</span>
-            <span className="mx-2 opacity-40">·</span>
+            <span className="mx-2 opacity-40"> · </span>
             <span>Open to conversations</span>
           </span>
         </motion.p>
+
+        <noscript>
+          <p className="mt-4 font-mono text-xs tracking-wider text-text-tertiary sm:hidden">
+            {HERO_SUMMARY.join(' · ')}
+          </p>
+        </noscript>
       </div>
 
       {/* Number sequence — ambient strip at bottom of viewport.
@@ -231,11 +223,12 @@ export default function Hero() {
           social icons on mobile (content + ticker + bottom-10 > min-h-screen). */}
       <div className="absolute bottom-10 left-0 right-0 z-10 hidden sm:block">
         <div className="mx-auto max-w-content px-6 md:px-16">
-          <AnimatePresence mode="wait">
+          <div className="js-number-sequence">
+            <AnimatePresence mode="wait">
             {!sequenceDone && (
               <motion.div
                 key={frame}
-                initial={{ opacity: 0, y: 8 }}
+                initial={false}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] as const }}
@@ -244,6 +237,7 @@ export default function Hero() {
                 <span className="font-mono text-2xl font-bold text-text-primary sm:text-3xl">
                   {NUMBER_SEQUENCE[frame].value}
                 </span>
+                <span className="sr-only"> — </span>
                 <span className="font-mono text-xs tracking-wider text-text-tertiary">
                   {NUMBER_SEQUENCE[frame].context}
                 </span>
@@ -253,7 +247,7 @@ export default function Hero() {
             {sequenceDone && (
               <motion.div
                 key="summary"
-                initial={{ opacity: 0 }}
+                initial={false}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6 }}
                 className="flex items-center gap-6 font-mono text-xs tracking-wider text-text-tertiary"
@@ -266,24 +260,32 @@ export default function Hero() {
                 ))}
               </motion.div>
             )}
-          </AnimatePresence>
+            </AnimatePresence>
 
-          {/* Progress dots */}
-          {!sequenceDone && (
-            <div className="mt-3 flex gap-1.5">
-              {NUMBER_SEQUENCE.map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="h-0.5 rounded-2xl"
-                  animate={{
-                    width: i === frame ? 24 : 6,
-                    backgroundColor: i === frame ? 'var(--color-accent)' : 'var(--color-border)',
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
-              ))}
-            </div>
-          )}
+            {/* Progress dots */}
+            {!sequenceDone && (
+              <div className="mt-3 flex gap-1.5">
+                {NUMBER_SEQUENCE.map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="h-0.5 rounded-2xl"
+                    animate={{
+                      width: i === frame ? 24 : 6,
+                      backgroundColor: i === frame ? 'var(--color-accent)' : 'var(--color-border)',
+                    }}
+                    transition={{ duration: 0.3 }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          <noscript>
+            <style>{'.js-number-sequence{display:none!important}'}</style>
+            <p className="font-mono text-xs tracking-wider text-text-tertiary">
+              {HERO_SUMMARY.join(' · ')}
+            </p>
+          </noscript>
         </div>
       </div>
 

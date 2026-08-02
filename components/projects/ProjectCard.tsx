@@ -19,7 +19,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={false}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1, ease: [0.4, 0, 0.2, 1] as const }}
       ref={ref}
@@ -64,6 +64,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
           >
             {project.heroMetric.value}
           </span>
+          <span className="sr-only"> — </span>
           <span className="text-xs text-text-tertiary">{project.heroMetric.label}</span>
         </div>
 

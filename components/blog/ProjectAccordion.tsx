@@ -13,9 +13,8 @@ import type { BlogPostMeta } from '@/data/posts';
  *   • Click a header to expand; click again to collapse.
  *   • Single-active: opening one closes the previously open section.
  *
- * Earlier iteration had scroll-driven auto-expand; removed per user
- * call — click is the only toggle path. Keeps the page feel calm and
- * predictable; nothing happens unless the user asks for it.
+ * Click is the only toggle path, keeping the page calm and predictable;
+ * nothing expands unless the reader asks for it.
  */
 
 export interface AccordionGroup {
@@ -98,10 +97,11 @@ function Section({ id, group, isOpen, onToggle }: SectionProps) {
               className="font-mono text-[10px] font-semibold uppercase tracking-widest"
               style={{ color: accent.dark }}
             >
-              <span className="dark:hidden" style={{ color: accent.light }}>
+              <span className="sr-only">{accent.label}</span>
+              <span aria-hidden="true" className="dark:hidden" style={{ color: accent.light }}>
                 {accent.label}
               </span>
-              <span className="hidden dark:inline">{accent.label}</span>
+              <span aria-hidden="true" className="hidden dark:inline">{accent.label}</span>
             </p>
           )}
           <h2
@@ -141,21 +141,37 @@ function Section({ id, group, isOpen, onToggle }: SectionProps) {
         </p>
       )}
 
+      <noscript>
+        <ul className="grid gap-3 px-4 pb-4 sm:grid-cols-2 sm:pl-7 sm:pr-5 lg:grid-cols-3">
+          {group.posts.map((post) => (
+            <li key={post.slug}>
+              <Link
+                href={`/blog/${post.slug}`}
+                className="block rounded-lg border border-border-subtle bg-surface p-4 text-sm font-semibold text-text-primary"
+              >
+                {post.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </noscript>
+
       {/* Collapsible body — grid-template-rows trick gives a smooth
           height transition without measuring content. Inner div
           overflow-hidden so cards clip cleanly when collapsed.
-          `inert` (HTML attr) blocks focus AND interaction on the
-          collapsed subtree, so PostCard links inside the closed panel
-          are properly skipped by tab + screen readers. Replaces an
-          earlier aria-hidden={!isOpen} that Lighthouse flagged as
-          aria-hidden-focus because focusable descendants remained. */}
+          `inert` blocks focus and interaction where supported; explicit
+          visibility and aria-hidden state keep the collapsed subtree out
+          of keyboard and assistive-technology navigation everywhere. */}
       <div
         id={`panel-${id}`}
         className="grid transition-[grid-template-rows] duration-300 ease-out"
         style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
         {...(!isOpen ? { inert: true } : {})}
       >
-        <div className="overflow-hidden">
+        <div
+          aria-hidden={!isOpen}
+          className={`overflow-hidden ${isOpen ? 'visible' : 'invisible'}`}
+        >
           <div className="grid gap-4 px-4 pb-4 pt-1 sm:grid-cols-2 sm:pl-7 sm:pr-5 lg:grid-cols-3">
             {group.posts.map((post, i) => (
               <PostCard key={post.slug} post={post} index={i} />

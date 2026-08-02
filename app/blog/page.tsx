@@ -8,10 +8,30 @@ import Footer from '@/components/Footer';
 import BlogIndexClient from '@/components/blog/BlogIndexClient';
 import type { AccordionGroup } from '@/components/blog/ProjectAccordion';
 
+const META_TITLE = 'Writings';
+const META_DESCRIPTION =
+  'Technical writing on agentic AI, retrieval, text-to-SQL, and closed-loop optimization.';
+const META_PATH = '/blog';
+
 export const metadata: Metadata = {
-  title: 'Writings — Harmilap Singh Dhaliwal',
-  description: 'Technical whitepapers on agentic AI, text-to-SQL, and closed-loop optimization.',
-  alternates: { canonical: '/blog' },
+  title: META_TITLE,
+  description: META_DESCRIPTION,
+  alternates: { canonical: META_PATH },
+  openGraph: {
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    url: META_PATH,
+    siteName: 'Harmilap Singh Dhaliwal',
+    locale: 'en_US',
+    type: 'website',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    images: ['/og-image.png'],
+  },
 };
 
 /**

@@ -8,29 +8,29 @@ const LEVELS = [
     id: 'physical',
     label: 'Physical',
     color: '#f59e0b',
-    nodes: ['90+ Sensors', 'Regression Models', 'PSO', 'Plant Operators'],
+    nodes: ['90+ Sensors', 'Regression Models', 'PSO Candidates', 'Operator Review'],
   },
   {
     id: 'cloud',
     label: 'Cloud',
     color: '#8b5cf6',
-    nodes: ['Document Ingestion', 'Entity Extraction', 'Review Reduction', 'Verified Output'],
+    nodes: ['Document Ingestion', 'Entity Extraction', 'Quality Objective', 'Verified Output'],
   },
   {
     id: 'financial',
     label: 'Financial',
     color: '#22c55e',
-    nodes: ['GL Data Extraction', 'PySpark Transforms', 'Process Optimization', 'CFO Reports'],
+    nodes: ['GL Data Extraction', 'PySpark Transforms', 'Process Objective', 'CFO Reports'],
   },
   {
-    id: 'intelligent',
-    label: 'Intelligent',
+    id: 'model-assisted',
+    label: 'Model-assisted',
     color: '#3b82f6',
-    nodes: ['Policy/Data Ingest', 'LangGraph Agents', 'RAG/MCP Optimization', 'Guided Decisions'],
+    nodes: ['Policy/Data Ingest', 'LangGraph Workflow', 'Retrieval + Tools', 'Guided Decisions'],
   },
 ];
 
-const PHASES = ['Sense', 'Model', 'Optimize', 'Act'];
+const PHASES = ['Observe', 'Estimate', 'Choose', 'Act'];
 
 export default function ClosedLoopCycle() {
   const [activeLevel, setActiveLevel] = useState(0);
@@ -47,11 +47,14 @@ export default function ClosedLoopCycle() {
   return (
     <div className="flex flex-col gap-4 p-6">
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Operating-context example">
         {LEVELS.map((l, i) => (
           <button
             key={l.id}
+            type="button"
             onClick={() => setActiveLevel(i)}
+            aria-pressed={i === activeLevel}
+            aria-controls="closed-loop-cycle-chart"
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
               i === activeLevel
                 ? 'text-white'
@@ -64,7 +67,22 @@ export default function ClosedLoopCycle() {
         ))}
       </div>
 
-      <svg viewBox="0 0 400 320" className="mx-auto w-full max-w-md" fill="none">
+      <p className="text-xs text-text-tertiary" role="status" aria-live="polite">
+        {level.label}: {level.nodes.join(' → ')}
+      </p>
+
+      <svg
+        id="closed-loop-cycle-chart"
+        viewBox="0 0 400 320"
+        className="mx-auto w-full max-w-md"
+        fill="none"
+        role="img"
+        aria-labelledby="closed-loop-cycle-title closed-loop-cycle-description"
+      >
+        <title id="closed-loop-cycle-title">Four-question design cycle</title>
+        <desc id="closed-loop-cycle-description">
+          An illustrative comparison of observe, estimate, choose, and act across four operating contexts.
+        </desc>
         {/* Connecting arcs */}
         {positions.map((pos, i) => {
           const next = positions[(i + 1) % 4];
@@ -93,6 +111,7 @@ export default function ClosedLoopCycle() {
               key={`arrow-${i}`}
               points="-5,-4 5,0 -5,4"
               transform={`translate(${mx},${my}) rotate(${angle})`}
+              initial={false}
               animate={{ fill: level.color }}
               transition={{ duration: 0.3 }}
             />
@@ -106,6 +125,7 @@ export default function ClosedLoopCycle() {
         <motion.circle
           cx={cx} cy={cy} r={20}
           fill="transparent"
+          initial={false}
           animate={{ stroke: level.color }}
           strokeWidth={1}
           strokeOpacity={0.3}
@@ -118,6 +138,7 @@ export default function ClosedLoopCycle() {
             <motion.rect
               x={pos.x - 55} y={pos.y - 22} width={110} height={44} rx={8}
               fill={`${level.color}15`}
+              initial={false}
               animate={{ stroke: level.color }}
               strokeWidth={1.5}
               transition={{ duration: 0.3 }}
@@ -131,7 +152,7 @@ export default function ClosedLoopCycle() {
               textAnchor="middle"
               className="fill-text-secondary"
               fontSize="8"
-              initial={{ opacity: 0 }}
+              initial={false}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
             >
@@ -140,6 +161,17 @@ export default function ClosedLoopCycle() {
           </g>
         ))}
       </svg>
+
+      <noscript>
+        <ul className="space-y-2 rounded-lg border border-border-subtle bg-surface/50 p-4 text-xs text-text-secondary">
+          {LEVELS.map((item) => (
+            <li key={item.id}>
+              <strong className="text-text-primary">{item.label}:</strong>{' '}
+              {PHASES.map((phase, phaseIndex) => `${phase}: ${item.nodes[phaseIndex]}`).join(' → ')}
+            </li>
+          ))}
+        </ul>
+      </noscript>
     </div>
   );
 }
