@@ -140,11 +140,9 @@ export default function ParticleField() {
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Detect WebGL availability up-front — headless Chrome under --disable-gpu
-    // (Lighthouse, some CI envs) returns null here, and letting Three.js crash
-    // downstream surfaces console errors that Lighthouse counts against BP +
-    // cascades into DOM-query audits (viewport / title / lang / meta-description
-    // were reporting as missing even though the server HTML carried them).
+    // Detect WebGL availability before initializing Three.js. Headless and
+    // GPU-disabled environments can return null; the decoration should then
+    // fail closed without affecting the page content.
     try {
       const c = document.createElement('canvas');
       const gl = c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl');

@@ -56,21 +56,21 @@ export const CASE_STUDIES: CaseStudy[] = [
     era: 'Foundation',
     tldr: {
       problem:
-        'A 900MW coal plant in Japan ran with fuel inefficiency and high emissions — operator settings were calibrated against idealized bench conditions, not the live combustion dynamics the plant actually faced.',
+        'One 900MW generating unit at the 1,800MW Maizuru coal-fired power station in Japan needed a data-driven way to evaluate combustion settings across noisy, high-dimensional operating data while keeping plant operators in control.',
       decision:
-        'Built a Digital Twin — 84 regression models across 90+ sensors — optimized by Particle Swarm Optimization to recommend settings in closed loop with plant operators.',
+        'Built a Digital Twin — 84 independent regression models across 90+ sensors — with Particle Swarm Optimization proposing bounded candidate settings for plant-operator review.',
       impact:
-        '$3M/year in fuel savings and measurable NOx/SOx/CO reduction. The framework became a replicable template for other industrial clients at TCS.',
+        '$3M/year in savings from an operator-reviewed combustion-tuning system.',
     },
     sections: {
       context:
-        'Maizuru is a 900MW coal power plant in Japan operated by a major energy company. Combustion inefficiency was costing millions annually in wasted fuel and excessive emissions (NOx, SOx, CO). The plant had 90+ sensors generating continuous operational data, but no systematic way to translate that data into actionable tuning recommendations for operators.',
+        'Kansai Electric owns and operates the 1,800MW Maizuru coal-fired power station in Japan. This project focused on one of its two 900MW generating units. The unit had 90+ sensors generating operational data, and the project used that history to model combustion behavior and produce tuning recommendations for operators.',
       myRole:
-        'ML Engineer on a 3-person R&D team within TCS, partnered with MHPS (Mitsubishi Hitachi Power Systems). I owned the full ML pipeline: data collection from plant sensors, feature engineering, model development, optimization, and the feedback loop with plant operators. This was my first end-to-end ML project at scale.',
+        'Data Scientist on a 3-person R&D team within TCS, partnered with MHPS (Mitsubishi Hitachi Power Systems). I owned the full ML pipeline: data collection from plant sensors, feature engineering, model development, optimization, and the feedback loop with plant operators. This was my first end-to-end ML project at scale.',
       stakeholders:
-        'Japanese energy company (plant owner), MHPS engineering team (domain expertise on combustion dynamics), TCS delivery leadership (project governance), and plant operators (end users who adjusted settings based on our recommendations).',
+        'Kansai Electric (station owner and operator), MHPS engineering team (equipment and combustion-domain expertise), TCS delivery leadership (project governance), and Maizuru plant operators (end users who adjusted settings based on our recommendations).',
       challenge:
-        'The core difficulty was multi-objective optimization under real-world constraints. We needed to simultaneously minimize NOx, SOx, and CO emissions while maintaining thermal efficiency — objectives that often conflict. The sensor data was noisy, high-dimensional (90+ inputs), and the plant operated under varying load conditions. Any model recommendations had to be trustworthy enough for operators to act on in a live 900MW facility.',
+        'The core difficulty was multi-objective optimization under real-world constraints. We needed to simultaneously minimize NOx, SOx, and CO emissions while maintaining thermal efficiency — objectives that often conflict. The sensor data was noisy, high-dimensional (90+ inputs), and the unit operated under varying load conditions. Any model recommendations had to be trustworthy enough for operators to act on in a live 900MW generating unit.',
       optionsConsidered: [
         {
           option: 'Single comprehensive model predicting all outputs',
@@ -89,18 +89,17 @@ export const CASE_STUDIES: CaseStudy[] = [
         },
       ],
       decision:
-        'We chose the 84-model ensemble with PSO because it let each model specialize on its prediction target while PSO handled the multi-objective optimization. The models served as objective functions — PSO explored the input space to find sensor configurations that minimized emissions. This gave us the flexibility to balance competing objectives without hard-coding trade-offs.',
+        'We chose 84 independent regression models with PSO because each model could specialize on its prediction target while PSO handled the multi-objective search. The models served as objective functions — PSO explored bounded controllable-setting combinations, conditioned on observed plant state. This let the team represent explicit trade-offs without treating sensor readings as actuators.',
       implementation:
-        'Built 84 simultaneous ML regression models mapping sensor inputs to emission and efficiency outputs. Applied rigorous model selection using k-fold cross-validation with R², RMSE, MAPE, and fold variance stability as criteria. Then used Particle Swarm Optimization with the trained models as objective functions, exploring the input parameter space to find configurations that minimized emissions while maintaining efficiency. Results were delivered as recommended sensor settings to plant operators.',
+        'Built 84 independent regression models mapping observed state and candidate settings to emission and efficiency targets. Applied model selection using k-fold cross-validation with R², RMSE, MAPE, and fold variance stability as criteria. Then used Particle Swarm Optimization with the trained models as objective functions, exploring the bounded controllable-setting space. Results were delivered as candidate control settings for plant-operator review.',
       impact:
-        '$3M in annual cost savings through reduced fuel waste and improved combustion efficiency. Measurable reduction in NOx, SOx, and CO emissions. This project directly led to two Star of the Month awards (Nov 2017, Jan 2019) and established the Digital Twin approach as the replicable pattern TCS adopted for other industrial clients.',
+        '$3M in annual cost savings attributed to the combustion-tuning program. This project led to two Star of the Month awards (Nov 2017, Jan 2019).',
       inProduction:
-        'The model was deployed as an operational tool at the Maizuru plant, with operators using recommended settings during combustion tuning cycles. The closed-loop feedback (model recommends → operator adjusts → sensors measure → model improves) ran continuously during my tenure.',
+        'The model was deployed as an operational tool at the plant, with operators reviewing recommended settings during combustion-tuning cycles. Subsequent sensor observations could be reviewed against the recommendations; feedback alone did not imply an automatic model update.',
       lessonsLearned:
-        'This project taught me that the hardest part of ML isn\'t the model — it\'s the feedback loop. Getting plant operators to trust and act on ML recommendations required translating model outputs into terms they understood (specific valve positions, not abstract parameters). The PSO approach also taught me that optimization is a design pattern, not just a technique — a lesson that resurfaced years later in agentic AI.',
+        'This project taught me that the hardest part of ML is often the action boundary. Getting plant operators to assess recommendations required translating model outputs into concrete control settings and preserving their authority to accept, modify, or reject them. I later reused the questions around observation, estimation, choice, and action as a design heuristic — not as a claim that enterprise AI inherits control-system guarantees.',
     },
     blogPostSlug: 'closed-loop',
-    companionBlogPostSlug: 'combustion-tuning-operators',
   },
   {
     projectId: 'document-intelligence',
@@ -108,50 +107,44 @@ export const CASE_STUDIES: CaseStudy[] = [
     era: 'Cloud ML',
     tldr: {
       problem:
-        'Insurance claim document verification at Humana sat at ~70% accuracy with Document AI alone — too low for production, forcing expensive manual review.',
+        'Checkbox detection within Humana\'s insurance-document workflow sat at ~70% accuracy with Document AI alone, requiring manual review for that component.',
       decision:
-        'Layered OpenCV pixel-level checkbox detection and a Random Forest classifier on top of Document AI OCR, routed through Vertex AI with BigQuery for downstream analytics.',
+        'Combined Document AI OCR with OpenCV pixel-level checkbox localization and a Random Forest checked/unchecked classifier within the Google Cloud workflow.',
       impact:
-        '99.95% checkbox accuracy — a production-ready pipeline. The structure-aware approach later informed RAG chunking strategy at RBC.',
+        '99.95% checkbox-detection accuracy for that component, up from the ~70% Document AI-only baseline. This is not a full-pipeline accuracy figure.',
     },
     sections: {
       context:
-        'Insurance claims processing is document-heavy — claim forms, policy documents, supporting evidence, identity verification. Quantiphi\'s insurance clients were drowning in manual review: adjusters and underwriters spending hours per claim extracting fields from scanned PDFs, photos of damaged property, handwritten forms, and multi-page policy documents. The bottleneck wasn\'t decision-making — it was getting structured data out of unstructured documents fast enough to make decisions at scale.',
+        'Humana\'s document-understanding workflow included structured forms whose checkboxes were not captured reliably by Document AI alone. The checkbox-detection component was measuring about 70% accuracy, leaving a meaningful manual-verification burden. Other document extraction work from this period is separate from the checkbox metric reported here.',
       myRole:
-        'ML Engineer responsible for designing and building the end-to-end document processing pipeline on Google Cloud. I owned the architecture from ingestion to validated output: choosing which GCP services to compose, building the entity extraction layer, deploying custom and AutoML models via Vertex AI, and tuning the pipeline for cost efficiency at scale. Also led a parallel inventory analytics workstream using SQL and Tableau for enterprise retail clients.',
+        'ML Engineer on Quantiphi\'s client delivery team, responsible for implementing the checkbox-detection component within a broader Google Cloud document-understanding workflow. I combined OCR output with OpenCV localization and a Random Forest classifier; deployment and the surrounding client workflow were delivered with the wider team. I also contributed to a separate inventory analytics workstream using SQL and Tableau for an enterprise retail client.',
       stakeholders:
-        'Insurance client teams (claims operations managers, underwriting leads), Quantiphi delivery lead and project manager, Google Cloud partner engineering team (platform guidance and co-development support).',
+        'Humana document-operations stakeholders, the Quantiphi delivery team, and Google Cloud partner engineers supporting the platform.',
       challenge:
-        'Insurance documents are uniquely messy: scanned claim forms with variable layouts, handwritten damage descriptions, photos mixed with text, multi-page policies where the relevant clause is buried on page 47. OCR alone wasn\'t enough — the pipeline needed to understand document structure (which section is this field in?) and handle graceful degradation when scan quality was poor. On top of that, GCP costs scale with volume, so the architecture had to be cost-conscious — over-processing low-confidence documents on expensive custom models would blow the economics.',
+        'Checkboxes are small, near-binary visual elements whose state can be lost when a general OCR service reduces a page to text and layout. The component needed to preserve Document AI\'s document context while adding pixel-level localization and a classifier specialized for checked-versus-unchecked state.',
       optionsConsidered: [
         {
-          option: 'Custom-trained models only',
-          prosAndCons: 'Maximum accuracy for specific document types, but required large labeled datasets per client and weeks of training per document format. Didn\'t scale across client variety.',
+          option: 'Document AI checkbox output alone',
+          prosAndCons: 'Kept the pipeline simple and preserved OCR context, but the checkbox task remained at the ~70% baseline.',
           chosen: false,
         },
         {
-          option: 'Off-the-shelf vendor solution (e.g., ABBYY, Kofax)',
-          prosAndCons: 'Fastest to deploy, but limited customization for insurance-specific fields. Vendor lock-in and per-page pricing made it expensive at scale. Couldn\'t handle the client\'s non-standard form layouts.',
-          chosen: false,
-        },
-        {
-          option: 'GCP Document AI + Vertex AI hybrid pipeline',
-          prosAndCons: 'Document AI handles OCR and structural parsing out of the box; AutoML provides quick-start classification for standard forms; custom Vertex AI models handle edge cases (handwritten fields, damaged scans). Incremental — start with AutoML, upgrade to custom where accuracy demands it.',
+          option: 'Document AI + OpenCV + Random Forest',
+          prosAndCons: 'Retained Document AI for OCR and structure, added pixel-level checkbox localization with OpenCV, and specialized the final checked/unchecked decision with a Random Forest classifier.',
           chosen: true,
         },
       ],
       decision:
-        'The hybrid pipeline let us deliver value fast while keeping a clear upgrade path. Document AI handled the OCR and structural parsing — it\'s excellent at decomposing pages into fields and tables. AutoML classified document types (claim form vs. policy vs. ID) with minimal training data. For high-value extraction tasks where AutoML accuracy wasn\'t sufficient (e.g., handwritten damage descriptions, non-standard form layouts), we trained custom models on Vertex AI. The tiered approach also controlled costs: AutoML is cheap per-inference, custom models are reserved for documents that need them.',
+        'Use each component for the part it could support: Document AI for OCR and document structure, OpenCV for pixel-level checkbox localization, and Random Forest for checked-versus-unchecked classification. The narrow task boundary also keeps the reported accuracy attached to the component it actually measured.',
       implementation:
-        'Ingestion layer receives scanned documents (PDFs, images). Document AI performs OCR with structural parsing — extracting not just text but document layout (tables, key-value pairs, form fields). A classification stage routes documents to the appropriate extraction pipeline based on type. Vertex AI models (AutoML for standard forms, custom for edge cases) extract entities: claimant names, policy numbers, damage descriptions, dates, amounts. A validation layer cross-references extracted data against business rules (e.g., policy number format, date ranges, required fields). Structured output is delivered for downstream claims processing.',
+        'Document AI produced OCR and structural context for each form. OpenCV then localized checkbox regions at pixel level, and engineered visual features fed a Random Forest classifier that distinguished checked from unchecked states. The component output was rejoined with the surrounding document structure for the broader workflow.',
       impact:
-        'Reduced manual document review time for insurance claims processing. Established a replicable GCP pipeline pattern that Quantiphi could adapt across their insurance client base. The document processing architecture — parsing structure from unstructured sources, tiered model selection, cost-conscious inference — directly informed my later work on RAG pipelines at RBC, where I built chunking and embedding pipelines for PDFs, PPTX, and DOCX.',
+        'Improved checkbox-detection accuracy from a ~70% Document AI-only baseline to 99.95%, reducing manual verification for that field type. The number applies only to checkbox detection; it does not describe OCR, entity extraction, or end-to-end document-pipeline accuracy.',
       inProduction:
-        'Deployed on Google Cloud Platform for active use in insurance claims workflows. The pipeline processed claim documents in production, feeding structured data into downstream adjudication and underwriting systems.',
+        'Delivered on Google Cloud as part of Humana\'s document-understanding workflow, with the checkbox component feeding its classified state into the surrounding document process.',
       lessonsLearned:
-        'Two things stayed with me. First, cost-per-inference matters as much as accuracy at scale — we had to architect the pipeline so expensive custom models only ran on documents that needed them, which taught me to think about ML economics, not just ML metrics. Second, document structure is information: knowing which section a field appears in (header vs. body vs. footer) dramatically improves extraction accuracy. This insight resurfaced directly when I built RAG pipelines at RBC — chunking documents by structure rather than fixed token windows was the difference between useful and useless retrieval.',
+        'A narrow model can materially improve a larger workflow when its boundary is explicit. The equally important reporting lesson is to keep an excellent component score attached to its task, baseline, and review surface rather than letting it become a claim about the entire pipeline.',
     },
-    blogPostSlug: 'document-intelligence-accuracy-cliff',
   },
   {
     projectId: 'commodity-tax',
@@ -161,21 +154,21 @@ export const CASE_STUDIES: CaseStudy[] = [
       problem:
         'RBC\'s Commodity Tax return process consumed finance teams for months per cycle — manual General Ledger extraction, reconciliation, and error-prone return preparation.',
       decision:
-        'PySpark pipeline for GL data extraction paired with Tableau dashboards — not as output, but as the transparency layer that let skeptical finance analysts audit every step.',
+        'PySpark pipeline for GL data extraction paired with Tableau dashboards — not only as output, but as a transparency layer for inspecting configured stages and recorded transformations.',
       impact:
-        'Months → 90 minutes per cycle on ~$600M tax allocation. CFO Group RBC Quarterly Team Award (Q4 2023). The stakeholder-trust win that opened the door to every subsequent AI initiative at the CFO Group.',
+        'Months → 90 minutes per cycle on a roughly $600M tax allocation. CFO Group RBC Quarterly Team Award (Q4 2023). The delivery helped establish credibility for subsequent AI initiatives in the CFO Group.',
     },
     sequencing:
-      'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with dashboards the CFO could audit, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then Aegis v2 (AI-native rewrite, 2 weeks, 2025), then Astraeus (production 2025), then conceive PAR Assist and build it end-to-end after handing the concept to the 2025 Amplify cohort for problem-space ideation (pilot launched April 2026). Each project underwrote the next one\'s scope. The Commodity Tax wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
+      'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with dashboards the CFO could audit, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then refactor it into Aegis v2 in a concurrent 2-week sprint (2025), then Astraeus (production 2025), then conceive PAR Assist and build it end-to-end after handing the concept to the 2025 Amplify cohort for problem-space ideation (pilot launched April 2026). Each project underwrote the next one\'s scope. The Commodity Tax wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
     blogPostSlug: 'commodity-tax-provenance',
     companionBlogPostSlug: 'commodity-tax-cfo-trust',
     leadershipCallout:
-      'This was my first project at RBC — and I treated it as an audition. By choosing Tableau as the transparency layer (not just an output), I gave skeptical finance stakeholders visibility into every step of the automation. The resulting trust didn\'t just deliver Commodity Tax — it opened the door for Aegis, Astraeus, and every AI initiative that followed. The months-to-90-minutes metric became the team\'s calling card with CFO leadership.',
+      'This was my first project at RBC — and I treated it as an audition. By choosing Tableau as a transparency layer (not just an output), I gave finance stakeholders a way to inspect configured stages and recorded lineage. The delivery helped build the credibility to propose Aegis, Astraeus, and PAR Assist. The months-to-90-minutes metric became a concrete result to discuss with CFO leadership.',
     sections: {
       context:
         'The Commodity Tax return process within RBC\'s CFO Group was a massive manual effort — finance teams spent months each cycle extracting data from General Ledger journals, reconciling figures, and preparing tax returns. The process was error-prone, time-consuming, and consumed significant analyst bandwidth that could be directed at higher-value work.',
       myRole:
-        'Lead developer and primary stakeholder liaison. I owned the technical solution end-to-end and was the bridge between the finance team (who understood the tax process) and the AI team (who could automate it). This was my first project at RBC and the one that built the trust needed for everything that followed.',
+        'Lead developer and primary stakeholder liaison. I owned the technical solution end-to-end and was the bridge between the finance team (who understood the tax process) and the AI team (who could automate it). This was my first project at RBC and an important credibility-building delivery.',
       stakeholders:
         'CFO Group finance team (tax analysts and managers), Enterprise Finance leadership, Director AI (governance and priority alignment).',
       challenge:
@@ -195,13 +188,13 @@ export const CASE_STUDIES: CaseStudy[] = [
       decision:
         'We chose PySpark for the heavy data extraction (GL journals are massive) paired with Tableau dashboards for financial KPI monitoring. The dashboards were critical — they gave the finance team visibility into what the automation was doing, which built trust. This wasn\'t just a technical choice; it was a stakeholder management strategy.',
       implementation:
-        'Built a PySpark pipeline for General Ledger Journal data extraction at scale, replacing the manual process. Created advanced Tableau dashboards for financial KPI monitoring that gave tax analysts real-time visibility into the data flow. The pipeline codified the institutional knowledge about GL-to-tax-category mappings that had previously lived in spreadsheets and people\'s heads.',
+        'Built a PySpark pipeline for General Ledger Journal data extraction at scale, replacing the manual process. Created advanced Tableau dashboards for financial KPI monitoring that gave tax analysts interactive visibility into the data flow. The pipeline codified the institutional knowledge about GL-to-tax-category mappings that had previously lived in spreadsheets and people\'s heads.',
       impact:
-        'Reduced the Commodity Tax return process from months to 90 minutes. Recognized with the CFO Group RBC Quarterly Team Award (Q4 2023). More importantly, this project built the stakeholder trust that opened the door to AI — leadership saw that the AI team could deliver tangible, measurable value. Without this win, Astraeus and PAR Assist might never have been greenlit.',
+        'Reduced the Commodity Tax return process from months to 90 minutes. Recognized with the CFO Group RBC Quarterly Team Award (Q4 2023). The result gave leadership concrete evidence that the team could deliver measurable value and strengthened the case for later AI work.',
       inProduction:
         'Running in production within the CFO Group. The automated pipeline processes each tax cycle, with Tableau dashboards providing ongoing monitoring and verification for the finance team.',
       lessonsLearned:
-        'The biggest lesson was that the technical solution is sometimes the easy part. Building trust with finance stakeholders who were skeptical of automation required showing them every step — hence Tableau as the transparency layer. The "months to 90 minutes" metric became a calling card that opened doors for every subsequent AI initiative. I learned that your first project at a new organization isn\'t just a deliverable; it\'s an audition.',
+        'The biggest lesson was that the technical solution is sometimes the easy part. Building trust with finance stakeholders required making configured stages and lineage inspectable — hence Tableau as the transparency layer. The “months to 90 minutes” result helped subsequent proposals, and reinforced that a first project in a new organization is also an audition.',
     },
   },
   {
@@ -212,19 +205,19 @@ export const CASE_STUDIES: CaseStudy[] = [
       problem:
         'CFO Group analysts benchmarked KPIs against Big 6 Canadian banks manually via Supplementary Financial Packages — hours per query, error-prone, hard to scale.',
       decision:
-        'Five-stage pipeline: intent parsing, embeddings-based KPI detection, LLM-assisted disambiguation, guardrailed SQL generation, deterministic formatting. SQL injection impossible by construction.',
+        'Five-stage pipeline: intent parsing, embeddings-based KPI detection, confidence-gated disambiguation, SQL generation from reviewed templates with parameter binding, then deterministic formatting.',
       impact:
-        'Built the v2 benchmarking module in a focused 2-week sprint — while simultaneously running Astraeus development and the Amplify intern program — then handed it to my direct report, who incorporated it into Aegis v2 with the broader team. v1 had earned the 2025 CFO One RBC Team Award; v2 inherited the trust that made the sprint possible.',
+        'Refactored the v1 benchmarking module into the v2 architecture in a focused 2-week sprint — while simultaneously running Astraeus development and the Amplify intern program — then handed it to my direct report, who incorporated it into Aegis v2 with the broader team. v1 had earned the 2025 CFO One RBC Team Award; v2 inherited the trust that made the sprint possible.',
     },
     sections: {
       context:
-        'RBC\'s CFO Group needed to benchmark financial KPIs against the Big 6 Canadian banks using Supplementary Financial Packages — publicly available but complex financial disclosures. Aegis v1 was a rules-based benchmarking engine I\'d built and productionized earlier. v2 was the AI-native evolution: natural language queries to validated SQL, with embeddings-based KPI disambiguation.',
+        'RBC\'s CFO Group needed to benchmark financial KPIs against the Big 6 Canadian banks using Supplementary Financial Packages — publicly available but complex financial disclosures. Aegis v1 was a rules-based benchmarking engine I\'d built and productionized earlier. v2 was a focused refactor of that system: natural language queries to validated SQL, with embeddings-based KPI disambiguation.',
       myRole:
-        'Designed and built the Aegis v2 benchmarking module — the five-stage pipeline architecture, implemented end-to-end — in a focused two-week sprint while simultaneously leading Astraeus development and the Amplify intern program, then handed it to my direct report, who collaborated with the broader team to incorporate it into Aegis v2. A deliberate sprint: months of research and brainstorming crystallized into two weeks of focused execution.',
+        'Refactored the Aegis v1 benchmarking module into a five-stage v2 pipeline in a focused two-week sprint while simultaneously leading Astraeus development and the Amplify intern program, then handed it to my direct report, who collaborated with the broader team to integrate and productionalize it as Aegis v2. A deliberate sprint: months of research and brainstorming crystallized into two weeks of focused execution.',
       stakeholders:
         'CFO Group leadership (strategic benchmarking consumers), finance analysts (daily users), Director AI (priority alignment across concurrent workstreams).',
       challenge:
-        'Financial KPI disambiguation is harder than general text-to-SQL. KPI names in supplementary packages are ambiguous — "CET1 Ratio" might appear under different names across banks, and similar-sounding KPIs can mean very different things. The system needed to handle this ambiguity reliably while guaranteeing SQL injection safety and schema compliance. And it needed to ship fast — I had a two-week window before other priorities consumed my bandwidth.',
+        'Financial KPI disambiguation is harder than general text-to-SQL. KPI names in supplementary packages are ambiguous — "CET1 Ratio" might appear under different names across banks, and similar-sounding KPIs can mean very different things. The system needed to handle that ambiguity while constraining the executable SQL surface to reviewed templates and allowed schema elements. And it needed to ship fast — I had a two-week window before other priorities consumed my bandwidth.',
       optionsConsidered: [
         {
           option: 'Extend Aegis v1 with LLM layer on top',
@@ -232,17 +225,17 @@ export const CASE_STUDIES: CaseStudy[] = [
           chosen: false,
         },
         {
-          option: 'Full rebuild with five-stage decomposed pipeline',
-          prosAndCons: 'Higher initial effort, but each stage is testable, deterministic where possible, and LLM-assisted only where needed. Clean separation of concerns.',
+          option: 'Refactor v1 into a five-stage decomposed pipeline',
+          prosAndCons: 'Higher initial effort than adding a thin LLM layer, but it preserved the proven product boundary while making each stage testable, deterministic where possible, and LLM-assisted only where needed.',
           chosen: true,
         },
       ],
       decision:
         'The five-stage decomposed pipeline (intent parsing → KPI detection → LLM-assisted disambiguation → guardrailed SQL generation → deterministic formatting) let each stage own a specific concern. Rule-based stages handle the deterministic parts; LLM-assisted stages handle ambiguity — but with confidence thresholds and guardrails. This architecture makes the system auditable and testable despite using LLMs.',
       implementation:
-        'Stage 1: GPT-4.1 with constrained JSON-schema generation parses natural language into a typed intent tuple (metric, time, comparison, output format). Stage 2: deterministic embedding similarity search returns a candidate set from the KPI catalog. Stage 3: confidence gate \u2014 if the top candidate dominates by margin, accept; otherwise an LLM disambiguator (with names + definitions only, no values) selects, with a calibrated confidence score, falling back to a clarification request below threshold. Stage 4: SQL generation via pre-authored, schema-whitelisted templates with parameterized binding; defense-in-depth validation (whitelist + AST + SELECT-only + parameter type + deny-list) before execution. Stage 5: deterministic formatting in the output shape fixed at intent-parse time.',
+        'Stage 1: constrained JSON-schema generation parses natural language into a typed intent tuple (metric, time, comparison, output format). Stage 2: deterministic embedding similarity search returns a candidate set from the KPI catalog. Stage 3: a confidence gate accepts a dominant candidate or asks an LLM disambiguator to choose using names and definitions; a below-threshold result returns a clarification request. Stage 4: pre-authored, schema-allow-listed SQL templates bind values as parameters, with structural, SELECT-only, parameter-type, and deny-list checks before execution. Stage 5: deterministic formatting uses the output shape fixed at intent-parse time.',
       impact:
-        'Built a production-grade text-to-SQL benchmarking module in two weeks; my direct report then productionalized it with the broader team. The system provides formal safety guarantees: SQL injection is impossible by construction (parameterized queries + whitelisted schema), disambiguation is bounded by confidence thresholds, and every stage is independently testable. Two weeks of focused build, concurrent with Astraeus productionization and the Amplify intern program — the speed came from a shelved-and-resumed architecture (an earlier prototype against GPT-4o had failed the calibration bar; GPT-4.1 cleared it) plus the operational trust v1 had already earned. The 2025 CFO One RBC Team Award recognized v1\u2019s productionization \u2014 the precondition that made v2\u2019s mandate possible.',
+        'Refactored the v1 benchmarking module into the production text-to-SQL architecture in two weeks; my direct report then integrated and productionalized it with the broader team as Aegis v2. Reviewed templates, parameter binding, schema checks, confidence-gated clarification, and stage-level tests constrain the failure surface; they remain dependent on configuration, validation coverage, and model calibration. The focused refactor ran concurrently with Astraeus productionization and the Amplify intern program. Its speed came from a shelved-and-resumed architecture—an earlier model had failed the calibration bar, while a later model cleared the held-out evaluation—plus the operational trust v1 had already earned. The 2025 CFO One RBC Team Award recognized v1\u2019s productionization, the precondition for v2\u2019s mandate.',
       inProduction:
         'Running in production within the CFO Group as the primary benchmarking tool. Finance analysts use natural language to query cross-bank KPI comparisons, replacing manual spreadsheet lookups.',
       lessonsLearned:
@@ -258,32 +251,32 @@ export const CASE_STUDIES: CaseStudy[] = [
     status: 'shipped',
     tldr: {
       problem:
-        'CFO Group financial questions — "headcount by division, crossed with open positions, crossed with tenure" — bounced through days of email. No interactive system could answer dynamic arbitrary-combination queries across ~40K leaf-level cost centres with entitlement controls. The dynamic ins-outs question (who joined / left / moved between any two arbitrary groups) was off the table — every prior attempt hit the factorial wall.',
+        'CFO Group financial questions — "headcount by division, crossed with open positions, crossed with tenure" — bounced through days of email. The existing workflow did not support interactive arbitrary-combination queries across ~40K leaf-level cost centres with entitlement controls. Earlier attempts had scoped out the dynamic ins-outs question (who joined / left / moved between any two authorized groups) because precomputing the subset-selection space was infeasible.',
       decision:
-        'Two-wall architecture. GPT-4.1 handles gate / metadata extraction / answer / synthesis only — never touches operational data. Between the walls, Cython-compiled Python runs event-level ins-outs math in milliseconds over ~40K leaf-level cost centres, with the permission-to-SQL entitlement cascade applied before compute. Simple queries take one Answer call; cross-domain queries fan out to 3 parallel Answer-stage calls (Headcount / HR Costs / Open Positions) plus a final synthesis.',
+        'Two-wall architecture. LLM calls handle gate, metadata extraction, answer shaping, and synthesis using scoped metadata or structured aggregates. Between the walls, Cython-compiled Python runs event-level ins-outs math over ~40K leaf-level cost centres, with the permission-to-SQL entitlement cascade applied before compute. Simple queries take one Answer call; cross-domain queries fan out to 3 parallel Answer-stage calls (Compensation Costs / Headcount / Open Positions) plus a final synthesis.',
       impact:
-        'Days of email replaced by seconds-level answers via dashboard, chatbot, and HTML reports. Dynamic ins-outs analysis — previously deemed impossible at bank scale — is now default. Production since November 2025; recognized as a flagship CFO Group AI initiative with an accompanying formal whitepaper.',
+        'Days of email replaced by interactive answers via dashboard, chatbot, and HTML reports. Dynamic ins-outs analysis—previously scoped out at bank scale—is now supported. Production since November 2025, with an accompanying technical note on the architecture.',
     },
     leadershipCallout:
-      'The defining leadership decision was choosing LLM-as-Router over a monolithic agent. Every instinct around the table said "give the LLM full access and let it figure it out" — faster to build, easier to demo. I pushed back because I\'d seen what happens when LLMs touch sensitive financial data in regulated contexts: non-deterministic outputs, leakage risk, and no audit trail. The two-wall architecture took longer to build but delivers what the CFO Group actually needs — trustworthy, auditable, deterministic analytics. I led this cross-functionally with engineering services partner while staying ~70% hands-on in the codebase.',
+      'I conceived, architected, and built Astraeus, then led its cross-functional productionisation with the engineering services partner. The defining architectural decision was choosing LLM-as-Router over a monolithic agent: the common prototype pattern—broad model access for a faster demo—did not fit the data, entitlement, and calculation constraints. The two-wall architecture reduced the model-facing surface, made handoffs inspectable, and kept numerical calculation on a deterministic path. I stayed ~70% hands-on while partner teams contributed to frontend and infrastructure delivery.',
     sections: {
       context:
-        'RBC\'s CFO Group needed a single platform for financial insights (headcount analytics, HR costs, open positions) serving three delivery channels: interactive dashboard, chatbot, and inbox-ready HTML reports. The data spans ~40,000 cost centres (the leaf-level org units, each one or more teams) queryable in any combination, rolling up through ~9,000 parent nodes across a business-segment and a geography hierarchy, with strict entitlement controls so users see only what they\'re authorized to access.',
+        'RBC\'s CFO Group needed a single platform for financial insights (headcount analytics, compensation costs, open positions) serving three delivery channels: interactive dashboard, chatbot, and inbox-ready HTML reports. The data spans ~40,000 cost centres (the shared leaves of two hierarchies, each cost centre representing one or more teams) queryable in any combination, rolling up through ~9,000 parent nodes in an 18-level business-segment hierarchy plus a separate geography hierarchy, with strict entitlement controls so users see only what they\'re authorized to access.',
       myRole:
-        'Architect, lead developer, and product visionary. Conceived the "CFO-ready" vision — at-a-glance, trustworthy insights delivered to the inbox with drill-through across domains. Designed the two-wall architecture, built the permission-to-SQL entitlement cascade, wrote the event-level ins-outs math with Cython-compiled Python, and led cross-functional delivery with the engineering services partner while writing a significant portion of the codebase. ~70% hands-on.',
+        'Conceived, architected, and built Astraeus, then led its cross-functional productionisation. I defined the "CFO-ready" vision — at-a-glance, trustworthy insights delivered to the inbox with drill-through across domains — designed the two-wall architecture, built the permission-to-SQL entitlement cascade, and wrote the event-level ins-outs math in Cython-compiled Python. Engineering services partners contributed to frontend and infrastructure delivery. ~70% hands-on.',
       stakeholders:
         'CFO Group leadership (executive consumers), finance analysts and HR teams (daily users), engineering services partner peers (co-delivery on frontend and infrastructure), Director AI (governance and priority), 1 Senior AI Scientist direct report contributing to development, rotating summer interns.',
       challenge:
-        'Three simultaneous hard problems. (1) The factorial wall: arbitrary-combination queries across 40K leaf-level cost centres and 9K rollups look combinatorially impossible at dynamic response times. Previous attempts scoped the feature out. (2) Security: enterprise permission entitlements had to translate from cube-level permissions into SQL-level access controls by construction, not post-hoc filters. (3) Trust: this is CFO-grade analytics; non-determinism anywhere in the data path is disqualifying. LLMs had to be on one side of a hard line, data on the other, with no leakage.',
+        'Three simultaneous hard problems. (1) Subset selection: arbitrary-combination queries across roughly 40,000 leaf-level cost centres and 9,000 business-hierarchy rollups create a combinatorial precomputation problem at interactive response times. Previous attempts scoped the feature out. (2) Security: EPM entitlements had to resolve into SQL-level access filters before compute, with checks for catalog freshness and handoff failures. (3) Trust: CFO-grade calculations need a deterministic data path, while model-assisted routing and answer shaping require validation and monitoring at their boundaries.',
       optionsConsidered: [
         {
           option: 'Monolithic LLM agent with direct data access',
-          prosAndCons: 'Simpler + faster to demo. Violates data confidentiality (LLM sees raw rows), non-deterministic outputs unacceptable for CFO-grade numbers, no structural audit trail. Rejected on governance grounds before engineering began.',
+          prosAndCons: 'Simpler and faster to demo, but placing underlying records in model context expands the governed exposure surface, model-generated calculations are probabilistic, and model-directed queries alone do not provide the typed trace records finance review requires. Rejected on governance grounds before engineering began.',
           chosen: false,
         },
         {
           option: 'Pre-computed OLAP cube / materialized-view approach',
-          prosAndCons: 'The obvious choice for analytics scale. Falls apart at dynamic arbitrary-combination ins-outs: ~40K! combinations is combinatorial explosion long before pre-computation can finish. Scoped out in earlier attempts at the problem.',
+          prosAndCons: 'The obvious choice for analytics scale, but precomputing every supported subset over roughly 40,000 cost-centre leaves becomes infeasible for dynamic arbitrary-combination ins-outs. Scoped out in earlier attempts at the problem.',
           chosen: false,
         },
         {
@@ -293,20 +286,20 @@ export const CASE_STUDIES: CaseStudy[] = [
         },
         {
           option: 'Two-wall architecture: LLM intent side → deterministic Cython compute → LLM synthesis side',
-          prosAndCons: 'More architecture to design and defend, but solves all three problems by construction. LLM reasons about intent only (gate / metadata extraction / answer / synthesis), never touches data. Event-level ins-outs math in Cython-compiled Python reframes the factorial problem as linear-in-events. Permission-to-SQL entitlement cascade applies structurally before any compute, so users see only what they\'re authorized to see.',
+          prosAndCons: 'More architecture to design and defend, but it separates model-assisted intent and answer shaping from entitlement and event-level compute. The Cython path evaluates the requested authorized subset over event rows instead of precomputing the subset space, while the permission-to-SQL cascade resolves the authorized input set before compute. Typed contracts, privilege checks, and monitoring remain necessary at the boundaries.',
           chosen: true,
         },
       ],
       decision:
-        'The two-wall architecture resolves the intelligence-vs-trust tension. GPT-4.1 handles the LLM work that benefits from reasoning — parsing the user\'s natural-language query, routing (is this Astraeus-scope?), extracting structured metadata for up to 3 parallel extraction calls (one per domain), and synthesizing the final answer from aggregates (either one Answer call on the simple path, or 3 parallel Answer-stage calls plus a final synthesis on the cross-domain path). In between, deterministic code handles everything that benefits from determinism — permission-to-SQL entitlement enforcement (domain permissions → access groups → entities → cost centres → SQL tables), event-level ins-outs math in Cython-compiled Python, and netting semantics that fold intra-rollup movements to net-zero. Two walls separate the bands: on the way down, only parsed metadata crosses; on the way back up, only structured aggregates cross. Operational rows never leave the deterministic side.',
+        'The two-wall architecture separates model-assisted work from the deterministic data path. LLM calls parse the natural-language query, route scope, extract structured metadata for up to 3 parallel domain calls, and shape the final answer from approved aggregates. In between, deterministic code resolves permission-to-SQL entitlements (domain permissions → access groups → entities → cost centres → SQL tables), runs event-level ins-outs math in Cython-compiled Python, and applies netting semantics that fold intra-rollup movements to net-zero. The declared contracts allow parsed metadata to cross down and structured aggregates to cross up; record-level inputs stay outside the intended model-call surface and are checked at each handoff.',
       implementation:
-        'Custom Python router orchestrates the flow (no off-the-shelf agent framework). 5 to 8 LLM calls per query: 1 gate + 3 parallel domain metadata extracts + 1 answer (simple path) OR 3 parallel Answer-stage calls + 1 synthesis (cross-domain path). Between: Cython-compiled Python runs the event-level math — employees modeled as join / leave / transfer events, netting semantics, milliseconds even across arbitrary 40K-leaf combinations. Permission-to-SQL entitlement cascade applied at query time so the deterministic side can only see what the user is authorized to see. Everything lands in a single Postgres instance: event log, entitlement catalog, business hierarchy, geography hierarchy, and audit trail. Delivery surfaces: production dashboard, chatbot, and polished HTML inbox-ready reports — all generated from the same architecture.',
+        'A custom Python router orchestrates the flow (no off-the-shelf agent framework). Each query uses 5 to 8 LLM calls: 1 gate + 3 parallel domain metadata extracts (compensation costs, headcount, open positions) + 1 answer on the simple path, or 3 parallel Answer-stage calls + 1 synthesis on the cross-domain path. Between them, Cython-compiled Python runs event-level math over employees modeled as join, leave, and transfer events, with netting semantics across arbitrary 40K-leaf combinations. The permission-to-SQL cascade resolves the filtered input set at query time. Transactional storage supports event, entitlement, hierarchy, and trace records. Delivery surfaces include a production dashboard, conversational interface, and HTML reports.',
       impact:
-        'Days of email replaced by seconds-level answers. Dynamic ins-outs analysis — who joined, left, or transferred between any two arbitrary groups over any time window — is now the default capability; previous attempts had scoped it out as combinatorially impossible. The reframe (events linear-in-rows, not queries factorial-in-combinations) turned 40K! into tractable. Data confidentiality structural, not aspirational. Extensible architecture scaling across CFO data domains (Headcount, HR Costs, Open Positions today; Income Statement, Balance Sheet, PAR Financial Analysis, Daily Financial Reporting on the roadmap).',
+        'Days of email were replaced by interactive answers. Dynamic ins-outs analysis—who joined, left, or transferred between authorized groups over a selected time window—is now supported after previous attempts had scoped it out. Modeling movements as events makes a requested subset an event-filtering and netting problem instead of a requirement to precompute the combinatorial subset space. The architecture currently spans Compensation Costs, Headcount, and Open Positions, with entitlement resolution, typed handoffs, validation, and logging used to constrain the data and model surfaces.',
       inProduction:
-        'Running in production since November 2025. Dashboard and chatbot actively used by CFO Group leadership, finance analysts, and HR teams. HTML reports distributed for executive consumption.',
+        'Running in production since November 2025 across dashboard, conversational, and HTML-report surfaces.',
       lessonsLearned:
-        'The architectural lesson: when a problem looks factorial, check whether the factorial is in the data or in the framing. Astraeus\'s arbitrary-combination queries *look* factorial — and every prior attempt had modelled them as factorial, which is why dynamic ins-outs was deemed impossible. The reframe (model employees as events, let the user\'s query filter the event log at runtime) made the same problem linear-in-rows. The factorial was in the framing, not in the data. The product lesson: LLMs and deterministic code serve different purposes — LLMs for intent, code for truth. The leadership lesson: pushing back on "just give the LLM full access" took longer, but it shipped an architecture that survives stakeholder audit. Astraeus is the pattern I now start every production AI system from at the bank.',
+        'The architectural lesson: a combinatorial query space does not require a precomputed answer space. Modeling employees as events lets each authorized query filter and net the relevant rows at runtime. The product lesson: LLMs and deterministic code serve different purposes — LLMs for intent, code for governed calculations. Astraeus is now one design reference I use when deciding where model calls end and conventional controls begin.',
     },
     blogPostSlug: 'agentic-ai',
     companionBlogPostSlug: 'astraeus-llm-as-router',
@@ -318,55 +311,55 @@ export const CASE_STUDIES: CaseStudy[] = [
     status: 'shipped',
     tldr: {
       problem:
-        'RBC\'s Project Approval Request process — governance for every major bank initiative — took weeks to draft. Fragmented templates, contradictory policies, and institutional knowledge locked in people\'s heads.',
+        'RBC\'s Project Approval Request process is a manual, iterative governance workflow shaped by fragmented templates, sometimes-conflicting policies, and institutional knowledge held by experienced authors.',
       decision:
-        'First true agentic framework approved for production at the bank, built inside a single-agent governance envelope: LangGraph on a Postgres backbone, template-as-MCP-tool with decision-tree dialog, two-stage field-group retrieval with custom compression, N parallel Sonnet-4.5 extraction calls merging as a dictionary union, coverage + follow-ups loop.',
+        'First true agentic AI platform approved for production at the bank, built inside a single-agent governance envelope: LangGraph orchestration, a typed template tool, bounded field-group retrieval, concurrent scoped extraction with ownership-aware merge, and a coverage + follow-ups loop.',
       impact:
-        'Pilot launched April 2026; deployed bank-wide May 2026. The largest-scope agentic AI initiative in the CFO Group — and the reference architecture the v2 multi-agent "skills" framework is being built on top of.',
+        'Pilot launched April 2026; full CFO Group launch across all geographies followed in May 2026. A multi-agent successor is in pilot.',
     },
     leadershipCallout:
-      'Conceived PAR Assist as the bank\'s first bank-wide production agentic AI platform. Handed the concept to 2025 Amplify interns as an ideation exercise to explore the problem space, then built the production system end-to-end: ETL pipelines, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), the PostgreSQL/pgvector store, custom multi-layer RAG, and frontend integration. The single-agent governance envelope, two-stage field-group retrieval, and typed MCP tool registry codify a production-agentic pattern inside RBC\'s regulated quality bar.',
+      'Conceived PAR Assist, the first true agentic AI platform approved for production at the bank. Handed the concept to 2025 Amplify interns as an ideation exercise to explore the problem space, then built the production system end-to-end: ingestion paths, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), transactional workflow state, vector-backed field-group retrieval, and frontend integration. Its pilot launched in April 2026, followed by a full CFO Group launch across all geographies in May.',
     sections: {
       context:
-        'Project Approval Requests (PARs) are a critical governance process at RBC: every major initiative requires one, and drafting them involves metadata, policies, historical examples, and institutional knowledge. I conceived PAR Assist to transform that drafting process. The concept was handed to 2025 Amplify interns as an ideation exercise to explore the problem space; the production platform was then built end-to-end as the bank\'s first true agentic AI deployment, setting the architectural pattern every subsequent agentic system inherits.',
+        'Project Approval Requests (PARs) are a critical governance process at RBC for significant initiatives, and drafting them involves metadata, policies, historical examples, and institutional knowledge. I conceived PAR Assist to transform that drafting process. The concept was handed to 2025 Amplify interns as an ideation exercise to explore the problem space; I then built the production system end-to-end as the first true agentic AI platform approved for production at the bank.',
       myRole:
-        'Conceived the product vision, designed the agentic architecture, and built the production system end-to-end: ETL pipelines, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), the PostgreSQL + pgvector store, custom multi-layer RAG, and frontend integration. Production deployment runs through GFT (RBC\'s Global Functions Technology team) on OpenShift via CI/CD.',
+        'Conceived the product vision, designed the agentic architecture, and built the production system end-to-end: ingestion paths, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), transactional workflow state, vector-backed field-group retrieval, and frontend integration. Production deployment runs through GFT (RBC\'s Global Functions Technology team) on OpenShift via CI/CD.',
       stakeholders:
         'CFO Group leadership (sponsor), enterprise stakeholders across the bank (PAR authors in every department), Director AI (governance and priority), 2025 Amplify interns (problem-space ideation exploration), GFT (Global Functions Technology, RBC\'s infrastructure team) for OpenShift CI/CD production deployment.',
       challenge:
-        'Two problems stacked on top of each other. The domain problem: PARs are not standardized — different templates for different initiative types, conflicting policies, ambiguous fields, institutional knowledge that lives in people\'s heads. The meta problem: this was the first agentic system approved for production at the bank, so the governance envelope was a single-agent design. The architecture had to get agentic behaviour — branching dialogs, parallel specialized work, multi-turn state — without multi-agent orchestration. And every action had to be auditable by construction, not by convention.',
+        'Two problems stacked on top of each other. The domain problem: PARs are not standardized — different templates for different initiative types, conflicting policies, ambiguous fields, institutional knowledge that lives in people\'s heads. The meta problem: this was the first true agentic AI platform approved for production at the bank, and its governance envelope was a single-agent design. The architecture had to support branching dialogs, parallel specialized work, and multi-turn state without multi-agent orchestration, while routing actions through typed contracts that produce structured audit records.',
       optionsConsidered: [
         {
           option: 'Simple RAG chatbot with document retrieval',
-          prosAndCons: 'Quick to build, but can\'t handle the structured workflow of PAR drafting. A chatbot can answer questions; it can\'t guide a user through a multi-step form-filling process with validation and audit at every step.',
+          prosAndCons: 'Quick to build, but does not by itself provide the structured workflow state, registered-action tracing, collision review, and follow-up checkpoints needed for PAR drafting.',
           chosen: false,
         },
         {
           option: 'True multi-agent orchestration with specialist sub-agents per field domain',
-          prosAndCons: 'Architecturally the cleanest mapping of the problem, but would not have cleared the single-agent governance envelope in v1. Deferred to v2 as "skills + tools" — same shape, approved scope.',
+          prosAndCons: 'Architecturally the cleanest mapping of the problem, but it would not have cleared the single-agent governance envelope approved for the production system.',
           chosen: false,
         },
         {
           option: 'Flat RAG — one embedding index over all chunks',
-          prosAndCons: 'Simplest retrieval, but top-k against a flat index surfaces chunks from unrelated fields and templates. Scales with corpus size, not field count. Can\'t structurally say "this chunk belongs to risk-and-compliance fields."',
+          prosAndCons: 'Simplest retrieval, but our evaluation surfaced chunks from unrelated fields and templates because retrieval was not scoped by target field. It also lacked an explicit ownership relationship between a retrieved chunk and the fields it could support.',
           chosen: false,
         },
         {
-          option: 'LangGraph + MCP tools + two-stage field-group retrieval + N parallel extraction + Postgres backbone',
-          prosAndCons: 'LangGraph picked for maturity (stable, active, production-deployed). MCP tools make every action a typed, logged contract — audit is structural, not aspirational. Two-stage retrieval organizes knowledge by the target fields the LLM extracts toward, not by source document. N parallel Sonnet-4.5 calls (one per relevant field group, ≤20 fields each with rich metadata) gives multi-agent-like parallelism inside a single-agent envelope. Postgres carries LangGraph checkpoints + logs + raw/mapped content + pgvector embeddings + audit — one store, one provenance graph.',
+          option: 'LangGraph + MCP tools + two-stage field-group retrieval + scoped parallel extraction',
+          prosAndCons: 'LangGraph was picked for maturity and fit with conditional workflows. MCP tools provide typed action contracts and structured dispatch records. Two-stage retrieval organizes knowledge by target field groups rather than source document. A bounded number of group-scoped extraction calls can run concurrently inside a single-agent envelope. Transactional state and vector-backed retrieval support retained workflow data and trace records.',
           chosen: true,
         },
       ],
       decision:
-        'PAR drafting is a stateful, branching workflow over a structured form with regulatory audit requirements. LangGraph (picked for maturity over CrewAI/AutoGen, which we considered but didn\'t deeply evaluate) provides the graph engine and wires directly into a Postgres checkpointer for session durability. Template selection is itself an MCP tool with a decision-tree dialog — project type, spend tier, business line, regulatory exposure — returning a typed template-id with confidence and rationale. Retrieval reshapes the knowledge base around the target: field groups aggregate logically related fields across all PAR templates; stage-1 picks relevant groups for the session, stage-2 retrieves top-10 chunks per group, custom compression fits the payload into a Sonnet-4.5 system prompt carrying up to 20 fields of rich metadata. The extraction layer fans out to N parallel calls (one per relevant group), each returning a JSON dictionary with guardrails and few-shot good/bad examples scoped to its group. The merge is a deterministic dictionary union. A coverage analyzer checks the merged state against guidelines + examples, surfaces intelligent follow-ups, and loops the session back through a clarify node when answers are still open.',
+        'PAR drafting is a stateful, branching workflow over a structured form with regulatory audit requirements. LangGraph (picked for maturity and workflow fit; CrewAI/AutoGen were considered but not deeply evaluated) provides the graph engine and retained checkpoints. Template selection is a typed MCP tool with a guided dialog that returns a template identifier with a score and rationale. Retrieval reshapes the knowledge base around the target: stage 1 selects relevant field groups, stage 2 retrieves a bounded candidate set within each group, and compression fits each scoped extraction payload to its context budget. A bounded number of group calls can run concurrently, with one expected owner per target field and collision handling for duplicate or out-of-scope contributions. A coverage analyzer surfaces follow-ups and loops the session through clarification when inputs remain open.',
       implementation:
-        'LangGraph graph orchestrates the session (intake → template → retrieve → extract → merge → coverage → respond), with conditional edges for loops. Template selection, retrieval, compression, extraction, merge, and coverage are all MCP tools — every action typed, logged, and dispatched through the graph engine. Ingestion handles pptx, docx, pdf, txt, and images (OCR via GPT-4-turbo vision). Field groups are a taxonomy over the hundreds of fields across PAR templates; retrieval runs two-stage similarity search with custom compression on top-10 chunks per group. Parallelism = relevant-group count: up to N Sonnet-4.5 calls fire at once, each carrying ≤20 fields + guardrails + few-shot good/bad examples; each returns JSON. Merge is a dict union (groups disjoint by construction). Coverage analyzer gates the draft — if it finds open follow-ups, the session loops to a clarify node before returning to template/extraction. Postgres (with pgvector for retrieval) is the single store: LangGraph checkpoints, tool-invocation logs, raw ingested content, mapped intermediates, embeddings, and the complete audit trail all land in one place.',
+        'A LangGraph graph orchestrates the session (intake → template → retrieve → extract → merge → coverage → respond), with conditional edges for loops. Registered actions use MCP tools with typed inputs and structured dispatch records. Supported source material passes through approved parsing or OCR-assisted extraction paths. Field groups form a taxonomy over the target template; two-stage similarity search and compression produce bounded, group-scoped payloads. Extraction calls can run concurrently within configured capacity, and an ownership-aware merge routes collisions for review. If the coverage analyzer finds open follow-ups, the session loops to clarification. Transactional workflow state and vector-backed retrieval retain the declared session data and trace records needed by the registered path.',
       impact:
-        'Transformed a manual, multi-week governance process into a guided drafting session with every field cited back to its source. Pilot launched April 2026 with the first wave of PAR authors; deployed bank-wide May 2026 across RBC business lines. Beyond the direct drafting win, PAR Assist is the reference architecture for agentic AI at the bank — the MCP tool registry, Postgres backbone, and single-agent envelope are the substrate v2 (multi-agent "skills" framework) is being built on. v1 is the part of v2 that already passed review.',
+        'Transformed a manual, iterative governance process into a guided drafting session with available field-level source references and a coverage loop for unresolved inputs. Pilot launched April 2026 with the first wave of PAR authors; full CFO Group launch across all geographies followed in May 2026.',
       inProduction:
-        'Pilot shipped April 2026; deployed bank-wide May 2026. Every MCP tool call is typed and logged; every field value in every draft traces back to the guideline, policy, or few-shot example that grounded it; the full provenance graph for any session is one Postgres query away. Ongoing: author feedback loops, and the first steps toward the v2 skills-and-tools composition.',
+        'Pilot shipped April 2026; full CFO Group launch across all geographies followed in May 2026. MCP tool calls use typed contracts and structured logs; field-level source references and coverage checks make missing grounding visible. Retained checkpoint, tool, retrieval, and field records support review of the registered session path when the corresponding versions and records are available. A multi-agent successor is in pilot.',
       lessonsLearned:
-        'Two lessons, one technical and one organizational. Technical: in regulated environments, the first agentic deployment is not about maximum capability; it is about building the envelope so the next envelope (larger) inherits without rewrite. Every decision (MCP tool registry, Postgres backbone, field-group taxonomy) was picked so v2 skills compose over the same substrate. v1 is not a throwaway; v1 is the part of v2 that already passed governance review. Organizational: handing a concept to interns as an ideation exercise opens up problem-space exploration without delaying the production build. The Amplify cohort explored angles I might have otherwise prioritized later; the production platform was then built end-to-end against a clear architectural thesis. Most AI POCs die in the transition to enterprise product; the fix is to plan that transition before the POC is written.',
+        'Two lessons, one technical and one organizational. Technical: an early agentic deployment in a regulated environment is not about maximum capability; it is about making the reviewed envelope explicit and preserving reusable contracts. Organizational: handing a concept to interns as an ideation exercise can widen problem-space exploration while the production build follows a separate delivery path. The Amplify cohort explored angles I might otherwise have prioritized later; the production platform was then built against a clear architectural thesis.',
     },
     blogPostSlug: 'enterprise-agentic-ai-architecture',
     companionBlogPostSlug: 'par-assist-building',

@@ -44,11 +44,14 @@ export default function GuardrailValidator() {
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Example selector */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Validator example">
         {EXAMPLES.map((ex, i) => (
           <button
             key={i}
+            type="button"
             onClick={() => setExampleIdx(i)}
+            aria-pressed={i === exampleIdx}
+            aria-controls="guardrail-validator-result"
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
               i === exampleIdx
                 ? 'bg-accent text-white'
@@ -74,7 +77,7 @@ export default function GuardrailValidator() {
           return (
             <motion.div
               key={`${exampleIdx}-${i}`}
-              initial={{ opacity: 0, x: -8 }}
+              initial={false}
               animate={{ opacity: isReached ? 1 : 0.3, x: 0 }}
               transition={{ delay: i * 0.15, duration: 0.3 }}
               className={`flex items-start gap-3 rounded-lg border p-3 ${
@@ -105,13 +108,43 @@ export default function GuardrailValidator() {
       </div>
 
       {/* Result */}
-      <div className={`rounded-lg p-3 text-center text-xs font-semibold ${
+      <div
+        id="guardrail-validator-result"
+        role="status"
+        aria-live="polite"
+        className={`rounded-lg p-3 text-center text-xs font-semibold ${
         example.results.every(Boolean)
           ? 'bg-green-500/10 text-green-400'
           : 'bg-red-500/10 text-red-400'
-      }`}>
-        {example.results.every(Boolean) ? '✓ Query accepted — executing' : '✗ Query rejected — never reaches database'}
+      }`}
+      >
+        {example.results.every(Boolean)
+          ? '✓ Validator accepts this example — database role, timeout, and result limits still apply'
+          : '✗ Validator rejects this example before execution on the illustrated path'}
       </div>
+
+      <noscript>
+        <div className="rounded-lg border border-border-subtle bg-surface/50 p-4">
+          <p className="text-xs font-semibold text-text-primary">All illustrative validator paths</p>
+          <ul className="mt-3 space-y-4">
+            {EXAMPLES.map((item) => (
+              <li key={item.label}>
+                <p className="text-xs font-semibold text-text-primary">{item.label}</p>
+                <code className="mt-1 block overflow-x-auto text-[10px] text-text-secondary">
+                  {item.sql}
+                </code>
+                <ol className="mt-2 space-y-1 text-xs text-text-secondary">
+                  {GATES.map((gate, gateIndex) => (
+                    <li key={gate.label}>
+                      Gate {gateIndex + 1}, {gate.label}: {item.explanations[gateIndex]}
+                    </li>
+                  ))}
+                </ol>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </noscript>
     </div>
   );
 }

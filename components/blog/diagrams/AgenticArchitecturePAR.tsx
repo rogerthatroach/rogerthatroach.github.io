@@ -18,28 +18,28 @@ import { motion } from 'framer-motion';
 import AgentNode, { type AgentNodeData } from '@/components/diagrams/AgentNode';
 import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
 import { useThemeColor } from '@/lib/useThemeColor';
+import SemanticDiagramFallback from './SemanticDiagramFallback';
 
 /**
  * PAR Assist architecture — "the envelope" diagram.
  *
  * One hero visual: a dashed governance envelope that says *this is one
  * agent* from the review side, wrapping a graph whose middle ring fans
- * out into N parallel group-scoped extraction calls, then fans back in
- * to a dict-union merge + coverage loop. The fan-out/fan-in is the whole
+ * out into concurrent group-scoped extraction calls, then fans back in
+ * to an ownership-aware merge + coverage loop. The fan-out/fan-in is the whole
  * story of how we got agentic behavior without a multi-agent shape.
  *
  * Layers (top → bottom):
  *   1. Intake — file-type satellites orbit the upload node (5 formats).
  *   2. Template selection (MCP tool) with a mini decision-tree gloss.
  *   3. Stage-1 retrieval HUB — picks which field groups are in play.
- *   4. N parallel lanes — pod → chunks → extraction per group.
- *   5. Merge (dict union) — coverage/follow-ups loop back via clarify.
+ *   4. Concurrent lanes — scoped evidence → extraction per group.
+ *   5. Ownership-aware merge — coverage/follow-ups loop back via clarify.
  *   6. PAR draft — rendered output (live, revisable).
  *
- * Beneath the envelope: the Postgres backbone rail — checkpoints, logs,
- * raw/mapped content, pgvector embeddings, audit trail. One store.
+ * Beneath the envelope: a public abstraction for retained state, retrieval,
+ * request logs, and audit records. Storage topology is intentionally omitted.
  *
- * A ghosted v2 pill in the bottom-right teases the "skills" evolution.
  */
 
 // ── Palette (hardcoded hex; grid uses theme var) ─────────────────────
@@ -48,10 +48,9 @@ const ORCH = '#14b8a6';       // orchestration chain
 const TOOL = '#f59e0b';       // MCP tools / intake
 const RETRIEVAL = '#3b82f6';  // retrieval / groups / chunks
 const LLM = '#8b5cf6';        // extraction LLM calls
-const DATA = '#ea580c';       // Postgres rail
+const DATA = '#ea580c';       // public state-and-audit rail
 const LOOP = '#ef4444';       // coverage loop-back edge
 const DRAFT = '#10b981';      // output / draft
-const GHOST = '#94a3b8';      // v2 teaser
 
 // ── Custom node: small circle with optional side label ───────────────
 interface DotNodeData {
@@ -166,7 +165,7 @@ function HubNode({ data }: NodeProps) {
 }
 const MemoHub = memo(HubNode);
 
-// ── Custom node: wide horizontal rail (Postgres backbone) ────────────
+// ── Custom node: wide public state-and-audit rail ───────────────────
 interface RailNodeData {
   label: string;
   tokens: string[];
@@ -299,7 +298,7 @@ const initialNodes: Node[] = [
   { id: 'ft-docx', type: 'dot', position: { x: 130, y: 148 }, data: { label: '.docx', color: TOOL, size: 'sm', labelPosition: 'left' } satisfies DotNodeData, draggable: false },
   { id: 'ft-pdf',  type: 'dot', position: { x: 180, y: 188 }, data: { label: '.pdf',  color: TOOL, size: 'sm', labelPosition: 'left' } satisfies DotNodeData, draggable: false },
   { id: 'ft-txt',  type: 'dot', position: { x: 690, y: 120 }, data: { label: '.txt',  color: TOOL, size: 'sm', labelPosition: 'right' } satisfies DotNodeData, draggable: false },
-  { id: 'ft-img',  type: 'dot', position: { x: 670, y: 178 }, data: { label: 'image · OCR · 4-turbo', color: TOOL, size: 'sm', labelPosition: 'right' } satisfies DotNodeData, draggable: false },
+  { id: 'ft-img',  type: 'dot', position: { x: 670, y: 178 }, data: { label: 'image · OCR', color: TOOL, size: 'sm', labelPosition: 'right' } satisfies DotNodeData, draggable: false },
 
   {
     id: 'intake',
@@ -401,14 +400,14 @@ const initialNodes: Node[] = [
     id: 'lane-label-chunks',
     type: 'label',
     position: { x: 30, y: CHUNK_Y - 4 },
-    data: { text: 'top-10 · compress', color: RETRIEVAL, size: 'xs' } satisfies LabelNodeData,
+    data: { text: 'rank · retrieve · compress', color: RETRIEVAL, size: 'xs' } satisfies LabelNodeData,
     draggable: false,
   },
   {
     id: 'lane-label-extract',
     type: 'label',
     position: { x: 30, y: EXTRACT_Y - 4 },
-    data: { text: 'extract → JSON', sub: 'Sonnet 4.5 · ≤20 fields', color: LLM, size: 'xs' } satisfies LabelNodeData,
+    data: { text: 'extract → JSON', sub: 'approved model · scoped fields', color: LLM, size: 'xs' } satisfies LabelNodeData,
     draggable: false,
   },
 
@@ -419,7 +418,7 @@ const initialNodes: Node[] = [
     position: { x: 738, y: EXTRACT_Y - 6 },
     data: {
       text: 'N in parallel',
-      sub: 'one per group · dict-union on return',
+      sub: 'one per group · ownership-aware merge',
       color: LLM,
       size: 'xs',
       width: 64,
@@ -433,8 +432,8 @@ const initialNodes: Node[] = [
     type: 'agent',
     position: { x: 338, y: 640 },
     data: {
-      label: 'Merge · dict union',
-      description: 'Disjoint field groups merge deterministically. Conflicts flag for coverage.',
+      label: 'Merge · ownership check',
+      description: 'Expected field ownership is checked during merge. Collisions surface for coverage review.',
       icon: '🧩',
       category: 'orchestrator',
       accentColor: ORCH,
@@ -458,45 +457,30 @@ const initialNodes: Node[] = [
     position: { x: 338, y: 840 },
     data: {
       label: 'Rendered PAR draft',
-      description: 'Every field populated, cited, flagged. Revision continues on live state with full audit.',
+      description: 'Candidate fields carry source references or review flags. Revision continues on retained session state.',
       icon: '📄',
       category: 'output',
       accentColor: DRAFT,
     } satisfies AgentNodeData,
   },
 
-  // ═══ Postgres backbone (below envelope) ═══
+  // ═══ Public state-and-audit abstraction (below envelope) ═══
   {
     id: 'rail-label',
     type: 'label',
     position: { x: 40, y: 930 },
-    data: { text: 'Everything reads/writes below', color: DATA, size: 'xs' } satisfies LabelNodeData,
+    data: { text: 'Retained state, retrieval, request-log, and audit services', color: DATA, size: 'xs' } satisfies LabelNodeData,
     draggable: false,
   },
   {
-    id: 'postgres',
+    id: 'state-services',
     type: 'rail',
     position: { x: 40, y: 960 },
     data: {
-      label: 'Postgres backbone',
+      label: 'State and audit services',
       color: DATA,
-      tokens: ['checkpoints', 'logs', 'raw', 'mapped', 'pgvector', 'audit'],
+      tokens: ['session state', 'retrieval index', 'source references', 'request logs', 'audit records'],
     } satisfies RailNodeData,
-    draggable: false,
-  },
-
-  // ═══ v2 ghost pill (future teaser) ═══
-  {
-    id: 'v2-ghost',
-    type: 'label',
-    position: { x: 580, y: 920 },
-    data: {
-      text: 'v2 · skills + tools',
-      sub: 'single-agent envelope ▸ multi-agent graph',
-      color: GHOST,
-      size: 'sm',
-      dashedBorder: true,
-    } satisfies LabelNodeData,
     draggable: false,
   },
 ];
@@ -564,6 +548,8 @@ export default function AgenticArchitecturePAR() {
     <div
       className="relative w-full"
       style={{ aspectRatio: '820 / 1020' }}
+      role="group"
+      aria-label="PAR Assist single-agent drafting flow"
     >
       {/* Dashed envelope overlay — wraps the single-agent region.
           Percentage-based so it scales with the responsive aspect-ratio
@@ -582,9 +568,50 @@ export default function AgenticArchitecturePAR() {
         }}
       />
 
+      <SemanticDiagramFallback
+        title="PAR Assist drafting flow"
+        summary="The registered v1 route uses one orchestrator. It selects a template, activates relevant field groups, runs scoped retrieval and extraction calls, checks the merged candidate state, and renders a reviewable draft."
+        steps={[
+          {
+            title: 'Normalize the intake',
+            detail: 'Supported document formats are converted into typed text with source references.',
+          },
+          {
+            title: 'Select a template',
+            detail: 'A guided tool identifies the applicable document type and returns a typed template choice with rationale.',
+          },
+          {
+            title: 'Activate field groups',
+            detail: 'The orchestrator selects relevant groups and retrieves bounded evidence for each group.',
+          },
+          {
+            title: 'Extract scoped candidates',
+            detail: 'Parallel model calls propose values only for their assigned field groups and return typed results.',
+          },
+          {
+            title: 'Merge and check coverage',
+            detail: 'Expected field ownership is checked; collisions, missing support, and open questions route to review or clarification.',
+          },
+          {
+            title: 'Render a revisable draft',
+            detail: 'Candidate fields carry source references or review flags, and subsequent revisions use retained session state.',
+          },
+        ]}
+        notes={[
+          'The diagram describes the production v1 single-agent envelope; it does not depict sub-agents in that route.',
+          'Retrieval batch sizes, model providers, and storage topology are intentionally omitted.',
+        ]}
+      />
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        nodesFocusable={false}
+        edgesFocusable={false}
+        elementsSelectable={false}
+        deleteKeyCode={null}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}

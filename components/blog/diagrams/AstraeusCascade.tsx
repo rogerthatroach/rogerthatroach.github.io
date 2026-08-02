@@ -17,6 +17,7 @@ import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
 import { useThemeColor } from '@/lib/useThemeColor';
+import SemanticDiagramFallback from './SemanticDiagramFallback';
 
 /**
  * Astraeus architecture — "The Cascade" diagram.
@@ -24,26 +25,28 @@ import { useThemeColor } from '@/lib/useThemeColor';
  * Four-stage LLM pipeline, 5 to 8 LLM calls per query. Two dashed walls
  * cut the canvas into three bands.
  *   (Band 1) LLM intent side — Stage 1 Gate, Stage 2 parallel metadata
- *   — WALL: no data crosses —
- *   (Band 2) Deterministic Postgres + Cython compute
- *   — WALL: only aggregates return —
+ *   — WALL: scoped metadata interface —
+ *   (Band 2) Entitlement checks + coded hierarchy compute
+ *   — WALL: structured aggregate interface —
  *   (Band 3) LLM answer-shaping side — Stage 3 Answer (1 simple OR 3
  *            parallel cross-domain) + Stage 4 Synthesis (cross-domain
  *            only) → delivered as dashboard / chatbot / HTML
  *
  * Nodes are oblong pills (no circles); hero nodes are bigger pills with
- * glow. The walls carry the signature property visibly: the LLM never
- * touches operational data, by construction.
+ * glow. The walls show the intended interface: parsed metadata moves
+ * toward compute and structured aggregates return toward answer shaping.
+ * Access controls, tests, validation, logging, and monitoring verify that
+ * the deployed paths keep the boundary aligned with the design.
  *
- * A Postgres rail runs beneath the whole canvas — everything reads and
- * writes below: tables, event log, entitlement catalog, audit trail.
+ * A public data-services abstraction runs beneath the canvas for scoped
+ * state, entitlements, and audit records; storage topology is omitted.
  */
 
 // Palette
 const LLM = '#8b5cf6';        // LLM calls
 const COMPUTE = '#3b82f6';     // deterministic / Cython compute
 const ENTITLE = '#f59e0b';     // permission cascade (entitlement chain)
-const DATA = '#ea580c';        // Postgres rail
+const DATA = '#ea580c';        // data-services rail
 const WALL = '#ef4444';        // wall barrier
 const HERO = '#d4a0a7';        // hero accent (same as site accent)
 const DELIVERY = '#10b981';    // delivery channels
@@ -160,7 +163,7 @@ function ChainNode({ data }: NodeProps) {
 }
 const MemoChain = memo(ChainNode);
 
-// Wide Postgres rail (reused pattern from PAR diagram)
+// Wide public data-services rail
 interface RailNodeData {
   label: string;
   tokens: string[];
@@ -280,7 +283,7 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 10 },
     data: {
-      text: 'LLM never touches operational data · by construction',
+      text: 'Scoped interfaces · verified controls · residual risk',
       color: HERO,
       size: 'sm',
       dashedBorder: true,
@@ -294,7 +297,7 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 55 },
     data: {
-      text: 'Band 1 · LLM intent (no data touched)',
+      text: 'Band 1 · LLM intent (scoped metadata)',
       color: LLM,
       size: 'xs',
     } satisfies LabelNodeData,
@@ -315,7 +318,7 @@ const initialNodes: Node[] = [
     id: 'gate',
     type: 'pill',
     position: { x: 330, y: 185 },
-    data: { badge: 'LLM 1 · Stage 1', label: 'Gate', sub: 'relevance · injection · scope · path', color: LLM, size: 'sm' } satisfies PillNodeData,
+    data: { badge: 'LLM 1 · Stage 1', label: 'Gate', sub: 'relevance · scope · path · safety checks', color: LLM, size: 'sm' } satisfies PillNodeData,
     draggable: false,
   },
 
@@ -333,13 +336,13 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // ═══ WALL 1 — "no data crosses down" ═══
+  // ═══ WALL 1 — scoped metadata interface ═══
   {
     id: 'wall-1',
     type: 'label',
     position: { x: 160, y: 355 },
     data: {
-      text: '═══ WALL · only parsed metadata crosses down ═══',
+      text: '═══ WALL · declared contract: parsed metadata down ═══',
       color: WALL,
       size: 'xs',
       align: 'center',
@@ -354,7 +357,7 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 395 },
     data: {
-      text: 'Band 2 · Deterministic · Cython',
+      text: 'Band 2 · Entitlements + coded Cython compute',
       color: COMPUTE,
       size: 'xs',
     } satisfies LabelNodeData,
@@ -374,15 +377,15 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // Hero node: event-level ins-outs math (narrower sub line)
+  // Hero node: employee-event-level ins/outs calculations.
   {
     id: 'compute',
     type: 'pill',
     position: { x: 180, y: 520 },
     data: {
       badge: 'Hero',
-      label: 'Event-level ins-outs math',
-      sub: 'Cython · netting · ms over 40K cost centres',
+      label: 'Employee-event ins/outs math',
+      sub: 'Cython · netting · entitled cost-centre set',
       color: COMPUTE,
       size: 'lg',
       glow: true,
@@ -396,8 +399,8 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 580, y: 525 },
     data: {
-      text: '40K! factorial combinations',
-      sub: '~40K cost centres · ~9K parent rollups · ms latency',
+      text: 'Large authorized hierarchy',
+      sub: '~40K cost centres · ~9K parent rollups · interactive queries',
       color: HERO,
       size: 'sm',
       dashedBorder: true,
@@ -406,13 +409,13 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // ═══ WALL 2 — "only aggregates cross back up" ═══
+  // ═══ WALL 2 — structured aggregate interface ═══
   {
     id: 'wall-2',
     type: 'label',
     position: { x: 160, y: 625 },
     data: {
-      text: '═══ WALL · only structured aggregates cross up ═══',
+      text: '═══ WALL · structured aggregates cross up ═══',
       color: WALL,
       size: 'xs',
       align: 'center',
@@ -427,7 +430,7 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 665 },
     data: {
-      text: 'Band 3 · LLM Answer + Synthesis (aggregates only)',
+      text: 'Band 3 · LLM Answer + Synthesis (scoped aggregates)',
       color: LLM,
       size: 'xs',
     } satisfies LabelNodeData,
@@ -460,22 +463,22 @@ const initialNodes: Node[] = [
   { id: 'deliver-chat', type: 'pill', position: { x: 370, y: 860 }, data: { label: 'Chatbot', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
   { id: 'deliver-html', type: 'pill', position: { x: 570, y: 860 }, data: { label: 'HTML reports', sub: 'inbox-ready', color: DELIVERY, size: 'sm' } satisfies PillNodeData, draggable: false },
 
-  // ═══ Postgres backbone rail ═══
+  // ═══ Public data-services abstraction ═══
   {
     id: 'rail-label',
     type: 'label',
     position: { x: 30, y: 925 },
-    data: { text: 'Everything reads/writes below · single Postgres', color: DATA, size: 'xs' } satisfies LabelNodeData,
+    data: { text: 'Scoped state, entitlement, and audit services', color: DATA, size: 'xs' } satisfies LabelNodeData,
     draggable: false,
   },
   {
-    id: 'postgres',
+    id: 'data-services',
     type: 'rail',
     position: { x: 30, y: 955 },
     data: {
-      label: 'Postgres backbone',
+      label: 'Data services',
       color: DATA,
-      tokens: ['event log', 'entitlements', 'business hier.', 'geo hier.', 'audit'],
+      tokens: ['movement records', 'entitlements', 'business hierarchy', 'geographic hierarchy', 'audit records'],
       width: 820,
     } satisfies RailNodeData,
     draggable: false,
@@ -525,6 +528,8 @@ export default function AstraeusCascade() {
     <div
       className="relative w-full"
       style={{ aspectRatio: '880 / 1020' }}
+      role="group"
+      aria-label="Astraeus scoped analytics cascade"
     >
       {/* Two dashed walls — the hero visual. Positioned in % of the
           container so they scale with the responsive aspect-ratio box.
@@ -553,9 +558,46 @@ export default function AstraeusCascade() {
         }}
       />
 
+      <SemanticDiagramFallback
+        title="Astraeus analytics cascade"
+        summary="The registered route separates intent handling, entitlement-aware hierarchy computation, and answer shaping. Interfaces are scoped and observed, with residual risk made explicit."
+        steps={[
+          {
+            title: 'Gate the request',
+            detail: 'The first model call assesses relevance, requested scope, route, and safety signals.',
+          },
+          {
+            title: 'Extract scoped metadata',
+            detail: 'Relevant domain calls produce typed metadata for headcount, cost, or open-position questions.',
+          },
+          {
+            title: 'Apply entitlements and compute',
+            detail: 'Permission checks establish the eligible entity and cost-centre set before coded hierarchy calculations run.',
+          },
+          {
+            title: 'Shape the answer',
+            detail: 'A simple request uses one answer path; a cross-domain request combines scoped aggregate summaries.',
+          },
+          {
+            title: 'Deliver and record',
+            detail: 'The response is delivered through supported channels while the registered route writes operational and audit records.',
+          },
+        ]}
+        notes={[
+          'The path uses five to eight model calls depending on which domains are relevant.',
+          'Access controls, tests, validation, logging, and monitoring provide evidence about boundary behavior and residual risk.',
+        ]}
+      />
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        nodesFocusable={false}
+        edgesFocusable={false}
+        elementsSelectable={false}
+        deleteKeyCode={null}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}

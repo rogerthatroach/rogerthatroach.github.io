@@ -1,26 +1,19 @@
-'use client';
+import CombustionDiagram from '@/components/diagrams/CombustionDiagram';
+import DocumentIntelligenceDiagram from '@/components/diagrams/DocumentIntelligenceDiagram';
+import CommodityTaxDiagram from '@/components/diagrams/CommodityTaxDiagram';
+import AegisDiagram from '@/components/diagrams/AegisDiagram';
+import AstraeusDiagram from '@/components/diagrams/AstraeusDiagram';
+import PARAssistDiagram from '@/components/diagrams/PARAssistDiagram';
 
-import dynamic from 'next/dynamic';
-
-function DiagramSkeleton() {
-  return (
-    <div className="flex h-[400px] w-full items-center justify-center rounded-xl border border-border-subtle bg-surface/50 sm:h-[500px]">
-      <span className="text-xs text-text-tertiary">Loading diagram...</span>
-    </div>
-  );
-}
-
-// next/dynamic with { ssr: false } must live in a Client Component as of
-// Next 16 (it was allowed in Server Components through Next 14). The ReactFlow
-// architecture diagrams are client-only, so this wrapper owns the lazy map and
-// the case-study page (a Server Component) just passes the slug.
+// Static registry: each leaf remains a Client Component, but Next can render its
+// semantic fallback into the exported case-study HTML.
 const DIAGRAMS: Record<string, React.ComponentType> = {
-  'combustion-tuning': dynamic(() => import('@/components/diagrams/CombustionDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'document-intelligence': dynamic(() => import('@/components/diagrams/DocumentIntelligenceDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'commodity-tax': dynamic(() => import('@/components/diagrams/CommodityTaxDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'aegis': dynamic(() => import('@/components/diagrams/AegisDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'astraeus': dynamic(() => import('@/components/diagrams/AstraeusDiagram'), { ssr: false, loading: DiagramSkeleton }),
-  'par-assist': dynamic(() => import('@/components/diagrams/PARAssistDiagram'), { ssr: false, loading: DiagramSkeleton }),
+  'combustion-tuning': CombustionDiagram,
+  'document-intelligence': DocumentIntelligenceDiagram,
+  'commodity-tax': CommodityTaxDiagram,
+  'aegis': AegisDiagram,
+  'astraeus': AstraeusDiagram,
+  'par-assist': PARAssistDiagram,
 };
 
 export default function ProjectDiagram({ slug }: { slug: string }) {

@@ -3,13 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Github } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
-
-const BUILD_DATE = new Date().toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-  timeZone: 'UTC',
-});
+import { THEMES } from '@/data/themes';
 
 const ROWS: { label: string; value: React.ReactNode }[] = [
   {
@@ -20,17 +14,15 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Styling',
     value: (
       <>
-        Tailwind CSS with CSS-variable-backed theme tokens. Six themes live
-        behind the palette picker in the nav:{' '}
-        <span className="font-mono">Sakura</span> (warm paper / wabi-sabi,
-        default),{' '}
-        <span className="font-mono">Aurora</span> (arctic blue, née Nord),{' '}
-        <span className="font-mono">Obsidian</span> (CIELAB-precise, née
-        Solarized Dark),{' '}
-        <span className="font-mono">Ember</span> (warm black + pink spark,
-        née Monokai),{' '}
-        <span className="font-mono">Papyrus</span> (editorial cream + ink,
-        née Paper). Every theme AA-tuned.
+        Tailwind CSS with CSS-variable-backed theme tokens. {THEMES.length}{' '}
+        themes live behind the palette picker in the nav:{' '}
+        {THEMES.map((theme, index) => (
+          <span key={theme.id}>
+            {index > 0 && (index === THEMES.length - 1 ? ', and ' : ', ')}
+            <span className="font-mono">{theme.name}</span> ({theme.description})
+          </span>
+        ))}
+        .
       </>
     ),
   },
@@ -56,9 +48,9 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Motion',
     value: (
       <>
-        Framer Motion, gated on{' '}
-        <span className="font-mono">prefers-reduced-motion</span>. Every
-        scroll-triggered reveal has a static fallback.
+        Framer Motion, with{' '}
+        <span className="font-mono">prefers-reduced-motion</span> handling in
+        interactive components.
       </>
     ),
   },
@@ -69,8 +61,7 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
         ReactFlow for interactive architecture diagrams with animated
         bezier edges. Custom node types (hero hub, dot, rail, label) for
         non-rectangular shapes. Hand-authored SVG where layout is static.
-        KaTeX pre-rendered at module scope for math (never pass LaTeX
-        through client-component props). PAR Assist{' '}
+        KaTeX rendered at module scope for math. PAR Assist{' '}
         <a
           href="/blog/enterprise-agentic-ai-framework"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
@@ -85,15 +76,10 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Writing framework',
     value: (
       <>
-        Blog posts run through a reusable rewrite framework:{' '}
-        <span className="font-mono">OptionsConsidered</span>,{' '}
-        <span className="font-mono">ConstraintsBlock</span>,{' '}
-        <span className="font-mono">DecisionRationale</span>,{' '}
-        <span className="font-mono">StepThrough</span>,{' '}
-        <span className="font-mono">BeforeAfterDiff</span>. Decisions and
-        their alternatives become first-class structure; formal math moves
-        to an appendix for readers who want it. Spec lives at{' '}
-        <span className="font-mono">docs/specs/WRITING_REWRITE_FRAMEWORK.md</span>.
+        Decision-oriented posts surface constraints, alternatives, trade-offs,
+        walkthroughs, and before-and-after comparisons. Mathematical detail
+        moves to a technical companion when it helps rather than leading every
+        story.
       </>
     ),
   },
@@ -120,42 +106,6 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
       </a>
     ),
   },
-  {
-    label: 'Last built',
-    value: <span className="font-mono text-sm">{BUILD_DATE}</span>,
-  },
-];
-
-const REFERENCE_IMPLEMENTATIONS: {
-  name: string;
-  url: string;
-  backs: string;
-  status: 'live' | 'queued';
-}[] = [
-  {
-    name: 'aegis-guarded-text-to-sql',
-    url: 'https://github.com/rogerthatroach/aegis-guarded-text-to-sql',
-    backs: 'Aegis text-to-SQL — formal · builder · practitioner',
-    status: 'live',
-  },
-  {
-    name: 'commodity-tax-provenance',
-    url: 'https://github.com/rogerthatroach/commodity-tax-provenance',
-    backs: 'Commodity Tax provenance algebra — three registers',
-    status: 'live',
-  },
-  {
-    name: 'astraeus-llm-as-router',
-    url: 'https://github.com/rogerthatroach/astraeus-llm-as-router',
-    backs: 'Astraeus LLM-as-router — three registers',
-    status: 'live',
-  },
-  {
-    name: 'prometheus-multi-agent-retrieval',
-    url: 'https://github.com/rogerthatroach/prometheus-multi-agent-retrieval',
-    backs: 'PAR Assist multi-agent retrieval — three registers',
-    status: 'live',
-  },
 ];
 
 const PRINCIPLES: { heading: string; body: string }[] = [
@@ -165,7 +115,7 @@ const PRINCIPLES: { heading: string; body: string }[] = [
   },
   {
     heading: 'Zero waste',
-    body: 'No dead code. No commented-out blocks. No just-in-case abstractions. Every file earns its place.',
+    body: 'Remove unused code and just-in-case abstractions when they are found. Keep the public source focused.',
   },
   {
     heading: 'Copy-first, animation-last',
@@ -173,15 +123,34 @@ const PRINCIPLES: { heading: string; body: string }[] = [
   },
   {
     heading: 'Measure twice, cut once',
-    body: 'Plan, confirm, execute. Lighthouse, axe, keyboard-only flow, and screen reader every shippable route.',
+    body: 'Plan, confirm, execute. Type checks and production builds are followed by route, keyboard, and rendered-text review before publication.',
   },
 ];
 
+const META_TITLE = 'Colophon';
+const META_DESCRIPTION =
+  'Typefaces, framework, hosting, and design principles behind this site. Craft notes.';
+const META_PATH = '/colophon';
+
 export const metadata: Metadata = {
-  title: 'Colophon — Harmilap Singh Dhaliwal',
-  description:
-    'Typefaces, framework, hosting, and design principles behind this site. Craft notes.',
-  alternates: { canonical: '/colophon' },
+  title: META_TITLE,
+  description: META_DESCRIPTION,
+  alternates: { canonical: META_PATH },
+  openGraph: {
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    url: META_PATH,
+    siteName: 'Harmilap Singh Dhaliwal',
+    locale: 'en_US',
+    type: 'website',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    images: ['/og-image.png'],
+  },
 };
 
 export default function ColophonPage() {
@@ -229,58 +198,6 @@ export default function ColophonPage() {
               </div>
             ))}
           </dl>
-
-          {/* Reference implementations */}
-          <h2 className="mt-12 text-xl font-semibold text-text-primary">
-            Reference implementations
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-            Public Python repos backing the technical posts — working code,
-            synthetic data, reproducible plots. Each one is the public
-            skeleton of one production system, kept small enough to read
-            end-to-end in an hour.
-          </p>
-          <ul className="mt-5 space-y-3">
-            {REFERENCE_IMPLEMENTATIONS.map((r) => (
-              <li
-                key={r.name}
-                className="rounded-lg border border-border-subtle bg-surface/30 p-4"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    {r.status === 'live' ? (
-                      <a
-                        href={r.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 font-mono text-sm text-accent underline underline-offset-4 hover:text-text-primary"
-                      >
-                        <Github size={13} />
-                        {r.name}
-                      </a>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 font-mono text-sm text-text-tertiary">
-                        <Github size={13} />
-                        {r.name}
-                      </span>
-                    )}
-                    <p className="mt-1 text-xs leading-relaxed text-text-secondary">
-                      {r.backs}
-                    </p>
-                  </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest ${
-                      r.status === 'live'
-                        ? 'bg-accent/10 text-accent'
-                        : 'bg-surface text-text-tertiary'
-                    }`}
-                  >
-                    {r.status}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
 
           {/* Principles */}
           <h2 className="mt-12 text-xl font-semibold text-text-primary">

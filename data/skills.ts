@@ -1,19 +1,9 @@
 /**
  * Categorized skill inventory for the /resume Skill Grid.
  *
- * Five categories (per INTERACTIVE_RESUME_HANDOVER_FINAL.md §4):
- *   - GenAI & Agentic, Traditional ML & DL, Data Engineering,
- *     Cloud & Platforms, Viz & Frontend.
- *
- * "Leadership" is NOT a filter category — it's a story shape, surfaced
- * via transitionStory + teamContext fields in data/timeline.ts, not here.
- *
- * Each skill optionally carries:
- *   - firstShipped year (more honest than a proficiency bar)
- *   - anchorProject + anchorLink (click-through to the project/blog
- *     where the skill appears in context)
- *
- * Source: docs/career/RESUME_RAW.md §4.
+ * Skills can include a first-shipped year and an anchor project or link.
+ * Leadership context is represented in the timeline rather than as a
+ * filter category.
  */
 
 export type SkillCategory =
@@ -83,17 +73,17 @@ export const SKILLS: Skill[] = [
   { name: 'Embeddings / semantic search', category: 'genai', firstShipped: 2025, anchorProject: 'Aegis v2 KPI disambiguation', anchorLink: '/projects/aegis' },
   { name: 'Prompt engineering', category: 'genai', firstShipped: 2024, anchorProject: 'All RBC GenAI work' },
   { name: 'LLM evaluation', category: 'genai', firstShipped: 2025, anchorProject: 'Aegis v2 + Astraeus' },
-  { name: 'Intent parsing / routing', category: 'genai', firstShipped: 2025, anchorProject: 'Astraeus (GPT for routing only)', anchorLink: '/projects/astraeus' },
+  { name: 'Intent parsing / routing', category: 'genai', firstShipped: 2025, anchorProject: 'Astraeus (LLM for routing only)', anchorLink: '/projects/astraeus' },
   { name: 'BERT / early transformers', category: 'genai', firstShipped: 2021, anchorProject: 'IBM DataJam (side)' },
 
   // ─── Traditional ML & DL ───
   { name: 'TensorFlow', category: 'ml-dl', firstShipped: 2017, anchorProject: 'TCS — Combustion Tuning' },
   { name: 'PyTorch', category: 'ml-dl', firstShipped: 2018, anchorProject: 'TCS — LSTM on Ammonium Bisulphate deposition' },
   { name: 'scikit-learn', category: 'ml-dl', firstShipped: 2017, anchorProject: 'TCS' },
-  { name: 'XGBoost', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Transformer Life (85% MAPE)' },
-  { name: 'Regression (multi-output)', category: 'ml-dl', firstShipped: 2017, anchorProject: 'Combustion — 84 models', anchorLink: '/projects/combustion-tuning' },
+  { name: 'XGBoost', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Transformer Life Prediction' },
+  { name: 'Regression', category: 'ml-dl', firstShipped: 2017, anchorProject: 'Combustion — 84 independent models', anchorLink: '/projects/combustion-tuning' },
   { name: 'Classification', category: 'ml-dl', firstShipped: 2017, anchorProject: 'Coal classification (5 algorithms)' },
-  { name: 'Clustering (kMeans)', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Coal classification' },
+  { name: 'Clustering (kMeans)', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Coal clustering' },
   { name: 'PSO (Particle Swarm Optimization)', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Combustion closed-loop', anchorLink: '/projects/combustion-tuning' },
   { name: 'LSTM / RNN', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Ammonium Bisulphate deposition' },
   { name: 'CNN / Computer Vision', category: 'ml-dl', firstShipped: 2019, anchorProject: 'Math Notation Detection (2nd/600)' },
@@ -119,11 +109,11 @@ export const SKILLS: Skill[] = [
   // ─── Platform & Infra ───
   { name: 'OpenShift (consumer-side via CI/CD)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Services I own deployed to OCP via GFT CI/CD', anchorLink: '/platform' },
   { name: 'FastAPI / API services', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Astraeus + PAR Assist orchestration services', anchorLink: '/platform' },
-  { name: 'Multi-vendor LLM routing (via Lumina gateway)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Claude (AWS Bedrock) + OpenAI (Azure) integration', anchorLink: '/platform' },
+  { name: 'Multi-provider model routing', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Approved foundation-model endpoints through an internal gateway', anchorLink: '/platform' },
   { name: 'Permission cascade / authorization', category: 'platform-infra', firstShipped: 2025, anchorProject: 'Astraeus 5-stage entitlement', anchorLink: '/projects/astraeus' },
   { name: 'Audit logging (Postgres-backed)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'PAR Assist typed-MCP audit trail', anchorLink: '/projects/par-assist' },
   { name: 'Typed MCP tool registry', category: 'platform-infra', firstShipped: 2026, anchorProject: 'PAR Assist tool dispatcher', anchorLink: '/projects/par-assist' },
-  { name: 'Cython (production compute paths)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'Astraeus event-level ins-outs math at ms latency', anchorLink: '/projects/astraeus' },
+  { name: 'Cython (production compute paths)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'Astraeus event-level ins-outs math', anchorLink: '/projects/astraeus' },
 
   // ─── Viz & Frontend ───
   { name: 'Tableau', category: 'viz-frontend', firstShipped: 2022, anchorProject: 'Chick-fil-A → RBC CFO dashboards' },

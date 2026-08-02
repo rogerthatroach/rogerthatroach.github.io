@@ -14,6 +14,7 @@ import AgentNode from './AgentNode';
 import AnimatedEdge from './AnimatedEdge';
 import type { AgentNodeData } from './AgentNode';
 import { useThemeColor } from '@/lib/useThemeColor';
+import SemanticDiagramFallback from '@/components/blog/diagrams/SemanticDiagramFallback';
 
 const nodeTypes = { agent: AgentNode };
 const edgeTypes = { animated: AnimatedEdge };
@@ -86,8 +87,8 @@ const initialNodes: Node[] = [
     type: 'agent',
     position: { x: 740, y: 120 },
     data: {
-      label: 'Verified Output',
-      description: 'Structured, validated document data for downstream use',
+      label: 'Reviewed Output',
+      description: 'Structured document data after validation and review',
       icon: '📊',
       category: 'output',
       accentColor: COLOR,
@@ -110,10 +111,34 @@ export default function DocumentIntelligenceDiagram() {
   const gridColor = useThemeColor('--color-diagram-grid', '#d4ccc8');
 
   return (
-    <div className="h-[400px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-xs sm:h-[500px]">
+    <div
+      className="relative h-[400px] w-full overflow-hidden rounded-xl border border-border-subtle bg-surface/50 backdrop-blur-xs sm:h-[500px]"
+      role="group"
+      aria-label="Document-intelligence processing flow"
+    >
+      <SemanticDiagramFallback
+        title="Document-intelligence processing flow"
+        summary="Insurance and financial documents pass through OCR, structural parsing, field extraction, model-assisted classification, and rule-based validation before reviewed structured output is released downstream."
+        steps={[
+          { title: 'Ingest documents', detail: 'The pipeline accepts supported insurance forms, financial records, and PDFs.' },
+          { title: 'Parse structure', detail: 'OCR and document parsing recover text and layout cues.' },
+          { title: 'Extract fields', detail: 'Entity and field extraction proposes structured values and metadata.' },
+          { title: 'Classify and validate', detail: 'Cloud-hosted models and business-rule checks assess the candidate document data.' },
+          { title: 'Review output', detail: 'Validated structured data proceeds downstream with the applicable review path.' },
+        ]}
+        notes={[
+          'The published 99.95% result is scoped to checkbox detection, not the accuracy of the entire pipeline.',
+        ]}
+      />
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        nodesFocusable={false}
+        edgesFocusable={false}
+        elementsSelectable={false}
+        deleteKeyCode={null}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}

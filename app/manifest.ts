@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
     short_name: 'HSD',
     description:
-      "AI & Data Science Lead. Bank-wide production agentic AI, LLM analytics platforms, and the career arc behind them.",
+      "AI & Data Science Lead. Production agentic AI for RBC's CFO Group, LLM analytics platforms, and the career arc behind them.",
     start_url: '/',
     display: 'standalone',
     background_color: '#0c0a0a',

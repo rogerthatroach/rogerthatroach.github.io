@@ -2,6 +2,12 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono, Fraunces } from 'next/font/google';
 import CommandPalette from '@/components/CommandPalette';
 import MotionProvider from '@/components/MotionProvider';
+import {
+  DARK_THEME_IDS,
+  DEFAULT_THEME_ID,
+  THEME_DATA_ATTRIBUTES,
+  THEME_IDS,
+} from '@/data/themes';
 import './globals.css';
 
 const inter = Inter({
@@ -28,6 +34,17 @@ const fraunces = Fraunces({
 });
 
 const SITE_URL = 'https://rogerthatroach.github.io';
+const SITE_DESCRIPTION =
+  'AI & Data Science Lead building production AI in regulated finance, from industrial digital twins and document intelligence to governed agentic systems.';
+
+function serializeForInlineScript(value: unknown): string {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029');
+}
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -44,12 +61,10 @@ export const metadata: Metadata = {
     default: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
     template: '%s | Harmilap Singh Dhaliwal',
   },
-  description:
-    "Built RBC's first bank-wide production agentic AI in the last year, alongside a multi-stage LLM analytics platform shipped to production. 8+ years of progressive AI/ML, from industrial Digital Twins to bank-wide LLM platforms.",
+  description: SITE_DESCRIPTION,
   openGraph: {
     title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
-    description:
-      "Built RBC's first bank-wide production agentic AI in the last year. 8+ years of progressive AI/ML, from industrial Digital Twins to bank-wide LLM platforms.",
+    description: SITE_DESCRIPTION,
     url: SITE_URL,
     siteName: 'Harmilap Singh Dhaliwal',
     locale: 'en_US',
@@ -67,8 +82,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
-    description:
-      "Built RBC's first bank-wide production agentic AI in the last year. 8+ years of progressive AI/ML, from industrial Digital Twins to bank-wide LLM platforms.",
+    description: SITE_DESCRIPTION,
     images: ['/og-image.png'],
   },
   robots: {
@@ -94,27 +108,37 @@ export const metadata: Metadata = {
 //
 // OS prefers-color-scheme is intentionally ignored — theme is an explicit
 // choice, not an environment default.
+const serializedThemeIds = serializeForInlineScript(THEME_IDS);
+const serializedDarkThemeIds = serializeForInlineScript(DARK_THEME_IDS);
+const serializedThemeDataAttributes = serializeForInlineScript(
+  THEME_DATA_ATTRIBUTES,
+);
+const serializedDefaultThemeId = serializeForInlineScript(DEFAULT_THEME_ID);
+
 const themeScript = `
   (function() {
     try {
-      var valid = ['sakura-light','sakura-dark','nord','solarized-dark','monokai','paper','themis','themis-dark'];
-      // URL param override — e.g. ?theme=monokai — ephemeral (not
-      // persisted), useful for preview links and Lighthouse sweeps.
+      var valid = ${serializedThemeIds};
+      var darkThemes = ${serializedDarkThemeIds};
+      var dataThemes = ${serializedThemeDataAttributes};
+      // URL param override — e.g. ?theme=monokai — ephemeral and not persisted.
       var params = new URLSearchParams(window.location.search);
       var urlTheme = params.get('theme');
       var pack = urlTheme && valid.indexOf(urlTheme) !== -1
         ? urlTheme
-        : localStorage.getItem('theme-pack');
+        : null;
+      if (!pack) {
+        var stored = localStorage.getItem('theme-pack');
+        pack = stored && valid.indexOf(stored) !== -1 ? stored : null;
+      }
       if (!pack) {
         var legacy = localStorage.getItem('theme');
-        pack = legacy === 'dark' ? 'sakura-dark' : 'sakura-light';
+        pack = legacy === 'dark' ? 'sakura-dark' : ${serializedDefaultThemeId};
       }
-      var darkBase = ['sakura-dark','nord','solarized-dark','monokai','themis-dark'].indexOf(pack) !== -1;
+      var darkBase = darkThemes.indexOf(pack) !== -1;
       if (darkBase) document.documentElement.classList.add('dark');
-      // 'themis' and 'themis-dark' both resolve to the same data-theme
-      // attribute — only the .dark class differs.
-      var themeAttr = pack === 'themis-dark' ? 'themis' : pack;
-      if (pack !== 'sakura-light' && pack !== 'sakura-dark') {
+      var themeAttr = dataThemes[pack];
+      if (themeAttr !== null) {
         document.documentElement.setAttribute('data-theme', themeAttr);
       }
     } catch (e) { /* localStorage blocked — fall through to default */ }

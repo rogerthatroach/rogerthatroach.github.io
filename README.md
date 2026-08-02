@@ -3,7 +3,7 @@
 Personal portfolio of **Harmilap Singh Dhaliwal** — AI & Data Science Lead.
 Live at **[rogerthatroach.github.io](https://rogerthatroach.github.io)**.
 
-A career arc from industrial Digital Twins to bank-wide production agentic AI,
+A career arc from industrial Digital Twins to production agentic AI in RBC's CFO Group,
 told through interactive case studies, technical whitepapers, and architecture
 diagrams.
 

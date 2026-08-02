@@ -17,6 +17,7 @@ import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
 import { useThemeColor } from '@/lib/useThemeColor';
+import SemanticDiagramFallback from './SemanticDiagramFallback';
 
 /**
  * Aegis architecture — "The Pipeline + Two Walls" diagram.
@@ -24,21 +25,21 @@ import { useThemeColor } from '@/lib/useThemeColor';
  * The hero move: five sequential stages, two dashed walls. The walls
  * carry the architectural punchline visibly:
  *
- *   WALL 1 — no raw data crosses (LLM intent never sees KPI values)
- *   WALL 2 — no free-form SQL emits (only template + parameter binds reach the DB)
+ *   WALL 1 — the registered path limits intent payloads to query and catalog metadata
+ *   WALL 2 — query templates, typed parameters, and validators bound SQL generation
  *
  *   Band 1 — Intent (LLM, schema-constrained)
  *   ┄┄ WALL 1 ┄┄
- *   Band 2 — Detect (deterministic embeddings) → Disambiguate (LLM-conditional)
+ *   Band 2 — Catalog match → Disambiguate (LLM-conditional)
  *   ┄┄ WALL 2 ┄┄
- *   Band 3 — Generate (template + param) → Format (deterministic)
+ *   Band 3 — Generate (template + typed parameters) → Format (coded)
  *
- * The decomposition itself is the guardrail. LLM use is bounded to
- * stages 1 and 3 (3 only when the confidence gate fires); stages 2, 4,
- * 5 are mechanical. Decomposition is what makes this auditable.
+ * The decomposition places controls at stage boundaries. LLM use is
+ * limited to stages 1 and 3 on the registered path (3 only when the
+ * match gate fires); stages 2, 4, and 5 use coded operations.
  *
- * A Postgres + pgvector backbone runs beneath: kpi_catalog, embeddings,
- * templates, query_log, audit. One store.
+ * Catalog, retrieval, template, request-log, and audit services run beneath
+ * the pipeline. The public diagram intentionally omits storage topology.
  *
  * Visual register matches Astraeus's cascade: same canvas dimensions,
  * same palette, same wall language. Family resemblance is intentional
@@ -48,11 +49,11 @@ import { useThemeColor } from '@/lib/useThemeColor';
 
 // ── Palette (mirrors Astraeus for register continuity) ───────────────
 const LLM = '#8b5cf6';        // LLM stages (parse, disambiguate-when-fired)
-const DET = '#3b82f6';        // deterministic stages (detect, format)
+const DET = '#3b82f6';        // catalog matching and coded formatting
 const TEMPLATE = '#14b8a6';   // template-based SQL gen (its own register)
 const GATE = '#d4a0a7';       // hero accent — confidence gate keystone
 const WALL = '#ef4444';       // wall barriers + clarify-back loop
-const DATA = '#ea580c';       // Postgres rail
+const DATA = '#ea580c';       // data-services rail
 const RESULT = '#10b981';     // final output
 
 // ── Pill node ────────────────────────────────────────────────────────
@@ -164,7 +165,7 @@ function GateNode({ data }: NodeProps) {
 }
 const MemoGate = memo(GateNode);
 
-// ── Wide Postgres rail (reused pattern) ──────────────────────────────
+// ── Wide public data-services rail ──────────────────────────────────
 interface RailNodeData {
   label: string;
   tokens: string[];
@@ -283,7 +284,7 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 10 },
     data: {
-      text: 'Decomposition is the guardrail · 5 stages · 2 walls · 1 store',
+      text: 'Stage boundaries place controls · 5 stages · 2 interfaces',
       color: GATE,
       size: 'sm',
       dashedBorder: true,
@@ -326,7 +327,7 @@ const initialNodes: Node[] = [
     data: {
       badge: 'S1 · LLM 1',
       label: 'Parse intent',
-      sub: 'GPT-4.1 · JSON-schema',
+      sub: 'approved model · JSON-schema',
       color: LLM,
       size: 'md',
       glow: true,
@@ -368,22 +369,22 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 380 },
     data: {
-      text: 'Band 2 · Detect (deterministic) → Disambiguate (LLM if confidence drops)',
+      text: 'Band 2 · Catalog match → Disambiguate when confidence drops',
       color: DET,
       size: 'xs',
     } satisfies LabelNodeData,
     draggable: false,
   },
 
-  // Stage 2 — KPI detect (embeddings, deterministic)
+  // Stage 2 — semantic KPI catalog match
   {
     id: 's2',
     type: 'pill',
     position: { x: 100, y: 425 },
     data: {
-      badge: 'S2 · embeddings',
+      badge: 'S2 · semantic match',
       label: 'KPI detect',
-      sub: 'cosine sim ≥ τ_min',
+      sub: 'catalog score against threshold',
       color: DET,
       size: 'md',
     } satisfies PillNodeData,
@@ -397,7 +398,7 @@ const initialNodes: Node[] = [
     position: { x: 460, y: 430 },
     data: {
       label: 'K_c · candidates',
-      sub: 'top-k matched KPIs',
+      sub: 'ranked catalog matches',
       color: DET,
       size: 'sm',
     } satisfies PillNodeData,
@@ -410,8 +411,8 @@ const initialNodes: Node[] = [
     type: 'gate',
     position: { x: 270, y: 530 },
     data: {
-      label: 'p ≥ 1 − ε ?',
-      sub: 'confidence gate',
+      label: 'score ≥ τ ?',
+      sub: 'match threshold',
       color: GATE,
     } satisfies GateNodeData,
     draggable: false,
@@ -425,7 +426,7 @@ const initialNodes: Node[] = [
     data: {
       badge: 'S3 · LLM 2 (cond.)',
       label: 'LLM disambig.',
-      sub: 'name + def, no values',
+      sub: 'catalog labels + definitions',
       color: LLM,
       size: 'sm',
     } satisfies PillNodeData,
@@ -439,7 +440,7 @@ const initialNodes: Node[] = [
     position: { x: 60, y: 540 },
     data: {
       label: 'clarify',
-      sub: 'ask user · do not guess',
+      sub: 'ask user when unresolved',
       color: WALL,
       size: 'sm',
     } satisfies PillNodeData,
@@ -452,8 +453,8 @@ const initialNodes: Node[] = [
     type: 'pill',
     position: { x: 295, y: 645 },
     data: {
-      label: 'k̂ · resolved KPI',
-      sub: 'p ≥ 1 − ε',
+      label: 'k̂ · selected KPI',
+      sub: 'threshold or review path passed',
       color: GATE,
       size: 'sm',
       glow: true,
@@ -461,13 +462,13 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // ═══ BAND 3 — Generate + Format (deterministic) ═══
+  // ═══ BAND 3 — Generate + coded format ═══
   {
     id: 'band3-label',
     type: 'label',
     position: { x: 20, y: 720 },
     data: {
-      text: 'Band 3 · Generate (template + param) → Format (deterministic)',
+      text: 'Band 3 · Generate (template + typed parameters) → Format',
       color: TEMPLATE,
       size: 'xs',
     } satisfies LabelNodeData,
@@ -496,8 +497,8 @@ const initialNodes: Node[] = [
     type: 'pill',
     position: { x: 470, y: 775 },
     data: {
-      label: 'whitelist · AST · SELECT · types',
-      sub: 'allow-list + deny-list · defense in depth',
+      label: 'allow-list · parser · SELECT · types',
+      sub: 'layered validation checks',
       color: TEMPLATE,
       size: 'sm',
     } satisfies PillNodeData,
@@ -510,7 +511,7 @@ const initialNodes: Node[] = [
     type: 'pill',
     position: { x: 295, y: 870 },
     data: {
-      badge: 'S5 · deterministic',
+      badge: 'S5 · coded',
       label: 'Format result',
       sub: 'table · chart · narrative · ω',
       color: DET,
@@ -525,34 +526,34 @@ const initialNodes: Node[] = [
     type: 'pill',
     position: { x: 320, y: 945 },
     data: {
-      label: 'r · response',
-      sub: 'cited, parameterized, audit-logged',
+      label: 'r · formatted response',
+      sub: 'parameterized query · logged route',
       color: RESULT,
       size: 'sm',
     } satisfies PillNodeData,
     draggable: false,
   },
 
-  // ═══ Postgres + pgvector backbone ═══
+  // ═══ Public data-services abstraction ═══
   {
     id: 'rail-label',
     type: 'label',
     position: { x: 30, y: 1010 },
     data: {
-      text: 'Everything reads/writes below · single Postgres + pgvector',
+      text: 'Catalog, query-template, and audit data services',
       color: DATA,
       size: 'xs',
     } satisfies LabelNodeData,
     draggable: false,
   },
   {
-    id: 'postgres',
+    id: 'data-services',
     type: 'rail',
     position: { x: 30, y: 1040 },
     data: {
-      label: 'Postgres + pgvector',
+      label: 'Data services',
       color: DATA,
-      tokens: ['kpi_catalog', 'embeddings', 'templates', 'query_log', 'audit'],
+      tokens: ['metric catalog', 'retrieval index', 'query templates', 'request logs', 'audit records'],
       width: 820,
     } satisfies RailNodeData,
     draggable: false,
@@ -615,9 +616,11 @@ export default function AegisCascade() {
     <div
       className="relative w-full"
       style={{ aspectRatio: '880 / 1100' }}
+      role="group"
+      aria-label="Aegis natural-language query pipeline"
     >
       {/* WALL 1 — between Band 1 (intent) and Band 2 (detect/disambiguate).
-          "no raw data crosses · LLM intent never sees KPI values" */}
+          Intent payload is limited to query and catalog metadata. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute border-t-2 border-dashed"
@@ -630,7 +633,7 @@ export default function AegisCascade() {
         }}
       />
       {/* WALL 2 — between Band 2 (disambiguate) and Band 3 (generate/format).
-          "no free-form SQL emits · only template + parameter binds" */}
+          The registered route uses templates, typed parameters, and validators. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute border-t-2 border-dashed"
@@ -643,9 +646,46 @@ export default function AegisCascade() {
         }}
       />
 
+      <SemanticDiagramFallback
+        title="Aegis query pipeline"
+        summary="A natural-language request becomes typed intent, a catalog match, a validated query, and a formatted response. The staged design creates explicit places to validate, clarify, and log the registered route."
+        steps={[
+          {
+            title: 'Parse intent',
+            detail: 'A model maps the request into a typed schema; validation can retry or request clarification.',
+          },
+          {
+            title: 'Match the metric',
+            detail: 'Semantic catalog lookup ranks candidate metrics against a configured threshold.',
+          },
+          {
+            title: 'Resolve ambiguity',
+            detail: 'Strong matches continue; uncertain matches receive scoped disambiguation or a user clarification step.',
+          },
+          {
+            title: 'Build and validate the query',
+            detail: 'An allow-listed template receives typed parameters, followed by parser, statement-type, and field checks.',
+          },
+          {
+            title: 'Format and record',
+            detail: 'The result is formatted for the requested channel and the registered route records request and decision metadata.',
+          },
+        ]}
+        notes={[
+          'The registered early-stage route is designed to pass query and catalog metadata; tests and monitoring check that boundary.',
+          'The diagram describes controls and expected interfaces; residual risk remains.',
+        ]}
+      />
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        nodesFocusable={false}
+        edgesFocusable={false}
+        elementsSelectable={false}
+        deleteKeyCode={null}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}

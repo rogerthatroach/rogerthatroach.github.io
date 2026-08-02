@@ -79,7 +79,7 @@ export default function StepThrough({
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}
-              initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
               transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
@@ -148,6 +148,33 @@ export default function StepThrough({
           </button>
         </div>
       </div>
+
+      {steps.length > 1 && (
+        <noscript>
+          <div className="mt-4 rounded-xl border border-border-subtle bg-surface/40 p-5 md:p-6">
+            <p className="mb-4 text-sm font-semibold text-text-primary">
+              Remaining steps
+            </p>
+            <ol className="space-y-5">
+              {steps.slice(1).map((step, stepIndex) => (
+                <li key={`${step.title}-${stepIndex}`}>
+                  <h3 className="text-base font-semibold text-text-primary">
+                    Step {stepIndex + 2}: {step.title}
+                  </h3>
+                  {step.caption && (
+                    <p className="mt-0.5 text-xs text-text-tertiary">
+                      {step.caption}
+                    </p>
+                  )}
+                  <div className="mt-2 text-sm leading-relaxed text-text-secondary">
+                    {step.content}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </noscript>
+      )}
     </figure>
   );
 }

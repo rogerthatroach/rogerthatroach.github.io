@@ -1,28 +1,9 @@
-/**
- * Single source of truth for canonical portfolio facts.
- *
- * DERIVED: counts computed from structural data.
- * FLAT CONSTANTS: irreducible claims sourced from CAREER_KNOWLEDGE_BASE.md
- * and PORTFOLIO_V2_HANDOVER_FINAL.md §9.
- *
- * OUT OF SCOPE:
- *   - MDX blog posts (data/posts/*.mdx) hardcode metrics at publication
- *     time. They are time-stamped artifacts, not live claims — do not
- *     import canonical values in MDX.
- *   - Case study narrative prose (data/projectCaseStudies.ts sections.*).
- *     Prose is authored voice. Discrete display fields only (heroMetric,
- *     milestone, hero summary strings) flow through canonical.
- *
- * RULE when adding a new fact:
- *   1. Derivable from structure? → compute it (e.g. AWARDS.length).
- *   2. Curated claim? → flat constant with an inline comment sourcing it.
- *   3. Prose? → stays where it's written, not here.
- */
+/** Shared display values used across portfolio surfaces. */
 
 import { AWARDS } from './awards';
 
 // ═══════════════════════════════════════════════════════════════════
-// DERIVED (drift is structurally impossible — the source is the data)
+// Values derived from structured portfolio data.
 // ═══════════════════════════════════════════════════════════════════
 
 export const AWARDS_COUNT = AWARDS.length;
@@ -32,17 +13,13 @@ export const AWARDS_COUNT = AWARDS.length;
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * RBC production AI systems (3). Surface names match the resume
- * (per 2026-05-12 portfolio↔resume sync — reverted the Session 14
- * "Prometheus" codename for the agentic platform back to PAR Assist
- * so the portfolio reads the same as the resume).
+ * RBC production AI systems (3).
  *
- *   1. PAR Assist — pilot launched April 2026; deployed bank-wide May 2026
+ *   1. PAR Assist — pilot launched April 2026; full CFO Group launch across all geographies May 2026
  *   2. Astraeus   — production since Nov 2025
  *   3. Aegis      — v1 shipped, v2 is a concurrent 2-week refactor of v1 (one product, two revisions)
  *
- * Per 2026-04-21 audit: do NOT present the v2 refactor as an independent 4th product.
- * v2 was a 2-week focused refactor of v1 done alongside PAR Assist + Astraeus work.
+ * Aegis v1 and its two-week v2 refactor count as one product, not two.
  */
 export const PRODUCTION_SYSTEMS_COUNT = 3;
 
@@ -59,18 +36,13 @@ interface CareerStint {
 }
 
 /**
- * Source of truth for career duration. Years-experience is derived
- * from this — never hardcode a years number elsewhere.
+ * Career ranges used to derive the years-of-experience display.
  *
  * Excludes the 2019-09 → 2021-08 gap (Georgian College post-grad +
  * Canada relocation) so the total reflects professional ML work, not
  * calendar elapsed since first job.
- *
- * REFINE: dates below are approximate per existing canonical reconciliation
- * (TCS = 3.3y, Quantiphi = 1.0y). Update with exact start/end as known.
  */
 const CAREER_STINTS: CareerStint[] = [
-  // Dates from CAREER_KNOWLEDGE_BASE_v2.md §2.1, §2.3, §2.4
   { org: 'TCS',       start: new Date('2016-08-15'), end: new Date('2019-11-30') }, // ~3.3y
   { org: 'Quantiphi', start: new Date('2021-10-01'), end: new Date('2022-09-30') }, // ~1.0y
   { org: 'RBC',       start: new Date('2022-09-15') },                              // ongoing (Sr DS Sep 2022, Lead Apr 2025)
@@ -119,23 +91,20 @@ export const DIGITAL_TWIN_SAVINGS = '$3M';
 export const DIGITAL_TWIN_MODELS = '84 models';
 export const DIGITAL_TWIN_SENSORS = '90+ sensors';
 
+/** Accuracy of the Humana checkbox-detection component, not the full document pipeline. */
 export const HUMANA_ACCURACY = '99.95%';
+/** Document AI-only baseline for that same checkbox-detection task. */
 export const HUMANA_BASELINE_ACCURACY = '~70%';
 
 export const COMMODITY_TAX_EFFICIENCY = 'Months → 90 min';
 /** Compact form for 3-slot displays (Hero NUMBER_SEQUENCE) */
 export const COMMODITY_TAX_EFFICIENCY_COMPACT = '90 min';
 
-/**
- * Aegis v2 refactor sprint length. NOT an independent
- * concept-to-production timeline — v2 is a 2-week refactor of v1 done
- * alongside other primary work. Display label should read
- * "v1 → v2 refactor" or similar, NOT "Concept → Production".
- */
+/** Duration of the concurrent Aegis v1-to-v2 refactor. */
 export const AEGIS_V2_BUILD_TIME = '2 weeks';
 
 /**
- * Astraeus domain model — single source of truth (public wording).
+ * Astraeus domain model.
  *
  * The CFO Group's workforce is modelled as ~40,000 COST CENTRES: the most
  * granular org unit (one cost centre = one or more teams). Cost centres are
@@ -146,28 +115,20 @@ export const AEGIS_V2_BUILD_TIME = '2 weeks';
  * intersects them down to the cost-centre leaves, retrieves from Postgres,
  * and aggregates. It answers HR compensation costs (actual vs planned),
  * headcount over time, and employee events (hires, departures, promotions,
- * demotions, lateral moves) — at any granularity.
- *
- * PUBLIC WORDING: always "cost centres" for the leaf unit. "events" is a
- * MEASURE over cost centres (the hires/leaves/moves netting), never the unit
- * itself. NEVER put the internal terms "transit"/"80k"/"60k" on a public
- * surface. Only ~40,000 cost centres and ~9,000 rollups are published as
- * figures (no geography count — "60k" is a codename, not a count).
+ * demotions, lateral moves) across supported, authorized hierarchy scopes.
  */
 export const ASTRAEUS_COST_CENTRES = '~40,000';
 
 /** Rollup nodes in the 18-level business-segment hierarchy, above the leaf cost centres. */
 export const ASTRAEUS_ROLLUPS = '~9,000';
 
-/** PAR Assist pilot launched April 2026; deployed bank-wide May 2026. */
-export const PROMETHEUS_SCALE = 'Bank-wide';
-/** @deprecated alias — see PROMETHEUS_SCALE. Kept so existing consumers keep compiling. */
-export const PAR_ASSIST_SCALE = PROMETHEUS_SCALE;
+/** PAR Assist pilot launched April 2026; full CFO Group launch across all geographies May 2026. */
+export const PAR_ASSIST_SCALE = 'Full CFO Group';
 
 // ═══════════════════════════════════════════════════════════════════
 // TEAM
 // ═══════════════════════════════════════════════════════════════════
 
 export const HANDS_ON_PCT = '~70%';
-export const INTERNS_TOTAL = 7;
-export const INTERNS_JOINING_MAY_2026 = 2;
+export const INTERNS_TOTAL = 9;
+export const INTERNS_JOINED_MAY_2026 = 2;

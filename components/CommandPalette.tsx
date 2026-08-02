@@ -9,32 +9,7 @@ import { Search, Home, User, FolderKanban, FileText, FileBadge, Sparkles, Hammer
 import { HERO } from '@/data/hero';
 import { POSTS, isPostPublic } from '@/data/posts';
 import { PROJECTS } from '@/data/projects';
-
-// Six theme packs mirror ThemePicker.tsx — keep this table in sync when
-// that list changes. The palette lets users jump straight to any theme
-// from ⌘K without opening the nav picker.
-type ThemeId =
-  | 'sakura-light'
-  | 'sakura-dark'
-  | 'nord'
-  | 'solarized-dark'
-  | 'monokai'
-  | 'paper'
-  | 'themis'
-  | 'themis-dark';
-const THEMES: { id: ThemeId; label: string; base: 'light' | 'dark' }[] = [
-  { id: 'sakura-light',    label: 'Theme · Sakura Light',        base: 'light' },
-  { id: 'sakura-dark',     label: 'Theme · Sakura Dark',         base: 'dark'  },
-  { id: 'nord',            label: 'Theme · Aurora (Nord)',       base: 'dark'  },
-  { id: 'solarized-dark',  label: 'Theme · Obsidian (Solarized)', base: 'dark'  },
-  { id: 'monokai',         label: 'Theme · Ember (Monokai)',     base: 'dark'  },
-  { id: 'paper',           label: 'Theme · Papyrus (Paper)',     base: 'light' },
-  { id: 'themis',          label: 'Theme · Amethyst (Themis)',   base: 'light' },
-  { id: 'themis-dark',     label: 'Theme · Amethyst Dark',       base: 'dark'  },
-];
-const THEME_BASES: Record<ThemeId, 'light' | 'dark'> = Object.fromEntries(
-  THEMES.map((t) => [t.id, t.base])
-) as Record<ThemeId, 'light' | 'dark'>;
+import { THEMES, getTheme, type ThemeId } from '@/data/themes';
 
 /**
  * ⌘K command palette — cmdk under the hood, Framer Motion for enter/exit.
@@ -93,19 +68,17 @@ export default function CommandPalette() {
     [router],
   );
 
-  // Apply a theme-pack by id — mirrors the logic in `components/ThemePicker.tsx`
-  // so ⌘K theme changes stay consistent with the nav picker.
+  // Apply a canonical theme-pack entry so ⌘K stays aligned with the nav picker.
   const applyThemePack = useCallback((id: ThemeId) => {
     setOpen(false);
     const html = document.documentElement;
-    const base = THEME_BASES[id];
-    if (base === 'dark') html.classList.add('dark');
+    const theme = getTheme(id);
+    if (theme.base === 'dark') html.classList.add('dark');
     else html.classList.remove('dark');
-    if (id === 'sakura-light' || id === 'sakura-dark') {
+    if (theme.dataTheme === null) {
       html.removeAttribute('data-theme');
     } else {
-      const attr = id === 'themis-dark' ? 'themis' : id;
-      html.setAttribute('data-theme', attr);
+      html.setAttribute('data-theme', theme.dataTheme);
     }
     localStorage.setItem('theme-pack', id);
     localStorage.removeItem('theme'); // drop legacy key
@@ -204,8 +177,8 @@ export default function CommandPalette() {
                     <PaletteItem
                       key={t.id}
                       icon={Palette}
-                      label={t.label}
-                      value={`theme ${t.id} ${t.label}`}
+                      label={t.commandLabel}
+                      value={`theme ${t.id} ${t.commandLabel}`}
                       onSelect={() => applyThemePack(t.id)}
                     />
                   ))}

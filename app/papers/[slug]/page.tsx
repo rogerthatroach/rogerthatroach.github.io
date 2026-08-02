@@ -19,10 +19,11 @@ export async function generateMetadata(
   const params = await props.params;
   const paper = PAPERS.find((p) => p.slug === params.slug);
   if (!paper) return { title: 'Paper not found' };
-  const description = paper.subtitle ?? paper.abstract.slice(0, 180);
+  const description = paper.subtitle ?? 'An in-progress working note on regulated AI engineering.';
   return {
-    title: `${paper.title} — Papers`,
-    description: paper.abstract.slice(0, 180),
+    title: paper.title,
+    description,
+    robots: paper.status === 'draft' ? { index: false, follow: true } : undefined,
     alternates: { canonical: `/papers/${paper.slug}` },
     openGraph: {
       title: paper.title,
@@ -30,7 +31,7 @@ export async function generateMetadata(
       url: `/papers/${paper.slug}`,
       siteName: 'Harmilap Singh Dhaliwal',
       locale: 'en_US',
-      type: 'article',
+      type: paper.status === 'published' ? 'article' : 'website',
       images: ['/og-image.png'],
     },
     twitter: {
@@ -41,8 +42,6 @@ export async function generateMetadata(
     },
   };
 }
-
-const SITE_URL = 'https://rogerthatroach.github.io';
 
 export default async function PaperLandingPage(
   props: {
@@ -63,25 +62,27 @@ export default async function PaperLandingPage(
     timeZone: 'UTC',
   });
 
-  const articleJsonLd = {
+  const articleJsonLd = !isDraft && paper.publishedAt ? {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: paper.title,
     description: paper.abstract.slice(0, 280),
     datePublished: citationDate,
-    author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: 'Harmilap Singh Dhaliwal' },
-    url: `${SITE_URL}/papers/${paper.slug}`,
-    mainEntityOfPage: `${SITE_URL}/papers/${paper.slug}`,
-    image: `${SITE_URL}/og-image.png`,
+    author: { '@type': 'Person', '@id': 'https://rogerthatroach.github.io/#person', name: 'Harmilap Singh Dhaliwal' },
+    url: `https://rogerthatroach.github.io/papers/${paper.slug}`,
+    mainEntityOfPage: `https://rogerthatroach.github.io/papers/${paper.slug}`,
+    image: 'https://rogerthatroach.github.io/og-image.png',
     inLanguage: 'en',
-  };
+  } : null;
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
+      {articleJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+        />
+      )}
       <ScrollProgressRail />
       <Nav />
       <main
@@ -98,7 +99,7 @@ export default async function PaperLandingPage(
 
         {/* Header */}
         <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
-          Paper · {paper.year} · {paper.pages} pp
+          {isDraft ? `Working note · ${paper.year}` : `Paper · ${paper.year}${paper.pages ? ` · ${paper.pages} pp` : ''}`}
         </p>
         <h1 className="mt-2 font-display text-2xl font-bold leading-tight tracking-tight text-text-primary sm:text-3xl md:text-4xl">
           {paper.title}
@@ -114,7 +115,7 @@ export default async function PaperLandingPage(
           {isDraft ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-amber-500">
               <Calendar size={10} aria-hidden="true" />
-              Drafting since {citationMonth}
+              In progress since {citationMonth}
             </span>
           ) : (
             <a
@@ -125,12 +126,12 @@ export default async function PaperLandingPage(
               className="group inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background"
             >
               <Download size={14} aria-hidden="true" />
-              Download PDF ({paper.pages} pp)
+              Download PDF{paper.pages ? ` (${paper.pages} pp)` : ''}
               <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
             </a>
           )}
           <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-            Stable URL · no version churn
+            {isDraft ? 'Not yet published or citable' : 'Versioned publication'}
           </span>
         </div>
 
@@ -207,34 +208,34 @@ export default async function PaperLandingPage(
           </section>
         )}
 
-        {/* Cite as */}
-        <section className="mt-12 border-t border-border-subtle pt-8">
-          <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-accent">
-            Cite as
-          </p>
-          <pre className="overflow-x-auto rounded-lg border border-border-subtle bg-surface/40 p-4 text-xs text-text-secondary">
-            <code className="font-mono">{`@techreport{${bibtexKey},
+        {/* Citation metadata exists only for published artifacts. */}
+        {!isDraft && (
+          <section className="mt-12 border-t border-border-subtle pt-8">
+            <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-accent">
+              Cite as
+            </p>
+            <pre className="overflow-x-auto rounded-lg border border-border-subtle bg-surface/40 p-4 text-xs text-text-secondary">
+              <code className="font-mono">{`@techreport{${bibtexKey},
   author      = {${bibtexAuthor}},
   title       = {${paper.title}},
   year        = {${paper.year}},
   month       = {${new Date(citationDate).toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' })}},
-  pages       = {${paper.pages}},
-  url         = {https://rogerthatroach.github.io/papers/${paper.slug}},
+${paper.pages ? `  pages       = {${paper.pages}},\n` : ''}  url         = {https://rogerthatroach.github.io/papers/${paper.slug}},
   institution = {Independent}
 }`}</code>
-          </pre>
-          <p className="mt-3 text-xs text-text-tertiary">
-            Plain text: <em className="text-text-secondary">{bibtexAuthor}. ({citationMonth}). {paper.title}. https://rogerthatroach.github.io/papers/{paper.slug}.</em>
-          </p>
-        </section>
+            </pre>
+            <p className="mt-3 text-xs text-text-tertiary">
+              Plain text: <em className="text-text-secondary">{bibtexAuthor}. ({citationMonth}). {paper.title}. https://rogerthatroach.github.io/papers/{paper.slug}.</em>
+            </p>
+          </section>
+        )}
 
         {/* Disclaimer */}
         <p className="mt-10 text-xs italic text-text-tertiary">
-          This paper describes architectural patterns and engineering decisions
+          This note describes architectural patterns and engineering decisions
           at a level of abstraction that does not reveal proprietary code,
-          data, or internal screenshots. Concrete details appear only where
-          they have already been shared publicly. Everything else is
-          generalised to the pattern.
+          data, or internal screenshots. Details are generalized to the pattern
+          where needed.
         </p>
       </main>
       <Footer />

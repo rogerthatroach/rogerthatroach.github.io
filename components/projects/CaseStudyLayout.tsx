@@ -46,11 +46,15 @@ const TOC_SECTIONS = [
   { id: 'lessons', label: 'Lessons Learned' },
 ] as const;
 
+const TOC_SECTIONS_WITHOUT_SEQUENCING = TOC_SECTIONS.filter(
+  (section) => section.id !== 'sequencing'
+);
+
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
     <motion.div
       id={id}
-      initial={{ opacity: 0, y: 16 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
       transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] as const }}
@@ -66,8 +70,11 @@ function Section({ id, title, children }: { id: string; title: string; children:
   );
 }
 
-function CaseStudyTOC() {
+function CaseStudyTOC({ showSequencing }: { showSequencing: boolean }) {
   const [activeId, setActiveId] = useState('');
+  const tocSections = showSequencing
+    ? TOC_SECTIONS
+    : TOC_SECTIONS_WITHOUT_SEQUENCING;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -80,13 +87,13 @@ function CaseStudyTOC() {
       { rootMargin: '-100px 0px -65% 0px', threshold: 0 }
     );
 
-    TOC_SECTIONS.forEach((s) => {
+    tocSections.forEach((s) => {
       const el = document.getElementById(s.id);
       if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [tocSections]);
 
   return (
     <nav
@@ -102,7 +109,7 @@ function CaseStudyTOC() {
           Contents
         </p>
         <ul>
-          {TOC_SECTIONS.map((s) => (
+          {tocSections.map((s) => (
             <li key={s.id}>
               <a
                 href={`#${s.id}`}
@@ -129,14 +136,18 @@ function CaseStudyTOC() {
 
 // Narrow-viewport ToC (< xl): a native <details> disclosure at the top of the
 // article. Same jump links as the sidebar; no JS, keyboard-accessible.
-function CaseStudyTOCMobile() {
+function CaseStudyTOCMobile({ showSequencing }: { showSequencing: boolean }) {
+  const tocSections = showSequencing
+    ? TOC_SECTIONS
+    : TOC_SECTIONS_WITHOUT_SEQUENCING;
+
   return (
     <details className="mt-8 rounded-lg border border-border-subtle bg-surface/50 xl:hidden">
       <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">
         On this page
       </summary>
       <ul className="border-t border-border-subtle px-2 py-2">
-        {TOC_SECTIONS.map((s) => (
+        {tocSections.map((s) => (
           <li key={s.id}>
             <a
               href={`#${s.id}`}
@@ -153,6 +164,7 @@ function CaseStudyTOCMobile() {
 
 export default function CaseStudyLayout({ project, caseStudy, diagram, showFormalBlogCta, showCompanionBlogCta }: CaseStudyLayoutProps) {
   const { sections } = caseStudy;
+  const hasSequencing = Boolean(caseStudy.sequencing);
   // Cold load → render the header (incl. the LCP title) at rest immediately for
   // fast LCP; in-app nav → play the FADE_UP entrance. See useHasNavigated.
   const hasNavigated = useHasNavigated();
@@ -166,7 +178,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
         {/* Centered on all widths; from xl, a [sticky ToC | article] grid so
             the ToC sits in its own column instead of overlapping the article. */}
         <div className="mx-auto max-w-content xl:flex xl:max-w-312 xl:gap-12">
-          <CaseStudyTOC />
+          <CaseStudyTOC showSequencing={hasSequencing} />
           <div className="min-w-0 xl:max-w-content xl:flex-1">
           {/* Breadcrumbs */}
           <div className="flex items-center gap-4">
@@ -222,7 +234,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             </p>
           </motion.div>
 
-          <CaseStudyTOCMobile />
+          <CaseStudyTOCMobile showSequencing={hasSequencing} />
 
           {/* Key stats */}
           <motion.div
@@ -259,7 +271,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             <motion.div
               custom={2}
               variants={FADE_UP}
-              initial="hidden"
+              initial={headerInitial}
               animate="visible"
               className="mt-10 rounded-xl border border-border-subtle bg-surface/50 p-6"
             >
@@ -329,7 +341,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
               {sections.optionsConsidered.map((opt, i) => (
                 <motion.div
                   key={opt.option}
-                  initial={{ opacity: 0, y: 12 }}
+                  initial={false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
                   transition={{ delay: i * 0.08, duration: 0.4 }}
@@ -372,7 +384,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
           {/* Architecture Diagram */}
           <Section id="architecture" title="Architecture">
             <p className="mb-4 text-xs text-text-tertiary">
-              Interactive diagram — hover nodes for details, pan and zoom to explore
+              Explore the diagram; selection, pan, zoom, and semantic controls are available where supported
             </p>
             {diagram}
           </Section>
@@ -395,7 +407,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
           {/* Leadership Moment — only if present */}
           {caseStudy.leadershipCallout && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={false}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
               transition={{ duration: 0.6 }}
@@ -420,7 +432,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
 
           {/* Tech Stack */}
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={false}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
@@ -442,7 +454,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
           {/* Blog Post CTAs — formal deep-dive + optional builder-register companion */}
           {(showFormalBlogCta || showCompanionBlogCta) && (
             <motion.div
-              initial={{ opacity: 0 }}
+              initial={false}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
               transition={{ duration: 0.6 }}
@@ -452,13 +464,13 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
                 <div className="rounded-lg border border-accent/20 bg-accent-muted p-6">
                   <p className="text-sm font-medium text-text-primary">Technical Deep Dive</p>
                   <p className="mt-2 text-sm text-text-secondary">
-                    The formal architecture, proofs, and implementation details.
+                    The architecture, assumptions, trade-offs, and implementation details.
                   </p>
                   <Link
                     href={`/blog/${caseStudy.blogPostSlug}`}
                     className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-text-primary"
                   >
-                    Read the technical paper
+                    Read the technical note
                     <ArrowRight size={14} />
                   </Link>
                 </div>

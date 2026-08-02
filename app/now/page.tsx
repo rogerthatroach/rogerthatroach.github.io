@@ -6,27 +6,46 @@ import Footer from '@/components/Footer';
 
 // Update this file every ~6 weeks. Sivers convention: three bullets,
 // concrete, present-tense. https://nownownow.com
-const UPDATED = 'June 2026';
+const UPDATED = 'August 2026';
 
 const BULLETS: { heading: string; body: string }[] = [
   {
     heading: 'Shipping',
-    body: 'PAR Assist in production — RBC\'s first bank-wide production AI agent. Pilot live April 2026; deployed bank-wide May 2026. Single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, N parallel Sonnet-4.5 extraction calls.',
+    body: 'PAR Assist is the first true agentic AI platform approved for production at the bank. Its pilot launched in April 2026, followed by a full CFO Group launch across all geographies in May. The production system uses a single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, and bounded parallel extraction calls.',
   },
   {
     heading: 'Building',
-    body: 'The next phase of the drafter: turning PAR Assist\'s single-agent envelope into a config-driven multi-agent framework. The orchestration, typed MCP tool registry, and field-group retrieval stay fixed — what changes for a new business problem is configuration, not code. Solidifying that architecture now, so the next drafting product is a config, not a rebuild.',
+    body: 'A multi-agent successor is in pilot. Further details will follow in a coordinated publication.',
   },
   {
     heading: 'Thinking about',
-    body: 'Product as configuration. If the drafter architecture is right, a second business problem shouldn\'t need a second system — it should need a different config over the same orchestration, tools, and retrieval. The hard part is keeping the framework general without letting it drift into abstraction. Every envelope you build should make the next one cheaper.',
+    body: 'How production feedback can improve coverage checks without widening the reviewed system boundary.',
   },
 ];
 
+const META_TITLE = 'Now';
+const META_DESCRIPTION = `What I'm focused on, as of ${UPDATED}. Three bullets, updated every few weeks. Sivers convention.`;
+const META_PATH = '/now';
+
 export const metadata: Metadata = {
-  title: 'Now — Harmilap Singh Dhaliwal',
-  description: `What I'm focused on, as of ${UPDATED}. Three bullets, updated every few weeks. Sivers convention.`,
-  alternates: { canonical: '/now' },
+  title: META_TITLE,
+  description: META_DESCRIPTION,
+  alternates: { canonical: META_PATH },
+  openGraph: {
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    url: META_PATH,
+    siteName: 'Harmilap Singh Dhaliwal',
+    locale: 'en_US',
+    type: 'website',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    images: ['/og-image.png'],
+  },
 };
 
 export default function NowPage() {

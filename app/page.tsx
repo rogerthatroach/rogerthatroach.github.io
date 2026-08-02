@@ -53,7 +53,7 @@ export default function Home() {
       <SectionProgress sections={HOME_SECTIONS} />
       <Hero />
 
-      {/* Through-line + Stats — thesis and proof in one block (was two sections) */}
+      {/* Career through-line and supporting metrics. */}
       <MetricsRibbon />
 
       {/* The Journey — interactive career timeline (click any role for
@@ -76,8 +76,8 @@ export default function Home() {
             </Link>
           </div>
           <p className="mb-6 max-w-2xl text-sm text-text-secondary">
-            Six systems across {YEARS_EXPERIENCE} years. From power plant combustion tuning to bank-wide agentic
-            AI.
+            Six systems across {YEARS_EXPERIENCE} years. From power plant combustion tuning to agentic AI
+            launched across RBC&rsquo;s full CFO Group.
           </p>
 
           <ProjectsHybridTable rows={projectRows} />

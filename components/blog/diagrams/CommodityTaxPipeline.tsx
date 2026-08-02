@@ -17,6 +17,7 @@ import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
 import { useThemeColor } from '@/lib/useThemeColor';
+import SemanticDiagramFallback from './SemanticDiagramFallback';
 
 /**
  * Commodity Tax architecture — "Pipeline + Transparency Rail" diagram.
@@ -25,16 +26,15 @@ import { useThemeColor } from '@/lib/useThemeColor';
  * with a parallel column of Tableau dashboard taps on the right. Each
  * pipeline stage has a "drill" edge to its dashboard partner. The
  * dashboards aren't where the pipeline emits — they sit alongside it,
- * letting analysts inspect any step independently. Every drill
- * ultimately resolves to a specific source GL row in the analyst-
- * inspector anchor at the bottom.
+ * giving analysts stage-aligned inspection views and source-row drill
+ * paths where the retained joins and mappings support them.
  *
  * The architectural punchline: transparency is a parallel surface to
- * compute, not a final emission. That's what made stakeholders trust
- * the automation enough to abandon the manual process.
+ * compute, not only a final output view. This creates review points
+ * throughout the workflow rather than concentrating them at the end.
  *
  * Visual register: same canvas + palette family as the Astraeus/Aegis
- * cascades (deterministic blue + Postgres-orange backbone), with
+ * cascades (coded-compute blue + data-services orange), with
  * transparency as a distinct amber register. Process automation is a
  * different family of system from LLM-as-Router; the diagram signals
  * that without losing site coherence.
@@ -44,7 +44,7 @@ import { useThemeColor } from '@/lib/useThemeColor';
 const COMPUTE = '#3b82f6';      // pipeline stages (deterministic, blue)
 const TRANSPARENCY = '#f59e0b'; // Tableau dashboards (attention amber)
 const DRILL = '#f59e0b';        // drill edges (same amber, slightly darker visually)
-const DATA = '#ea580c';         // CDP backbone rail
+const DATA = '#ea580c';         // data-services rail
 const HERO = '#d4a0a7';         // input + final return anchors
 const ANALYST = '#10b981';      // analyst-inspector terminus
 
@@ -111,7 +111,7 @@ function PillNode({ data }: NodeProps) {
 }
 const MemoPill = memo(PillNode);
 
-// ── Wide CDP rail ────────────────────────────────────────────────────
+// ── Wide data-services rail ─────────────────────────────────────────
 interface RailNodeData {
   label: string;
   tokens: string[];
@@ -221,8 +221,8 @@ const edgeTypes = { animated: AnimatedEdge };
 // parallel dashboard column on the RIGHT (x ≈ 540). Every pipeline
 // stage has a horizontal "drill" edge to its dashboard partner. A
 // subtle background-tinted column behind the dashboards visually
-// signals "transparency rail." CDP backbone runs underneath the whole
-// diagram (matches the Postgres rail in Astraeus + Aegis).
+// signals "transparency rail." A public data-services abstraction runs
+// underneath the whole diagram.
 
 const PIPELINE_X = 130;
 const DASHBOARD_X = 540;
@@ -234,7 +234,7 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: 20, y: 10 },
     data: {
-      text: 'Tableau as transparency layer · 5 stages · drill any step → source GL row',
+      text: 'Stage-aligned inspection · 5 stages · source-row drill paths',
       color: HERO,
       size: 'sm',
       dashedBorder: true,
@@ -248,7 +248,7 @@ const initialNodes: Node[] = [
     type: 'label',
     position: { x: PIPELINE_X - 20, y: 60 },
     data: {
-      text: 'Pipeline · PySpark on CDP',
+      text: 'Pipeline · distributed data processing',
       color: COMPUTE,
       size: 'xs',
     } satisfies LabelNodeData,
@@ -273,7 +273,7 @@ const initialNodes: Node[] = [
     position: { x: PIPELINE_X - 20, y: 110 },
     data: {
       label: 'GL journals',
-      sub: '~10–50M rows / cycle',
+      sub: 'journal extract for the cycle',
       color: HERO,
       size: 'sm',
     } satisfies PillNodeData,
@@ -288,7 +288,7 @@ const initialNodes: Node[] = [
     data: {
       badge: 'S1',
       label: 'Extract',
-      sub: 'PySpark · GL pull',
+      sub: 'distributed GL pull',
       color: COMPUTE,
       size: 'md',
     } satisfies PillNodeData,
@@ -341,21 +341,21 @@ const initialNodes: Node[] = [
     data: {
       badge: 'S5',
       label: 'Return',
-      sub: 'CFO sign-off ready',
+      sub: 'review package',
       color: COMPUTE,
       size: 'md',
     } satisfies PillNodeData,
     draggable: false,
   },
 
-  // ═══ Filed return (output) ═══
+  // ═══ Reviewed allocation output ═══
   {
     id: 'output',
     type: 'pill',
     position: { x: PIPELINE_X - 8, y: 790 },
     data: {
-      label: 'Filed return',
-      sub: '$600M tax allocation · 90 min/cycle',
+      label: 'Allocation output',
+      sub: 'assembled for analyst review',
       color: HERO,
       size: 'sm',
       glow: true,
@@ -371,7 +371,7 @@ const initialNodes: Node[] = [
     data: {
       badge: 'TAP',
       label: 'GL inspector',
-      sub: 'raw row browser',
+      sub: 'source-row browser',
       color: TRANSPARENCY,
       size: 'sm',
     } satisfies PillNodeData,
@@ -423,7 +423,7 @@ const initialNodes: Node[] = [
     data: {
       badge: 'TAP',
       label: 'Return preview',
-      sub: 'final + cited',
+      sub: 'candidate output + trace links',
       color: TRANSPARENCY,
       size: 'sm',
     } satisfies PillNodeData,
@@ -437,7 +437,7 @@ const initialNodes: Node[] = [
     position: { x: DASHBOARD_X - 8, y: 790 },
     data: {
       label: 'Analyst drill-down',
-      sub: 'every dashboard → source row',
+      sub: 'follow retained links to source rows',
       color: ANALYST,
       size: 'sm',
       glow: true,
@@ -445,26 +445,26 @@ const initialNodes: Node[] = [
     draggable: false,
   },
 
-  // ═══ CDP backbone ═══
+  // ═══ Public data-services abstraction ═══
   {
     id: 'rail-label',
     type: 'label',
     position: { x: 30, y: 880 },
     data: {
-      text: 'Everything reads/writes below · CDP (Cloudera Data Platform)',
+      text: 'Pipeline data, mapping, reconciliation, and audit services',
       color: DATA,
       size: 'xs',
     } satisfies LabelNodeData,
     draggable: false,
   },
   {
-    id: 'cdp',
+    id: 'data-services',
     type: 'rail',
     position: { x: 30, y: 910 },
     data: {
-      label: 'CDP backbone',
+      label: 'Data services',
       color: DATA,
-      tokens: ['gl_journals', 'reconciliation', 'mappings', 'aggregations', 'returns', 'audit'],
+      tokens: ['journal records', 'reconciliation', 'mapping versions', 'aggregations', 'review outputs', 'audit records'],
       width: 820,
     } satisfies RailNodeData,
     draggable: false,
@@ -506,6 +506,8 @@ export default function CommodityTaxPipeline() {
     <div
       className="relative w-full"
       style={{ aspectRatio: '880 / 980' }}
+      role="group"
+      aria-label="Commodity Tax allocation pipeline and inspection views"
     >
       {/* Subtle column-tint behind the dashboard rail — visually says
           "this column is the transparency layer" without an explicit
@@ -524,9 +526,50 @@ export default function CommodityTaxPipeline() {
         }}
       />
 
+      <SemanticDiagramFallback
+        title="Commodity Tax allocation pipeline"
+        summary="A five-stage allocation workflow is paired with stage-aligned inspection views. Those views let analysts inspect transformations and follow retained reconciliation and mapping links toward source journal rows."
+        steps={[
+          {
+            title: 'Extract journal data',
+            detail: 'The cycle begins with a distributed pull of the in-scope general-ledger records.',
+          },
+          {
+            title: 'Reconcile periods',
+            detail: 'Journal records are aligned to the applicable tax periods and reconciliation differences are surfaced.',
+          },
+          {
+            title: 'Apply category mappings',
+            detail: 'Versioned rules map ledger accounts into allocation categories, with a corresponding mapping view.',
+          },
+          {
+            title: 'Aggregate',
+            detail: 'Mapped records are rolled up by allocation category and exposed through review pivots.',
+          },
+          {
+            title: 'Assemble the review output',
+            detail: 'The workflow produces a candidate allocation package and trace links for analyst review.',
+          },
+          {
+            title: 'Drill through retained evidence',
+            detail: 'Analysts can follow supported links across output, mapping, reconciliation, and source-row views.',
+          },
+        ]}
+        notes={[
+          'Traceability depends on retained joins, mapping versions, and audit records; exceptions still require analyst review.',
+          'Exact scale, financial-scope, and run-time figures sit outside this architecture view.',
+        ]}
+      />
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        nodesFocusable={false}
+        edgesFocusable={false}
+        elementsSelectable={false}
+        deleteKeyCode={null}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}

@@ -18,8 +18,8 @@ const RESUME_METRICS = [
   },
   {
     value: HUMANA_ACCURACY,
-    label: 'Document Pipeline Accuracy',
-    context: 'Humana — up from ~70%',
+    label: 'Checkbox Detection Accuracy',
+    context: 'Humana — up from a ~70% baseline',
   },
   {
     value: COMMODITY_TAX_EFFICIENCY,
@@ -28,7 +28,7 @@ const RESUME_METRICS = [
   },
   {
     value: String(PRODUCTION_SYSTEMS_COUNT),
-    label: 'Production Gen AI Systems',
+    label: 'Production AI Systems',
     context: 'PAR Assist · Astraeus · Aegis',
   },
 ];
@@ -41,7 +41,9 @@ export default function ResumeMetrics() {
           <span className="font-mono text-2xl font-bold leading-tight text-text-primary sm:text-3xl md:text-4xl">
             {m.value}
           </span>
+          <span className="sr-only"> — </span>
           <span className="mt-2 text-xs font-medium text-text-primary">{m.label}</span>
+          <span className="sr-only">; </span>
           <span className="mt-0.5 text-[10px] text-text-tertiary">{m.context}</span>
         </div>
       ))}

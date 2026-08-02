@@ -1,4 +1,4 @@
-import { AgenticArchitecture, SubAgentExecution, PermissionCascade, EventModelAnimation } from "@/components/blog/BlogDiagrams"
+import { PermissionCascade, EventModelAnimation } from "@/components/blog/BlogDiagrams"
 import AstraeusCascade from '@/components/blog/diagrams/AstraeusCascade'
 import MathBlock from '@/components/blog/MathBlock';
 import { tex } from '@/lib/katex';
@@ -9,24 +9,24 @@ import CitationRef from '@/components/blog/CitationRef';
 
 ## Abstract
 
-Large Language Models (LLMs) have demonstrated remarkable capability in natural language understanding, yet their probabilistic nature and opaque reasoning present fundamental challenges for enterprise financial systems requiring deterministic correctness, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that leverages language model strengths (intent classification, semantic parsing) while explicitly preventing their weaknesses (unreliable computation, data leakage) from affecting system outputs. We formalize the separation of concerns between an intent-side LLM layer and a deterministic computation layer separated by two structural walls (metadata-only on the way down, aggregates-only on the way up), prove that this architecture preserves data confidentiality under defined threat models, and describe the production implementation at a major bank's CFO Group: 5 to 8 GPT-4.1 calls per query arranged in four stages (gate, parallel metadata extraction, answer, synthesis) sandwiching Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 cost centres, where the equivalent headcount-movement queries previously took days and now return in real time at any granularity.
+Large Language Models (LLMs) have demonstrated strong natural-language capability, yet their probabilistic outputs and opaque reasoning present challenges for enterprise financial systems that need reproducible computation, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that limits models to intent parsing and answer phrasing while conventional code performs entitlement checks and numerical computation. We describe two application boundaries (metadata-oriented inputs on the way down, authorized aggregates on the way up), state the assumptions under which raw-record payloads stay outside application-managed model context, and identify residual risks that still require testing and monitoring. The production implementation at a major bank's CFO Group uses 5 to 8 approved-model calls per query across four stages (gate, parallel metadata extraction, answer, synthesis) around Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 cost centres, turning days-long line-of-business requests into interactive analysis across authorized hierarchy scopes.
 
-<VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed walls separate the three bands: LLM intent (gate / parallel metadata extraction), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM answer and synthesis (1 answer call on the simple path, or 3 parallel answer calls plus 1 synthesis call on the cross-domain path). Only parsed metadata crosses down; only structured aggregates cross up. Single Postgres backbone beneath.">
-  {(isVisible) => <AstraeusCascade />}
+<VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed boundaries separate the three bands: LLM intent (gate / parallel metadata extraction), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM answer and synthesis (1 answer call on the simple path, or 3 parallel answer calls plus 1 synthesis call on the cross-domain path). The declared application path sends metadata toward compute and authorized structured aggregates toward answer calls; payload tests and monitoring verify that boundary. Transactional persistence supports the compute and audit paths.">
+  <AstraeusCascade />
 </VisualizationContainer>
 
 ## 1. Introduction
 
-Enterprise AI systems operating on sensitive financial data face a trilemma: they must be *intelligent* (understand natural language queries), *correct* (produce deterministic, auditable results), and *secure* (enforce fine-grained access controls). Existing LLM-powered analytics tools typically sacrifice correctness and security for intelligence, passing sensitive data through model context windows and relying on probabilistic inference for computation <CitationRef id={1} /><CitationRef id={2} />.
+Enterprise AI systems operating on sensitive financial data have to combine three different properties: natural-language interpretation, reproducible numerical computation, and fine-grained access control. Architectures that place data and arithmetic inside one model call make those properties harder to test independently <CitationRef id={1} /><CitationRef id={2} />.
 
-We argue that this tradeoff is architectural, not fundamental. By decomposing the system into two layers with distinct computational properties (a stateless, data-free intent detection layer powered by an LLM, and a stateful, data-rich deterministic computation layer powered by conventional software) we achieve all three properties simultaneously.
+The pattern decomposes the system into components with distinct responsibilities: a model-based intent layer, a stateful compute layer, and model-based answer phrasing over authorized aggregate results. This does not make the full response deterministic or eliminate exposure risk; it makes the numerical and entitlement paths independently testable and narrows what application data the model receives.
 
 The contributions of this paper are:
 
 1. A formal definition of the **LLM-as-Router** architecture pattern for enterprise AI
-2. A proof that the architecture preserves data confidentiality under a defined threat model
-3. A formalization of permission-to-SQL entitlement translation as a lattice-preserving mapping
-4. A production validation at enterprise scale
+2. A conditional analysis of the application-managed model-context boundary and its residual risks
+3. A formalization of permission-to-SQL entitlement translation under explicit mapping assumptions
+4. A production implementation at enterprise scale
 
 ## 2. Problem Formulation
 
@@ -36,20 +36,20 @@ Let <InlineEquation html={tex("\\mathcal{Q}")} /> denote the space of natural la
 
 <TheoremBlock variant="definition" number={1} title="System Requirements">
   <div className="mb-3">
-    <strong>Requirement 1 (Semantic Understanding).</strong> <InlineEquation html={tex("f")} /> must map semantically equivalent queries to equivalent responses:
+    <strong>Requirement 1 (Semantic Understanding).</strong> Semantically equivalent queries should map to the same validated intent representation, subject to the supported intent schema:
   </div>
-  <MathBlock html={tex("q_1 \\equiv_{\\text{sem}} q_2 \\implies f(q_1) = f(q_2)", true)} />
+  <MathBlock html={tex("q_1 \\equiv_{\\text{sem}} q_2 \\implies \\phi(q_1) = \\phi(q_2)", true)} />
   <div className="mb-3">
-    <strong>Requirement 2 (Deterministic Correctness).</strong> For any query <InlineEquation html={tex("q")} /> with a well-defined answer <InlineEquation html={tex("r^*")} /> derivable from <InlineEquation html={tex("\\mathcal{D}")} />, the system must return exactly <InlineEquation html={tex("r^*")} />:
+    <strong>Requirement 2 (Reproducible Computation).</strong> For a validated intent <InlineEquation html={tex("\\phi(q)")} />, fixed versioned inputs, and a fixed entitlement snapshot, the numerical compute function should return the same structured result <InlineEquation html={tex("r^*")} />:
   </div>
-  <MathBlock html={tex("f(q) = r^* = g(\\mathcal{D}, \\phi(q))", true)} />
+  <MathBlock html={tex("g(\\mathcal{D}|_{P(u)}, \\phi(q)) = r^*", true)} />
   <div className="mb-1 text-xs text-text-tertiary">
     where <InlineEquation html={tex("\\phi(q)")} /> is the structured representation of <InlineEquation html={tex("q")} /> and <InlineEquation html={tex("g")} /> is a deterministic computation function.
   </div>
   <div className="mb-3 mt-3">
-    <strong>Requirement 3 (Data Confidentiality).</strong> The LLM component <InlineEquation html={tex("\\mathcal{L}")} /> must never observe any element of <InlineEquation html={tex("\\mathcal{D}")} />:
+    <strong>Requirement 3 (Raw-Record Boundary).</strong> Application-managed model inputs should exclude raw workforce and financial records <InlineEquation html={tex("\\mathcal{D}_{\\text{raw}}")} />. User queries and authorized aggregates remain in model context:
   </div>
-  <MathBlock html={tex("\\mathcal{L}.\\text{context} \\cap \\mathcal{D} = \\emptyset", true)} />
+  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{raw}} = \\emptyset", true)} />
   <div className="mb-3">
     <strong>Requirement 4 (Entitlement Enforcement).</strong> For a user <InlineEquation html={tex("u")} /> with permission set <InlineEquation html={tex("P(u)")} />, the visible data must be restricted:
   </div>
@@ -65,11 +65,7 @@ A monolithic architecture passes both the query and relevant data into a single 
 
 <MathBlock html={tex("f_{\\text{mono}}(q) = \\mathcal{L}(q, \\mathcal{D}_{\\text{relevant}})", true)} />
 
-This violates Requirement 3 by construction. It also violates Requirement 2 because LLM outputs are stochastic: the same prompt produces different outputs across invocations <CitationRef id={3} />. Temperature zero does not guarantee determinism across model versions or API updates.
-
-<VisualizationContainer minHeight={400} caption="Figure 1: Monolithic vs. LLM-as-Router architecture comparison. The monolithic approach passes data through the LLM context, violating confidentiality and determinism guarantees.">
-  {(isVisible) => <AgenticArchitecture />}
-</VisualizationContainer>
+When <InlineEquation html={tex("\\mathcal{D}_{\\text{relevant}}")} /> contains raw records, this shape exceeds the Requirement 3 boundary. It also puts numerical reasoning in a probabilistic component: the same prompt can produce different outputs across invocations <CitationRef id={3} />, and temperature zero does not guarantee stability across model versions or API updates.
 
 ## 3. Architecture: LLM-as-Router
 
@@ -77,19 +73,22 @@ This violates Requirement 3 by construction. It also violates Requirement 2 beca
 
 <TheoremBlock variant="definition" number={2} title="LLM-as-Router Architecture">
   <div className="mb-2">
-    A system <InlineEquation html={tex("\\mathcal{S}")} /> implements the LLM-as-Router pattern if it decomposes into two components:
+    A system <InlineEquation html={tex("\\mathcal{S}")} /> implements the LLM-as-Router pattern if it decomposes into intent, computation, and answer-shaping components:
   </div>
-  <MathBlock html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}", true)} />
+  <MathBlock html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{answer}} \\circ \\mathcal{A}_{\\text{compute}} \\circ \\mathcal{L}_{\\text{route}}", true)} />
   <div className="mb-1">where:</div>
   <ul className="list-inside list-disc space-y-1">
     <li>
       <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} /> is a <strong>routing function</strong> implemented by an LLM, mapping natural language queries to a structured intent space <InlineEquation html={tex("\\mathcal{I}")} />
     </li>
     <li>
-      <InlineEquation html={tex("\\mathcal{A}_{\\text{compute}}: \\mathcal{I} \\times \\mathcal{D} \\rightarrow \\mathcal{R}")} /> is a <strong>computation function</strong> implemented by deterministic agents, mapping intents and data to responses
+      <InlineEquation html={tex("\\mathcal{A}_{\\text{compute}}: \\mathcal{I} \\times \\mathcal{D} \\rightarrow \\mathcal{R}_{\\text{structured}}")} /> is a <strong>computation function</strong> implemented by deterministic modules, mapping validated intents and entitled data to structured results
     </li>
     <li>
-      <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> receives no element of <InlineEquation html={tex("\\mathcal{D}")} /> as input
+      <InlineEquation html={tex("\\mathcal{L}_{\\text{answer}}")} /> receives authorized structured aggregates and phrases them for the user; its output is checked against the structured result
+    </li>
+    <li>
+      Application-managed model inputs exclude <InlineEquation html={tex("\\mathcal{D}_{\\text{raw}}")} /> under the boundary assumptions in Section 4
     </li>
   </ul>
 </TheoremBlock>
@@ -107,88 +106,69 @@ where:
 - <InlineEquation html={tex("\\tau \\in \\mathcal{T}")} /> is the **temporal specification** (point-in-time, range, trend)
 - <InlineEquation html={tex("\\omega \\in \\Omega")} /> is the **output format** (table, chart, summary, report)
 
-The intent space is finite and enumerable, which is what makes the downstream agents deterministic: they handle a known set of structured inputs, not open-ended natural language.
+The intent space is finite and enumerable, which lets downstream compute modules validate a known set of structured inputs rather than accept open-ended natural language. The model's intent selection remains probabilistic and is evaluated separately.
 
 ### 3.3 Call Layering and Stage Orchestration
 
-The production system organizes LLM work into **5 to 8 calls per query** arranged in four stages. Stages 1 and 2 sit on the LLM *intent* side of the deterministic wall; stages 3 and 4 sit on the LLM *answer-shaping* side, downstream of the deterministic compute layer.
+The production system organizes LLM work into **5 to 8 calls per query** arranged in four stages. Stages 1 and 2 sit on the LLM *intent* side of the compute boundary; stages 3 and 4 sit on the LLM *answer-shaping* side, downstream of deterministic numerical computation.
 
-**Stage 1 — Gate (one LLM call).** A single gate call validates the query against three concerns at the door: is it relevant to Astraeus, is it a prompt-injection attempt, and is it within the scoped domain set. If the gate rejects, execution terminates here. Neither downstream LLM work nor the deterministic compute layer is touched.
+**Stage 1 — Gate (one LLM call).** A single gate call screens the query for three concerns at the door: relevance to Astraeus, prompt-injection indicators, and membership in the scoped domain set. A rejection terminates this path. The gate is one control, not proof that adversarial inputs cannot pass.
 
-**Stage 2 — Parallel metadata extraction (three parallel LLM calls).** Three metadata-extract calls fire in parallel, one per domain (Headcount, HR Costs / EPM, Open Positions). Each call returns rich domain-scoped metadata (time range, organizational scope, comparison shape) *without* any data access. This is the final LLM touch before the first wall. The deterministic Python layer between stages handles dispatch, parallelization, re-gating (privilege checks at each handoff), and typed JSON validation contracts at every stage boundary.
+**Stage 2 — Parallel metadata extraction (three parallel LLM calls).** Three metadata-extract calls fire in parallel, one per domain (Headcount, HR Costs / EPM, Open Positions). Under the declared stage contract, each call receives the query and reviewed metadata rather than direct access to operational data stores, then returns domain-scoped metadata (time range, organizational scope, comparison shape). This is the final LLM touch before the first wall. The deterministic Python layer between stages handles dispatch, parallelization, entitlement checks at relevant handoffs, and typed JSON validation contracts.
 
-**Stage 3 — Answer (one or three LLM calls; branches by query complexity).** After the deterministic compute layer returns aggregates, the system branches. On the simple path (single-domain query), one answer call composes the response and becomes the final output: stage 4 is skipped. On the cross-domain path, three answer calls fire in parallel, one per domain, each phrasing its slice from the aggregate it owns.
+**Stage 3 — Answer (one or three LLM calls; branches by query complexity).** After the deterministic compute layer returns authorized aggregates, the system branches. On the simple path (single-domain query), one answer call composes the response and stage 4 is skipped. On the cross-domain path, three answer calls fire in parallel, one per domain, each phrasing its slice from the aggregate it owns. These calls do see aggregate values, and their phrasing is probabilistic.
 
-**Stage 4 — Synthesis (one LLM call, cross-domain path only).** When stage 3 fans out across domains, a final synthesis call combines the three domain-specific answers into a single coherent response. The contract on this call's inputs is typed and structured: the synthesis LLM phrases the answer, but the numerical reconciliation rules (how rollups interact, which base number anchors the cross-domain join) are enforced by the validation contract on its inputs, not by freeform LLM reasoning. Total calls: 5 on the simple path (gate + 3 metadata + 1 answer); 8 on the cross-domain path (gate + 3 metadata + 3 answer + 1 synthesis).
+**Stage 4 — Synthesis (one LLM call, cross-domain path only).** When stage 3 fans out across domains, a final synthesis call combines the three domain-specific answers. Inputs are typed and structured; numerical reconciliation is computed before the call, and the generated response is checked against the structured aggregate payload. A failed check follows a fallback path rather than being accepted as evidence of correctness. Total calls: 5 on the simple path (gate + 3 metadata + 1 answer); 8 on the cross-domain path (gate + 3 metadata + 3 answer + 1 synthesis).
 
-Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic compute agents <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
+Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic compute modules <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
 
 <MathBlock html={tex("\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})", true)} />
 
-In the production system <InlineEquation html={tex("k = 3")} />: a cost agent, a headcount agent, and an open positions agent. These execute in parallel:
+In the production system <InlineEquation html={tex("k = 3")} />: cost, headcount, and open-positions compute modules. When a query spans more than one supported domain, eligible modules can run concurrently against the same versioned snapshot. Each produces an isolated typed output, and a separately tested merge combines those outputs. This is an operating contract for the conventional compute layer, not a proof that arbitrary parallel execution is equivalent to a selected single-module path. Model-based answer calls remain stochastic and are checked separately against their authorized aggregate inputs.
 
-<MathBlock html={tex("\\mathcal{A}_{\\text{compute}} = A_1 \\| A_2 \\| A_3", true)} />
-
-<TheoremBlock variant="proposition" number={1} title="Parallel Correctness">
-  <div>
-    If each compute agent <InlineEquation html={tex("A_j")} /> is deterministic and operates on disjoint data partitions, then parallel execution preserves correctness:
-  </div>
-  <MathBlock html={tex("\\forall j \\neq j': \\mathcal{D}_j \\cap \\mathcal{D}_{j'} = \\emptyset \\implies (A_1 \\| A_2 \\| A_3)(i, \\mathcal{D}) = A_{c(i)}(i, \\mathcal{D}_{c(i)})", true)} />
-</TheoremBlock>
-
-<TheoremBlock variant="proof">
-  <div>
-    Since each compute agent reads only from its own data partition and writes only to its own output buffer, there are no read-write conflicts. The routing function <InlineEquation html={tex("c(i)")} /> selects exactly one agent per query. The other agents either idle (no matching intent) or handle independent concurrent queries. By the absence of shared mutable state, parallel execution is equivalent to serial execution of the selected agent. The same parallel-correctness argument applies symmetrically to the answer-stage LLM calls on the cross-domain path, which operate on disjoint domain-aggregate inputs and write to disjoint output slots. <InlineEquation html={tex("\\square")} />
-  </div>
-</TheoremBlock>
-
-<VisualizationContainer minHeight={400} caption="Figure 2: Compute-agent parallel execution. Select a query type to see how the router dispatches to the corresponding agent track while others remain idle.">
-  {(isVisible) => <SubAgentExecution />}
-</VisualizationContainer>
-
-## 4. Data Confidentiality Guarantee
+## 4. Application-Managed Data Boundary
 
 ### 4.1 Threat Model
 
-We consider a threat model where the LLM provider is an honest-but-curious adversary: it faithfully processes inputs but may retain or leak context window contents. This is the standard concern for enterprise LLM deployment <CitationRef id={4} />.
+For this analysis, assume the model provider processes submitted context but that any submitted value could be retained or exposed. This is one bounded threat scenario <CitationRef id={4} />, not a complete security model: compromised application code, user-entered sensitive text, authorization defects, model-output leakage, and logging systems must be assessed separately.
 
-<TheoremBlock variant="definition" number={3} title="Context Exposure Set">
+<TheoremBlock variant="definition" number={3} title="Application-Managed Context Set">
   <div>
-    The context exposure set <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L})")} /> of an LLM component <InlineEquation html={tex("\\mathcal{L}")} /> is the union of all inputs provided to <InlineEquation html={tex("\\mathcal{L}")} /> across all invocations:
+    The application-managed context set <InlineEquation html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L})")} /> is the union of system prompts, metadata, and generated payloads the application supplies to model calls. User-authored query text is tracked separately because a user can place sensitive content in it:
   </div>
-  <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}) = \\bigcup_{t} \\text{input}_t(\\mathcal{L})", true)} />
+  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) = \\bigcup_{t} \\bigl(\\text{input}_t(\\mathcal{L}) \\setminus \\{q_t\\}\\bigr)", true)} />
 </TheoremBlock>
 
-<TheoremBlock variant="theorem" number={1} title="Data Confidentiality">
+<TheoremBlock variant="theorem" number={1} title="Raw-Record Exclusion Under Declared Inputs">
   <div>
-    In an LLM-as-Router architecture <InlineEquation html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{route}} \\circ \\mathcal{A}_{\\text{compute}}")} />, if <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> receives only elements of <InlineEquation html={tex("\\mathcal{Q}")} /> (natural language queries) and system prompts <InlineEquation html={tex("\\mathcal{P}")} /> (containing schema metadata but no data values), then:
+    Let <InlineEquation html={tex("\\mathcal{D}_{\\text{raw}}")} /> be raw workforce and financial records and <InlineEquation html={tex("\\mathcal{A}_{\\text{authorized}}")} /> be aggregates already filtered for the requesting user. If routing calls receive only reviewed prompts and schema metadata, answer calls receive only <InlineEquation html={tex("\\mathcal{A}_{\\text{authorized}}")} />, and neither set contains raw-record payloads, then:
   </div>
-  <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}_{\\text{route}}) \\cap \\mathcal{D} = \\emptyset", true)} />
+  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{raw}} = \\emptyset", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
   <div className="mb-2">
-    By construction, <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} />. The input to <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}")} /> at each invocation is <InlineEquation html={tex("(q_t, p)")} /> where <InlineEquation html={tex("q_t \\in \\mathcal{Q}")} /> and <InlineEquation html={tex("p \\in \\mathcal{P}")} />. Since <InlineEquation html={tex("\\mathcal{Q}")} /> contains only user-generated natural language and <InlineEquation html={tex("\\mathcal{P}")} /> contains only structural metadata (table names, column types, domain labels, not data values), and <InlineEquation html={tex("\\mathcal{D}")} /> contains only data values (employee records, financial figures, organizational assignments):
+    Under the stated input contract, application-managed routing context is drawn from reviewed prompts and schema metadata, while answer context is drawn from authorized aggregate results:
   </div>
-  <MathBlock html={tex("\\mathcal{E}(\\mathcal{L}_{\\text{route}}) = \\bigcup_t \\{q_t\\} \\cup \\{p\\} \\subseteq \\mathcal{Q} \\cup \\mathcal{P}", true)} />
+  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\subseteq \\mathcal{P}_{\\text{reviewed}} \\cup \\mathcal{M}_{\\text{schema}} \\cup \\mathcal{A}_{\\text{authorized}}", true)} />
   <div>
-    Since <InlineEquation html={tex("(\\mathcal{Q} \\cup \\mathcal{P}) \\cap \\mathcal{D} = \\emptyset")} /> by the domain separation assumption, the result follows. <InlineEquation html={tex("\\square")} />
+    The empty-intersection result follows only from the declared disjointness assumption. It is a specification to test, not evidence that the implementation always satisfies it. Payload classification, authorization, aggregate construction, and call-site inventory are all load-bearing controls.
   </div>
 </TheoremBlock>
 
-<TheoremBlock variant="corollary" number={1}>
+<TheoremBlock variant="remark">
   <div>
-    Even if the LLM provider retains all context window contents indefinitely, no sensitive enterprise data is exposed.
+    This boundary does not mean zero data exposure. Model calls contain user query text and authorized aggregates, either of which may be sensitive. Users can also paste raw values into a query. Provider terms, encryption, retention, DLP, redaction, output validation, and incident response remain necessary controls.
   </div>
 </TheoremBlock>
 
 ### 4.2 Boundary Enforcement
 
-The confidentiality guarantee holds only if the architectural boundary is enforced; i.e., no code path exists that passes data values to the LLM. In the production system, this is enforced by:
+The raw-record boundary depends on all model call sites honoring the declared contract. The production design narrows and tests that surface through:
 
-1. **Interface typing:** The routing function's input type signature accepts only <code className="rounded-sm bg-surface px-1.5 py-0.5 font-mono text-xs">(query: string, system_prompt: string)</code>; no data parameters exist in the function signature
-2. **Network isolation:** The LLM API call originates from a service that has no database credentials and no access to data stores
-3. **Audit logging:** Every LLM invocation is logged with its full input, enabling automated verification that <InlineEquation html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D} = \\emptyset")} />
+1. **Interface typing:** The routing function's declared input accepts query text and reviewed prompt metadata rather than a raw-record payload. Types reduce accidental coupling but do not stop unsafe values inside strings.
+2. **Network isolation:** The model-calling service does not hold database credentials; authorized aggregate payloads arrive through a narrower application interface.
+3. **Call-site inventory and testing:** Registered call sites, payload schemas, redaction tests, and controlled inspection provide evidence that raw-record fields are not sent. Logging itself follows minimization and access-control rules rather than retaining unrestricted prompt contents.
 
 ## 5. Entitlement Model: Permission-to-SQL Translation
 
@@ -220,7 +200,7 @@ Enterprise Performance Management (EPM) systems enforce access control through m
 
 ### 5.3 The Translation Pipeline
 
-The production system implements this translation as a five-stage pipeline:
+The production system implements this translation as a four-mapping pipeline:
 
 <MathBlock html={tex("\\text{Domains} \\xrightarrow{\\alpha} \\text{Access Groups} \\xrightarrow{\\beta} \\text{Entity Sets} \\xrightarrow{\\gamma} \\text{Cost-Centre Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
 
@@ -238,21 +218,21 @@ The production system implements this translation as a five-stage pipeline:
   </code>
 </div>
 
-<TheoremBlock variant="proposition" number={2} title="Entitlement Preservation">
+<TheoremBlock variant="proposition" number={2} title="Conditional Entitlement Monotonicity">
   <div>
-    The translation pipeline preserves the lattice structure of enterprise permissions: if user <InlineEquation html={tex("u_1")} /> has a subset of <InlineEquation html={tex("u_2")} />'s permissions in the entitlement system, then <InlineEquation html={tex("u_1")} /> sees a subset of <InlineEquation html={tex("u_2")} />'s data in SQL:
+    If every translation stage is complete, monotone with respect to set inclusion, evaluated against the same versioned entitlement snapshot, and compiled without a broader fallback, then a user with a permission subset receives a data subset:
   </div>
   <MathBlock html={tex("P(u_1) \\subseteq P(u_2) \\implies \\mathcal{D}|_{P(u_1)} \\subseteq \\mathcal{D}|_{P(u_2)}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
   <div>
-    Each stage <InlineEquation html={tex("\\alpha, \\beta, \\gamma, \\delta")} /> is monotone with respect to set inclusion. If <InlineEquation html={tex("P(u_1) \\subseteq P(u_2)")} />, then <InlineEquation html={tex("\\alpha(P(u_1)) \\subseteq \\alpha(P(u_2))")} /> (fewer permission grants leads to fewer security groups), <InlineEquation html={tex("\\beta(\\alpha(P(u_1))) \\subseteq \\beta(\\alpha(P(u_2)))")} /> (fewer security groups leads to fewer employees), and so on. Since each stage preserves subset relationships, the composition preserves them. <InlineEquation html={tex("\\square")} />
+    Under the stated assumptions, composition of the monotone mappings <InlineEquation html={tex("\\alpha, \\beta, \\gamma, \\delta")} /> preserves subset relationships. The mathematical result does not establish that production mappings are complete or correctly configured; differential authorization tests, snapshot/version checks, fail-closed behavior, and access reviews provide that operating evidence.
   </div>
 </TheoremBlock>
 
-<VisualizationContainer minHeight={400} caption="Figure 3: Permission-to-SQL translation pipeline. Toggle between two different permission sets to see how the output SQL changes at each stage.">
-  {(isVisible) => <PermissionCascade />}
+<VisualizationContainer minHeight={400} caption="Figure 2: Permission-to-SQL translation pipeline. Toggle between two different permission sets to see how the output SQL changes at each stage.">
+  <PermissionCascade />
 </VisualizationContainer>
 
 ## 6. Event-Driven Data Model
@@ -275,41 +255,41 @@ We instead model workforce movements as a stream of discrete events at the trans
 
 ### 6.2 Automatic Reconciliation
 
-<TheoremBlock variant="theorem" number={2} title="Intra-Rollup Transfer Netting">
+<TheoremBlock variant="theorem" number={2} title="Intra-Rollup Transfer Netting Under Paired Events">
   <div>
-    For any rollup <InlineEquation html={tex("R")} />, if an employee <InlineEquation html={tex("e")} /> transfers from position <InlineEquation html={tex("p_1")} /> to position <InlineEquation html={tex("p_2")} /> where both <InlineEquation html={tex("p_1, p_2 \\in R")} />, then the net headcount change for <InlineEquation html={tex("R")} /> is zero:
+    For any rollup <InlineEquation html={tex("R")} />, if a transfer is represented by one correctly paired, de-duplicated Move Out and Move In event, and both positions <InlineEquation html={tex("p_1, p_2 \\in R")} />, then its net headcount contribution to <InlineEquation html={tex("R")} /> is zero:
   </div>
   <MathBlock html={tex("\\Delta H(R) = \\sum_{e \\in \\text{events}(R)} \\text{sign}(e) = (+1)_{\\text{Move In}} + (-1)_{\\text{Move Out}} = 0", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="proof">
   <div>
-    An intra-rollup transfer generates exactly two events: a Lateral Move Out from <InlineEquation html={tex("p_1")} /> (counted as <InlineEquation html={tex("-1")} />) and a Lateral Move In to <InlineEquation html={tex("p_2")} /> (counted as <InlineEquation html={tex("+1")} />). Since both positions belong to the same rollup <InlineEquation html={tex("R")} />, the contribution to <InlineEquation html={tex("\\Delta H(R)")} /> is <InlineEquation html={tex("-1 + 1 = 0")} />. <InlineEquation html={tex("\\square")} />
+    Given the paired-event premise, the Lateral Move Out from <InlineEquation html={tex("p_1")} /> contributes <InlineEquation html={tex("-1")} /> and the Lateral Move In to <InlineEquation html={tex("p_2")} /> contributes <InlineEquation html={tex("+1")} />. Since both positions belong to <InlineEquation html={tex("R")} />, the contribution is <InlineEquation html={tex("-1 + 1 = 0")} />. Missing pairs, duplicate events, late-arriving corrections, or hierarchy-version errors violate the premise and require reconciliation checks.
   </div>
 </TheoremBlock>
 
-This is guaranteed by construction, not by post-hoc reconciliation. The event model makes double-counting structurally impossible.
+The event representation makes correct netting testable, but it does not make source or mapping defects impossible. Pairing, uniqueness, completeness, and hierarchy-version checks are what establish the premise in operation.
 
-<VisualizationContainer minHeight={400} caption="Figure 4: Event model animation. Drag an employee between positions to see how Lateral Move Out and Lateral Move In events fire, with headcount counters updating in real-time.">
-  {(isVisible) => <EventModelAnimation />}
+<VisualizationContainer minHeight={400} caption="Figure 3: Event model illustration. Select a destination to see how Lateral Move Out and Lateral Move In events fire, with headcount counters updating as the simulated events are applied.">
+  <EventModelAnimation />
 </VisualizationContainer>
 
-## 7. Production Validation
+## 7. Production Implementation
 
-The architecture has been deployed in production at a major bank's CFO Group since November 2025, with the following measured characteristics:
+The architecture has been deployed in production at a major bank's CFO Group since November 2025. The table summarizes published implementation characteristics; it is not a performance evaluation.
 
 <div className="my-6 overflow-x-auto">
   <table className="w-full text-sm">
     <thead>
       <tr className="border-b border-border-subtle text-left text-text-tertiary">
-        <th className="pb-2 pr-4 font-medium">Metric</th>
+        <th className="pb-2 pr-4 font-medium">Characteristic</th>
         <th className="pb-2 font-medium">Value</th>
       </tr>
     </thead>
     <tbody className="text-text-secondary">
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">LLM model</td>
-        <td className="py-2 font-mono">GPT-4.1 (intent side only)</td>
+        <td className="py-2 font-mono">Approved production model</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">LLM calls per query</td>
@@ -328,12 +308,12 @@ The architecture has been deployed in production at a major bank's CFO Group sin
         <td className="py-2 font-mono">~9,000</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">User-facing query latency</td>
-        <td className="py-2 font-mono">Real time at any granularity (was: days, line-of-business only)</td>
+        <td className="py-2 pr-4">User-facing analysis</td>
+        <td className="py-2 font-mono">Interactive across supported, authorized hierarchy scopes</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Compute-layer latency</td>
-        <td className="py-2 font-mono">Millisecond-level across arbitrary cuts (Cython compute path)</td>
+        <td className="py-2 pr-4">Compute path</td>
+        <td className="py-2 font-mono">Cython-optimized for supported production query shapes</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">Answer-stage parallelism (Stage 3, cross-domain path)</td>
@@ -341,7 +321,7 @@ The architecture has been deployed in production at a major bank's CFO Group sin
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">LLM data exposure</td>
-        <td className="py-2 font-mono">Zero (by construction, per Theorem 1)</td>
+        <td className="py-2 font-mono">No raw-record payloads by declared interface; queries and authorized aggregates remain in context</td>
       </tr>
       <tr className="border-b border-border-subtle/50">
         <td className="py-2 pr-4">Entitlement model</td>
@@ -349,43 +329,34 @@ The architecture has been deployed in production at a major bank's CFO Group sin
       </tr>
       <tr>
         <td className="py-2 pr-4">Persistence</td>
-        <td className="py-2 font-mono">Single Postgres (event log · entitlement catalog · hierarchies · audit)</td>
+        <td className="py-2 font-mono">Transactional records for events · entitlements · hierarchies · audit</td>
       </tr>
     </tbody>
   </table>
 </div>
 
-The system delivers financial insights through three channels: a production-grade dynamic dashboard, a conversational chatbot interface, and inbox-ready HTML reports, all enforcing the same entitlement model.
+The system supports financial analysis through three channels: a dynamic dashboard, a conversational interface, and inbox-ready HTML reports, each using the shared entitlement path described above.
 
 ### 7.1 The "Impossible" Capability
 
-Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between any two arbitrary groups over any arbitrary time window"*) was off the table. Previous attempts had modelled the problem as factorial: with ~40K leaf-level cost centres queryable in any combination, pre-aggregating the answer space is combinatorially infeasible. Astraeus reframes this as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The factorial is in the framing, not in the data. Arbitrary-combination ins-outs is now the default capability, answered in real time at any granularity (the Cython compute path itself runs in milliseconds).
+Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between selected groups over a selected time window"*) was off the table. With roughly 40,000 leaf-level cost centres queryable in authorized combinations, precomputing the combinatorial subset-selection space is infeasible. Astraeus reframes each supported request as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The implementation supports interactive ins-outs analysis across authorized hierarchy scopes; the Cython path is optimized for those production query shapes.
 
 ## 8. Related Work
 
 The separation of LLM reasoning from data computation relates to several active research threads:
 
-**Tool-use architectures.** ReAct <CitationRef id={5} /> and Toolformer <CitationRef id={6} /> demonstrate LLMs using external tools, but typically pass data through the LLM context for reasoning. Our architecture is stricter: the LLM never sees data, only intents.
+**Tool-use architectures.** ReAct <CitationRef id={5} /> and Toolformer <CitationRef id={6} /> demonstrate LLMs using external tools. This implementation uses a narrower application data contract: routing calls receive queries and metadata, while answer calls receive authorized aggregates rather than raw workforce records.
 
-**Guardrailed generation.** NeMo Guardrails <CitationRef id={7} /> and similar frameworks add safety filters around LLM outputs. Our approach is complementary but more fundamental: rather than filtering unsafe outputs, we prevent unsafe inputs.
+**Guardrailed generation.** NeMo Guardrails <CitationRef id={7} /> and similar frameworks add safety filters around LLM outputs. This architecture is complementary: it narrows and tests the declared inputs to each model call rather than relying only on output filters. Payload classification, redaction, and call-site coverage remain fallible controls that require monitoring.
 
-**Text-to-SQL.** DIN-SQL <CitationRef id={8} /> and DAIL-SQL <CitationRef id={9} /> achieve strong results on benchmarks but assume the LLM can access schema and data. Our architecture restricts the LLM to schema metadata only.
+**Text-to-SQL.** DIN-SQL <CitationRef id={8} /> and DAIL-SQL <CitationRef id={9} /> achieve strong results on benchmarks but assume the LLM can access schema and data. This implementation keeps raw records in the compute layer: intent calls use schema metadata, while answer calls receive authorized aggregates.
 
-**Agentic frameworks.** LangGraph <CitationRef id={10} />, AutoGen <CitationRef id={11} />, and CrewAI provide orchestration primitives. Our contribution is the formal separation guarantee and the entitlement-preserving data layer, which are architecture-level concerns above the framework level.
+**Agentic frameworks.** LangGraph <CitationRef id={10} />, AutoGen <CitationRef id={11} />, and CrewAI provide orchestration primitives. The contribution here is an explicit separation of model, compute, and entitlement responsibilities, together with assumptions that can be tested at their boundaries.
 
 ## 9. Conclusion
 
-The LLM-as-Router pattern resolves the intelligence-correctness-security trilemma by architectural decomposition rather than compromise. By proving that the data confidentiality guarantee holds under an honest-but-curious threat model, and that the entitlement translation preserves the permission lattice, we provide formal foundations for deploying LLM-powered systems in regulated enterprise environments.
+The LLM-as-Router pattern separates natural-language interpretation from numerical computation and entitlement enforcement. Under declared input, mapping, and snapshot assumptions, the model describes useful boundary properties; production confidence still depends on authorization tests, payload inspection, output validation, monitoring, and human accountability.
 
 The key insight is simple but consequential: **use LLMs for what they're good at (understanding language), and use deterministic systems for what they're good at (computing answers).** The architectural boundary between these two capabilities is where trust is built.
 
 {/* References and Further Reading rendered by PostLayout from data/posts/index.ts */}
-
-
----
-
-### Reference implementation
-
-Working code, synthetic data, and reproducible plots: [`rogerthatroach/astraeus-llm-as-router`](https://github.com/rogerthatroach/astraeus-llm-as-router).
-
-A 100-query synthetic eval, 4 users with varied access scopes, and the 5-stage cascade composed end-to-end. The pytest suite asserts that hallucinated entities are caught at the entity stage and cross-domain leak attempts are caught at the domain stage, independently of the LLM, which is exactly the point.

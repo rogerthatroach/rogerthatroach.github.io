@@ -6,6 +6,18 @@ import { isPostSlugPublic } from '@/data/posts';
 import CaseStudyLayout from '@/components/projects/CaseStudyLayout';
 import ProjectDiagram from '@/components/projects/ProjectDiagram';
 
+const MAX_META_DESCRIPTION_LENGTH = 160;
+
+function truncateDescription(text: string): string {
+  const normalized = text.trim().replace(/\s+/g, ' ');
+  if (normalized.length <= MAX_META_DESCRIPTION_LENGTH) return normalized;
+
+  const candidate = normalized.slice(0, MAX_META_DESCRIPTION_LENGTH - 1);
+  const lastBoundary = candidate.lastIndexOf(' ');
+  const truncated = lastBoundary > 0 ? candidate.slice(0, lastBoundary) : candidate;
+  return `${truncated.trimEnd()}…`;
+}
+
 export function generateStaticParams() {
   return CASE_STUDIES.map((cs) => ({ slug: cs.projectId }));
 }
@@ -20,13 +32,14 @@ export async function generateMetadata(
   if (!project) return {};
 
   const title = `${project.title} — ${project.subtitle}`;
+  const description = truncateDescription(project.caption);
   return {
     title,
-    description: project.caption,
+    description,
     alternates: { canonical: `/projects/${params.slug}` },
     openGraph: {
       title,
-      description: project.caption,
+      description,
       url: `/projects/${params.slug}`,
       siteName: 'Harmilap Singh Dhaliwal',
       locale: 'en_US',
@@ -36,7 +49,7 @@ export async function generateMetadata(
     twitter: {
       card: 'summary_large_image',
       title,
-      description: project.caption,
+      description,
       images: ['/og-image.png'],
     },
   };

@@ -10,41 +10,41 @@ import { tex } from '@/lib/katex'
 
 Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews: these workflows are high-stakes, document-heavy, and riddled with institutional knowledge that lives in people's heads rather than systems.
 
-Most teams throw a chatbot at this. But the user doesn't need a Q&A interface. They need a *collaborator*: something that understands where they are in a multi-step process, holds context across the entire session, pulls the right reference material at the right moment, and resolves contradictions between policy documents without the user knowing there was a conflict.
+A chatbot alone does not cover that workflow. The user needs something that understands where they are in a multi-step process, holds context across the session, pulls relevant reference material at the right moment, and surfaces contradictions between policy sources so the author can resolve them.
 
-That's a fundamentally different problem than retrieval-augmented generation <CitationRef id={7} />. It's an orchestration problem over a structured form, inside a regulated-institution governance envelope. This paper formalizes the architectural pattern that solves it, as deployed at PAR Assist inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
+Retrieval-augmented generation is one component of the design <CitationRef id={7} />. The system-level problem is orchestration over a structured form inside a regulated-institution governance envelope. This paper describes the architectural pattern used for PAR Assist inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
 
 ## 2. Problem Formulation
 
 ### 2.1 System Requirements
 
-Let <InlineEquation html={tex("\\mathcal{W}")} /> denote the space of enterprise workflows, <InlineEquation html={tex("\\mathcal{U}")} /> the space of user utterances, <InlineEquation html={tex("\\mathcal{D}")} /> the heterogeneous document corpus, <InlineEquation html={tex("\\mathcal{F}_T")} /> the target field set of the chosen template, and <InlineEquation html={tex("\\mathcal{S}")} /> the state space tracking workflow progress. We seek a system <InlineEquation html={tex("\\Phi")} /> that guides users through <InlineEquation html={tex("\\mathcal{W}")} /> while satisfying five formal requirements:
+Let <InlineEquation html={tex("\\mathcal{W}")} /> denote the space of enterprise workflows, <InlineEquation html={tex("\\mathcal{U}")} /> the space of user utterances, <InlineEquation html={tex("\\mathcal{D}")} /> the heterogeneous document corpus, <InlineEquation html={tex("\\mathcal{F}_T")} /> the target field set of the chosen template, and <InlineEquation html={tex("\\mathcal{S}")} /> the state space tracking workflow progress. We seek a system <InlineEquation html={tex("\\Phi")} /> that guides users through <InlineEquation html={tex("\\mathcal{W}")} /> while meeting five design requirements:
 
 <TheoremBlock variant="definition" number={1} title="System Requirements">
-**Requirement 1 (Context Isolation).** The LLM component <InlineEquation html={tex("\\mathcal{L}")} /> must never observe sensitive operational data <InlineEquation html={tex("\\mathcal{D}_{\\text{sensitive}}")} />:
+**Requirement 1 (Bounded Context).** The application should pass the LLM component <InlineEquation html={tex("\\mathcal{L}")} /> only user inputs, reference material, and tool summaries classified and authorized for model processing. If <InlineEquation html={tex("\\mathcal{D}_{\\text{approved}}")} /> is that reviewed input set, the intended boundary is:
 
-<MathBlock html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{sensitive}} = \\emptyset", true)} />
+<MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\subseteq \\mathcal{U}_{\\text{approved}} \\cup \\mathcal{D}_{\\text{approved}} \\cup \\mathcal{P}_{\\text{approved}}", true)} />
 
-**Requirement 2 (Stateful Orchestration).** The system maintains workflow state <InlineEquation html={tex("s \\in \\mathcal{S}")} /> across an unbounded number of interaction turns:
+**Requirement 2 (Stateful Orchestration).** The system maintains declared workflow state <InlineEquation html={tex("s \\in \\mathcal{S}")} /> across the many turns of a retained session:
 
 <MathBlock html={tex("s_{t+1} = \\delta(s_t, u_t, a_t), \\quad \\delta: \\mathcal{S} \\times \\mathcal{U} \\times \\mathcal{A} \\to \\mathcal{S}", true)} />
 
-**Requirement 3 (Field-Group Retrieval).** The corpus <InlineEquation html={tex("\\mathcal{D}")} /> is partitioned into a field-group taxonomy <InlineEquation html={tex("\\mathcal{G} = \\{g_1, \\ldots, g_K\\}")} /> that maps to disjoint target-field subsets <InlineEquation html={tex("\\mathcal{F}_{g_k} \\subseteq \\mathcal{F}_T")} />. Retrieval is two-stage, scoped by relevance at the group level:
+**Requirement 3 (Field-Group Retrieval).** A field-group taxonomy <InlineEquation html={tex("\\mathcal{G} = \\{g_1, \\ldots, g_K\\}")} /> assigns each target field one expected owner group <InlineEquation html={tex("\\mathcal{F}_{g_k} \\subseteq \\mathcal{F}_T")} />. Reference subsets <InlineEquation html={tex("\\mathcal{D}_g \\subseteq \\mathcal{D}")} /> may overlap because one policy passage can inform several fields. Retrieval is two-stage and scoped by relevant group:
 
 <MathBlock html={tex("\\text{retrieve}(q, s_t) = \\bigoplus_{g \\in G(q, s_t)} \\kappa\\bigl(\\operatorname{top}_{k}(q, s_t, \\mathcal{D}_g)\\bigr)", true)} />
 
 where <InlineEquation html={tex("G(q, s_t) \\subseteq \\mathcal{G}")} /> is the relevant-group set from Stage 1, <InlineEquation html={tex("\\operatorname{top}_k")} /> is the per-group Stage 2 similarity search, and <InlineEquation html={tex("\\kappa")} /> is a compression operator fitting the payload to the LLM context budget.
 
-**Requirement 4 (Auditability).** Every system action is a typed, logged tool invocation <CitationRef id={1} /><CitationRef id={2} />:
+**Requirement 4 (Auditability).** Every action registered in the agent tool surface should be a typed, logged invocation <CitationRef id={1} /><CitationRef id={2} />:
 
-<MathBlock html={tex("\\forall a \\in \\mathcal{A}: a = T_k(\\text{input}_k) \\mapsto \\text{output}_k \\in \\text{AuditLog}", true)} />
+<MathBlock html={tex("\\forall a \\in \\mathcal{A}_{\\text{registered}}: a = T_k(\\text{input}_k) \\land \\operatorname{commit}(a) \\implies a \\in \\text{AuditLog}", true)} />
 
-**Requirement 5 (Single-Agent Envelope).** The system must exhibit agentic behaviour (branching dialog, parallel specialized work, multi-turn state) without instantiating multi-agent primitives. Formally, there is exactly one agent-shaped entity <InlineEquation html={tex("\\alpha")} /> in the control surface; all parallelism is delegated to typed tools dispatched by a deterministic orchestrator.
+**Requirement 5 (Single-Agent Envelope).** The reviewed v1 control surface contains one agent-shaped workflow. Independent, scoped model calls may run concurrently, but they do not hold autonomous control or communicate as sub-agents; graph code dispatches them as registered tool work and validates their outputs.
 </TheoremBlock>
 
 ### 2.2 Why Monolithic Architectures Fail
 
-A monolithic LLM <InlineEquation html={tex("\\Phi_{\\text{mono}}(u_t) = \\mathcal{L}(u_t, \\mathcal{D}, s_t)")} /> violates Requirement 1 by construction <CitationRef id={10} />, lacks Requirement 2, and cannot satisfy Requirement 4. Sequential chain architectures <CitationRef id={12} /> address none of these. A naïve multi-agent design satisfies Requirements 1–4 but violates Requirement 5, which disqualifies it from first-deployment approval in regulated environments.
+A monolithic LLM <InlineEquation html={tex("\\Phi_{\\text{mono}}(u_t) = \\mathcal{L}(u_t, \\mathcal{D}, s_t)")} /> places the corpus directly in model context, which is incompatible with Requirement 1 when that corpus contains material outside the approved model-processing boundary <CitationRef id={10} />. It also provides neither durable workflow state nor a complete action log on its own. A simple linear chain <CitationRef id={12} /> would need added routing, loop, and persistence logic for this workflow. A naïve multi-agent design would violate Requirement 5, which disqualified it from this first-deployment approval path.
 
 ## 3. Architecture
 
@@ -58,30 +58,28 @@ An agentic workflow system is a directed graph <InlineEquation html={tex("G = (V
 - <InlineEquation html={tex("\\mathcal{S}")} /> is the shared persistent state space
 - <InlineEquation html={tex("\\delta: \\mathcal{S} \\times \\mathcal{U} \\times \\mathcal{A} \\to \\mathcal{S}")} /> is the state transition function
 
-Each node reads from <InlineEquation html={tex("\\mathcal{S}")} />, performs its computation via typed MCP tools <CitationRef id={5} /><CitationRef id={6} />, and writes back.
+Each node reads from <InlineEquation html={tex("\\mathcal{S}")} />. Registered action nodes invoke typed MCP tools <CitationRef id={5} /><CitationRef id={6} /> and write declared results back to state.
 </TheoremBlock>
 
-<VisualizationContainer minHeight={1040} caption="Figure 1. The envelope. Dashed boundary is the v1 single-agent governance scope. Inside: intake → template MCP tool with decision-tree dialog → stage-1 field-group hub → N parallel extraction lanes (top-10 chunks · compression · Sonnet-4.5 extraction call per group) → dict-union merge → coverage analyzer with clarify-loop back to template. Postgres rail carries every write.">
-{() => <AgenticArchitecturePAR />}
+<VisualizationContainer minHeight={400} caption="Figure 1. The envelope. Dashed boundary is the v1 single-agent governance scope. Inside: intake → template MCP tool with decision-tree dialog → stage-1 field-group hub → bounded parallel extraction lanes (scoped chunks · compression · approved extraction-model call per group) → ownership-aware merge → coverage analyzer with clarify-loop back to template. The transactional state rail carries registered workflow writes.">
+<AgenticArchitecturePAR />
 </VisualizationContainer>
 
-<TheoremBlock variant="proposition" number={1} title="State Persistence Across Turns">
-The workflow state <InlineEquation html={tex("s_t")} /> at turn <InlineEquation html={tex("t")} /> encodes the complete interaction history:
+<TheoremBlock variant="definition" title="Retained-State Contract">
+For a retained session, workflow state <InlineEquation html={tex("s_t")} /> at turn <InlineEquation html={tex("t")} /> is designed to encode the declared fields needed to resume the registered path:
 
 <MathBlock html={tex("s_t = \\delta(s_{t-1}, u_t, a_t) = \\delta(\\ldots\\delta(s_0, u_1, a_1)\\ldots, u_t, a_t)", true)} />
-</TheoremBlock>
 
-<TheoremBlock variant="proof">
-By induction on <InlineEquation html={tex("t")} />. Base case: <InlineEquation html={tex("s_0")} /> is the initial state. Inductive step: <InlineEquation html={tex("\\delta")} /> is deterministic, and <InlineEquation html={tex("\\mathcal{S}")} /> includes the merged extraction dictionary, coverage report, pending follow-ups, and the complete MCP tool-invocation log, so no information is lost. The LangGraph Postgres checkpointer <CitationRef id={6} /> materializes <InlineEquation html={tex("s_t")} /> atomically, making durability a property of the store rather than the application layer.
+At each transition, <InlineEquation html={tex("\\delta")} /> writes the merged extraction dictionary, coverage report, pending follow-ups, and tool-invocation references required by the next node. The LangGraph checkpointer <CitationRef id={6} /> commits that declared state to the transactional workflow store. This is an application contract, not a mathematical persistence guarantee: resume depends on successful commits, configured retention, and a complete state schema.
 </TheoremBlock>
 
 ### 3.2 Why LangGraph Over Vanilla Chains
 
-LangChain's sequential chains implement <InlineEquation html={tex("f = f_n \\circ \\cdots \\circ f_1")} />, insufficient for conditional-branching workflows. LangGraph <CitationRef id={6} /> models the workflow as a directed graph with conditional routing:
+LangChain's basic sequential-chain shape implements <InlineEquation html={tex("f = f_n \\circ \\cdots \\circ f_1")} />. This workflow needed conditional routing, loops, and durable checkpoints in addition to that linear composition. LangGraph <CitationRef id={6} /> exposes those concepts directly:
 
 <MathBlock html={tex("v_{\\text{next}} = \\text{Router}(s_t) = \\begin{cases} v_{\\text{clarify}} & \\text{if open\\_followups}(s_t) \\\\ v_{\\text{retrieve}} & \\text{if groups\\_pending}(s_t) \\\\ v_{\\text{extract}} & \\text{if chunks\\_ready}(s_t) \\\\ v_{\\text{merge}} & \\text{if extractions\\_complete}(s_t) \\\\ v_{\\text{respond}} & \\text{if coverage\\_clear}(s_t) \\end{cases}", true)} />
 
-LangGraph was picked for maturity (the most stable production-deployed graph orchestrator at evaluation time) and because PAR drafting is shaped like a graph, not a pipeline. Multi-agent-first frameworks (CrewAI, AutoGen <CitationRef id={4} />) were considered but not deeply evaluated. Their primitives would have violated Requirement 5.
+LangGraph was selected because its graph, routing, tool, and checkpoint abstractions matched the evaluated workflow. Multi-agent-first frameworks (CrewAI, AutoGen <CitationRef id={4} />) were considered but not deeply evaluated, so this is not a market ranking. Their agent primitives also sat outside the approved v1 envelope.
 
 ### 3.3 MCP Tools as the Action Layer
 
@@ -90,23 +88,25 @@ A Model Context Protocol tool <InlineEquation html={tex("T_k")} /> is a typed fu
 
 <MathBlock html={tex("T_k: \\text{Input}_k \\to \\text{Output}_k", true)} />
 
-The tool set <InlineEquation html={tex("\\mathcal{T} = \\{T_{\\text{ingest}}, T_{\\text{template}}, T_{\\text{retrieve}_1}, T_{\\text{retrieve}_2}, T_{\\text{compress}}, T_{\\text{extract}}, T_{\\text{merge}}, T_{\\text{coverage}}\\}")} /> defines the complete action boundary of the agent.
+The tool set <InlineEquation html={tex("\\mathcal{T} = \\{T_{\\text{ingest}}, T_{\\text{template}}, T_{\\text{retrieve}_1}, T_{\\text{retrieve}_2}, T_{\\text{compress}}, T_{\\text{extract}}, T_{\\text{merge}}, T_{\\text{coverage}}\\}")} /> defines the registered action boundary of the workflow described here.
 </TheoremBlock>
 
-<TheoremBlock variant="theorem" number={1} title="Action Boundary Enforcement">
-<MathBlock html={tex("\\forall a \\in \\mathcal{A},\\; \\exists k: a = T_k(\\text{input}_k) \\implies a \\in \\text{AuditLog}", true)} />
+<TheoremBlock variant="definition" title="Registered-Action Logging Contract">
+<MathBlock html={tex("\\forall a \\in \\mathcal{A}_{\\text{registered}},\\; \\exists k: a = T_k(\\text{input}_k) \\land \\operatorname{commit}(a) \\implies a \\in \\text{AuditLog}", true)} />
+
+For the registered workflow path, the LangGraph execution engine dispatches actions through <InlineEquation html={tex("\\mathcal{T}")} />. A successful invocation is expected to write a typed record to the transactional audit store with the state transition. This configured invariant does not rule out an implementation bypass, a failed transaction, or an unregistered administrative path. Access controls, integration tests, and log-completeness monitoring remain part of Requirement 4.
 </TheoremBlock>
 
-<TheoremBlock variant="proof">
-By construction. The LangGraph execution engine dispatches actions exclusively through <InlineEquation html={tex("\\mathcal{T}")} />; no code path exists outside the tool registry. Each invocation writes a typed record to the Postgres audit table as part of the transactional commit of <InlineEquation html={tex("\\delta")} />, so Requirement 4 holds unconditionally.
-</TheoremBlock>
-
-Template selection is itself an MCP tool. <InlineEquation html={tex("T_{\\text{template}}")} /> accepts the user's uploaded material and decision-tree answers (project type, spend tier, business line, regulatory exposure) and returns a typed template identifier with confidence and rationale, so even the act of choosing *what PAR we are writing* is auditable.
+Template selection is itself an MCP tool. <InlineEquation html={tex("T_{\\text{template}}")} /> accepts the user's uploaded material and decision-tree answers (project type, spend tier, business line, regulatory exposure) and returns a typed template identifier with confidence and rationale. When the call and its state transition commit successfully, the retained record gives reviewers evidence for how the proposed template was chosen.
 
 ### 3.4 Two-Stage Field-Group Retrieval
 
 <TheoremBlock variant="definition" number={4} title="Field-Group Taxonomy">
-A field-group taxonomy is a partition <InlineEquation html={tex("\\mathcal{G} = \\{g_1, \\ldots, g_K\\}")} /> of the corpus <InlineEquation html={tex("\\mathcal{D} = \\bigsqcup_{g \\in \\mathcal{G}} \\mathcal{D}_g")} /> such that each group maps to a disjoint subset of target fields <InlineEquation html={tex("\\mathcal{F}_g \\subseteq \\mathcal{F}_T")} /> with <InlineEquation html={tex("\\mathcal{F}_{g_i} \\cap \\mathcal{F}_{g_j} = \\emptyset")} /> for <InlineEquation html={tex("i \\neq j")} />. A group aggregates policies, guidelines, historical examples, and few-shot good/bad exemplars for its field subset.
+A field-group taxonomy <InlineEquation html={tex("\\mathcal{G} = \\{g_1, \\ldots, g_K\\}")} /> assigns each target field to one expected owner group:
+
+<MathBlock html={tex("\\mathcal{F}_T = \\bigsqcup_{g \\in \\mathcal{G}} \\mathcal{F}_g", true)} />
+
+Each group also has an associated reference subset <InlineEquation html={tex("\\mathcal{D}_g \\subseteq \\mathcal{D}")} /> containing policies, guidelines, historical examples, and few-shot exemplars relevant to its fields. These reference subsets are not required to be disjoint: a source passage may support more than one group. The ownership rule applies to target fields, not to evidence.
 </TheoremBlock>
 
 <TheoremBlock variant="definition" number={5} title="Two-Stage Retrieval Function">
@@ -114,27 +114,25 @@ A field-group taxonomy is a partition <InlineEquation html={tex("\\mathcal{G} = 
 
 <MathBlock html={tex("G(q, s_t) = \\{\\, g \\in \\mathcal{G} : \\operatorname{sim}(\\varphi_{\\mathcal{G}}(q, s_t),\\, \\varphi_{\\mathcal{G}}(g)) \\geq \\tau_{\\text{group}} \\,\\}", true)} />
 
-**Stage 2 (chunk retrieval).** For each <InlineEquation html={tex("g \\in G(q, s_t)")} />, run scoped top-<InlineEquation html={tex("k")} /> similarity search over <InlineEquation html={tex("\\mathcal{D}_g")} /> only (production uses <InlineEquation html={tex("k=10")} />):
+**Stage 2 (chunk retrieval).** For each <InlineEquation html={tex("g \\in G(q, s_t)")} />, run a bounded top-<InlineEquation html={tex("k_g")} /> similarity search over the references associated with <InlineEquation html={tex("\\mathcal{D}_g")} />:
 
-<MathBlock html={tex("\\mathcal{C}_g = \\operatorname{top}_{k}\\bigl(\\varphi_g(q, s_t),\\, \\mathcal{D}_g\\bigr)", true)} />
+<MathBlock html={tex("\\mathcal{C}_g = \\operatorname{top}_{k_g}\\bigl(\\varphi_g(q, s_t),\\, \\mathcal{D}_g\\bigr)", true)} />
 
 **Compression.** Each group's chunk set is reduced by a custom compression operator <InlineEquation html={tex("\\kappa")} /> to fit the per-call LLM context budget:
 
 <MathBlock html={tex("\\hat{\\mathcal{C}}_g = \\kappa(\\mathcal{C}_g) \\quad \\text{where } |\\hat{\\mathcal{C}}_g| \\ll |\\mathcal{C}_g|", true)} />
 
-Similarity uses cosine over an embedding model trained for the corpus <CitationRef id={9} />:
+Similarity uses cosine over a pretrained embedding model selected for the corpus <CitationRef id={9} />:
 
 <MathBlock html={tex("\\operatorname{sim}(\\mathbf{e}_q, \\mathbf{e}_{d}) = \\frac{\\mathbf{e}_q \\cdot \\mathbf{e}_{d}}{\\|\\mathbf{e}_q\\|\\,\\|\\mathbf{e}_{d}\\|}", true)} />
 </TheoremBlock>
 
-<TheoremBlock variant="proposition" number={2} title="Retrieval Scope Correctness">
-Field-group partitioning ensures every retrieved chunk belongs to a group whose target fields are currently extractable:
+<TheoremBlock variant="definition" title="Configured Retrieval-Scope Contract">
+If every target field has a configured owner, reference-to-group mappings are current, and retrieval enforces its group filter, every returned chunk is associated with at least one selected group whose owned target fields are in scope:
 
 <MathBlock html={tex("\\forall c \\in \\bigcup_{g \\in G(q, s_t)} \\hat{\\mathcal{C}}_g: \\exists g \\in G(q, s_t) \\text{ such that } c \\in \\mathcal{D}_g \\wedge \\mathcal{F}_g \\cap \\mathcal{F}_T \\neq \\emptyset", true)} />
-</TheoremBlock>
 
-<TheoremBlock variant="proof">
-Immediate from the partition structure of Definition 4 and the selection criterion in Stage 1. Because <InlineEquation html={tex("\\mathcal{D}_g \\cap \\mathcal{D}_{g'} = \\emptyset")} /> for distinct groups, no chunk appears in unrelated retrieval scopes, which is the structural correction flat top-<InlineEquation html={tex("k")} /> retrieval cannot provide.
+This is an association contract enforced through configuration and filtering, not a relevance or completeness theorem. Overlap between <InlineEquation html={tex("\\mathcal{D}_g")} /> sets is allowed. The property remains conditional on taxonomy quality, indexing correctness, and enforcement of the group filter; stale mappings or retrieval bugs violate the premise and require validation and monitoring.
 </TheoremBlock>
 
 ### 3.5 Parallel Extraction Within a Single-Agent Envelope
@@ -144,21 +142,19 @@ Let <InlineEquation html={tex("N = |G(q, s_t)|")} />. For each relevant group <I
 
 <MathBlock html={tex("J_g = T_{\\text{extract}}\\bigl(\\mathcal{L},\\,\\hat{\\mathcal{C}}_g,\\, \\mathcal{F}_g,\\, \\Pi_g\\bigr) \\in \\text{JSON}(\\mathcal{F}_g)", true)} />
 
-executes in parallel (at most one LLM invocation per group, bounded by the per-group token budget; production uses Sonnet-4.5 with up to 20 fields per system prompt). <InlineEquation html={tex("\\Pi_g")} /> carries per-group guardrails, instructions, and few-shot good/bad exemplars. Each output <InlineEquation html={tex("J_g")} /> is a JSON dictionary whose keys are the target fields <InlineEquation html={tex("\\mathcal{F}_g")} />.
+executes concurrently where capacity permits, with each call bounded by the configured field and token budgets. <InlineEquation html={tex("\\Pi_g")} /> carries per-group instructions, validation criteria, and few-shot good/bad exemplars. Each output <InlineEquation html={tex("J_g")} /> is validated against a JSON dictionary whose allowed keys are the target fields owned by <InlineEquation html={tex("\\mathcal{F}_g")} />.
 </TheoremBlock>
 
-<TheoremBlock variant="definition" number={7} title="Dictionary-Union Merge">
-<MathBlock html={tex("J^* = \\bigcup_{g \\in G(q, s_t)} J_g", true)} />
+<TheoremBlock variant="definition" number={7} title="Ownership-Aware Merge">
+Let <InlineEquation html={tex("o: \\mathcal{F}_T \\to \\mathcal{G}")} /> be the configured owner map. For a candidate field <InlineEquation html={tex("f")} /> returned by its owner group:
 
-Because <InlineEquation html={tex("\\mathcal{F}_{g_i} \\cap \\mathcal{F}_{g_j} = \\emptyset")} /> for <InlineEquation html={tex("i \\neq j")} /> (Definition 4), the union is well-defined without synthesis: at most one extraction call contributes a value per field.
+<MathBlock html={tex("J^*(f) = J_{o(f)}(f) \\quad \\text{when } f \\in \\operatorname{keys}(J_{o(f)})", true)} />
+
+Merge code accepts values only for a group's owned keys; duplicate or out-of-scope contributions are collisions, not silent tie-breaks, and are routed for review. Overlapping source evidence does not create a field-value collision by itself.
 </TheoremBlock>
 
-<TheoremBlock variant="theorem" number={2} title="Single-Agent Envelope">
-Under the construction above, parallelism <InlineEquation html={tex("N > 1")} /> does not imply multiple agents. The deterministic orchestrator <InlineEquation html={tex("G")} /> dispatches <InlineEquation html={tex("N")} /> instances of <InlineEquation html={tex("T_{\\text{extract}}")} /> (each a typed tool invocation, not an autonomous agent) and merges their outputs via Definition 7. Exactly one agent-shaped entity <InlineEquation html={tex("\\alpha")} /> exists in the control surface; Requirement 5 holds.
-</TheoremBlock>
-
-<TheoremBlock variant="proof">
-A multi-agent system would require (i) agents with independent control, (ii) inter-agent messaging as a first-class primitive, and (iii) emergent coordination. Our construction has none: control is vested in the LangGraph router, "messaging" is replaced by deterministic dict-union merge over disjoint field domains (Definition 7), and "coordination" reduces to graph topology. The same <InlineEquation html={tex("N")} /> that drives parallelism in a multi-agent shape is absorbed into the *tool-dispatch fan-out* in our shape, which is exactly the transformation required to fit the single-agent envelope.
+<TheoremBlock variant="remark" title="Operational single-agent boundary">
+Concurrency alone does not make these extraction calls sub-agents. In the reviewed v1 design, graph code selects the groups, dispatches registered extraction work, validates each response, and applies the ownership-aware merge. The calls do not hold independent workflow control or exchange messages with one another. That operational boundary, rather than a mathematical theorem about what counts as an agent, is the basis for describing v1 as single-agent.
 </TheoremBlock>
 
 ### 3.6 Coverage and Follow-Up Loop
@@ -166,44 +162,35 @@ A multi-agent system would require (i) agents with independent control, (ii) int
 <TheoremBlock variant="definition" number={8} title="Coverage Operator">
 <MathBlock html={tex("\\langle\\, \\rho_t,\\, \\mathcal{Q}_t \\,\\rangle = T_{\\text{coverage}}(J^*,\\, \\mathcal{F}_T,\\, \\text{guidelines},\\, \\text{exemplars})", true)} />
 
-where <InlineEquation html={tex("\\rho_t \\in [0,1]")} /> is the coverage ratio (fraction of required fields populated with defensible values) and <InlineEquation html={tex("\\mathcal{Q}_t")} /> is the set of intelligent follow-up questions. The graph transitions to <InlineEquation html={tex("v_{\\text{respond}}")} /> iff <InlineEquation html={tex("\\rho_t \\geq \\tau_{\\text{ship}} \\wedge \\mathcal{Q}_t = \\emptyset")} />; otherwise the session loops through <InlineEquation html={tex("v_{\\text{clarify}}")} />.
+where <InlineEquation html={tex("\\rho_t \\in [0,1]")} /> is the fraction of required fields containing candidate values that pass configured checks, and <InlineEquation html={tex("\\mathcal{Q}_t")} /> is the set of prioritized follow-up questions. When the configured review threshold is met and no follow-ups remain, the graph can assemble a draft for author review; otherwise the session loops through <InlineEquation html={tex("v_{\\text{clarify}}")} />.
 </TheoremBlock>
 
-### 3.7 PostgreSQL as the Unified Store
+### 3.7 Transactional State and Retrieval
 
-LangGraph checkpoints, tool-invocation logs, raw ingested content, mapped intermediates, pgvector embeddings, and the audit trail all reside in one Postgres instance <CitationRef id={14} />:
+The implementation pairs a transactional workflow store with vector-backed retrieval <CitationRef id={14} />. The workflow store retains declared checkpoints, registered tool records, and validated session state; the retrieval layer indexes approved reference material:
 
-<MathBlock html={tex("\\text{store}(s_t) = \\underbrace{\\text{ckpt}(s_t)}_{\\text{LangGraph}} \\cup \\underbrace{\\text{log}(a_{0:t})}_{\\text{MCP calls}} \\cup \\underbrace{\\mathcal{D}_{\\text{raw}} \\cup \\mathcal{D}_{\\text{mapped}}}_{\\text{content}} \\cup \\underbrace{\\{\\mathbf{e}_d\\}_{d \\in \\mathcal{D}}}_{\\text{pgvector}}", true)} />
+<MathBlock html={tex("\\text{workflow}(s_t) = \\underbrace{\\text{ckpt}(s_t)}_{\\text{declared state}} \\cup \\underbrace{\\text{log}(a_{0:t})}_{\\text{registered actions}}", true)} />
 
-One transactional store means a session's complete provenance is reconstructable with a handful of joins, and the single atomic snapshot of <InlineEquation html={tex("\\delta(s_t, u_t, a_t)")} /> avoids cross-store consistency windows.
+Committing <InlineEquation html={tex("\\delta(s_t, u_t, a_t)")} /> with its registered tool records makes the declared session path inspectable. Reconstruction still depends on successful writes, schema and registry coverage, reference-version capture, and retention policy; the storage arrangement alone does not prove completeness.
 
-## 4. Context Isolation Guarantee
+## 4. Context Boundary and Assumptions
 
-<TheoremBlock variant="theorem" number={3} title="Context Isolation">
-<MathBlock html={tex("\\mathcal{E}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{sensitive}} = \\emptyset", true)} />
+<TheoremBlock variant="definition" title="Application-Managed Context Objective">
+<MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\subseteq \\mathcal{U}_{\\text{approved}} \\cup \\mathcal{D}_{\\text{approved}} \\cup \\mathcal{P}_{\\text{approved}}", true)} />
 </TheoremBlock>
 
-<TheoremBlock variant="proof">
-The LLM operates at the intake/template node and at the <InlineEquation html={tex("N")} /> extraction nodes, receiving <InlineEquation html={tex("(u_t, \\hat{\\mathcal{C}}_g, \\mathcal{F}_g, \\Pi_g)")} /> in each call. Compressed chunks <InlineEquation html={tex("\\hat{\\mathcal{C}}_g")} /> are drawn exclusively from the public policy/guideline corpus <InlineEquation html={tex("\\mathcal{D}_g \\subseteq \\mathcal{D} \\setminus \\mathcal{D}_{\\text{sensitive}}")} />; sensitive operational data flows only through MCP tools <InlineEquation html={tex("\\mathcal{T}")} /> in a separate context <CitationRef id={10} />. Tool outputs rejoining the agent context are post-processed into status summaries containing no raw sensitive payload. The intersection with <InlineEquation html={tex("\\mathcal{D}_{\\text{sensitive}}")} /> is empty by construction.
+<TheoremBlock variant="remark" title="Operational assumptions">
+The LLM operates at the intake/template node and at the <InlineEquation html={tex("N")} /> extraction nodes, receiving <InlineEquation html={tex("(u_t, \\hat{\\mathcal{C}}_g, \\mathcal{F}_g, \\Pi_g)")} /> in each call. These inputs can include user-uploaded source material and retrieved references, so the design does not imply zero data exposure. Instead, ingestion classification, scoped retrieval, and tool-output filtering are intended to keep application-managed context within the approved model-processing set <CitationRef id={10} />. The boundary is conditional on those controls working as configured; user-entered sensitive text, misclassification, overly broad retrieval, or a faulty output filter remains residual risk and requires testing, monitoring, and incident controls.
 </TheoremBlock>
 
 ## 5. Impact and Reusability
 
-PAR Assist transformed multi-week governance drafting into a guided interactive session, with every extracted field cited back to a policy, guideline, or few-shot example. Pilot launched April 2026; enterprise rollout across RBC business lines through Q2/Q3 2026.
+PAR Assist supports a guided interactive drafting session in which extracted candidate fields can retain references to a policy, guideline, or example. The pilot launched in April 2026; the full CFO Group launch across all geographies followed in May. No drafting-time or adoption result is asserted here without a publishable measurement.
 
-The five-piece pattern (LangGraph <CitationRef id={6} />, MCP tool boundary <CitationRef id={5} />, two-stage field-group retrieval <CitationRef id={7} />, N parallel scoped extraction with dict-union merge, unified Postgres backbone) is reusable for any enterprise workflow with (i) a structured target form, (ii) institutional knowledge across heterogeneous sources, and (iii) regulatory audit requirements. The v2 evolution replaces the single-agent envelope with a multi-agent *skills* framework composed over the same MCP tool registry; v1 is the substrate v2 extends.
+The five-piece pattern (graph orchestration <CitationRef id={6} />, a typed tool boundary <CitationRef id={5} />, two-stage field-group retrieval <CitationRef id={7} />, concurrent scoped extraction with ownership-aware merge, and retained workflow state) is a candidate for other enterprise workflows with (i) a structured target form, (ii) institutional knowledge across heterogeneous sources, and (iii) regulatory audit requirements. Transfer still requires domain-specific controls and evaluation. A multi-agent successor is in pilot; further details will follow in a coordinated publication.
 
 <TheoremBlock variant="remark">
-<MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{Postgres remembers}}", true)} />
+<MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{state persists}}", true)} />
 
-That separation is what makes agentic AI viable in regulated environments <CitationRef id={3} /><CitationRef id={13} />: structural guarantees, not prompt engineering tricks, and a single-agent envelope that trades maximum capability today for an approved substrate that v2 skills already sit on top of.
+That separation supported this deployment path in a regulated environment <CitationRef id={3} /><CitationRef id={13} />: narrower model context, typed action surfaces, explicit operational checks, and a reviewed single-agent envelope.
 </TheoremBlock>
-
-
----
-
-### Reference implementation
-
-Working code, synthetic data, and reproducible plots: [`rogerthatroach/prometheus-multi-agent-retrieval`](https://github.com/rogerthatroach/prometheus-multi-agent-retrieval).
-
-The two-stage retrieval + parallel extraction + coverage-loop architecture this post describes runs end-to-end on 50 synthetic PAR docs. The pytest suite asserts that `N=1/2/4` extraction agents yield identical merged results, that coverage is monotone non-decreasing across passes, and that flagged-for-review docs are correctly identified when convergence fails.

@@ -30,12 +30,19 @@ export default function PermissionCascade() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
+      <p className="text-xs leading-relaxed text-text-tertiary">
+        Illustrative synthetic example; identifiers and counts are not production data.
+      </p>
+
       {/* Toggle */}
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="group" aria-label="Permission example">
         {PERMISSION_SETS.map((p, i) => (
           <button
             key={i}
+            type="button"
             onClick={() => setPermIdx(i)}
+            aria-pressed={i === permIdx}
+            aria-controls="permission-cascade-example"
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
               i === permIdx
                 ? 'bg-accent text-white'
@@ -46,6 +53,10 @@ export default function PermissionCascade() {
           </button>
         ))}
       </div>
+
+      <p className="text-xs text-text-tertiary">
+        Synthetic illustration: all names, domains, groups, identities, and counts below are fictional.
+      </p>
 
       {/* Pipeline */}
       <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
@@ -68,7 +79,7 @@ export default function PermissionCascade() {
                 <p className="text-xs font-semibold text-accent">{stage}</p>
                 <motion.p
                   key={`${permIdx}-${i}`}
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={false}
                   animate={{ opacity: 1, scale: 1 }}
                   className="mt-1 font-mono text-lg font-bold text-text-primary"
                 >
@@ -95,13 +106,35 @@ export default function PermissionCascade() {
 
       {/* SQL Output */}
       <motion.pre
+        id="permission-cascade-example"
         key={permIdx}
-        initial={{ opacity: 0 }}
+        initial={false}
         animate={{ opacity: 1 }}
+        aria-live="polite"
         className="overflow-x-auto rounded-lg bg-surface p-4 font-mono text-xs text-text-secondary"
       >
         <code>{perm.sql}</code>
       </motion.pre>
+
+      <noscript>
+        <div className="rounded-lg border border-border-subtle bg-surface/50 p-4">
+          <p className="text-xs font-semibold text-text-primary">All synthetic permission examples</p>
+          <ul className="mt-3 space-y-4">
+            {PERMISSION_SETS.map((item) => (
+              <li key={item.label}>
+                <p className="text-xs font-semibold text-text-primary">{item.label}</p>
+                <p className="mt-1 text-xs text-text-secondary">
+                  {item.domains.length} domains → {item.groups.length} access groups →{' '}
+                  {item.entities.toLocaleString()} entities → {item.costCentres.toLocaleString()} cost centres → SQL filter
+                </p>
+                <code className="mt-2 block overflow-x-auto whitespace-pre text-[10px] text-text-secondary">
+                  {item.sql}
+                </code>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </noscript>
     </div>
   );
 }

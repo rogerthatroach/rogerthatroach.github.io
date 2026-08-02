@@ -20,11 +20,11 @@ export function useThemeColor(varName: string, fallback: string): string {
 
     update();
 
-    // Watch for class changes on <html> (theme toggle)
+    // Theme changes can update either the light/dark class or data-theme.
     const observer = new MutationObserver(update);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class'],
+      attributeFilter: ['class', 'data-theme'],
     });
 
     return () => observer.disconnect();

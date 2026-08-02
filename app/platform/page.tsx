@@ -1,23 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Github } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 
+const META_TITLE = 'Platform';
+const META_DESCRIPTION =
+  'Platform patterns behind production AI: approved model access, containerized runtime, transactional state, vector retrieval, and audit controls.';
+
 const STACK: { title: string; body: React.ReactNode }[] = [
   {
-    title: 'Lumina (LLM gateway)',
+    title: 'Internal multi-provider model gateway',
     body: (
       <>
-        Internal API gateway. Production AI systems at RBC route their
-        LLM calls through Lumina &mdash; authentication, rate limiting,
-        audit logging, and provider selection in one layer.
-        Behind Lumina:{' '}
-        <span className="font-mono">Azure OpenAI</span> (GPT-4o,
-        GPT-4.1) and <span className="font-mono">AWS Bedrock</span>{' '}
-        (Anthropic Claude &mdash; Sonnet 4.5 in production). Multi-vendor
-        by construction; services request capabilities, Lumina picks the
-        route.
+        Production AI systems route approved LLM calls through an internal
+        multi-provider model gateway. It centralizes authentication, rate
+        limiting, audit logging, and endpoint selection. Gateway configuration
+        routes approved requests to approved foundation-model endpoints.
       </>
     ),
   },
@@ -27,7 +26,7 @@ const STACK: { title: string; body: React.ReactNode }[] = [
       <>
         Kubernetes-based runtime. Containerized FastAPI services,
         OCP-managed scaling, rollout, secrets, and network policy.
-        Every system I lead ships as OCP-deployable artifacts on the
+        The bank systems described here ship as OCP-deployable artifacts on the
         standard CI/CD pipeline. OCP itself is operated by GFT
         (Global Functions Technology); my role is consumer-side
         &mdash; designing services to deploy cleanly into the
@@ -39,14 +38,13 @@ const STACK: { title: string; body: React.ReactNode }[] = [
     title: 'PostgreSQL + pgvector',
     body: (
       <>
-        The unified store. Application state, audit logs, embeddings,
-        and vector search &mdash; one database, multiple roles.
-        PAR Assist runs production RAG on this stack: field-group
-        classifier picks groups, two-stage retrieval pulls top-K
-        passages from <span className="font-mono">pgvector</span>,
-        parallel extraction agents run against Sonnet 4.5 (via
-        Lumina), results merge as dict-union, every typed MCP tool
-        dispatch logs to the same Postgres instance.
+        Transactional storage supports application state, trace records,
+        embeddings, and vector search across separated roles.
+        PAR Assist runs production RAG on this stack: a field-group
+        classifier selects relevant groups, bounded retrieval pulls
+        candidates from <span className="font-mono">pgvector</span>,
+        scoped extraction calls feed an ownership-aware merge, and registered
+        MCP dispatches are recorded alongside retained workflow state.
       </>
     ),
   },
@@ -55,10 +53,11 @@ const STACK: { title: string; body: React.ReactNode }[] = [
     body: (
       <>
         Structured request logs, per-tool dispatch records, model
-        invocation metadata, refusal reasons &mdash; all written to
-        Postgres alongside application state. Audit-by-construction,
-        not aspirational. Drilling from a final answer back through
-        every step is a SQL query, not log archeology.
+        invocation metadata, refusal reasons &mdash; written to
+        Postgres alongside application state on the registered path. Record
+        completeness still depends on successful writes, route coverage, and
+        retention. Retained records support SQL-based reconstruction of a
+        final answer&rsquo;s normal execution path.
       </>
     ),
   },
@@ -67,24 +66,24 @@ const STACK: { title: string; body: React.ReactNode }[] = [
 const ACTIVITIES: { lead: string; body: string }[] = [
   {
     lead: 'Design AI services that integrate with this stack.',
-    body: 'Through Lumina (vendor-agnostic LLM access, rate limit, audit), on OCP (containerized, observable), on Postgres (state + audit + embeddings).',
+    body: 'Through an internal multi-provider model gateway (approved endpoint access, rate limiting, audit), on OCP (containerized, observable), on Postgres (state + audit + embeddings).',
   },
   {
     lead: 'Define the contract.',
-    body: 'What does "an AI service at RBC" look like? Typed APIs, structured logs, audit-by-default, multi-vendor LLM access via Lumina, RAG via pgvector. The architectural pattern is the artifact.',
+    body: 'What does "an AI service at RBC" look like? Typed APIs, structured logs, explicit audit records, approved foundation-model endpoints through an internal multi-provider gateway, RAG via pgvector. The architectural pattern is the artifact.',
   },
   {
     lead: 'Hands-on at the complex levels.',
-    body: '70% hands-on. LangGraph orchestrator on Postgres. Field-group RAG schema. Typed MCP tool registry. Cython compute paths for the millisecond-latency stuff. Permission cascade for entitlement.',
+    body: '~70% hands-on. LangGraph orchestrator on Postgres. Field-group RAG schema. Typed MCP tool registry. Optimized Cython compute paths. Permission cascade for entitlement.',
   },
 ];
 
 const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
   {
-    surface: 'Multi-vendor LLM API integration',
+    surface: 'Multi-provider model API integration',
     evidence: (
       <>
-        Lumina-fronted Claude (Sonnet 4.5) + OpenAI (GPT-4.1) across{' '}
+        Approved foundation-model endpoints across{' '}
         <Link
           href="/projects/astraeus"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
@@ -114,15 +113,6 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
         >
           formal post
         </Link>
-        ,{' '}
-        <a
-          href="https://github.com/rogerthatroach/prometheus-multi-agent-retrieval"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          repo
-        </a>
         ).
       </>
     ),
@@ -138,15 +128,6 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
         >
           formal post
         </Link>
-        ,{' '}
-        <a
-          href="https://github.com/rogerthatroach/astraeus-llm-as-router"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          repo
-        </a>
         ).
       </>
     ),
@@ -163,15 +144,6 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
         >
           formal post
         </Link>
-        ,{' '}
-        <a
-          href="https://github.com/rogerthatroach/commodity-tax-provenance"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          repo
-        </a>
         ).
       </>
     ),
@@ -188,15 +160,6 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
         >
           formal post
         </Link>
-        ,{' '}
-        <a
-          href="https://github.com/rogerthatroach/aegis-guarded-text-to-sql"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          repo
-        </a>
         ).
       </>
     ),
@@ -237,38 +200,33 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
   },
 ];
 
-const REFERENCE_IMPLEMENTATIONS: {
-  name: string;
-  url: string;
-  backs: string;
-}[] = [
-  {
-    name: 'aegis-guarded-text-to-sql',
-    url: 'https://github.com/rogerthatroach/aegis-guarded-text-to-sql',
-    backs: 'Aegis text-to-SQL — calibration · AST validation · template-bank fallback',
-  },
-  {
-    name: 'commodity-tax-provenance',
-    url: 'https://github.com/rogerthatroach/commodity-tax-provenance',
-    backs: 'Commodity Tax — typed graph rewrite + provenance algebra',
-  },
-  {
-    name: 'astraeus-llm-as-router',
-    url: 'https://github.com/rogerthatroach/astraeus-llm-as-router',
-    backs: 'Astraeus — LLM-as-router + 5-stage permission cascade',
-  },
-  {
-    name: 'prometheus-multi-agent-retrieval',
-    url: 'https://github.com/rogerthatroach/prometheus-multi-agent-retrieval',
-    backs: 'PAR Assist — two-stage retrieval + N parallel extraction + coverage loop',
-  },
-];
-
 export const metadata: Metadata = {
-  title: 'Platform — Harmilap Singh Dhaliwal',
-  description:
-    'The platform stack underneath the systems — Lumina LLM gateway, OpenShift runtime, PostgreSQL + pgvector, Postgres-backed audit. What I do at this layer, mapped to evidence.',
+  title: META_TITLE,
+  description: META_DESCRIPTION,
   alternates: { canonical: '/platform' },
+  openGraph: {
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    url: '/platform',
+    siteName: 'Harmilap Singh Dhaliwal',
+    locale: 'en_US',
+    type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        type: 'image/png',
+        alt: 'Platform | Harmilap Singh Dhaliwal',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    images: ['/og-image.png'],
+  },
 };
 
 export default function PlatformPage() {
@@ -338,9 +296,9 @@ export default function PlatformPage() {
             ))}
           </ol>
           <p className="mt-6 rounded-lg border border-border-subtle bg-surface/30 p-4 text-sm leading-relaxed text-text-secondary">
-            Lumina is owned and operated by another RBC team. The systems
-            documented here integrate through it; their architectural shape
-            is downstream of what Lumina makes easy or hard.
+            The internal multi-provider model gateway is owned and operated by
+            another RBC team. The systems documented here integrate through
+            that shared service; my role is on the consumer side.
           </p>
 
           {/* Capability map */}
@@ -349,8 +307,7 @@ export default function PlatformPage() {
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-text-secondary">
             Each row maps a platform-engineering surface to where I demonstrate
-            it &mdash; in production at RBC and in the public reference
-            implementations below.
+            it in production case studies and technical posts.
           </p>
           <dl className="mt-5 divide-y divide-border-subtle overflow-hidden rounded-xl border border-border-subtle bg-surface/30">
             {CAPABILITIES.map((c) => (
@@ -368,37 +325,6 @@ export default function PlatformPage() {
             ))}
           </dl>
 
-          {/* Reference implementations */}
-          <h2 className="mt-12 text-xl font-semibold text-text-primary">
-            Reference implementations
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-            Four public Python repos backing the technical posts. Working
-            code, synthetic data, reproducible plots, deterministic LLM
-            stubs. Each is the public skeleton of one production system,
-            small enough to read end-to-end in an hour.
-          </p>
-          <ul className="mt-5 space-y-3">
-            {REFERENCE_IMPLEMENTATIONS.map((r) => (
-              <li
-                key={r.name}
-                className="rounded-lg border border-border-subtle bg-surface/30 p-4"
-              >
-                <a
-                  href={r.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 font-mono text-sm text-accent underline underline-offset-4 hover:text-text-primary"
-                >
-                  <Github size={13} />
-                  {r.name}
-                </a>
-                <p className="mt-1 text-xs leading-relaxed text-text-secondary">
-                  {r.backs}
-                </p>
-              </li>
-            ))}
-          </ul>
         </div>
       </main>
       <Footer />

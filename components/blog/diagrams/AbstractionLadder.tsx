@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const PHASES = ['Sense', 'Model', 'Optimize', 'Act'];
+const PHASES = ['Observe', 'Estimate', 'Choose', 'Act'];
 
 const LEVELS = [
   {
@@ -19,30 +19,29 @@ const LEVELS = [
     years: '2021–2022',
     color: '#8b5cf6',
     metric: 'Reduced review',
-    nodes: ['Document Ingestion', 'Entity Extraction', 'Review Reduction', 'Verified Output'],
-    tech: ['GCP', 'Vertex AI, AutoML', 'Accuracy opt.', 'Structured output'],
+    nodes: ['Document Ingestion', 'Entity Extraction', 'Quality Objective', 'Verified Output'],
+    tech: ['GCP', 'Vertex AI, AutoML', 'Measured quality', 'Structured output'],
   },
   {
     label: 'Financial',
     years: '2022–2024',
     color: '#22c55e',
     metric: 'Months → 90min',
-    nodes: ['GL Data Extraction', 'PySpark Transforms', 'Process Optimization', 'CFO Reports'],
-    tech: ['PySpark', 'ETL pipelines', 'SLA reduction', 'Tableau'],
+    nodes: ['GL Data Extraction', 'PySpark Transforms', 'Process Objective', 'CFO Reports'],
+    tech: ['PySpark', 'ETL pipelines', 'Cycle-time target', 'Tableau'],
   },
   {
-    label: 'Intelligent',
+    label: 'Model-assisted',
     years: '2024–present',
     color: '#3b82f6',
     metric: '40K cost centres',
-    nodes: ['Policy/Data Ingest', 'LangGraph Agents', 'RAG/MCP Optimization', 'Guided Decisions'],
-    tech: ['Embeddings', 'LangGraph, MCP', 'RAG, Text-to-SQL', 'Agentic platform'],
+    nodes: ['Policy/Data Ingest', 'LangGraph Workflow', 'Retrieval + Tools', 'Guided Decisions'],
+    tech: ['Embeddings', 'LangGraph, MCP', 'RAG, Text-to-SQL', 'Human oversight'],
   },
 ];
 
 export default function AbstractionLadder() {
   const [showTech, setShowTech] = useState(false);
-  const [hoveredNode, setHoveredNode] = useState<{ level: number; phase: number } | null>(null);
 
   const nodeW = 130;
   const nodeH = 48;
@@ -59,7 +58,10 @@ export default function AbstractionLadder() {
       {/* Toggle */}
       <div className="flex gap-3">
         <button
+          type="button"
           onClick={() => setShowTech(!showTech)}
+          aria-expanded={showTech}
+          aria-controls="abstraction-ladder-chart"
           className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
             showTech ? 'bg-accent text-white' : 'bg-surface text-text-secondary hover:bg-surface-hover'
           }`}
@@ -68,7 +70,18 @@ export default function AbstractionLadder() {
         </button>
       </div>
 
-      <svg viewBox={`0 0 ${totalW} ${totalH}`} className="w-full" fill="none">
+      <svg
+        id="abstraction-ladder-chart"
+        viewBox={`0 0 ${totalW} ${totalH}`}
+        className="w-full"
+        fill="none"
+        role="img"
+        aria-labelledby="abstraction-ladder-title abstraction-ladder-description"
+      >
+        <title id="abstraction-ladder-title">Four design questions across four operating contexts</title>
+        <desc id="abstraction-ladder-description">
+          Rows compare observe, estimate, choose, and act. The technology toggle adds implementation examples.
+        </desc>
         {/* Phase labels at top */}
         {PHASES.map((phase, pi) => (
           <text
@@ -96,7 +109,7 @@ export default function AbstractionLadder() {
               strokeWidth={1}
               strokeDasharray="3 3"
               strokeOpacity={0.4}
-              initial={{ pathLength: 0 }}
+              initial={false}
               animate={{ pathLength: 1 }}
               transition={{ duration: 1, delay: 0.5 + pi * 0.1 }}
             />
@@ -110,7 +123,7 @@ export default function AbstractionLadder() {
           return (
             <motion.g
               key={level.label}
-              initial={{ opacity: 0, y: 10 }}
+              initial={false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: li * 0.2, duration: 0.4 }}
             >
@@ -125,21 +138,15 @@ export default function AbstractionLadder() {
               {/* Nodes */}
               {level.nodes.map((node, pi) => {
                 const x = startX + pi * (nodeW + gapX);
-                const isHovered = hoveredNode?.level === li && hoveredNode?.phase === pi;
 
                 return (
-                  <g
-                    key={`${li}-${pi}`}
-                    onMouseEnter={() => setHoveredNode({ level: li, phase: pi })}
-                    onMouseLeave={() => setHoveredNode(null)}
-                    style={{ cursor: 'pointer' }}
-                  >
+                  <g key={`${li}-${pi}`}>
                     <motion.rect
                       x={x} y={y} width={nodeW} height={nodeH} rx={6}
-                      fill={isHovered ? `${level.color}25` : `${level.color}10`}
+                      fill={`${level.color}10`}
                       stroke={level.color}
-                      strokeWidth={isHovered ? 1.5 : 0.8}
-                      strokeOpacity={isHovered ? 1 : 0.5}
+                      strokeWidth={0.8}
+                      strokeOpacity={0.5}
                     />
                     <text
                       x={x + nodeW / 2} y={y + (showTech ? 18 : nodeH / 2 + 2)}
@@ -194,6 +201,20 @@ export default function AbstractionLadder() {
           );
         })}
       </svg>
+
+      <noscript>
+        <div className="rounded-lg border border-border-subtle bg-surface/50 p-4">
+          <p className="text-xs font-semibold text-text-primary">Technology examples</p>
+          <ul className="mt-2 space-y-2 text-xs text-text-secondary">
+            {LEVELS.map((level) => (
+              <li key={level.label}>
+                <strong className="text-text-primary">{level.label}:</strong>{' '}
+                {PHASES.map((phase, phaseIndex) => `${phase}: ${level.tech[phaseIndex]}`).join(' · ')}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </noscript>
     </div>
   );
 }

@@ -14,39 +14,39 @@ import { tex } from '@/lib/katex'
 
 Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews: high-stakes, document-heavy workflows riddled with institutional knowledge that lives in people's heads rather than systems.
 
-Most teams throw a chatbot at this. But the user doesn't need a Q&A interface. They need a **collaborator**: something that understands where they are in a multi-step process, holds context across the session, pulls the right reference material at the right moment, and resolves contradictions between policy documents without the user knowing there was a conflict.
+A chatbot alone does not cover that workflow. The user needs something that understands where they are in a multi-step process, holds context across the session, pulls relevant reference material at the right moment, and surfaces contradictions between policy sources so the author can resolve them.
 
-That's not retrieval-augmented generation <CitationRef id={7} />. That's orchestration over a structured form. This post walks through the architecture at <Glossed>PAR Assist</Glossed> inside <Glossed>RBC CFO Group</Glossed>, the first true agentic system approved for production deployment at the bank.
+Retrieval-augmented generation is one component of the design <CitationRef id={7} />. The system-level problem is orchestration over a structured form. This post walks through the architecture at <Glossed>PAR Assist</Glossed> inside <Glossed>RBC CFO Group</Glossed>, the first true agentic AI platform approved for production at the bank.
 
-<VisualizationContainer minHeight={1040} caption="The envelope. The dashed boundary is the v1 governance scope — one agent, one approved surface. Inside: intake (pptx / docx / pdf / txt / image-OCR) → template MCP tool with decision-tree dialog → stage-1 groups hub → N parallel extraction lanes (one per relevant field group, each a Sonnet-4.5 call with ≤20 fields + compressed top-10 chunks) → dict-union merge → coverage analyzer with clarify-loop back to template. Everything reads and writes the Postgres rail beneath — checkpoints, logs, raw, mapped, embeddings, audit. The ghosted v2 pill is the skills-based multi-agent evolution.">
-{() => <AgenticArchitecturePAR />}
+<VisualizationContainer minHeight={400} caption="The envelope. The dashed boundary is the v1 governance scope — one agent, one approved surface. Inside: intake (document and image parsing) → template MCP tool with decision-tree dialog → stage-1 groups hub → bounded parallel extraction lanes (one per relevant field group, each with scoped reference chunks and target fields) → ownership-aware merge → coverage analyzer with clarify-loop back to template. A transactional state rail and vector-backed retrieval layer support the workflow.">
+<AgenticArchitecturePAR />
 </VisualizationContainer>
 
 ## Constraints before choices
 
-Four constraints shaped every decision below. One is governance, two are regulatory/technical absolutes, one is the shape of the source material. Every downstream choice satisfies these first; aesthetics second.
+Four constraints shaped every decision below. One is governance, two are regulatory/technical requirements, one is the shape of the source material. Every downstream choice was evaluated against these first; aesthetics second.
 
 <ConstraintsBlock
   constraints={[
     {
       kind: 'regulatory',
       label: 'Single-agent envelope',
-      detail: 'The governance bar for the first agentic deployment at the bank was one agent, one approved scope. No multi-agent orchestration in v1. The architecture had to get agent-like behavior (branching, conditional reasoning, tool use) without crossing that line.',
+      detail: 'The governance bar for the first true agentic AI platform approved for production at the bank was one agent, one approved scope. No multi-agent orchestration in v1. The architecture had to get agent-like behavior (branching, conditional reasoning, tool use) without crossing that line.',
     },
     {
       kind: 'hard',
-      label: 'Full auditability',
-      detail: 'Every system action has to be a logged, typed tool invocation. "The agent did X" must be reconstructable after the fact, with inputs, outputs, timestamps, and the code path that produced it. Not a convention. A structural property.',
+      label: 'Registered-action evidence',
+      detail: 'Every registered workflow action has to be a typed tool invocation with a committed audit record. Reconstruction depends on registry coverage, successful writes, retention, and controls for bypass paths.',
     },
     {
       kind: 'hard',
       label: 'Stateful orchestration',
-      detail: 'A PAR drafting session lasts 30+ minutes across an unbounded number of turns. Template choice, extracted field values, conflicts, open questions, and session provenance all persist without loss across the session, and are durable enough to resume the next day.',
+      detail: 'A PAR drafting session can span many turns. The state schema persists template choice, extracted field values, conflicts, open questions, and tool-record references so a successfully checkpointed session can resume within its retention window.',
     },
     {
       kind: 'soft',
       label: 'Heterogeneous inputs',
-      detail: 'Authors upload pptx, docx, txt, pdf, and images (OCR via GPT-4-turbo vision). Templates, guidelines, policies, and historical examples are all differently shaped. Retrieval has to cope with that without forcing everything through the same lens.',
+      detail: 'Authors upload pptx, docx, txt, pdf, and images (OCR via an approved vision-capable model). Templates, guidelines, policies, and historical examples are all differently shaped. Retrieval has to cope with that without forcing everything through the same lens.',
     },
   ]}
 />
@@ -58,16 +58,16 @@ Four calls separate PAR Assist from a clever chatbot. Each one mapped to an expl
 ### Decision 1 · Orchestration framework
 
 <OptionsConsidered
-  decision="What orchestrates a 30+ minute, branching drafting session?"
+  decision="What orchestrates an extended, branching drafting session?"
   options={[
     {
       name: 'LangGraph',
-      summary: 'Directed graph with conditional edges and shared state; Postgres-backed checkpointer.',
+      summary: 'Directed graph with conditional edges, shared state, and durable checkpoint support.',
       chosen: true,
       pros: [
-        'Most mature graph-orchestration library at evaluation time: stable release, production deployments, active maintenance',
+        'Its graph, routing, checkpoint, and tool abstractions matched the evaluated workflow',
         'Conditional edges for branching workflows (template selection, clarification loops, conflict resolution)',
-        'Shared state is first-class; checkpointer plugs directly into Postgres for session durability',
+        'Shared state and checkpointing are first-class concepts for session durability',
         'Tool-call boundary treated as a first-class primitive, not bolted on',
       ],
       cons: [
@@ -80,15 +80,15 @@ Four calls separate PAR Assist from a clever chatbot. Each one mapped to an expl
       summary: 'Considered at the framework-survey step, not deeply evaluated.',
       pros: ['Richer multi-agent primitives out of the box.'],
       cons: [
-        'Less mature and less stable at the time; smaller communities',
-        'Multi-agent primitives would not have cleared the single-agent governance bar anyway',
+        'Multi-agent primitives would not have cleared the single-agent governance bar in v1',
+        'Not deeply evaluated, so no comparative performance or maturity conclusion was reached',
       ],
     },
     {
       name: 'LangChain sequential chains',
       pros: ['Simple composition; most tutorials assume this shape.'],
       cons: [
-        'Linear composition cannot express branching workflows',
+        'The linear primitive needs added routing, loop, and persistence logic for this workflow',
         'Session state has to be bolted on via memory abstractions, not modeled natively',
       ],
     },
@@ -104,14 +104,14 @@ Four calls separate PAR Assist from a clever chatbot. Each one mapped to an expl
 />
 
 <DecisionRationale option="LangGraph">
-Two reasons, in order. First: LangGraph was the most mature, stable orchestration library at the time the call was made (stable release, production deployments at other shops, active maintenance). In a regulated-finance first-deployment context, *stable and maintained* outranks *elegant on paper*.
+Two reasons drove the choice. First, LangGraph's graph, routing, tool, and checkpoint abstractions matched the workflow evaluated for PAR Assist. This was a fit decision within the reviewed options, not a market-wide ranking.
 
-Second: the drafting session is shaped like a graph. A user picks a template, the agent retrieves relevant field groups, extracts candidate values, sometimes a field is ambiguous (loop to clarify), sometimes two guideline clauses conflict (loop to resolve), sometimes the project classification changes mid-session (loop back to template selection). That topology is a graph, not a pipeline, and LangGraph's checkpointer wires directly into Postgres, which gave us session durability without building a second persistence layer.
+Second, the drafting session is shaped like a graph. A user picks a template, the agent retrieves relevant field groups, extracts candidate values, sometimes a field is ambiguous (loop to clarify), sometimes two guideline clauses conflict (loop to resolve), sometimes the project classification changes mid-session (loop back to template selection). LangGraph represented that control flow directly and supported durable checkpoints without a separate orchestration-state abstraction.
 </DecisionRationale>
 
 ### Decision 2 · Action boundary
 
-Every action the agent takes (pick a template, retrieve a group, extract fields, run a coverage check) has to pass through a typed, logged contract. That's how auditability becomes a property of the system rather than a promise.
+Every registered workflow action (pick a template, retrieve a group, extract fields, run a coverage check) passes through a typed contract and writes an audit record on successful commit. That makes the normal path inspectable; registry coverage and log-completeness checks still matter.
 
 <OptionsConsidered
   decision="What's the action-boundary abstraction for tool calls?"
@@ -122,7 +122,7 @@ Every action the agent takes (pick a template, retrieve a group, extract fields,
       chosen: true,
       pros: [
         'Every tool call is a typed function with declared schemas on both sides',
-        'Dispatch goes through the engine: so every call lands in the Postgres audit log by construction',
+        'Registered dispatch goes through the engine, pairing successful tool calls with typed audit records',
         'Portable: the same tool definitions move with the workflow if the graph topology evolves',
       ],
       cons: [
@@ -134,8 +134,8 @@ Every action the agent takes (pick a template, retrieve a group, extract fields,
       name: 'Free-form / function-calling',
       pros: ['Maximum flexibility; the LLM picks arguments dynamically.'],
       cons: [
-        'Action space is implicit: no structural guarantee every call is auditable',
-        'Auditability becomes prompt-engineering discipline instead of a code-path invariant',
+        'Action space is less explicit, so complete logging requires additional wrappers and coverage tests',
+        'Auditability depends on implementation discipline across more call paths',
       ],
     },
     {
@@ -150,25 +150,25 @@ Every action the agent takes (pick a template, retrieve a group, extract fields,
 />
 
 <DecisionRationale option="MCP tools">
-The property we care about is: *every action the agent takes lands in the audit log.* With MCP, that is true by construction: the engine dispatches actions exclusively through the tool registry, so no code path exists outside it. With free-form function calling, the same property is a prompt-engineering discipline: it could be true, but it is not structurally guaranteed.
+The property we care about is: *every registered workflow action that commits has a corresponding audit record.* MCP gives those actions one typed registry and dispatch path, which makes the property testable. It does not prove that no bypass, failed write, or unregistered administrative path exists; those cases require access controls, integration tests, and log-completeness monitoring. Free-form function calling can also be logged, but it requires more wrappers and coverage work.
 
-Regulated finance cannot accept "probably true." MCP made the guarantee structural.
+In regulated finance, the control has to be evidenced. MCP narrowed the surface that needs that evidence.
 
-A concrete example: template selection is itself an MCP tool. It takes the user's uploaded material and their responses to decision-tree questions (project type, spend tier, business line, regulatory exposure) and returns a typed template-id with a confidence score. The tool is how the agent "decides" which PAR template fits, and every call into it is logged, inputs and outputs both, so the selection is auditable end-to-end.
+A concrete example: template selection is itself an MCP tool. It takes the user's uploaded material and their responses to decision-tree questions (project type, spend tier, business line, regulatory exposure) and returns a typed template-id with a confidence score. Successful calls retain structured inputs, outputs, and timestamps, giving reviewers evidence for how a selection was made. Completeness still depends on the logging and retention controls above.
 </DecisionRationale>
 
 ### Decision 3 · Retrieval shape
 
-PAR templates are large. Across the bank's PAR types there are hundreds of fields, and most of them repeat, partially, across templates. Flat chunk retrieval against policy and guideline documents would produce noisy top-k for any given drafting session: too much relevant-looking text, not enough that actually maps to a specific field.
+PAR templates are large. Across the supported PAR types there are many fields, and some recur across templates. In our evaluations, flat chunk retrieval against policy and guideline documents produced noisy results for a drafting session: too much relevant-looking text, not enough that mapped cleanly to a target field.
 
 The shape we needed is **field-group retrieval**: organize the knowledge base by the *target* the LLM is extracting toward, not by source document.
 
 <OptionsConsidered
-  decision="How do we structure retrieval over hundreds of fields and dozens of policy documents?"
+  decision="How do we structure retrieval over many fields and policy sources?"
   options={[
     {
       name: 'Two-stage retrieval: groups → chunks → compression',
-      summary: 'Group = a logically related set of fields (sections + subsections) across all PAR templates. Stage 1: which groups are relevant? Stage 2: top-10 chunks per relevant group. Custom compression before the LLM sees them.',
+      summary: 'Group = a logically related set of target fields. Stage 1 selects relevant groups; Stage 2 retrieves a bounded set of associated chunks per group, followed by compression.',
       chosen: true,
       pros: [
         'Fields map to a taxonomy the LLM can reason over, not a flat sea of chunks',
@@ -185,8 +185,8 @@ The shape we needed is **field-group retrieval**: organize the knowledge base by
       pros: ['Simplest to build; one index, one query.'],
       cons: [
         'Top-k against a flat index surfaces chunks from unrelated fields and templates',
-        'No structural way to say "this chunk belongs to risk-and-compliance fields": so the LLM has to re-derive it every turn',
-        'Scaling is linear with corpus, not field count',
+        'A flat index does not preserve the configured field-group association without extra metadata and filtering',
+        'Our evaluated top-k results mixed evidence for unrelated target fields',
       ],
     },
     {
@@ -194,7 +194,7 @@ The shape we needed is **field-group retrieval**: organize the knowledge base by
       pros: ['Would preserve inter-document references in policy documents.'],
       cons: [
         'The LLM still needs to go from a graph neighborhood to *which field this helps fill*',
-        'Overhead of graph construction and maintenance outweighed the benefit vs. a flat taxonomy over field groups',
+        'For this workflow, graph construction and maintenance added overhead without improving the field-targeting result enough to justify it',
       ],
     },
   ]}
@@ -203,9 +203,9 @@ The shape we needed is **field-group retrieval**: organize the knowledge base by
 <DecisionRationale option="Two-stage retrieval with group taxonomy">
 The insight is that a PAR has a known target shape. We know which fields we're trying to fill before we retrieve anything. If we organize knowledge by those fields (group related fields together across templates, attach the relevant policy/guideline/example chunks to each group) retrieval becomes a lookup into a structure the LLM already understands.
 
-**Stage 1** picks relevant groups for the current session (by uploaded-doc similarity + template-selection context). **Stage 2** runs similarity search within each group, returning top-10 chunks per group. A custom compression pass (details of the compression will be covered in a follow-up post) reduces those ten chunks into a dense, signal-heavy representation the LLM can fit alongside up to 20 fields' worth of rich metadata in a single Sonnet-4.5 system prompt.
+**Stage 1** picks relevant groups for the current session using uploaded-document similarity and template-selection context. **Stage 2** runs a bounded similarity search over the references associated with each group. A compression pass reduces each result set to a payload that fits alongside a scoped batch of target-field metadata in the approved extraction model's prompt.
 
-Flat RAG would work for a Q&A chatbot. It does not work for structured field extraction across a template where fields are categorically different.
+Flat retrieval remained useful for Q&A, but our evaluations found it too noisy for structured extraction across categorically different template fields.
 </DecisionRationale>
 
 ### Decision 4 · Extraction within the single-agent envelope
@@ -217,17 +217,17 @@ This is where the governance constraint (single-agent envelope) met the problem 
   options={[
     {
       name: 'Up to N parallel LLM calls, one per relevant group',
-      summary: 'N = number of groups surfaced in stage 1. Each call owns its group, operates on its own compressed chunks, and returns structured JSON. The agent frames them as tool invocations, not as independent agents.',
+      summary: 'N = number of groups surfaced in stage 1. Each call receives one group\'s scoped target fields and associated reference chunks, then returns structured JSON. The workflow dispatches these as tool invocations, not independent agents.',
       chosen: true,
       pros: [
-        'Each call is scoped: up to 20 fields per system prompt with rich metadata, enough context to reason about its slice without drowning',
-        'Parallelism gives the latency of a multi-agent system without the multi-agent governance classification',
-        'JSON-out from each call is mechanically mergeable: no synthesis LLM pass required',
+        'Each call is bounded to a configured batch of target fields and associated context',
+        'Independent group calls can run concurrently instead of serially',
+        'Schema-valid JSON can be merged by ownership-aware code without an additional synthesis-model call',
         'Guardrails, guidelines, and few-shot good/bad examples can be tuned per group',
       ],
       cons: [
-        'Group taxonomy has to be right: a badly-drawn group boundary means either an overstuffed call or a missing field',
-        'Merge logic has to handle conflicting values when the same field appears in two groups',
+        'Group taxonomy has to be maintained: a badly drawn boundary can produce an overstuffed call or a missing field',
+        'The ownership map and merge logic must detect duplicate or out-of-scope field contributions',
       ],
     },
     {
@@ -244,18 +244,17 @@ This is where the governance constraint (single-agent envelope) met the problem 
       pros: ['Architecturally cleanest mapping of the problem.'],
       cons: [
         'Would not have cleared the single-agent governance envelope in v1',
-        'Deferred to v2 as "skills + tools": same shape, approved scope',
       ],
     },
   ]}
 />
 
 <DecisionRationale option="Parallel LLM calls, one per relevant group">
-The relevant groups picked by stage-1 retrieval become the parallelism. Up to N calls fire at once, each one carrying its group's compressed chunks, up to 20 fields of metadata for that group, and the guardrails / few-shot good-and-bad examples specific to its scope. Each returns a JSON dictionary of extracted field values.
+The relevant groups picked by stage-1 retrieval become the units of concurrency. A bounded number of calls can run at once, each carrying one group's compressed references, a scoped batch of target-field metadata, and the instructions and few-shot examples specific to that task. Each returns a JSON dictionary of candidate field values.
 
-The merge step is a dictionary union. Because groups are disjoint field sets by construction, conflicts are rare and localized; when they happen, last-writer-wins with a flag raised for the coverage analyzer downstream (leaning toward union rather than a synthesis pass; revisitable if we find conflicts becoming routine).
+Each target field has one expected owner group, while the underlying reference subsets may overlap because the same source can inform several fields. Merge code accepts values only for the owner's configured keys. Duplicate or out-of-scope contributions are treated as collisions and surfaced for review rather than resolved by last-writer-wins.
 
-The result: specialized, scoped extraction that runs in parallel and merges deterministically, all inside a single-agent envelope. The LLM never reasons about "I am coordinating sub-agents"; the graph does that. What it sees is *tools that happen to return structured data.*
+The result is scoped extraction that can run concurrently and then pass through schema validation and ownership-aware merge code, all inside a single-agent envelope. Coordination lives in graph logic rather than in independent agent processes; each model call receives a bounded extraction task and returns structured data for validation.
 </DecisionRationale>
 
 ## A PAR draft, end to end
@@ -268,7 +267,7 @@ The result: specialized, scoped extraction that runs in parallel and merges dete
       caption: 'pptx · docx · txt · pdf · images',
       content: (
         <>
-          User uploads the source material: a deck, a memo, a pre-existing draft, screenshots of requirements. pptx, docx, and pdf parse natively; txt passes through; images route to GPT-4-turbo vision for OCR. Everything normalizes into text with source provenance preserved.
+          User uploads the source material: a deck, a memo, a pre-existing draft, screenshots of requirements. pptx, docx, and pdf parse natively; txt passes through; images route to an approved vision-capable model for OCR. The normalized text carries source references where the parser and OCR path provide them.
         </>
       ),
     },
@@ -277,7 +276,7 @@ The result: specialized, scoped extraction that runs in parallel and merges dete
       caption: 'classification, not classification-by-ML',
       content: (
         <>
-          The template-selection MCP tool takes the uploaded material plus the user's answers to a short decision-tree dialog (project type, spend tier, business line, regulatory exposure) and returns a typed template-id with a confidence score and rationale. Decision trees are interpretable; the user can always see why a template was picked and override.
+          The template-selection MCP tool takes the uploaded material plus the user's answers to a short decision-tree dialog (project type, spend tier, business line, regulatory exposure) and returns a typed template-id with a confidence score and rationale. The interface exposes that rationale and an override path for the author.
         </>
       ),
     },
@@ -291,11 +290,11 @@ The result: specialized, scoped extraction that runs in parallel and merges dete
       ),
     },
     {
-      title: '4 · Stage-2 retrieval: top-10 chunks per group',
+      title: '4 · Stage-2 retrieval: bounded chunks per group',
       caption: 'scoped similarity within each group',
       content: (
         <>
-          Per relevant group: similarity search returns the top-10 chunks from the group's attached policies, guidelines, templates, and few-shot good/bad examples. Custom compression reduces those ten into a dense, signal-heavy payload sized for a Sonnet-4.5 system prompt.
+          Per relevant group, similarity search returns a bounded set of chunks from associated policies, guidelines, templates, and few-shot examples. Compression reduces that set to a payload sized for the approved extraction model's prompt.
         </>
       ),
     },
@@ -304,16 +303,16 @@ The result: specialized, scoped extraction that runs in parallel and merges dete
       caption: 'one LLM call per group, each returns JSON',
       content: (
         <>
-          Up to N calls fire in parallel, one per relevant group. Each carries its compressed chunks, up to 20 fields of rich metadata, and the guardrails and few-shot examples scoped to its group. Each returns a JSON dictionary of extracted field values with source citations.
+          A bounded number of calls can run concurrently, one per relevant group. Each carries compressed reference chunks, a scoped batch of target-field metadata, and the instructions and few-shot examples for that task. Each returns a JSON dictionary of candidate field values with available source references.
         </>
       ),
     },
     {
-      title: '6 · Merge → Postgres',
-      caption: 'dictionary union · audit log on write',
+      title: '6 · Validate, merge, and persist',
+      caption: 'ownership-aware merge · audit record on commit',
       content: (
         <>
-          The N JSON dictionaries merge into a single session-state object. The merge is a dictionary union; groups are disjoint by construction. The merged state goes to Postgres alongside the raw inputs, the mapped intermediates, the embeddings used, and the LangGraph checkpointer: one store for everything.
+          Validated JSON dictionaries merge into one session-state object using the target-field ownership map. Duplicate or out-of-scope contributions and schema violations are flagged for review. Declared workflow state and registered action records commit to the transactional store; approved references remain available through the vector-backed retrieval layer.
         </>
       ),
     },
@@ -322,7 +321,7 @@ The result: specialized, scoped extraction that runs in parallel and merges dete
       caption: 'analysis pass vs guidelines and few-shot examples',
       content: (
         <>
-          A coverage analyzer checks the merged state against the template's guideline set and the few-shot good/bad example library. It produces two things: a coverage report (are all required fields populated with defensible values?) and an intelligent-follow-ups list (questions the author should be asked before the draft is considered complete). Both feed back into the graph: unanswered follow-ups loop the session into a clarification node.
+          A coverage analyzer checks the merged state against configured template guidelines and the few-shot example library. It produces a coverage report (which required fields contain candidate values that pass configured checks?) and a prioritized follow-up list for the author. Unanswered follow-ups loop the session into a clarification node.
         </>
       ),
     },
@@ -331,30 +330,28 @@ The result: specialized, scoped extraction that runs in parallel and merges dete
       caption: 'structured state → rendered template',
       content: (
         <>
-          Once coverage clears, the merged state renders into the target PAR template. The author sees a draft with every field populated, every value cited back to its source, every flag from the coverage analyzer surfaced inline. Revision happens on the live state; every edit is an MCP tool invocation, so the audit trail extends through the review phase.
+          Once coverage clears, the merged state renders into the target PAR template. The author sees populated fields, available source references, and coverage flags inline. Revisions made through the registered workflow are typed tool invocations and extend the audit record; out-of-band changes require separate controls.
         </>
       ),
     },
   ]}
 />
 
-## The Postgres backbone
+## Transactional workflow state
 
-One of the less-glamorous decisions that made a lot of the rest of the system cheap: **everything goes in Postgres**. LangGraph checkpoints, tool-invocation logs, the merged session state, raw uploaded content, mapped/normalized intermediates, the embeddings used for retrieval, the audit trail. One store.
+The public architectural point is the separation of responsibilities: a transactional workflow store retains declared checkpoints, validated session state, and registered action records, while a vector-backed retrieval layer indexes approved reference material.
 
-That's not the default for a system like this: retrieval usually sits in a dedicated vector store, logs in a time-series database, state in Redis or similar. One-store is unusual.
+Committing a state transition with its corresponding registered action record reduces inconsistency between the workflow's declared state and its audit evidence. It does not prove complete reconstruction: successful writes, registry and schema coverage, reference-version capture, access controls, and retention still have to be tested and monitored.
 
-The reasons are pragmatic. pgvector is good enough for the retrieval scale PAR Assist operates at. Having state, logs, and embeddings in one transactional store means a single session's entire provenance is reconstructable with a handful of joins, which matters for audit. Backup, replication, and access control only need to be solved once. And when the graph's Postgres-backed checkpointer takes a snapshot, it captures the whole session atomically, no cross-store consistency window to worry about.
-
-Two cons, honestly stated: pgvector is not the fastest vector store at the high end, and a single Postgres instance is a single blast radius. Both are acceptable at current scale; both are revisitable if scale changes.
+That level of detail is enough to explain the control pattern without publishing deployment topology. Storage products and boundaries can change independently as long as the workflow preserves those tested properties.
 
 ## Coverage, guardrails, and few-shot examples
 
 Three quality layers run through the system, each at a different node in the graph:
 
-1. **Per-group guardrails:** applied inside each parallel extraction call. The group's system prompt carries the constraints: what the field *must* be, what the field *cannot* be, what the field *is allowed to be phrased as.* The LLM can't emit a value that fails a guardrail because the guardrail is in the prompt, enforced by the few-shot bad examples.
+1. **Per-group instructions and validation:** each extraction prompt carries field constraints and phrasing guidance. Prompts and few-shot examples influence behavior but do not enforce it, so responses are schema-checked and violations follow a review or retry path.
 
-2. **Per-group few-shot good/bad examples:** small, curated libraries of real-world extracted values and why they're good or bad. These do more work than abstract rules because they show the LLM what "defensible" actually looks like for a given field.
+2. **Per-group few-shot good/bad examples:** small, curated libraries of example values and review notes. They give the model concrete examples of acceptable and unacceptable output for a field, but validation and author review remain separate controls.
 
 3. **Session-level coverage analyzer:** runs after the merge. Checks the full merged state against the guideline set. Produces a coverage report + a prioritized list of intelligent follow-ups. The follow-ups are what turn PAR Assist from a field extractor into a collaborator: "You haven't addressed regulatory exposure for this spend tier. Here are three questions."
 
@@ -368,7 +365,7 @@ Three quality layers run through the system, each at a different node in the gra
       caption: 'thesis: process guidance generalizes across PAR templates',
       content: (
         <>
-          One page, written to frame the opportunity. The vision was process guidance for PAR drafting; the next year was spent translating it into an enterprise platform. What was missing was a production shape and a thesis for why the pattern extended across every PAR type and every business line.
+          One page, written to frame the opportunity. The vision was process guidance for PAR drafting; the following months were spent translating it into a production system. What was missing was a production shape and a testable thesis for how the pattern could extend across supported PAR types.
         </>
       ),
     },
@@ -383,10 +380,10 @@ Three quality layers run through the system, each at a different node in the gra
     },
     {
       title: 'April 2026: pilot launch',
-      caption: 'first wave of PAR authors; enterprise rollout through Q2/Q3',
+      caption: 'first wave of PAR authors; full launch followed in May',
       content: (
         <>
-          Pilot with the first wave of PAR authors. Enterprise rollout expands across RBC business lines through Q2/Q3 2026.
+          Pilot with the first wave of PAR authors. The full launch followed in May 2026.
         </>
       ),
     },
@@ -404,61 +401,55 @@ Three quality layers run through the system, each at a different node in the gra
         A PAR draft was the product of multi-meeting, multi-revision cycles. Authors spent most of their time hunting for the right template, reading policy to figure out which fields applied to which project type, and resolving contradictions between guideline documents by hand. Drafts that reached first review often had fields populated with best-guess values because the author could not be sure which policy source was authoritative.
       </>
     ),
-    hint: 'Directional description: specific metrics pending.',
   }}
   after={{
     label: 'After',
     content: (
       <>
-        A guided interactive session. The agent surfaces the right template, extracts candidate field values from uploaded source material, resolves policy conflicts in-flight with citations, and flags genuine ambiguity for the author to decide. First drafts that used to take days now land same-session. Revision cycles compress, not because the agent is always right, but because when it's wrong, it's wrong with a citation the author can inspect.
+        A guided interactive session. The system proposes a template, extracts candidate field values from uploaded source material, surfaces policy conflicts with citations, and flags ambiguity for the author to decide. The author can inspect source references and correct the draft rather than treating the model as authoritative. No duration or adoption measurement is published here.
       </>
     ),
-    hint: 'Directional description: specific metrics pending.',
   }}
 />
 
 ## War story: living inside a single-agent envelope
 
-The problem wanted multiple agents. A PAR has disjoint field groups (risk, financial structure, regulatory impact, implementation plan) that look like separate specialist domains. The natural architecture would have been one sub-agent per domain, each a specialist with its own tools and guardrails, coordinated by an orchestrator.
+The problem decomposes into specialist scopes such as risk, financial structure, regulatory impact, and implementation planning. Each target field has one configured owner group, while the policy and guideline evidence available to those groups can overlap. One candidate design was a sub-agent per scope, coordinated by an orchestrator.
 
-Governance said no. The first agentic framework approved for deployment at the bank was a single-agent envelope: one agent, one approved scope, no multi-agent orchestration in v1. The right engineering answer was structurally unavailable.
+Governance set a different boundary. The first true agentic AI platform approved for production at the bank had a single-agent envelope: one agent, one approved scope, no multi-agent orchestration in v1. That removed the sub-agent design from the v1 option set.
 
-What we built instead was the multi-agent *behavior* without the multi-agent *shape*. The parallel extraction calls are not sub-agents; they are tool invocations. The orchestration is deterministic: the graph decides which groups are in play, the graph fires the N calls, the graph merges the results. The LLM never reasons about "I am coordinating specialist agents." It sees a sequence of extraction tools, each returning structured data.
+The v1 design uses concurrent scoped extraction without sub-agents. The graph selects groups, dispatches registered calls, validates their schemas, and merges results according to the target-field ownership map. Cross-call coordination is not assigned to an autonomous model process; each call receives a bounded extraction task.
 
-From the outside, it looks agentic: branching dialogs, multi-step reasoning, parallel specialized work. From the governance review, it is one agent calling tools. Both things are true. The architecture sits exactly on that seam.
+The workflow still provides branching dialog, multi-step state, tool use, and concurrent specialized work. Its reviewed control surface remains one agent calling tools. That operational distinction is more useful here than claiming a universal definition of an agent.
 
-The cost was design discipline. Every time we reached for a multi-agent pattern (persistent cross-agent memory, inter-agent negotiation, agent-on-agent reasoning) we had to ask whether that could be expressed as deterministic graph logic plus MCP tools, or whether it fundamentally required multi-agent primitives. In v1, everything that needed the latter got deferred to v2.
+The cost was design discipline. Every time we reached for a multi-agent pattern (persistent cross-agent memory, inter-agent negotiation, agent-on-agent reasoning) we had to ask whether that could be expressed as deterministic graph logic plus MCP tools, or whether it fundamentally required multi-agent primitives. Capabilities that required the latter stayed outside the approved production design.
 
-**The lesson that generalizes:** in regulated environments, the first agentic deployment is not about maximum capability. It is about building the envelope in a way that the next envelope (larger) inherits without rewrite. PAR Assist v1 is single-agent. The groups, the parallel calls, the per-group guardrails, the coverage analyzer, the Postgres backbone, the MCP tool surface: all of these become the substrate v2 runs on. The LangGraph graph's next evolution is multi-agent *skills* composed over the same tool registry. We are not building v1 as a throwaway; we are building v1 as the part of v2 that already passed review.
+**The lesson that generalizes:** an early agentic deployment in a regulated environment is not about maximum capability. It is about making the reviewed boundary explicit and preserving reusable contracts. PAR Assist v1 is single-agent: its group taxonomy, scoped calls, validation, coverage analysis, state model, and MCP tool surface remain inside that reviewed boundary.
 
-## What's next: skills
+## Current status
 
-v2 of the framework moves from single-agent to a LangGraph multi-agent composition where the primitive is a **skill** rather than a tool. A skill is a bounded capability: either a small focused LLM call (shorter prompt, specialized output), an added-context step (injects template-specific or role-specific context before a call), or a deterministic algorithmic step (rule-based transformation, validation, or lookup).
-
-Skills are composable. A workflow is a graph over skills. A "draft-this-PAR" is no longer one agent with tools; it is a coordination of skills, each with its own approved scope, its own audit surface, its own testable contract. The single-agent envelope becomes one specialization inside the skill catalog.
-
-Crucially: because PAR Assist v1 built everything on MCP tools, the tool registry is already the substrate v2's skills compose over. No rewrite. The v1 architecture is the subgraph v2 extends.
+A multi-agent successor is in pilot. Further details will follow in a coordinated publication.
 
 ## What transfers
 
-The pattern (**governance-shaped orchestration + typed action boundary + field-group retrieval + parallel scoped extraction + unified state store**) transfers to any enterprise workflow that combines (a) multi-turn state, (b) structured-form target outputs, and (c) regulatory audit requirements. PAR drafting is one instance. Budget-request review, compliance audit, credit-memo drafting, M&A checklist work: same skeleton, different domain anchors.
+The pattern (**governance-shaped orchestration + typed action boundary + field-group retrieval + concurrent scoped extraction + retained workflow state**) is a candidate for enterprise workflows that combine (a) multi-turn state, (b) structured-form target outputs, and (c) regulatory audit requirements. PAR drafting is one instance. Applying it elsewhere still requires domain-specific controls, evaluation, and evidence.
 
-The substrate changes; the shape does not. That is what makes agentic AI viable in regulated environments: structural guarantees from the architecture, not prompt-engineering discipline at the margin.
+The implementation can change while those control questions remain useful: what context reaches the model, which actions have typed contracts, what state is retained, where collisions surface, and how each boundary is tested.
 
 ---
 
 ## Formal notation appendix
 
-The sections above are the practitioner treatment. For readers who want the mathematical framing (the agentic workflow as a graph <InlineEquation html={tex("G = (V, E, \\mathcal{S}, \\delta)")} />, the retrieval as a composition over field-group scopes, the auditability guarantee as an invariant) the [sibling post](/blog/enterprise-agentic-ai-architecture) carries the full formal treatment. A compressed version appears below.
+The sections above are the practitioner treatment. For readers who want the mathematical framing (the agentic workflow as a graph <InlineEquation html={tex("G = (V, E, \\mathcal{S}, \\delta)")} />, retrieval as a composition over field-group scopes, and the assumptions behind registered-action logging) the [sibling post](/blog/enterprise-agentic-ai-architecture) carries the full treatment. A compressed version appears below.
 
 <TheoremBlock variant="definition" number={1} title="System requirements (formal)">
-Let <InlineEquation html={tex("\\mathcal{W}")} /> denote the space of enterprise workflows, <InlineEquation html={tex("\\mathcal{U}")} /> user utterances, <InlineEquation html={tex("\\mathcal{D}")} /> the document corpus partitioned into field groups <InlineEquation html={tex("\\mathcal{D} = \\bigsqcup_{g \\in G} \\mathcal{D}_g")} />, and <InlineEquation html={tex("\\mathcal{S}")} /> the workflow-state space. System <InlineEquation html={tex("\\mathcal{F}")} /> satisfies:
+Let <InlineEquation html={tex("\\mathcal{W}")} /> denote the space of enterprise workflows, <InlineEquation html={tex("\\mathcal{U}")} /> user utterances, <InlineEquation html={tex("\\mathcal{D}")} /> the document corpus, <InlineEquation html={tex("\\mathcal{D}_g \\subseteq \\mathcal{D}")} /> the potentially overlapping references associated with group <InlineEquation html={tex("g")} />, and <InlineEquation html={tex("\\mathcal{S}")} /> the workflow-state space. Target fields, unlike reference subsets, have one expected owner group. System <InlineEquation html={tex("\\mathcal{F}")} /> is designed around:
 
 <MathBlock html={tex("s_{t+1} = \\delta(s_t, u_t, a_t), \\quad \\delta: \\mathcal{S} \\times \\mathcal{U} \\times \\mathcal{A} \\to \\mathcal{S}", true)} />
 
 <MathBlock html={tex("\\text{retrieve}(q, s_t) = \\bigoplus_{g \\in G(q)} R_g(q, s_t, \\mathcal{D}_g)", true)} />
 
-<MathBlock html={tex("\\forall a \\in \\mathcal{A}: a = \\text{Tool}_k(\\text{input}_k) \\mapsto \\text{output}_k \\in \\text{AuditLog}", true)} />
+<MathBlock html={tex("\\forall a \\in \\mathcal{A}_{\\text{registered}}: a = \\text{Tool}_k(\\text{input}_k) \\land \\operatorname{commit}(a) \\implies a \\in \\text{AuditLog}", true)} />
 </TheoremBlock>
 
 <TheoremBlock variant="definition" number={2} title="Agentic workflow graph">
@@ -467,9 +458,9 @@ An agentic workflow system is a directed graph <InlineEquation html={tex("G = (V
 
 <MathBlock html={tex("v_{\\text{next}} = \\text{Router}(s_t) = \\begin{cases} v_{\\text{clarify}} & \\text{if open\\_followups}(s_t) \\\\ v_{\\text{resolve}} & \\text{if conflict}(s_t) \\\\ v_{\\text{extract}} & \\text{if groups\\_pending}(s_t) \\\\ v_{\\text{respond}} & \\text{if coverage\\_clear}(s_t) \\end{cases}", true)} />
 
-<MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{Postgres remembers}}", true)} />
+<MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{state persists}}", true)} />
 
-That separation is what makes agentic AI viable in regulated environments<CitationRef id={3} /><CitationRef id={13} />: structural guarantees, not prompt engineering tricks.
+That separation makes the workflow easier to govern in a regulated environment<CitationRef id={3} /><CitationRef id={13} />: narrow context, typed boundaries, explicit assumptions, and controls that can be tested.
 
 ---
 
@@ -478,7 +469,7 @@ That separation is what makes agentic AI viable in regulated environments<Citati
 ```bibtex
 @misc{dhaliwal2026enterpriseagenticframework,
   author = {Dhaliwal, Harmilap Singh},
-  title  = {Enterprise Agentic AI Architecture (framework rewrite): Decisions, Options Considered, and Formal Guarantees},
+  title  = {Enterprise Agentic AI Architecture (framework rewrite): Decisions, Options Considered, and Control Assumptions},
   year   = {2026},
   month  = {April},
   url    = {https://rogerthatroach.github.io/blog/enterprise-agentic-ai-framework}
@@ -489,11 +480,4 @@ That separation is what makes agentic AI viable in regulated environments<Citati
 
 ---
 
-*This post describes architectural patterns and engineering decisions at a level of abstraction that does not reveal proprietary code, data, or internal screenshots. Specific metrics (drafting time before/after, revision-cycle reduction) are directional pending user approval of precise numbers. Custom compression details and specific system-prompt shapes will be covered in a follow-up post.*
-
-
----
-
-### Reference implementation
-
-The orchestrator + retriever + extractor + coverage loop are implemented at [`rogerthatroach/prometheus-multi-agent-retrieval`](https://github.com/rogerthatroach/prometheus-multi-agent-retrieval), useful as a worked example when adapting this framework to other domains (claims, KYC, contract extraction). 25 tests assert the convergence + determinism + flag-for-review invariants.
+*This post describes architectural patterns and engineering decisions without proprietary code, data, or internal screenshots. Quantitative drafting-time and revision-cycle claims are omitted because verified, publishable measurements are not included here. Compression and prompt details remain intentionally abstracted.*

@@ -37,13 +37,13 @@
 
     <!-- Headline claim (matches hero bio opening) -->
     <text y="195" font-family="system-ui, -apple-system, sans-serif" font-size="30" font-weight="600" fill="#f0ece8">
-      Built RBC&#8217;s first bank-wide production agentic AI
+      First true agentic AI platform approved for production at the bank
     </text>
     <text y="232" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#8a8078">
-      in the last year. 8+ years of progressive AI/ML, from 900MW
+      Full CFO Group launch across all geographies, May 2026. 8+ years
     </text>
     <text y="259" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#8a8078">
-      power plants in Japan to bank-wide platforms in Toronto.
+      of progressive AI/ML, from power generation to enterprise AI.
     </text>
 
     <!-- Metrics row -->
@@ -51,11 +51,11 @@
       <text font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">$3M</text>
       <text x="85" font-family="monospace" font-size="12" fill="#8a8078" dy="4">annual savings</text>
 
-      <text x="280" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Days &#8594; real time</text>
+      <text x="280" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Interactive</text>
       <text x="555" font-family="monospace" font-size="12" fill="#8a8078" dy="4">CFO analytics</text>
 
-      <text x="720" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Bank-wide</text>
-      <text x="900" font-family="monospace" font-size="12" fill="#8a8078" dy="4">agentic AI</text>
+      <text x="720" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">CFO Group</text>
+      <text x="900" font-family="monospace" font-size="12" fill="#8a8078" dy="4">all geographies</text>
     </g>
   </g>
 

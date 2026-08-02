@@ -5,11 +5,30 @@ import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import { PAPERS } from '@/data/papers';
 
+const META_TITLE = 'Papers';
+const META_DESCRIPTION =
+  'Published papers and clearly labeled working notes on regulated AI engineering.';
+const META_PATH = '/papers';
+
 export const metadata: Metadata = {
-  title: 'Papers — Harmilap Singh Dhaliwal',
-  description:
-    'Long-form citable artifacts. Patterns, constraints, and decisions from inside the work.',
-  alternates: { canonical: '/papers' },
+  title: META_TITLE,
+  description: META_DESCRIPTION,
+  alternates: { canonical: META_PATH },
+  openGraph: {
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    url: META_PATH,
+    siteName: 'Harmilap Singh Dhaliwal',
+    locale: 'en_US',
+    type: 'website',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    images: ['/og-image.png'],
+  },
 };
 
 export default function PapersIndexPage() {
@@ -32,12 +51,12 @@ export default function PapersIndexPage() {
           Papers
         </p>
         <h1 className="mt-2 font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
-          Long-form artifacts — citable, stable, specific.
+          Long-form work, honestly labeled.
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-base">
-          Blog posts compress ideas; papers commit to them. Each artifact
-          below is a stable URL, a BibTeX citation, and an 8–15 page PDF.
-          Written to be linked-to, not just read.
+          Published papers include a versioned PDF and citation. Working notes
+          stay plainly marked as in progress until the underlying artifact
+          exists.
         </p>
 
         <ul className="mt-12 space-y-4">
@@ -61,7 +80,7 @@ export default function PapersIndexPage() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                          {p.year} · {p.pages} pp
+                          {p.year}{!isDraft && p.pages ? ` · ${p.pages} pp` : ' · Working note'}
                         </span>
                         {isDraft && (
                           <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest text-amber-500">
@@ -97,8 +116,8 @@ export default function PapersIndexPage() {
         </ul>
 
         <p className="mt-10 text-xs text-text-tertiary">
-          New papers appear here as they&rsquo;re drafted. Each has a stable
-          URL that will not change.
+          Draft status is not publication status. Citation and download
+          affordances appear only after a versioned paper is released.
         </p>
       </main>
       <Footer />

@@ -1,10 +1,4 @@
-/**
- * Education + credentials. Source: docs/career/CAREER_KNOWLEDGE_BASE.md
- * and docs/career/RESUME_RAW.md.
- *
- * Active credentials only — GCP Associate Cloud Engineer expired
- * Jan 2024 and is intentionally omitted per the 2026-04-21 audit.
- */
+/** Active education and credential entries displayed on the résumé. */
 
 export interface Education {
   degree: string;

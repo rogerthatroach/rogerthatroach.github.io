@@ -26,9 +26,7 @@ export default function ProjectReveal({
   return (
     <motion.div
       ref={ref}
-      initial={
-        reduceMotion ? { opacity: 1 } : { opacity: 0, y: 24, filter: 'blur(8px)' }
-      }
+      initial={false}
       animate={
         reduceMotion
           ? { opacity: 1 }

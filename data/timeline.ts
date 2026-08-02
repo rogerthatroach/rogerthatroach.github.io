@@ -98,46 +98,46 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead — CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived, architected, and built PAR Assist end-to-end (pilot April 2026; deployed bank-wide May 2026), and did the same for Astraeus (production since Nov 2025). Designed and built Aegis v2 in a 2-week solo sprint while running Astraeus and the Amplify intern program in parallel. Led the 2025 Amplify intern cohort. ~70% hands-on.',
+      'Architecting enterprise agentic AI. Conceived, architected, and built PAR Assist end-to-end (pilot April 2026; full CFO Group launch across all geographies May 2026). Conceived, architected, and built Astraeus, then led its cross-functional productionisation (production since Nov 2025). Refactored Aegis v1 into the v2 architecture in a 2-week concurrent sprint while leading Astraeus productionisation and mentoring the Amplify intern cohort. ~70% hands-on.',
     skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
     milestone: `${PAR_ASSIST_SCALE} AI platform`,
     accent: 'purple',
     logoPath: '/images/logos/rbc.svg',
     headlineMetric: {
       value: '2 enterprise platforms',
-      label: 'Conceived + architected in 12 months',
+      label: 'Conceived · architected · built',
     },
     transitionStory:
-      'Promoted internally from Senior Data Scientist after 2.5 years built on Commodity Tax (months → 90 min) and Aegis v1 solo end-to-end productionization. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and ownership of net-new enterprise platforms: Astraeus development began April 2025 coincident with the promotion, and PAR Assist was conceived as my own vision, handed to Amplify interns for problem-space ideation, then built end-to-end as a bank-wide production platform.',
+      'Promoted internally from Senior Data Scientist after 2.5 years built on Commodity Tax (months → 90 min) and Aegis v1 solo end-to-end productionization. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and responsibility for net-new enterprise platforms: Astraeus development began April 2025 coincident with the promotion, and PAR Assist was conceived as my own vision, handed to Amplify interns for problem-space ideation, then built end-to-end as the first true agentic AI platform approved for production at the bank.',
     teamContext:
-      'Current team: 1 Senior AI Scientist direct + 2 interns joining May 2026 (3 total). Cumulative intern scope: 7 managed end-to-end (the 2025 Amplify cohort explored the PAR Assist problem space via an ideation exercise before I built the production platform end-to-end). Cross-functional leadership of engineering services partners (senior + junior) on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
+      'Current team: 1 Senior AI Scientist direct report + 2 interns who joined in May 2026 (3 total). Cumulative intern scope: 9 managed end-to-end (the 2025 Amplify cohort explored the PAR Assist problem space via an ideation exercise before I built the production platform end-to-end). Cross-functional leadership of engineering services partners (senior + junior) on Astraeus. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
     projects: [
       {
         name: 'PAR Assist',
         oneLiner:
-          'Conceived, architected, and built end-to-end: enterprise-wide agentic AI platform guiding PAR drafting across all RBC business lines. Pilot launched April 2026.',
+          'Conceived, architected, and built end-to-end: the first true agentic AI platform approved for production at the bank. Pilot launched April 2026; full CFO Group launch across all geographies followed in May.',
         decisionRationale:
-          'LangGraph over plain LangChain chains because PAR workflows branch conditionally (template selection, field assignment, conflict resolution looping back). PostgreSQL + pgvector over vector-DB-only so embeddings stay co-located with relational metadata. Concept handed to Amplify interns as an ideation exercise; production system built end-to-end after the exploration. Production deployment runs through GFT on OpenShift via CI/CD.',
-        metric: { value: 'Pilot April 2026', label: 'Bank-wide May 2026' },
+          'LangGraph over plain LangChain chains because PAR workflows branch conditionally (template selection, field assignment, conflict resolution looping back). Transactional workflow state and vector-backed retrieval support retained session data and trace records. Concept handed to Amplify interns as an ideation exercise; production system built end-to-end after the exploration. Production deployment runs through GFT on OpenShift via CI/CD.',
+        metric: { value: 'Pilot April 2026', label: 'Full CFO Group · May 2026' },
         caseStudyLink: '/projects/par-assist',
         blogLink: '/blog/par-assist-building',
       },
       {
         name: 'Astraeus',
         oneLiner:
-          'Conceived, architected, and built end-to-end: production analytics platform for CFO Group delivering dynamic headcount, HR costs, and open positions at bank scale with millisecond slicing. Production since Nov 2025.',
+          'Conceived, architected, and built the production analytics platform for CFO Group, then led its cross-functional productionisation with engineering services partners. It delivers interactive headcount, compensation-cost, and open-position analysis at bank scale. Production since Nov 2025.',
         decisionRationale:
-          'Two-wall architecture. GPT-4.1 on the intent side handles gate, metadata extraction, answer, and synthesis; never touches data. Cython-compiled Python on the compute side, with permission-to-SQL entitlement cascade applied before compute and event-level ins-outs math that reframes the apparent factorial problem as linear-in-events. Bounded, parallel domain-specific metadata extraction across EPM, Headcount, and Open Positions, with defense-in-depth gating between stages — each LLM call has less surface area for failure, and the whole pipeline stays foundation-model-agnostic. Single Postgres backbone for the event log, entitlement catalog, hierarchies, and audit trail. Production deployment runs through GFT on OpenShift via CI/CD.',
-        metric: { value: '~40K leaf-level cost centres', label: 'arbitrary combinations, ms latency' },
+          'Two-wall architecture. LLM calls handle gate, metadata extraction, answer shaping, and synthesis using scoped metadata or structured aggregates. Cython-compiled Python handles entitlement and compute, with the permission-to-SQL cascade applied before event-level ins-outs math. Bounded, parallel domain extraction spans Compensation Costs, Headcount, and Open Positions; typed contracts, validation, privilege checks, logs, and monitoring constrain the handoffs. Transactional storage supports the event, entitlement, hierarchy, and trace records needed by the controlled path. Production deployment runs through GFT on OpenShift via CI/CD.',
+        metric: { value: '~40K leaf-level cost centres', label: 'production since Nov 2025' },
         caseStudyLink: '/projects/astraeus',
       },
       {
         name: 'Aegis v2',
         oneLiner:
-          '2-week solo design and build, run in parallel with Astraeus and the Amplify intern program. Multi-stage RAG with multi-gate query parsing across bank, parameter, platform, and time-period, plus a text-to-SQL layer over rich KPI metadata and embeddings. Productionalized by direct report.',
+          '2-week concurrent refactor of the v1 benchmarking module, completed in parallel with Astraeus delivery and mentoring the Amplify intern cohort. The v2 architecture adds multi-stage RAG with multi-gate query parsing across bank, parameter, platform, and time-period, plus a text-to-SQL layer over rich KPI metadata and embeddings. Integrated and productionalized by my direct report with the broader team.',
         decisionRationale:
           'Guarded LLM disambiguation over pure semantic search for near-duplicate KPI names. Text-to-SQL with whitelisting and parameterization over free-form generation, because schema safety is non-negotiable in regulated finance.',
-        metric: { value: '2 weeks', label: 'solo design and build' },
+        metric: { value: '2 weeks', label: 'v1 → v2 refactor' },
         caseStudyLink: '/projects/aegis',
       },
     ],
@@ -161,7 +161,7 @@ export const TIMELINE: TimelineNode[] = [
       label: 'Tax allocation automated (months → 90 min)',
     },
     transitionStory:
-      'Joined RBC after Quantiphi seeking financial services depth and a bigger platform than consulting. The Senior DS role at CFO Group delivered C-suite stakeholder access, bank-scale data (Big 6 peer benchmarking, enterprise GL), and the chance to evolve from ML engineering into product-oriented data science. Promotion to Lead came from accumulated trust: Commodity Tax built credibility, Aegis v1 proved end-to-end product ownership, and Astraeus scoping in early 2025 set the stage for the platform built end-to-end during the Lead role.',
+      'Joined RBC after Quantiphi seeking financial services depth and a bigger platform than consulting. The Senior DS role at CFO Group delivered C-suite stakeholder access, bank-scale data (Big 6 peer benchmarking, enterprise GL), and the chance to evolve from ML engineering into product-oriented data science. Promotion to Lead came from accumulated trust: Commodity Tax built credibility, Aegis v1 proved end-to-end product ownership, and Astraeus scoping in early 2025 set the stage for the cross-functional production delivery I would lead in the Lead role.',
     teamContext:
       'Individual contributor progressing toward leadership. Partnered with CFO Group leadership, Commodity Tax team, and finance teams across the bank. Mentored junior data scientists. Built the stakeholder relationships that made Astraeus possible.',
     projects: [
@@ -193,7 +193,7 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: 'Journal Entry Automation',
         oneLiner:
-          'Automated all manual journal entries across the bank via PySpark + CDP with dynamic monitoring dashboards.',
+          'Automated a manual journal-entry workflow with PySpark + CDP and dynamic monitoring dashboards.',
         decisionRationale:
           'PySpark + CDP over Dataiku/other — CDP was the enterprise-sanctioned platform for PII-adjacent workloads. Staying inside the sanctioned boundary avoided a governance fight.',
       },
@@ -212,7 +212,7 @@ export const TIMELINE: TimelineNode[] = [
     accent: 'cyan',
     headlineMetric: {
       value: HUMANA_ACCURACY,
-      label: 'Humana document classification (up from ~70%)',
+      label: 'Humana checkbox detection (up from ~70%)',
     },
     transitionStory:
       'After Georgian College (Jan–Aug 2021) I needed a Canadian ML role with cloud depth. Quantiphi was a Google Cloud partner — the fastest on-ramp to production GCP / Vertex AI work, which the bank market was starting to demand. The one-year tenure was intentional: a bridge from pure data science into a major Canadian bank.',
@@ -224,8 +224,8 @@ export const TIMELINE: TimelineNode[] = [
         oneLiner:
           'Hybrid document pipeline (Document AI + OpenCV + Random Forest) on Google Cloud — detection of checkboxes, handwritten text, and form fields to reduce manual review.',
         decisionRationale:
-          'Document AI alone hit ~70% — not production-grade. Hybrid composition: Document AI for OCR + OpenCV for pixel-level checkbox detection + Random Forest for final classification. BigTable (hot lookups) + BigQuery (analytics) over Cloud Storage + CSVs — match storage to access pattern.',
-        metric: { value: HUMANA_ACCURACY, label: 'Final pipeline accuracy' },
+          'Document AI alone hit ~70% on checkbox detection. Hybrid composition: Document AI for OCR + OpenCV for pixel-level checkbox detection + Random Forest for the checkbox classification. BigTable (hot lookups) + BigQuery (analytics) over Cloud Storage + CSVs — match storage to access pattern.',
+        metric: { value: HUMANA_ACCURACY, label: 'Checkbox-detection accuracy' },
       },
       {
         name: 'Chick-fil-A Inventory Analytics',
@@ -243,7 +243,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Tata Consultancy Services',
     role: 'Data Scientist',
     description:
-      'Built a Digital Twin for a 900MW coal power plant in Japan — $3M annual savings. Won 2nd/600 in a computer vision hackathon. Where the ML journey began.',
+      'Built a Digital Twin for one 900MW generating unit at the 1,800MW Maizuru coal-fired power station in Japan — $3M annual savings. Won 2nd/600 in a computer vision hackathon. Where the ML journey began.',
     skills: ['R', 'Python', 'ggplot2', 'Regression', 'Classification', 'Clustering', 'CNNs', 'TensorFlow'],
     milestone: `${DIGITAL_TWIN_SAVINGS}/year savings`,
     accent: 'emerald',
@@ -259,20 +259,20 @@ export const TIMELINE: TimelineNode[] = [
     hideOrgNameInHeader: true,
     headlineMetric: {
       value: DIGITAL_TWIN_SAVINGS,
-      label: 'Annual savings — Maizuru 900MW Digital Twin',
+      label: 'Annual savings — Maizuru 900MW unit Digital Twin',
     },
     transitionStory:
-      'Joined TCS out of B.Eng (Electronics & Communications Engineering, Thapar, 2016). TCS offered the fastest path from engineering generalist to applied ML — specifically the MHPS / Maizuru digital twin opportunity, which was leading-edge industrial AI in 2017. Gave end-to-end ML ownership (ETL to production recommendations), cross-border client delivery (India ↔ Japan), and the closed-loop pattern (sense → model → optimize → act) that every subsequent role has built on.',
+      'Joined TCS out of B.Eng (Electronics & Communications Engineering, Thapar, 2016). TCS offered the fastest path from engineering generalist to applied ML — specifically the MHPS / Maizuru digital twin opportunity, which was leading-edge industrial AI in 2017. It gave me end-to-end ML ownership (ETL to production recommendations), cross-border client delivery (India ↔ Japan), and a set of observe → estimate → choose → act questions that I later reused as a design heuristic.',
     teamContext:
-      'Sole data/ML engineer on a 3-person R&D team (mechanical engineer + technical manager + me). Owned the entire pipeline from raw sensor data to optimized control recommendations. Stakeholders: MHPS (Mitsubishi Hitachi Power Systems) SMEs and plant operators at the Maizuru 900MW coal power plant.',
+      'Sole Data Scientist on a 3-person R&D team (mechanical engineer + technical manager + me). Owned the entire pipeline from raw sensor data to optimized control recommendations. Stakeholders: MHPS (Mitsubishi Hitachi Power Systems) engineering and equipment SMEs, and Kansai Electric operators working on the project at one 900MW unit of the 1,800MW Maizuru station.',
     projects: [
       {
         name: 'Combustion Tuning (Digital Twin)',
         oneLiner:
-          '84 regression models across 90+ industrial sensors; Particle Swarm Optimization for closed-loop boiler control recommendations at the Maizuru 900MW coal power plant.',
+          '84 independent regression models across 90+ industrial sensors; Particle Swarm Optimization for closed-loop boiler control recommendations on one 900MW generating unit at the 1,800MW Maizuru station.',
         decisionRationale:
-          'PSO over gradient-based optimization because the objective landscape (coupled boiler dynamics, non-convex, high-dimensional, no analytical gradient) is the metaheuristic fit. 84 separate regression models over one multi-output net because plant operators needed per-variable explainability for MHPS audits.',
-        metric: { value: DIGITAL_TWIN_SAVINGS, label: '/year + NOx/SOx/CO reduction' },
+          'PSO over gradient-based optimization because the objective landscape (coupled boiler dynamics, non-convex, high-dimensional, no analytical gradient) is the metaheuristic fit. 84 independent regression models rather than one shared model because plant operators and engineering reviewers needed per-variable explainability.',
+        metric: { value: DIGITAL_TWIN_SAVINGS, label: '/year savings' },
         caseStudyLink: '/projects/combustion-tuning',
       },
       {
@@ -292,7 +292,7 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: 'Transformer Life Prediction',
         oneLiner:
-          'Electrical transformer life prediction using XGBoost on tabular physicochemical data. 85% MAPE accuracy.',
+          'Electrical transformer life prediction using XGBoost on tabular physicochemical data.',
         decisionRationale:
           'XGBoost over deep learning — small tabular data is XGBoost\'s dominant regime.',
       },

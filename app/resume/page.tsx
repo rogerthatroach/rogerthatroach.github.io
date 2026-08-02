@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Download, Linkedin, FileText, ChevronDown } from 'lucide-react';
+import { Linkedin, ChevronDown } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import ResumeMetrics from '@/components/resume/ResumeMetrics';
@@ -18,16 +18,19 @@ import { SKILLS, SKILL_CATEGORIES } from '@/data/skills';
 import { AWARDS } from '@/data/awards';
 import { EDUCATION, CREDENTIALS } from '@/data/education';
 
+const META_TITLE = 'Resume';
+const META_DESCRIPTION =
+  'Scrollytelling career arc with collapsible skills, education, awards, and writing links.';
+const META_PATH = '/resume';
+
 export const metadata: Metadata = {
-  title: 'Resume — Harmilap Singh Dhaliwal',
-  description:
-    'Scrollytelling career arc across four abstraction levels — physical, cloud, financial, intelligent — bookended by current-role context and collapsible deep-dives on skills, education, awards, and writing.',
-  alternates: { canonical: '/resume' },
+  title: META_TITLE,
+  description: META_DESCRIPTION,
+  alternates: { canonical: META_PATH },
   openGraph: {
-    title: 'Resume — Harmilap Singh Dhaliwal',
-    description:
-      'Scrollytelling career arc with collapsible skills, education, awards, and writing links.',
-    url: 'https://rogerthatroach.github.io/resume',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    url: META_PATH,
     siteName: 'Harmilap Singh Dhaliwal',
     locale: 'en_US',
     type: 'profile',
@@ -35,9 +38,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Resume — Harmilap Singh Dhaliwal',
-    description:
-      'Scrollytelling career arc with collapsible skills, education, awards, and writing links.',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
     images: ['/og-image.png'],
   },
 };
@@ -60,33 +62,13 @@ export default function ResumePage() {
             </h1>
             <p className="max-w-2xl text-base leading-relaxed text-text-secondary sm:text-lg">
               {HERO.title} · {YEARS_EXPERIENCE} years across industrial, cloud, and
-              financial-services AI. The scroll arc below traces the same closed-loop
-              pattern across four substrates. Details live in the collapsed sections
-              beneath — open what matters.
+              financial-services AI. The scroll arc below compares four domains through
+              a bounded observe → estimate → choose → act heuristic. Details live in the
+              collapsed sections beneath — open what matters.
             </p>
 
-            {/* Actions — PDFs grouped together, LinkedIn separated */}
+            {/* External profile */}
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              <a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                download
-                className="group inline-flex items-center gap-2 rounded-lg border border-accent/30 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background print:hidden"
-              >
-                <Download size={16} aria-hidden="true" />
-                Download PDF
-              </a>
-              <a
-                href="/resume.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 rounded-lg border border-border-subtle bg-surface/50 px-4 py-2 text-sm text-text-secondary transition-colors hover:border-accent/40 hover:text-accent print:hidden"
-              >
-                <FileText size={16} aria-hidden="true" />
-                Open in new tab
-              </a>
-              <span className="mx-1 hidden h-6 w-px bg-border-subtle sm:inline-block" />
               <a
                 href={HERO.links.linkedin}
                 target="_blank"
@@ -121,18 +103,18 @@ export default function ResumePage() {
               Career Arc
             </p>
             <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl md:text-5xl">
-              Same pattern.
+              Different systems.
               <br />
-              Four abstraction levels.
+              Four recurring questions.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-text-secondary">
-              Every role runs the same loop:{' '}
+              Across these roles I reuse a bounded design heuristic:{' '}
               <strong className="text-text-primary">
-                sense → model → optimize → act.
+                observe → estimate → choose → act.
               </strong>{' '}
-              Starting from today — enterprise agentic AI — and tracing the pattern
-              back through financial services, cloud ML, and the industrial machine
-              learning where it was forged. Scroll to trace the arc.
+              Starting from today&rsquo;s enterprise AI and tracing back through
+              financial services, cloud ML, and industrial machine learning. The
+              questions transfer; the guarantees do not. Scroll to trace the arc.
             </p>
             <div className="mt-6 inline-flex items-center gap-2 text-xs text-text-tertiary">
               <ChevronDown size={14} aria-hidden="true" />
@@ -149,16 +131,16 @@ export default function ResumePage() {
         <section className="border-t border-border-subtle px-6 py-20 md:px-16 md:py-24 print:hidden">
           <div className="mx-auto max-w-content">
             <p className="font-mono text-xs uppercase tracking-widest text-accent">
-              The pattern, stated
+              The heuristic, stated
             </p>
             <h2 className="mt-3 max-w-3xl text-2xl font-bold leading-snug text-text-primary sm:text-3xl md:text-4xl">
-              Sense the state of the system. Model it. Optimize against a goal. Act —
-              and close the loop.
+              Observe the system. Estimate what matters. Choose within constraints.
+              Act, then reassess.
             </h2>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-text-secondary">
               Across four substrates — physical plant, cloud document pipelines,
-              enterprise finance, agentic AI — the engineering discipline rhymes.
-              That&rsquo;s the arc.
+              enterprise finance, agentic AI — these questions recur, while the
+              implementation and guarantees remain domain-specific.
             </p>
           </div>
         </section>

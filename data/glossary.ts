@@ -16,11 +16,11 @@
 export const GLOSSARY: Record<string, string> = {
   // ── Products / systems ──
   'PAR Assist':
-    'Enterprise-wide agentic AI platform guiding Project Approval Request (PAR) drafting at RBC. Pilot launched April 2026; deployed bank-wide May 2026.',
+    'The first true agentic AI platform approved for production at the bank, guiding Project Approval Request (PAR) drafting. Pilot launched April 2026; full CFO Group launch across all geographies followed in May 2026.',
   'Astraeus':
-    'Production analytics platform for RBC CFO Group — millisecond slicing across ~40K leaf-level cost centres with event-level ins-outs math (Cython-compiled). GPT-4.1 used only for gate / metadata extraction / answer / synthesis; deterministic code handles all data access. LLM never touches operational data by construction.',
+    'Production analytics platform for RBC CFO Group across ~40K leaf-level cost centres. LLM calls handle scoped intent and answer-shaping stages; entitlement and event-level ins-outs computation run in Cython-compiled Python behind typed, validated boundaries.',
   'Aegis':
-    'Strategic peer-benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 (Sr DS period): solo end-to-end build that automated extraction and matching despite quarterly SFP schema shifts, the long-standing bottleneck blocking timely peer analysis. v2 (Lead, 2025): 2-week solo build adding multi-stage RAG with multi-gate query parsing across bank / parameter / platform / time-period plus text-to-SQL, run in parallel with Astraeus and the Amplify intern program. 2025 CFO One RBC Team Award for v1.',
+    'Strategic peer-benchmarking engine over Big 6 Canadian banks\' Supplementary Financial Packages. v1 (Sr DS period): solo end-to-end build that automated extraction and matching despite quarterly SFP schema shifts, the long-standing bottleneck blocking timely peer analysis. v2 (Lead, 2025): 2-week concurrent refactor of the v1 benchmarking module into multi-stage RAG with multi-gate query parsing across bank / parameter / platform / time-period plus text-to-SQL, run in parallel with Astraeus and the Amplify intern program; integrated and productionalized by my direct report with the broader team. 2025 CFO One RBC Team Award for v1.',
   'Commodity Tax':
     '~$600M tax allocation per cycle. Processing time slashed from months to 90 minutes. Q4 2023 CFO Group RBC Quarterly Team Award.',
   'EDS Automation':
@@ -39,14 +39,14 @@ export const GLOSSARY: Record<string, string> = {
 
   // ── Clients / client systems ──
   Humana:
-    'Healthcare client at Quantiphi. I built the hybrid document understanding pipeline (Document AI OCR + OpenCV pixel-level checkbox detection + Random Forest classification) that lifted accuracy from ~70% baseline to 99.95%.',
+    'Healthcare client at Quantiphi. I built a hybrid document understanding pipeline (Document AI OCR + OpenCV pixel-level checkbox detection + Random Forest classification); its checkbox-detection component improved from a ~70% Document AI-only baseline to 99.95%.',
   'Chick-fil-A':
     'US-wide retail client at Quantiphi. Multi-million-row inventory analytics with SQL + Tableau — self-serve intelligence in the tool operators already used.',
-  MHPS: 'Mitsubishi Hitachi Power Systems — Japanese energy client for the Maizuru 900MW combustion tuning digital twin at TCS.',
+  MHPS: 'Mitsubishi Hitachi Power Systems — engineering and equipment partner for the combustion-tuning project on one 900MW unit at Maizuru; Kansai Electric owns and operates the station.',
   'Maizuru 900MW':
-    '900MW coal power plant in Maizuru, Japan. Client-side beneficiary of the TCS digital twin — closed-loop optimization reduced NOx/SOx/CO emissions and saved $3M/year.',
+    'One 900MW generating unit at Kansai Electric’s 1,800MW Maizuru coal-fired power station in Japan. Site of the TCS combustion-tuning system, which generated operator-reviewed recommendations and delivered $3M/year in savings.',
   Maizuru:
-    'Maizuru, Japan — 900MW coal power plant, site of the TCS combustion tuning digital twin project.',
+    'Kansai Electric’s 1,800MW coal-fired power station in Maizuru, Japan. The TCS combustion-tuning digital twin project focused on one 900MW generating unit.',
 
   // ── Education ──
   'Georgian College':
@@ -56,19 +56,17 @@ export const GLOSSARY: Record<string, string> = {
 
   // ── Technical concepts ──
   LangGraph:
-    'Graph-based LLM orchestration library. Picked for PAR Assist for maturity (most stable orchestrator at evaluation time) and because PAR drafting is a conditional-branching workflow — template selection → field-group retrieval → extraction → coverage loops back on open follow-ups.',
-  MCP: 'Model Context Protocol — emerging standard for typed, logged tool contracts. In PAR Assist every action (template selection, retrieval, compression, extraction, merge, coverage) is an MCP tool dispatched through the graph engine, so auditability is structural, not aspirational.',
+    'Graph-based LLM orchestration library. Picked for PAR Assist after evaluation for its maturity and fit with a conditional-branching workflow — template selection → field-group retrieval → extraction → coverage loops back on open follow-ups.',
+  MCP: 'Model Context Protocol — a protocol for connecting model applications to tools and context through defined interfaces. PAR Assist routes its core workflow actions through typed MCP tools and records structured dispatch metadata for review.',
   pgvector:
-    'PostgreSQL vector-similarity extension. PAR Assist uses pgvector alongside LangGraph checkpoints + logs + raw/mapped content + audit trail — one Postgres store holds every layer of the session, so the full provenance for any draft is one query away.',
+    'PostgreSQL vector-similarity extension. It supports PAR Assist\'s vector-backed retrieval alongside retained workflow state and structured trace records.',
   'field-group retrieval':
-    'PAR Assist\'s two-stage retrieval pattern. Stage 1 picks which logically-related field groups are relevant to the session. Stage 2 runs similarity search within each group for top-10 chunks, then custom compression fits them into a Sonnet-4.5 prompt with up to 20 fields of rich metadata per call.',
+    'PAR Assist\'s two-stage retrieval pattern. Stage 1 picks which logically related field groups are relevant to the session. Stage 2 retrieves a bounded candidate set within each group, then compression fits each group-scoped extraction payload to its context budget.',
   'single-agent envelope':
-    'The governance constraint behind PAR Assist v1 — the first agentic framework approved for production at the bank. One agent, one scope, no multi-agent orchestration. We got multi-agent *behaviour* (N parallel group-scoped extraction calls) through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
-  'GPT-4.1':
-    'The model used in Astraeus for all LLM calls (gate, metadata extraction, answer, synthesis). Chosen for reliability + reasoning at intent-layer scale. Never sees operational data — that lives below the two entitlement + compute walls.',
+    'The governance constraint behind PAR Assist v1 — the first true agentic AI platform approved for production at the bank. One agent, one scope, no multi-agent orchestration. Bounded concurrent group-scoped extraction calls provide specialized work through deterministic graph orchestration + MCP tools, inside the single-agent envelope.',
   'cost centre':
-    'The most granular unit in Astraeus\'s org model — one cost centre = one or more teams (~40K of them). Cost centres are the shared leaves of the business-segment and geography hierarchies; a query intersects a node from each (e.g. Wealth Management × US) down to the cost-centre leaves. Employee events (hires, departures, lateral moves, promotions, demotions) and headcount net over cost centres in Cython-compiled ins-outs math, making arbitrary cross-domain slices tractable in milliseconds.',
-  PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS for closed-loop boiler control.',
+    'The most granular unit in Astraeus\'s org model — one cost centre represents one or more teams (~40K in total). Cost centres are the shared leaves of an 18-level business-segment hierarchy with ~9K rollups and a separate geography hierarchy. Employee events and headcount net over those leaves in Cython-compiled ins-outs math.',
+  PSO: 'Particle Swarm Optimization — metaheuristic for non-convex high-dimensional objective landscapes without clean analytical gradients. Used at TCS to generate operator-reviewed boiler-tuning recommendations.',
   'closed-loop':
-    'Sense → model → optimize → act. The pattern that repeats across every role in my career, at progressively higher abstraction levels.',
+    'Observe → estimate → choose → act. A bounded set of design questions that can help compare systems across domains, not a claim that they share control-system guarantees.',
 };

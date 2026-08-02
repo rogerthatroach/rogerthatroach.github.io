@@ -13,7 +13,7 @@ export default function RecognitionSection() {
     <section ref={ref} id="recognition" className="px-6 py-14 md:px-16">
       <div className="mx-auto max-w-content">
         <motion.h2
-          initial={{ opacity: 0, y: 16 }}
+          initial={false}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
           className="mb-8 font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl"
@@ -25,17 +25,12 @@ export default function RecognitionSection() {
           {AWARDS.map((award, i) => (
             <motion.li
               key={`${award.title}-${award.year}`}
-              initial={{ opacity: 0, y: 12 }}
+              initial={false}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.1 + i * 0.06, duration: 0.4 }}
               className="flex gap-4 rounded-xl border border-border-subtle bg-surface/50 p-4"
             >
-              {/* Thumbnail slot.
-                  PLACEHOLDER — when a real image is ready:
-                    1. Drop file at public/images/awards/{slug}.jpg (or .webp)
-                    2. Set imagePath: '/images/awards/{slug}.jpg' on the award
-                       entry in data/awards.ts
-                  Until then, renders Trophy icon on an accent-tinted square. */}
+              {/* Optional award image; the icon is the public fallback. */}
               <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border-subtle bg-accent-muted">
                 {award.imagePath ? (
                   // eslint-disable-next-line @next/next/no-img-element

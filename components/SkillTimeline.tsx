@@ -143,7 +143,7 @@ function RoleCard({
         <button
           type="button"
           onClick={onOpen}
-          className="palette-text group mt-5 inline-flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-3 py-1.5 text-xs font-semibold transition-all hover:border-accent/40 hover:bg-surface"
+          className="js-role-details-trigger palette-text group mt-5 inline-flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-3 py-1.5 text-xs font-semibold transition-all hover:border-accent/40 hover:bg-surface"
         >
           Open role details
           <ChevronRight
@@ -152,6 +152,73 @@ function RoleCard({
             aria-hidden="true"
           />
         </button>
+      )}
+
+      {hasDetails && (
+        <noscript>
+          <div className="mt-5 space-y-4 border-t border-border-subtle pt-4 text-sm text-text-secondary">
+            {node.headlineMetric && (
+              <p>
+                <strong className="text-text-primary">{node.headlineMetric.value}</strong>{' '}
+                {node.headlineMetric.label}
+              </p>
+            )}
+            {node.transitionStory && (
+              <div>
+                <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                  Why this move
+                </h4>
+                <p className="mt-1 leading-relaxed">{node.transitionStory}</p>
+              </div>
+            )}
+            {node.teamContext && (
+              <div>
+                <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                  Team shape
+                </h4>
+                <p className="mt-1 leading-relaxed">{node.teamContext}</p>
+              </div>
+            )}
+            {node.projects && node.projects.length > 0 && (
+              <div>
+                <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                  Projects
+                </h4>
+                <ul className="mt-2 space-y-4">
+                  {node.projects.map((project) => (
+                    <li key={project.name} className="border-l-2 border-border-subtle pl-3">
+                      <p>
+                        <strong className="text-text-primary">{project.name}</strong>
+                        {project.metric && ` — ${project.metric.value}`}
+                      </p>
+                      <p className="mt-1 leading-relaxed">{project.oneLiner}</p>
+                      {project.decisionRationale && (
+                        <p className="mt-2 text-xs leading-relaxed">
+                          <strong className="text-text-primary">Decision:</strong>{' '}
+                          {project.decisionRationale}
+                        </p>
+                      )}
+                      {(project.caseStudyLink || project.blogLink) && (
+                        <p className="mt-2 flex gap-4 text-xs">
+                          {project.caseStudyLink && (
+                            <a className="text-accent underline" href={project.caseStudyLink}>
+                              Case study
+                            </a>
+                          )}
+                          {project.blogLink && (
+                            <a className="text-accent underline" href={project.blogLink}>
+                              Blog post
+                            </a>
+                          )}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </noscript>
       )}
     </div>
   );
@@ -185,7 +252,7 @@ function TimelineRow({
       {/* Spine: center line + dot */}
       <div className="absolute left-4 top-0 flex h-full flex-col items-center md:left-1/2 md:-translate-x-1/2">
         <motion.div
-          initial={{ scale: 0 }}
+          initial={false}
           animate={isInView ? { scale: 1 } : {}}
           transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.05 }}
           className="z-10 h-4 w-4 rounded-full border-2 border-background bg-accent"
@@ -195,7 +262,7 @@ function TimelineRow({
 
       <div className={cn('ml-8 flex-1 pb-12 md:ml-0 md:flex-none', columnClasses)}>
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={false}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] as const }}
           className="rounded-2xl border border-border-subtle bg-surface/40 p-4 md:p-5"
@@ -260,6 +327,9 @@ export default function SkillTimeline({ expanded = false, heading }: SkillTimeli
 
   return (
     <Section id="journey" title={title}>
+      <noscript>
+        <style>{'.js-role-details-trigger{display:none!important}'}</style>
+      </noscript>
       <div className="relative">
         {groups.map((group, i) => (
           <TimelineRow
@@ -273,7 +343,7 @@ export default function SkillTimeline({ expanded = false, heading }: SkillTimeli
 
         <div className="absolute bottom-0 left-4 md:left-1/2 md:-translate-x-1/2">
           <motion.div
-            initial={{ scale: 0 }}
+            initial={false}
             whileInView={{ scale: 1 }}
             viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}

@@ -7,11 +7,30 @@ import ProjectCard from '@/components/projects/ProjectCard';
 import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
 
+const META_TITLE = 'Projects';
+const META_DESCRIPTION =
+  'Case studies covering context, architecture, decisions, trade-offs, and impact across AI and ML systems.';
+const META_PATH = '/projects';
+
 export const metadata: Metadata = {
-  title: 'Projects — Harmilap Singh Dhaliwal',
-  description:
-    'Case studies: from Digital Twins saving $3M to enterprise agentic AI platforms — the full story behind each project.',
-  alternates: { canonical: '/projects' },
+  title: META_TITLE,
+  description: META_DESCRIPTION,
+  alternates: { canonical: META_PATH },
+  openGraph: {
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    url: META_PATH,
+    siteName: 'Harmilap Singh Dhaliwal',
+    locale: 'en_US',
+    type: 'website',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${META_TITLE} | Harmilap Singh Dhaliwal`,
+    description: META_DESCRIPTION,
+    images: ['/og-image.png'],
+  },
 };
 
 export default function ProjectsIndexPage() {
