@@ -4,7 +4,6 @@ import { memo, useState } from 'react';
 import {
   ReactFlow,
   Background,
-  Controls,
   Handle,
   Position,
   type Node,
@@ -16,6 +15,8 @@ import {
 import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
+import DiagramViewport from '@/components/diagrams/DiagramViewport';
+import { PROJECT_DIAGRAM_REACT_FLOW_PROPS } from '@/components/diagrams/diagramCapabilities';
 import { useThemeColor } from '@/lib/useThemeColor';
 import SemanticDiagramFallback from './SemanticDiagramFallback';
 
@@ -190,7 +191,7 @@ function RailNode({ data }: NodeProps) {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div
-              className="h-3 w-3 rounded-full animate-pulse"
+              className="h-3 w-3 rounded-full"
               style={{ backgroundColor: d.color, boxShadow: `0 0 10px ${d.color}` }}
             />
             <span className="text-xs font-bold uppercase tracking-widest" style={{ color: d.color }}>
@@ -677,31 +678,31 @@ export default function AegisCascade() {
         ]}
       />
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        nodesFocusable={false}
-        edgesFocusable={false}
-        elementsSelectable={false}
-        deleteKeyCode={null}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        fitView
+      <DiagramViewport
+        initialNodes={initialNodes}
+        initialEdges={initialEdges}
+        initialWidth={880}
+        initialHeight={1100}
         fitViewOptions={{ padding: 0.04 }}
-        minZoom={0.2}
-        maxZoom={1.5}
-        proOptions={{ hideAttribution: true }}
-        zoomOnScroll={false}
-        preventScrolling={false}
-        className="[&_.react-flow__background]:bg-transparent!"
       >
-        <Background color={gridColor} gap={24} size={1} />
-        <Controls showInteractive={false} position="bottom-right" />
-      </ReactFlow>
+        <ReactFlow
+          {...PROJECT_DIAGRAM_REACT_FLOW_PROPS}
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          fitView
+          fitViewOptions={{ padding: 0.04 }}
+          minZoom={0.2}
+          maxZoom={1.5}
+          proOptions={{ hideAttribution: true }}
+          className="[&_.react-flow__background]:bg-transparent!"
+        >
+          <Background color={gridColor} gap={24} size={1} />
+        </ReactFlow>
+      </DiagramViewport>
     </div>
   );
 }

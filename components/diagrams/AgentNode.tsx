@@ -26,8 +26,10 @@ const CATEGORY_STYLES: Record<string, { border: string; bg: string; glow: string
 
 function AgentNode({ data }: NodeProps) {
   const [hovered, setHovered] = useState(false);
+  const [descriptionPinned, setDescriptionPinned] = useState(false);
   const nodeData = data as unknown as AgentNodeData;
   const style = CATEGORY_STYLES[nodeData.category] || CATEGORY_STYLES.process;
+  const descriptionVisible = hovered || descriptionPinned;
 
   // If a custom accent color is provided, use inline styles instead
   const useCustomColor = !!nodeData.accentColor;
@@ -36,6 +38,7 @@ function AgentNode({ data }: NodeProps) {
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => setDescriptionPinned((pinned) => !pinned)}
       className="relative"
     >
       <Handle type="target" position={Position.Top} className="bg-border-subtle! border-text-tertiary! w-2! h-2!" />
@@ -68,7 +71,7 @@ function AgentNode({ data }: NodeProps) {
         </div>
 
         <AnimatePresence>
-          {hovered && nodeData.description && (
+          {descriptionVisible && nodeData.description && (
             <motion.p
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}

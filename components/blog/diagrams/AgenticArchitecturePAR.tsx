@@ -4,7 +4,6 @@ import { memo, useState } from 'react';
 import {
   ReactFlow,
   Background,
-  Controls,
   Handle,
   Position,
   type Node,
@@ -17,6 +16,8 @@ import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 import AgentNode, { type AgentNodeData } from '@/components/diagrams/AgentNode';
 import AnimatedEdge from '@/components/diagrams/AnimatedEdge';
+import DiagramViewport from '@/components/diagrams/DiagramViewport';
+import { PROJECT_DIAGRAM_REACT_FLOW_PROPS } from '@/components/diagrams/diagramCapabilities';
 import { useThemeColor } from '@/lib/useThemeColor';
 import SemanticDiagramFallback from './SemanticDiagramFallback';
 
@@ -127,16 +128,15 @@ function HubNode({ data }: NodeProps) {
       <Handle type="source" position={Position.Left} id="l" className="opacity-0! w-1! h-1!" />
       <Handle type="source" position={Position.Right} id="r" className="opacity-0! w-1! h-1!" />
 
-      {/* orbital ring (rotates) */}
-      <motion.div
+      {/* Static orbital ring. Motion belongs to short, meaningful state changes,
+          not an endlessly rotating decoration. */}
+      <div
         className="absolute rounded-full border-2 border-dashed"
         style={{
           width: 120,
           height: 120,
           borderColor: `${d.color}55`,
         }}
-        animate={{ rotate: 360 }}
-        transition={{ duration: 30, ease: 'linear', repeat: Infinity }}
       />
       <motion.div
         whileHover={{ scale: 1.08 }}
@@ -191,7 +191,7 @@ function RailNode({ data }: NodeProps) {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div
-              className="h-3 w-3 rounded-full animate-pulse"
+              className="h-3 w-3 rounded-full"
               style={{ backgroundColor: d.color, boxShadow: `0 0 10px ${d.color}` }}
             />
             <span className="text-xs font-bold uppercase tracking-widest" style={{ color: d.color }}>
@@ -603,31 +603,31 @@ export default function AgenticArchitecturePAR() {
         ]}
       />
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        nodesDraggable={false}
-        nodesConnectable={false}
-        nodesFocusable={false}
-        edgesFocusable={false}
-        elementsSelectable={false}
-        deleteKeyCode={null}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
-        fitView
+      <DiagramViewport
+        initialNodes={initialNodes}
+        initialEdges={initialEdges}
+        initialWidth={820}
+        initialHeight={1020}
         fitViewOptions={{ padding: 0.04 }}
-        minZoom={0.2}
-        maxZoom={1.5}
-        proOptions={{ hideAttribution: true }}
-        zoomOnScroll={false}
-        preventScrolling={false}
-        className="[&_.react-flow__background]:bg-transparent!"
       >
-        <Background color={gridColor} gap={24} size={1} />
-        <Controls showInteractive={false} position="bottom-right" />
-      </ReactFlow>
+        <ReactFlow
+          {...PROJECT_DIAGRAM_REACT_FLOW_PROPS}
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
+          fitView
+          fitViewOptions={{ padding: 0.04 }}
+          minZoom={0.2}
+          maxZoom={1.5}
+          proOptions={{ hideAttribution: true }}
+          className="[&_.react-flow__background]:bg-transparent!"
+        >
+          <Background color={gridColor} gap={24} size={1} />
+        </ReactFlow>
+      </DiagramViewport>
     </div>
   );
 }

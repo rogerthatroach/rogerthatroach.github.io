@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -41,6 +41,7 @@ export default function StepThrough({
   label?: string;
 }) {
   const [idx, setIdx] = useState(0);
+  const panelId = useId();
   const reduceMotion = useReducedMotion();
   const current = steps[idx];
   const total = steps.length;
@@ -75,14 +76,21 @@ export default function StepThrough({
         </div>
 
         {/* Step body — crossfade on change */}
-        <div className="relative min-h-24">
+        <div
+          id={panelId}
+          role="region"
+          aria-label={`Step ${idx + 1} of ${total}: ${current.title}`}
+          aria-live="polite"
+          aria-atomic="true"
+          className="relative min-h-24"
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={idx}
               initial={false}
               animate={{ opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+              transition={{ duration: reduceMotion ? 0 : 0.2, ease: [0.4, 0, 0.2, 1] as const }}
               className="text-sm leading-relaxed text-text-secondary"
             >
               {current.content}
@@ -97,27 +105,28 @@ export default function StepThrough({
             onClick={prev}
             disabled={idx === 0}
             className={cn(
-              'inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors',
+              'inline-flex min-h-11 items-center gap-1 rounded-md border px-3 py-2 text-xs font-semibold transition-colors',
               idx === 0
                 ? 'border-border-subtle text-text-tertiary opacity-50'
                 : 'border-border-subtle text-text-secondary hover:border-accent/40 hover:text-accent'
             )}
-            aria-label="Previous step"
+            aria-label={idx === 0 ? 'Previous step' : `Previous step: ${steps[idx - 1].title}`}
+            aria-controls={panelId}
           >
             <ChevronLeft size={14} aria-hidden="true" />
             Prev
           </button>
 
-          <div className="flex" role="tablist" aria-label="Step progress">
-            {steps.map((_, i) => (
+          <div className="flex" role="group" aria-label="Choose a step">
+            {steps.map((step, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => setIdx(i)}
-                role="tab"
-                aria-selected={i === idx}
-                aria-label={`Go to step ${i + 1}`}
-                className="group flex h-6 min-w-6 items-center justify-center px-1.5"
+                aria-pressed={i === idx}
+                aria-controls={panelId}
+                aria-label={`Go to step ${i + 1}: ${step.title}`}
+                className="group flex h-11 min-w-6 items-center justify-center px-1.5"
               >
                 <span
                   className={cn(
@@ -136,12 +145,13 @@ export default function StepThrough({
             onClick={next}
             disabled={idx === total - 1}
             className={cn(
-              'inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors',
+              'inline-flex min-h-11 items-center gap-1 rounded-md border px-3 py-2 text-xs font-semibold transition-colors',
               idx === total - 1
                 ? 'border-border-subtle text-text-tertiary opacity-50'
                 : 'border-accent/40 bg-accent-muted text-accent hover:border-accent hover:bg-accent hover:text-background'
             )}
-            aria-label="Next step"
+            aria-label={idx === total - 1 ? 'Next step' : `Next step: ${steps[idx + 1].title}`}
+            aria-controls={panelId}
           >
             Next
             <ChevronRight size={14} aria-hidden="true" />

@@ -56,7 +56,7 @@ export default function FiveStagePipeline() {
 
   return (
     <div className="flex flex-col gap-4 p-6">
-      <p className="text-xs text-text-tertiary">Click any stage to see details</p>
+      <p className="text-xs text-text-tertiary">Select any stage to show or hide its details.</p>
 
       {/* Pipeline */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
@@ -67,7 +67,8 @@ export default function FiveStagePipeline() {
               type="button"
               onClick={() => setExpanded(expanded === i ? null : i)}
               aria-expanded={expanded === i}
-              aria-controls={`five-stage-detail-${stage.id}`}
+              aria-controls="five-stage-detail"
+              aria-label={`${expanded === i ? 'Hide' : 'Show'} details for stage ${i + 1}: ${stage.label}`}
               className="w-full rounded-lg border p-3 text-left transition-colors"
               style={{
                 borderColor: expanded === i ? stage.color : 'var(--color-border)',
@@ -99,24 +100,25 @@ export default function FiveStagePipeline() {
       </div>
 
       {/* Expanded detail */}
-      <AnimatePresence>
-        {expanded !== null && (
-          <motion.div
-            id={`five-stage-detail-${STAGES[expanded].id}`}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden rounded-lg border border-border-subtle bg-surface/50 p-4"
-          >
-            <p className="text-xs font-semibold" style={{ color: STAGES[expanded].color }}>
-              Stage {expanded + 1}: {STAGES[expanded].label}
-            </p>
-            <p className="mt-2 text-xs leading-relaxed text-text-secondary">
-              {STAGES[expanded].detail}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div id="five-stage-detail" aria-live="polite">
+        <AnimatePresence>
+          {expanded !== null && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden rounded-lg border border-border-subtle bg-surface/50 p-4"
+            >
+              <p className="text-xs font-semibold" style={{ color: STAGES[expanded].color }}>
+                Stage {expanded + 1}: {STAGES[expanded].label}
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-text-secondary">
+                {STAGES[expanded].detail}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <noscript>
         <ol className="space-y-3 rounded-lg border border-border-subtle bg-surface/50 p-4">

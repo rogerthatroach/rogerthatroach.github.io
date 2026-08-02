@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type KeyboardEvent } from 'react';
+import { useRef, useState, type KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
 
 interface ModelPoint {
@@ -47,6 +47,9 @@ const MODELS: ModelPoint[] = [
 export default function ModelSelectionScatter() {
   const [varianceThreshold, setVarianceThreshold] = useState(0.04);
   const [selectedId, setSelectedId] = useState('gbm-2');
+  const [tabStopId, setTabStopId] = useState('gbm-2');
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+  const pointRefs = useRef(new Map<string, SVGCircleElement>());
 
   const filtered = MODELS.filter((model) => model.variance <= varianceThreshold);
   const highestR2 = filtered.length > 0
@@ -57,11 +60,32 @@ export default function ModelSelectionScatter() {
   const scaleX = (r2: number) => 40 + ((r2 - 0.55) / 0.35) * 380;
   const scaleY = (variance: number) => 260 - (variance / 0.08) * 240;
 
-  const selectWithKeyboard = (event: KeyboardEvent<SVGCircleElement>, id: string) => {
+  const handlePointKeyDown = (event: KeyboardEvent<SVGCircleElement>, id: string) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       setSelectedId(id);
+      return;
     }
+
+    const currentIndex = MODELS.findIndex((model) => model.id === id);
+    let nextIndex: number | null = null;
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      nextIndex = (currentIndex + 1) % MODELS.length;
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      nextIndex = (currentIndex - 1 + MODELS.length) % MODELS.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = MODELS.length - 1;
+    }
+
+    if (nextIndex === null) return;
+
+    event.preventDefault();
+    const nextId = MODELS[nextIndex].id;
+    setTabStopId(nextId);
+    pointRefs.current.get(nextId)?.focus();
   };
 
   return (
@@ -70,7 +94,7 @@ export default function ModelSelectionScatter() {
         Illustrative synthetic fixture. Every point is fixed for this demo and is not a production measurement.
       </p>
 
-      <div className="flex items-center gap-4">
+      <div className="flex min-h-11 items-center gap-4">
         <label htmlFor="model-variance-threshold" className="text-xs font-medium text-text-tertiary">
           Maximum fold variance
         </label>
@@ -83,7 +107,7 @@ export default function ModelSelectionScatter() {
           value={varianceThreshold}
           aria-describedby="model-selection-note model-selection-summary"
           onChange={(event) => setVarianceThreshold(Number(event.target.value))}
-          className="flex-1"
+          className="h-11 flex-1"
         />
         <span className="w-12 font-mono text-xs text-accent">{varianceThreshold.toFixed(3)}</span>
       </div>
@@ -101,7 +125,8 @@ export default function ModelSelectionScatter() {
       >
         <title id="model-selection-title">Synthetic model-selection scatter plot</title>
         <desc id="model-selection-description">
-          Fixed candidate points compare R squared with cross-validation fold variance. Select a point for details.
+          Fixed candidate points compare R squared with cross-validation fold variance. Use arrow keys to move between
+          points, then Enter or Space to select one for details.
         </desc>
 
         <line
@@ -133,6 +158,7 @@ export default function ModelSelectionScatter() {
         {MODELS.map((model) => {
           const passes = model.variance <= varianceThreshold;
           const isSelected = selectedId === model.id;
+          const isFocused = focusedId === model.id;
           const pointNumber = model.id.split('-').at(-1);
 
           return (
@@ -145,31 +171,56 @@ export default function ModelSelectionScatter() {
                   fill="none"
                   className="stroke-accent"
                   strokeWidth={2}
+                  pointerEvents="none"
+                  aria-hidden="true"
+                />
+              )}
+              {isFocused && (
+                <circle
+                  cx={scaleX(model.r2)}
+                  cy={scaleY(model.variance)}
+                  r={13}
+                  fill="none"
+                  className="stroke-text-primary"
+                  strokeWidth={1.5}
+                  strokeDasharray="2 2"
+                  pointerEvents="none"
+                  aria-hidden="true"
                 />
               )}
               <motion.circle
+                ref={(node) => {
+                  if (node) pointRefs.current.set(model.id, node);
+                  else pointRefs.current.delete(model.id);
+                }}
                 cx={scaleX(model.r2)}
                 cy={scaleY(model.variance)}
                 r={5}
                 fill={model.color}
                 stroke="transparent"
-                strokeWidth={14}
+                strokeWidth={34}
+                vectorEffect="non-scaling-stroke"
                 pointerEvents="all"
                 initial={false}
                 animate={{ opacity: passes ? 0.85 : 0.2 }}
                 transition={{ duration: 0.2 }}
                 role="button"
-                tabIndex={0}
+                tabIndex={tabStopId === model.id ? 0 : -1}
                 aria-pressed={isSelected}
-                aria-describedby="model-selection-detail"
                 aria-label={`${model.algorithm} synthetic candidate ${pointNumber}: R squared ${model.r2.toFixed(2)}, fold variance ${model.variance.toFixed(3)}, ${passes ? 'inside' : 'outside'} the current threshold`}
-                onClick={() => setSelectedId(model.id)}
-                onFocus={() => setSelectedId(model.id)}
-                onKeyDown={(event) => selectWithKeyboard(event, model.id)}
+                onClick={(event) => {
+                  setSelectedId(model.id);
+                  setTabStopId(model.id);
+                  event.currentTarget.focus();
+                }}
+                onFocus={() => {
+                  setTabStopId(model.id);
+                  setFocusedId(model.id);
+                }}
+                onBlur={() => setFocusedId(null)}
+                onKeyDown={(event) => handlePointKeyDown(event, model.id)}
                 style={{ cursor: 'pointer' }}
-              >
-                <title>{model.algorithm} synthetic candidate {pointNumber}</title>
-              </motion.circle>
+              />
             </g>
           );
         })}
@@ -183,6 +234,7 @@ export default function ModelSelectionScatter() {
             className="stroke-green-400"
             strokeWidth={1}
             strokeDasharray="3 2"
+            pointerEvents="none"
             aria-hidden="true"
           />
         )}

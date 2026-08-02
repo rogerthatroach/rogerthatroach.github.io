@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { useId } from 'react';
 
 export interface SemanticDiagramStep {
   title: string;
@@ -17,9 +17,9 @@ interface SemanticDiagramFallbackProps {
 /**
  * Server-visible description for ReactFlow diagrams.
  *
- * Static/no-JS output leaves the native details element open. Once the
- * interactive canvas hydrates it closes, but remains available to keyboard,
- * touch, and assistive-technology users through its native summary control.
+ * The native details element is the authoritative accessible representation.
+ * It works before hydration and without JavaScript; the adjacent visual canvas
+ * is a pointer enhancement and is hidden from assistive technology.
  */
 export default function SemanticDiagramFallback({
   title,
@@ -27,28 +27,17 @@ export default function SemanticDiagramFallback({
   steps,
   notes = [],
 }: SemanticDiagramFallbackProps) {
-  const [expanded, setExpanded] = useState(true);
   const headingId = useId();
-
-  useEffect(() => {
-    setExpanded(false);
-  }, []);
 
   return (
     <details
-      open={expanded}
-      onToggle={(event) => setExpanded(event.currentTarget.open)}
-      className={`absolute z-30 overflow-auto rounded-xl border border-border-subtle bg-surface/95 shadow-lg backdrop-blur-md ${
-        expanded
-          ? 'inset-3 max-h-[calc(100%-1.5rem)]'
-          : 'right-3 top-3 max-w-[calc(100%-1.5rem)]'
-      }`}
+      className="diagram-semantic absolute right-3 top-3 z-30 max-w-[calc(100%-1.5rem)] overflow-auto rounded-xl border border-border-subtle bg-surface/95 shadow-lg backdrop-blur-md open:inset-3 open:max-h-[calc(100%-1.5rem)] open:max-w-none"
     >
       <summary
         id={headingId}
-        className="cursor-pointer select-none px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        className="flex min-h-11 cursor-pointer select-none items-center px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
-        {expanded ? 'Hide' : 'Show'} semantic flow · {title}
+        Semantic flow · {title}
       </summary>
 
       <div className="border-t border-border-subtle px-4 py-3" aria-labelledby={headingId}>
