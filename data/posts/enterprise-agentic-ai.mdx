@@ -1,196 +1,90 @@
-import { AgenticArchitecturePAR } from '@/components/blog/BlogDiagrams'
-import MathBlock from '@/components/blog/MathBlock'
-import InlineEquation from '@/components/blog/InlineEquation'
-import TheoremBlock from '@/components/blog/TheoremBlock'
+import { ParFormalEnvelopeFigure, ParFormalFieldGroupFigure, ParTraceFigure } from '@/components/visualizations/par'
 import CitationRef from '@/components/blog/CitationRef'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
-import { tex } from '@/lib/katex'
+import { PAR_FORMAL_ENVELOPE, PAR_FORMAL_FIELD_GROUP, PAR_FORMAL_TRACE } from '@/data/visualizations/par'
 
-## 1. Introduction
+## 1. The architecture problem
 
-Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews: these workflows are high-stakes, document-heavy, and riddled with institutional knowledge that lives in people's heads rather than systems.
+Document-heavy enterprise workflows ask more of an AI system than a chatbot can provide. The system has to remember where an author is in a structured process, find the right reference material for the fields currently in scope, keep partial work coherent across turns, and return unresolved questions to the author rather than quietly filling gaps.
 
-A chatbot alone does not cover that workflow. The user needs something that understands where they are in a multi-step process, holds context across the session, pulls relevant reference material at the right moment, and surfaces contradictions between policy sources so the author can resolve them.
+Retrieval-augmented generation can supply relevant source material <CitationRef id={7} />, but retrieval alone does not decide who owns the workflow, how retrieved evidence is scoped, what happens when sources disagree, or when a draft is ready for review. Those are orchestration and control questions.
 
-Retrieval-augmented generation is one component of the design <CitationRef id={7} />. The system-level problem is orchestration over a structured form inside a regulated-institution governance envelope. This paper describes the architectural pattern used for PAR Assist inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
+PAR Assist addresses them with one reviewed agent-shaped workflow. A LangGraph graph owns the session path; registered tool routines perform bounded work; field groups constrain which references and target fields travel together; merge and coverage checks surface collisions and omissions; and an author reviews the resulting draft. This is the production v1 architecture used inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
 
-## 2. Problem Formulation
+The important claim is narrow: the architecture makes responsibilities and failure paths explicit. It does not make model output deterministic, prove that every source is complete, or remove the need for human judgment.
 
-### 2.1 System Requirements
+## 2. One agent owns the workflow
 
-Let <InlineEquation html={tex("\\mathcal{W}")} /> denote the space of enterprise workflows, <InlineEquation html={tex("\\mathcal{U}")} /> the space of user utterances, <InlineEquation html={tex("\\mathcal{D}")} /> the heterogeneous document corpus, <InlineEquation html={tex("\\mathcal{F}_T")} /> the target field set of the chosen template, and <InlineEquation html={tex("\\mathcal{S}")} /> the state space tracking workflow progress. We seek a system <InlineEquation html={tex("\\Phi")} /> that guides users through <InlineEquation html={tex("\\mathcal{W}")} /> while meeting five design requirements:
+The reviewed v1 control surface contains one agent-shaped graph. LangGraph supplies graph routing, retained workflow state, and checkpoint concepts <CitationRef id={6} />. Application code uses those primitives to decide which registered step runs next: intake, template selection, evidence retrieval, scoped extraction, merge, coverage review, clarification, or response.
 
-<TheoremBlock variant="definition" number={1} title="System Requirements">
-**Requirement 1 (Bounded Context).** The application should pass the LLM component <InlineEquation html={tex("\\mathcal{L}")} /> only user inputs, reference material, and tool summaries classified and authorized for model processing. If <InlineEquation html={tex("\\mathcal{D}_{\\text{approved}}")} /> is that reviewed input set, the intended boundary is:
+That ownership boundary matters because some work can run concurrently without becoming a collection of agents. When several field groups are ready, graph code may dispatch multiple extraction calls. Those calls do not choose their own goals, exchange messages, or take control of the session. They receive bounded inputs, return typed candidate values, and hand control back to the graph. Concurrency changes execution timing; it does not change who owns orchestration.
 
-<MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\subseteq \\mathcal{U}_{\\text{approved}} \\cup \\mathcal{D}_{\\text{approved}} \\cup \\mathcal{P}_{\\text{approved}}", true)} />
+The graph also provides the explicit return paths that a linear happy-path flow would hide. Missing information can lead to clarification. Conflicting candidate values can lead to review. Incomplete coverage can stop draft assembly. A tool or state-write failure can stop progression rather than being treated as a completed step.
 
-**Requirement 2 (Stateful Orchestration).** The system maintains declared workflow state <InlineEquation html={tex("s \\in \\mathcal{S}")} /> across the many turns of a retained session:
-
-<MathBlock html={tex("s_{t+1} = \\delta(s_t, u_t, a_t), \\quad \\delta: \\mathcal{S} \\times \\mathcal{U} \\times \\mathcal{A} \\to \\mathcal{S}", true)} />
-
-**Requirement 3 (Field-Group Retrieval).** A field-group taxonomy <InlineEquation html={tex("\\mathcal{G} = \\{g_1, \\ldots, g_K\\}")} /> assigns each target field one expected owner group <InlineEquation html={tex("\\mathcal{F}_{g_k} \\subseteq \\mathcal{F}_T")} />. Reference subsets <InlineEquation html={tex("\\mathcal{D}_g \\subseteq \\mathcal{D}")} /> may overlap because one policy passage can inform several fields. Retrieval is two-stage and scoped by relevant group:
-
-<MathBlock html={tex("\\text{retrieve}(q, s_t) = \\bigoplus_{g \\in G(q, s_t)} \\kappa\\bigl(\\operatorname{top}_{k}(q, s_t, \\mathcal{D}_g)\\bigr)", true)} />
-
-where <InlineEquation html={tex("G(q, s_t) \\subseteq \\mathcal{G}")} /> is the relevant-group set from Stage 1, <InlineEquation html={tex("\\operatorname{top}_k")} /> is the per-group Stage 2 similarity search, and <InlineEquation html={tex("\\kappa")} /> is a compression operator fitting the payload to the LLM context budget.
-
-**Requirement 4 (Auditability).** Every action registered in the agent tool surface should be a typed, logged invocation <CitationRef id={1} /><CitationRef id={2} />:
-
-<MathBlock html={tex("\\forall a \\in \\mathcal{A}_{\\text{registered}}: a = T_k(\\text{input}_k) \\land \\operatorname{commit}(a) \\implies a \\in \\text{AuditLog}", true)} />
-
-**Requirement 5 (Single-Agent Envelope).** The reviewed v1 control surface contains one agent-shaped workflow. Independent, scoped model calls may run concurrently, but they do not hold autonomous control or communicate as sub-agents; graph code dispatches them as registered tool work and validates their outputs.
-</TheoremBlock>
-
-### 2.2 Why Monolithic Architectures Fail
-
-A monolithic LLM <InlineEquation html={tex("\\Phi_{\\text{mono}}(u_t) = \\mathcal{L}(u_t, \\mathcal{D}, s_t)")} /> places the corpus directly in model context, which is incompatible with Requirement 1 when that corpus contains material outside the approved model-processing boundary <CitationRef id={10} />. It also provides neither durable workflow state nor a complete action log on its own. A simple linear chain <CitationRef id={12} /> would need added routing, loop, and persistence logic for this workflow. A naïve multi-agent design would violate Requirement 5, which disqualified it from this first-deployment approval path.
-
-## 3. Architecture
-
-### 3.1 The Graph
-
-<TheoremBlock variant="definition" number={2} title="Agentic Workflow Graph">
-An agentic workflow system is a directed graph <InlineEquation html={tex("G = (V, E, \\mathcal{S}, \\delta)")} /> where:
-
-- <InlineEquation html={tex("V = \\{v_{\\text{intake}}, v_{\\text{template}}, v_{\\text{retrieve}}, v_{\\text{extract}}, v_{\\text{merge}}, v_{\\text{coverage}}, v_{\\text{clarify}}, v_{\\text{respond}}\\}")} /> are processing nodes
-- <InlineEquation html={tex("E \\subseteq V \\times V")} /> are directed edges including conditional branches and loops
-- <InlineEquation html={tex("\\mathcal{S}")} /> is the shared persistent state space
-- <InlineEquation html={tex("\\delta: \\mathcal{S} \\times \\mathcal{U} \\times \\mathcal{A} \\to \\mathcal{S}")} /> is the state transition function
-
-Each node reads from <InlineEquation html={tex("\\mathcal{S}")} />. Registered action nodes invoke typed MCP tools <CitationRef id={5} /><CitationRef id={6} /> and write declared results back to state.
-</TheoremBlock>
-
-<VisualizationContainer minHeight={400} caption="Figure 1. The envelope. Dashed boundary is the v1 single-agent governance scope. Inside: intake → template MCP tool with decision-tree dialog → stage-1 field-group hub → bounded parallel extraction lanes (scoped chunks · compression · approved extraction-model call per group) → ownership-aware merge → coverage analyzer with clarify-loop back to template. The transactional state rail carries registered workflow writes.">
-<AgenticArchitecturePAR />
+<VisualizationContainer minHeight={0} caption={PAR_FORMAL_ENVELOPE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<ParFormalEnvelopeFigure content={PAR_FORMAL_ENVELOPE} />
 </VisualizationContainer>
 
-<TheoremBlock variant="definition" title="Retained-State Contract">
-For a retained session, workflow state <InlineEquation html={tex("s_t")} /> at turn <InlineEquation html={tex("t")} /> is designed to encode the declared fields needed to resume the registered path:
+## 3. Retained state is an operating contract
 
-<MathBlock html={tex("s_t = \\delta(s_{t-1}, u_t, a_t) = \\delta(\\ldots\\delta(s_0, u_1, a_1)\\ldots, u_t, a_t)", true)} />
+A multi-turn workflow is useful only if the next turn receives the information required to continue the same reviewed path. PAR Assist therefore retains declared workflow fields such as the chosen template, field-group status, candidate values, coverage results, pending follow-ups, and references to registered tool work.
 
-At each transition, <InlineEquation html={tex("\\delta")} /> writes the merged extraction dictionary, coverage report, pending follow-ups, and tool-invocation references required by the next node. The LangGraph checkpointer <CitationRef id={6} /> commits that declared state to the transactional workflow store. This is an application contract, not a mathematical persistence guarantee: resume depends on successful commits, configured retention, and a complete state schema.
-</TheoremBlock>
+That list is a state contract, not a persistence guarantee. Resuming correctly depends on several conditions:
 
-### 3.2 Why LangGraph Over Vanilla Chains
+- The state schema must include everything a later step needs to interpret prior work.
+- A transition must be committed successfully before the workflow treats it as complete.
+- Concurrent results must be associated with the correct session and field group.
+- Retention and versioning must preserve the records needed for the supported review period.
+- Recovery code must distinguish an unfinished transition from a completed one.
 
-LangChain's basic sequential-chain shape implements <InlineEquation html={tex("f = f_n \\circ \\cdots \\circ f_1")} />. This workflow needed conditional routing, loops, and durable checkpoints in addition to that linear composition. LangGraph <CitationRef id={6} /> exposes those concepts directly:
+If any of those conditions fail, a checkpoint can exist and still be misleading. A stale template identifier could send later work through the wrong fields. A missing follow-up could make coverage appear clearer than it is. A partial write could preserve a candidate value without the record needed to explain where it came from.
 
-<MathBlock html={tex("v_{\\text{next}} = \\text{Router}(s_t) = \\begin{cases} v_{\\text{clarify}} & \\text{if open\\_followups}(s_t) \\\\ v_{\\text{retrieve}} & \\text{if groups\\_pending}(s_t) \\\\ v_{\\text{extract}} & \\text{if chunks\\_ready}(s_t) \\\\ v_{\\text{merge}} & \\text{if extractions\\_complete}(s_t) \\\\ v_{\\text{respond}} & \\text{if coverage\\_clear}(s_t) \\end{cases}", true)} />
+The appropriate response is not to describe state as inherently durable or replayable. It is to test interrupted transitions, resume from known checkpoints, validate the stored schema, and monitor incomplete or contradictory state. Retained state makes continuity inspectable when those controls work as intended.
 
-LangGraph was selected because its graph, routing, tool, and checkpoint abstractions matched the evaluated workflow. Multi-agent-first frameworks (CrewAI, AutoGen <CitationRef id={4} />) were considered but not deeply evaluated, so this is not a market ranking. Their agent primitives also sat outside the approved v1 envelope.
+## 4. Tools perform bounded work
 
-### 3.3 MCP Tools as the Action Layer
+Model Context Protocol defines a standard way to expose tools with declared inputs and outputs <CitationRef id={5} />. In PAR Assist, registered tools form the action surface for work such as template selection, retrieval, extraction, merge, and coverage checks.
 
-<TheoremBlock variant="definition" number={3} title="MCP Tool Contract">
-A Model Context Protocol tool <InlineEquation html={tex("T_k")} /> is a typed function <CitationRef id={5} />:
+A typed interface narrows what each routine is expected to receive and return. It does not prove that the values inside a valid payload are safe, relevant, or correct. The application still has to validate allowed fields, reject malformed outputs, enforce authorization at the appropriate handoffs, and handle timeouts or downstream failures.
 
-<MathBlock html={tex("T_k: \\text{Input}_k \\to \\text{Output}_k", true)} />
+Likewise, routing registered work through a tool surface can support useful trace records, but registration alone does not guarantee a complete audit history. A failed transaction, an implementation bypass, an unregistered administrative path, or incomplete retention can leave gaps. Integration tests, access controls, record-completeness checks, and operating review are what provide evidence that the supported path behaves as designed.
 
-The tool set <InlineEquation html={tex("\\mathcal{T} = \\{T_{\\text{ingest}}, T_{\\text{template}}, T_{\\text{retrieve}_1}, T_{\\text{retrieve}_2}, T_{\\text{compress}}, T_{\\text{extract}}, T_{\\text{merge}}, T_{\\text{coverage}}\\}")} /> defines the registered action boundary of the workflow described here.
-</TheoremBlock>
+## 5. Evidence is scoped by field group
 
-<TheoremBlock variant="definition" title="Registered-Action Logging Contract">
-<MathBlock html={tex("\\forall a \\in \\mathcal{A}_{\\text{registered}},\\; \\exists k: a = T_k(\\text{input}_k) \\land \\operatorname{commit}(a) \\implies a \\in \\text{AuditLog}", true)} />
+The target document is divided into groups of related fields. Each target field has one expected owner group, while a reference passage may support more than one group. That distinction avoids a false assumption that evidence must be partitioned as cleanly as the output schema.
 
-For the registered workflow path, the LangGraph execution engine dispatches actions through <InlineEquation html={tex("\\mathcal{T}")} />. A successful invocation is expected to write a typed record to the transactional audit store with the state transition. This configured invariant does not rule out an implementation bypass, a failed transaction, or an unregistered administrative path. Access controls, integration tests, and log-completeness monitoring remain part of Requirement 4.
-</TheoremBlock>
+Retrieval then works in two bounded steps. First, the workflow identifies the field groups relevant to the current material and template. Second, it searches the approved references associated with those groups and reduces the retrieved material to a payload suitable for scoped extraction. The model sees the current user material and selected references needed for that task rather than an undifferentiated corpus.
 
-Template selection is itself an MCP tool. <InlineEquation html={tex("T_{\\text{template}}")} /> accepts the user's uploaded material and decision-tree answers (project type, spend tier, business line, regulatory exposure) and returns a typed template identifier with confidence and rationale. When the call and its state transition commit successfully, the retained record gives reviewers evidence for how the proposed template was chosen.
+This improves scope control, but it does not prove relevance or completeness. A stale field owner, a missing reference-to-group mapping, an indexing defect, or an overly broad group selection can still produce the wrong evidence set. The system therefore needs taxonomy review, retrieval evaluation on representative cases, mapping-version checks, and tests that verify the group filter is actually applied.
 
-### 3.4 Two-Stage Field-Group Retrieval
+<VisualizationContainer minHeight={0} caption={PAR_FORMAL_FIELD_GROUP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<ParFormalFieldGroupFigure content={PAR_FORMAL_FIELD_GROUP} />
+</VisualizationContainer>
 
-<TheoremBlock variant="definition" number={4} title="Field-Group Taxonomy">
-A field-group taxonomy <InlineEquation html={tex("\\mathcal{G} = \\{g_1, \\ldots, g_K\\}")} /> assigns each target field to one expected owner group:
+## 6. Merge, coverage, and clarification
 
-<MathBlock html={tex("\\mathcal{F}_T = \\bigsqcup_{g \\in \\mathcal{G}} \\mathcal{F}_g", true)} />
+Each scoped extraction routine returns candidate values only for the fields owned by its group. Merge code accepts those owned keys and treats duplicate or out-of-scope contributions as collisions to investigate, not as values to resolve silently. Overlapping evidence is normal; conflicting ownership or competing field values is not.
 
-Each group also has an associated reference subset <InlineEquation html={tex("\\mathcal{D}_g \\subseteq \\mathcal{D}")} /> containing policies, guidelines, historical examples, and few-shot exemplars relevant to its fields. These reference subsets are not required to be disjoint: a source passage may support more than one group. The ownership rule applies to target fields, not to evidence.
-</TheoremBlock>
+The merged draft then passes through a coverage check. Coverage asks whether required fields contain candidate values that satisfy configured checks and whether unresolved follow-ups remain. It is not a probability that the draft is correct. A field can be populated with an incorrect value, a source can be incomplete, and a configured check can miss a material issue.
 
-<TheoremBlock variant="definition" number={5} title="Two-Stage Retrieval Function">
-**Stage 1 (group selection).** Given query <InlineEquation html={tex("q")} /> derived from the user's uploaded material and the chosen template, pick the relevant group set:
+When coverage is missing or uncertain, the workflow returns to clarification or review. The author may provide additional information, resolve a source conflict, or leave a field explicitly unresolved. Only after those conditions are addressed can the system assemble a candidate draft for human review.
 
-<MathBlock html={tex("G(q, s_t) = \\{\\, g \\in \\mathcal{G} : \\operatorname{sim}(\\varphi_{\\mathcal{G}}(q, s_t),\\, \\varphi_{\\mathcal{G}}(g)) \\geq \\tau_{\\text{group}} \\,\\}", true)} />
+This review boundary is part of the operating model. The system assists with evidence gathering and structured drafting; it does not become the accountable author. References and trace records help the reviewer inspect how a candidate value was formed, but they do not replace judgment about whether the value and its supporting source are appropriate.
 
-**Stage 2 (chunk retrieval).** For each <InlineEquation html={tex("g \\in G(q, s_t)")} />, run a bounded top-<InlineEquation html={tex("k_g")} /> similarity search over the references associated with <InlineEquation html={tex("\\mathcal{D}_g")} />:
+<VisualizationContainer minHeight={0} caption={PAR_FORMAL_TRACE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<ParTraceFigure content={PAR_FORMAL_TRACE} />
+</VisualizationContainer>
 
-<MathBlock html={tex("\\mathcal{C}_g = \\operatorname{top}_{k_g}\\bigl(\\varphi_g(q, s_t),\\, \\mathcal{D}_g\\bigr)", true)} />
+## 7. Context limits and residual risk
 
-**Compression.** Each group's chunk set is reduced by a custom compression operator <InlineEquation html={tex("\\kappa")} /> to fit the per-call LLM context budget:
+The model receives user-provided material and selected reference passages during intake and extraction. The design therefore does not imply zero data exposure. Its narrower objective is to keep application-managed context within material classified and authorized for model processing.
 
-<MathBlock html={tex("\\hat{\\mathcal{C}}_g = \\kappa(\\mathcal{C}_g) \\quad \\text{where } |\\hat{\\mathcal{C}}_g| \\ll |\\mathcal{C}_g|", true)} />
+That objective depends on ingestion classification, scoped retrieval, payload construction, and output filtering working as configured. A user can paste sensitive text into a request. A document can be misclassified. Retrieval can be broader than intended. A filter can omit a sensitive field. Provider terms, encryption, retention controls, incident handling, and controlled payload inspection remain relevant outside the graph itself.
 
-Similarity uses cosine over a pretrained embedding model selected for the corpus <CitationRef id={9} />:
+The same restraint applies to traceability. A retained record can show what the registered path recorded; it cannot show an action that bypassed that path or evidence that was never captured. Reviewers should read a trace as bounded evidence, not as proof of completeness.
 
-<MathBlock html={tex("\\operatorname{sim}(\\mathbf{e}_q, \\mathbf{e}_{d}) = \\frac{\\mathbf{e}_q \\cdot \\mathbf{e}_{d}}{\\|\\mathbf{e}_q\\|\\,\\|\\mathbf{e}_{d}\\|}", true)} />
-</TheoremBlock>
+## 8. What the deployment establishes
 
-<TheoremBlock variant="definition" title="Configured Retrieval-Scope Contract">
-If every target field has a configured owner, reference-to-group mappings are current, and retrieval enforces its group filter, every returned chunk is associated with at least one selected group whose owned target fields are in scope:
+PAR Assist entered pilot in April 2026 and launched across the full CFO Group in all geographies in May. That establishes that this architecture passed the applicable production path and is operating at the stated scope. It does not, by itself, establish a universal architecture for regulated workflows or a quantified improvement in drafting time.
 
-<MathBlock html={tex("\\forall c \\in \\bigcup_{g \\in G(q, s_t)} \\hat{\\mathcal{C}}_g: \\exists g \\in G(q, s_t) \\text{ such that } c \\in \\mathcal{D}_g \\wedge \\mathcal{F}_g \\cap \\mathcal{F}_T \\neq \\emptyset", true)} />
-
-This is an association contract enforced through configuration and filtering, not a relevance or completeness theorem. Overlap between <InlineEquation html={tex("\\mathcal{D}_g")} /> sets is allowed. The property remains conditional on taxonomy quality, indexing correctness, and enforcement of the group filter; stale mappings or retrieval bugs violate the premise and require validation and monitoring.
-</TheoremBlock>
-
-### 3.5 Parallel Extraction Within a Single-Agent Envelope
-
-<TheoremBlock variant="definition" number={6} title="N Parallel Scoped Extraction">
-Let <InlineEquation html={tex("N = |G(q, s_t)|")} />. For each relevant group <InlineEquation html={tex("g \\in G(q, s_t)")} />, a scoped extraction call
-
-<MathBlock html={tex("J_g = T_{\\text{extract}}\\bigl(\\mathcal{L},\\,\\hat{\\mathcal{C}}_g,\\, \\mathcal{F}_g,\\, \\Pi_g\\bigr) \\in \\text{JSON}(\\mathcal{F}_g)", true)} />
-
-executes concurrently where capacity permits, with each call bounded by the configured field and token budgets. <InlineEquation html={tex("\\Pi_g")} /> carries per-group instructions, validation criteria, and few-shot good/bad exemplars. Each output <InlineEquation html={tex("J_g")} /> is validated against a JSON dictionary whose allowed keys are the target fields owned by <InlineEquation html={tex("\\mathcal{F}_g")} />.
-</TheoremBlock>
-
-<TheoremBlock variant="definition" number={7} title="Ownership-Aware Merge">
-Let <InlineEquation html={tex("o: \\mathcal{F}_T \\to \\mathcal{G}")} /> be the configured owner map. For a candidate field <InlineEquation html={tex("f")} /> returned by its owner group:
-
-<MathBlock html={tex("J^*(f) = J_{o(f)}(f) \\quad \\text{when } f \\in \\operatorname{keys}(J_{o(f)})", true)} />
-
-Merge code accepts values only for a group's owned keys; duplicate or out-of-scope contributions are collisions, not silent tie-breaks, and are routed for review. Overlapping source evidence does not create a field-value collision by itself.
-</TheoremBlock>
-
-<TheoremBlock variant="remark" title="Operational single-agent boundary">
-Concurrency alone does not make these extraction calls sub-agents. In the reviewed v1 design, graph code selects the groups, dispatches registered extraction work, validates each response, and applies the ownership-aware merge. The calls do not hold independent workflow control or exchange messages with one another. That operational boundary, rather than a mathematical theorem about what counts as an agent, is the basis for describing v1 as single-agent.
-</TheoremBlock>
-
-### 3.6 Coverage and Follow-Up Loop
-
-<TheoremBlock variant="definition" number={8} title="Coverage Operator">
-<MathBlock html={tex("\\langle\\, \\rho_t,\\, \\mathcal{Q}_t \\,\\rangle = T_{\\text{coverage}}(J^*,\\, \\mathcal{F}_T,\\, \\text{guidelines},\\, \\text{exemplars})", true)} />
-
-where <InlineEquation html={tex("\\rho_t \\in [0,1]")} /> is the fraction of required fields containing candidate values that pass configured checks, and <InlineEquation html={tex("\\mathcal{Q}_t")} /> is the set of prioritized follow-up questions. When the configured review threshold is met and no follow-ups remain, the graph can assemble a draft for author review; otherwise the session loops through <InlineEquation html={tex("v_{\\text{clarify}}")} />.
-</TheoremBlock>
-
-### 3.7 Transactional State and Retrieval
-
-The implementation pairs a transactional workflow store with vector-backed retrieval <CitationRef id={14} />. The workflow store retains declared checkpoints, registered tool records, and validated session state; the retrieval layer indexes approved reference material:
-
-<MathBlock html={tex("\\text{workflow}(s_t) = \\underbrace{\\text{ckpt}(s_t)}_{\\text{declared state}} \\cup \\underbrace{\\text{log}(a_{0:t})}_{\\text{registered actions}}", true)} />
-
-Committing <InlineEquation html={tex("\\delta(s_t, u_t, a_t)")} /> with its registered tool records makes the declared session path inspectable. Reconstruction still depends on successful writes, schema and registry coverage, reference-version capture, and retention policy; the storage arrangement alone does not prove completeness.
-
-## 4. Context Boundary and Assumptions
-
-<TheoremBlock variant="definition" title="Application-Managed Context Objective">
-<MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\subseteq \\mathcal{U}_{\\text{approved}} \\cup \\mathcal{D}_{\\text{approved}} \\cup \\mathcal{P}_{\\text{approved}}", true)} />
-</TheoremBlock>
-
-<TheoremBlock variant="remark" title="Operational assumptions">
-The LLM operates at the intake/template node and at the <InlineEquation html={tex("N")} /> extraction nodes, receiving <InlineEquation html={tex("(u_t, \\hat{\\mathcal{C}}_g, \\mathcal{F}_g, \\Pi_g)")} /> in each call. These inputs can include user-uploaded source material and retrieved references, so the design does not imply zero data exposure. Instead, ingestion classification, scoped retrieval, and tool-output filtering are intended to keep application-managed context within the approved model-processing set <CitationRef id={10} />. The boundary is conditional on those controls working as configured; user-entered sensitive text, misclassification, overly broad retrieval, or a faulty output filter remains residual risk and requires testing, monitoring, and incident controls.
-</TheoremBlock>
-
-## 5. Impact and Reusability
-
-PAR Assist supports a guided interactive drafting session in which extracted candidate fields can retain references to a policy, guideline, or example. The pilot launched in April 2026; the full CFO Group launch across all geographies followed in May. No drafting-time or adoption result is asserted here without a publishable measurement.
-
-The five-piece pattern (graph orchestration <CitationRef id={6} />, a typed tool boundary <CitationRef id={5} />, two-stage field-group retrieval <CitationRef id={7} />, concurrent scoped extraction with ownership-aware merge, and retained workflow state) is a candidate for other enterprise workflows with (i) a structured target form, (ii) institutional knowledge across heterogeneous sources, and (iii) regulatory audit requirements. Transfer still requires domain-specific controls and evaluation. A multi-agent successor is in pilot; further details will follow in a coordinated publication.
-
-<TheoremBlock variant="remark">
-<MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{state persists}}", true)} />
-
-That separation supported this deployment path in a regulated environment <CitationRef id={3} /><CitationRef id={13} />: narrower model context, typed action surfaces, explicit operational checks, and a reviewed single-agent envelope.
-</TheoremBlock>
+The reusable part is a set of questions: Who owns control? Which work is bounded as a tool routine? What state is required to resume? How is evidence scoped? Where do collisions surface? What stops progression when coverage is missing? Who reviews the result? Those questions transfer to other structured workflows. The answers, controls, and evidence still have to be designed and evaluated for each domain.

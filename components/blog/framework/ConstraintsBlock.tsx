@@ -53,7 +53,7 @@ export default function ConstraintsBlock({
 }) {
   return (
     <figure className="my-8 not-prose">
-      <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-accent">
+      <p className="mb-4 font-mono text-xs uppercase tracking-widest text-accent">
         {heading}
       </p>
       <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -73,7 +73,7 @@ export default function ConstraintsBlock({
                 </strong>
                 <span
                   className={cn(
-                    'rounded-full border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider',
+                    'rounded-full border px-2 py-0.5 font-mono text-xs font-semibold uppercase tracking-wider',
                     styles.badge
                   )}
                 >

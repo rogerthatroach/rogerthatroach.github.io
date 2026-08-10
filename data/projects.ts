@@ -69,13 +69,13 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     stack: ['GCP', 'Vertex AI', 'Document AI', 'OpenCV', 'Random Forest'],
     heroMetric: { value: HUMANA_ACCURACY, label: 'Checkbox Accuracy' },
     caption:
-      '99.95% checkbox-detection accuracy for Humana — up from a ~70% Document AI-only baseline for that task. Hybrid pipeline: Document AI OCR, OpenCV pixel-level detection, Random Forest classification on BigTable + BigQuery.',
+      '99.95% checkbox-detection accuracy for Humana — up from a ~70% Document AI-only baseline for that task. The component combined Document AI OCR, OpenCV pixel-level localization, and Random Forest classification.',
     description:
-      'End-to-end document verification pipeline on Google Cloud. Led the checkbox-detection breakthrough for Humana: layered OpenCV pixel-level detection and Random Forest classification on top of Document AI OCR to improve that component from ~70% to 99.95%.',
+      'Implemented the checkbox-detection component on Quantiphi\'s client-delivery team, layering OpenCV pixel-level localization and Random Forest classification onto Document AI OCR to improve that task from ~70% to 99.95%.',
     highlights: [
       'Hybrid pipeline: Document AI OCR → OpenCV pixel-level checkbox detection → Random Forest classification — 99.95% checkbox-detection accuracy (up from a ~70% Document AI-only baseline for that task)',
-      'Vertex AI deployment: custom and AutoML models for document classification and entity extraction',
-      'BigTable + BigQuery backbone for ingestion and analytics at scale',
+      'Separate document-classification and entity-extraction work deployed on Vertex AI',
+      'Classified checkbox states rejoined with the surrounding document structure',
       'Parallel workstream: multi-million-row inventory analytics with SQL and Tableau for enterprise retail clients',
     ],
     palette: { primary: '#67e8f9', primaryLight: '#155e75', glow: 'shadow-cyan-500/20', bg: 'from-cyan-500/5' },
@@ -92,10 +92,10 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     caption:
       'Overhauled the Commodity Tax return process from a multi-month manual workflow to a 90-minute automated pipeline. The win that built CFO stakeholder trust and opened the door to AI.',
     description:
-      'Transformed the Commodity Tax return process with PySpark pipelines and Tableau dashboards for financial KPI monitoring.',
+      'Automated the Commodity Tax return process with a PySpark pipeline and configured Tableau inspection views for finance review.',
     highlights: [
       'PySpark pipeline for General Ledger Journal data extraction at scale',
-      'Tableau dashboards for financial KPI monitoring (CFO Group adoption vehicle)',
+      'Configured Tableau views for finance review and investigation',
       'Recognized with CFO Group RBC Quarterly Team Award (Q4 2023)',
     ],
     palette: { primary: '#fcd34d', primaryLight: '#92400e', glow: 'shadow-amber-500/20', bg: 'from-amber-500/5' },
@@ -110,15 +110,15 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
     heroMetric: { value: AEGIS_V2_BUILD_TIME, label: 'v1 → v2 refactor' },
     caption:
-      'Canadian Big 6 bank peer-benchmarking engine. v1 (Sr DS, solo): built end-to-end to automate extraction and matching despite quarterly Supplementary Financial Package schema shifts, breaking the long-standing peer-analysis bottleneck. v2 (Lead, 2-week concurrent refactor sprint, run in parallel with Astraeus and the Amplify intern program): refactored the v1 benchmarking module into multi-stage RAG with multi-gate query parsing across bank, parameter, platform, and time-period, plus a text-to-SQL layer over rich KPI metadata and embeddings. My direct report and the broader team integrated and productionalized it as Aegis v2. CFO One RBC Team Award (2025) for v1.',
+      'Canadian Big 6 bank peer-benchmarking engine. v1 (Sr DS, solo): built end-to-end to automate extraction and matching despite quarterly Supplementary Financial Package schema shifts, breaking the long-standing peer-analysis bottleneck. v2 (Lead, 2-week concurrent refactor sprint, run in parallel with Astraeus and the Amplify intern program): refactored the v1 benchmarking module into five stages for typed intent, embedding-based KPI candidate retrieval, accept-or-clarify resolution, reviewed query construction with bound values, and deterministic formatting. My direct report and the broader team integrated and productionalized it as Aegis v2. CFO One RBC Team Award (2025) for v1.',
     description:
-      'Strategic peer-benchmarking engine for the CFO Group, leveraging Supplementary Financial Package data from the Big 6 Canadian banks. v1 was a solo end-to-end build that automated SFP extraction and matching across quarterly schema shifts. The v2 refactor added multi-stage RAG with multi-gate query parsing, plus text-to-SQL with KPI disambiguation.',
+      'Strategic peer-benchmarking engine for the CFO Group, using Supplementary Financial Package data from the Big 6 Canadian banks. v1 was a solo end-to-end build that automated SFP extraction and matching across quarterly schema shifts. The v2 refactor added a five-stage text-to-SQL path with explicit candidate retrieval, clarification, and pre-execution controls.',
     highlights: [
       'v1 (Sr DS, solo): automated SFP extraction and matching across Big 6 Canadian banks despite quarterly schema shifts, breaking the long-standing peer-analysis bottleneck. CFO One RBC Team Award (2025).',
-      'v2 (Lead, 2-week concurrent refactor sprint): refactored the v1 benchmarking module into multi-stage RAG with multi-gate query parsing across bank, parameter, platform, time-period, plus text-to-SQL over rich KPI metadata and embeddings. Integrated and productionalized by my direct report with the broader team.',
+      'v2 (Lead, 2-week concurrent refactor sprint): refactored the v1 benchmarking module into a five-stage path from typed intent and KPI retrieval through resolution, reviewed query construction, and deterministic formatting. Integrated and productionalized by my direct report with the broader team.',
       'Intent parsing and query decomposition into logical sub-parts; KPI detection via embeddings-based similarity search for near-duplicate names.',
-      'Guarded LLM-assisted disambiguation: pinpoints intended KPI without exposing sensitive data.',
-      'Guardrails: whitelisting, parameterization, testability.',
+      'Bounded model-assisted disambiguation: an evaluated policy accepts one catalog KPI or returns focused alternatives for clarification before query construction.',
+      'Controls include reviewed patterns, allow-lists, parameter binding, stage-level validation, and a clarification path.',
     ],
     palette: { primary: '#93c5fd', primaryLight: '#1e40af', glow: 'shadow-blue-500/20', bg: 'from-blue-500/5' },
     deepDivePath: '/projects/aegis',

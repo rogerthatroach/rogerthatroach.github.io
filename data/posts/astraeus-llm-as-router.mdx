@@ -1,7 +1,8 @@
-import AstraeusCascade from '@/components/blog/diagrams/AstraeusCascade'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
+import { AstraeusBuilderContrastFigure } from '@/components/visualizations/astraeus'
+import { ASTRAEUS_BUILDER_CONTRAST } from '@/data/visualizations/astraeus'
 
-> **A builder-register companion to the formal post [Agentic Architecture with Bounded LLM Roles for Enterprise Financial Analytics](/blog/agentic-ai) and the practitioner rewrite [LLM-as-Router in Practice — Four Decisions](/blog/astraeus-llm-as-router-framework).** The formal post describes the system boundaries, controls, assumptions, and residual risks. The practitioner post lays the four architectural decisions and their alternatives out as first-class structure. This one is the story of the call: the pressure to make the opposite call, and what the pattern taught me about building AI in regulated finance.
+> **This is the story behind the architecture call.** [Astraeus: Bounded LLM Roles for Financial Analytics](/blog/agentic-ai) explains the mechanism, evidence, and failure paths. [LLM-as-Router in Practice — Four Decisions](/blog/astraeus-llm-as-router-framework) compares the alternatives and trade-offs. Here, the focus is the pressure to make the opposite call and what productionising the chosen boundary taught me about regulated AI.
 
 ---
 
@@ -40,15 +41,15 @@ The monolithic option did not meet those four constraints.
 The pattern I landed on is straightforward to describe and fiddly to build:
 
 - A foundation model is used for intent work and answer-shaping across four bounded stages: a Gate call (relevance / injection / scope), three parallel domain-specific metadata extractions, one Answer call on the simple path (or three parallel Answer calls on the cross-domain path), and a final Synthesis call on the cross-domain path. That is 5 to 8 LLM calls per query.
-- Between two dashed walls, a deterministic Cython-compiled Python layer owns the controlled data path: permission cascade (domain → access → entities → cost centres → SQL), then employee-event-level ins/outs calculations over the entitled cost-centre set. The deterministic layer also handles dispatch, parallelization, re-gating between stages, and typed JSON validation contracts at every stage boundary.
+- Between two declared application contracts, a deterministic Cython-compiled Python layer owns the controlled data path: permission cascade (domain → access → entities → cost centres → SQL), then employee-event-level ins/outs calculations over the entitled cost-centre set. The deterministic layer also handles dispatch, parallelization, re-gating between stages, and typed JSON validation contracts at every stage boundary.
 - Aggregates cross back up; the Answer-stage and Synthesis-stage calls shape them into the user-facing response.
 - The declared interface sends parsed metadata down and structured aggregates up. Keeping underlying records outside model context depends on the implementation, configuration, tests, and monitoring continuing to match that interface.
 - Transactional storage supports the state, entitlement, hierarchy, and trace records used by the controlled path.
 
-This is LLM-as-Router. The LLM handles language-shaped work (classifying intent, disambiguating phrasing, handling synonyms). The deterministic layer owns entitlement resolution, data access, calculation, and boundary validation. *[For the decision tree behind each of these (orchestration shape, computation layer, entitlement enforcement, synthesis strategy) see the [practitioner post](/blog/astraeus-llm-as-router-framework).]*
+This is LLM-as-Router. The LLM handles language-shaped work (classifying intent, disambiguating phrasing, handling synonyms). The deterministic layer owns entitlement resolution, data access, calculation, and boundary validation. [LLM-as-Router in Practice — Four Decisions](/blog/astraeus-llm-as-router-framework) compares the alternatives behind orchestration, computation, entitlement, and answer shaping.
 
-<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: LLM intent (Gate, then three parallel metadata extractions), deterministic Cython compute with permission cascade and employee-event-level ins/outs calculations, LLM answer and synthesis (1 Answer call on the simple path, or 3 parallel Answer calls plus 1 Synthesis call on the cross-domain path). The declared interface passes parsed metadata down and structured aggregates up; tests and monitoring are required to verify that boundary.">
-<AstraeusCascade />
+<VisualizationContainer minHeight={0} caption={ASTRAEUS_BUILDER_CONTRAST.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<AstraeusBuilderContrastFigure content={ASTRAEUS_BUILDER_CONTRAST} />
 </VisualizationContainer>
 
 The permission-to-SQL entitlement modeling alone took weeks of domain immersion: domain permissions map to access groups, which map to employees, which map to cost centres (the atomic unit of the data model), which map to SQL WHERE clauses. That mapping had to be explicit, reviewable, and testable rather than delegated to a prompt.

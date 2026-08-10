@@ -1,7 +1,5 @@
 'use client';
 
-import 'katex/dist/katex.min.css';
-
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Clock, Calendar, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';

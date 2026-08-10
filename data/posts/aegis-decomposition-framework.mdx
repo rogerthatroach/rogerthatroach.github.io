@@ -1,6 +1,6 @@
-import AegisCascade from '@/components/blog/diagrams/AegisCascade'
-import CitationRef from '@/components/blog/CitationRef'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
+import { AegisDecisionSpineFigure } from '@/components/visualizations/aegis'
+import { AEGIS_PRACTITIONER_DECISIONS, AEGIS_PRACTITIONER_WALKTHROUGH } from '@/data/visualizations/aegis'
 import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
 import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
 import DecisionRationale from '@/components/blog/framework/DecisionRationale'
@@ -11,10 +11,10 @@ Finance analysts ask a question with subtle ambiguity baked in: *"how does our c
 
 The industry pattern here is straightforward: prompt an LLM with a schema definition and the user&rsquo;s question; let the model emit SQL; run it. Fast to prototype. Easy to demo. Inadequate on its own inside regulated finance: chain-of-thought is not an audit trail; LLM-emitted SQL is not a safety property; *"the model usually gets it right"* is not a confidence interval.
 
-Aegis went the other way. Five sequential stages, two dashed walls, LLM use bounded to two stages (and the second only when a confidence gate fires). Templates produce SQL; parameters bind values; deterministic code formats the result. This post unpacks the four architectural decisions that separate decomposition-as-guardrail from the single-prompt pattern, with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. The project chronology lives in the [builder companion](/blog/aegis-v2-velocity). The companion [technical note](/blog/text-to-sql) states the assumptions behind template safety, schema constraints, and confidence-gated disambiguation.
+Aegis went the other way. Five sequential stages give interpretation, retrieval, ambiguity resolution, reviewed query construction, and formatting separate contracts. Model use is bounded to intent parsing and, when needed, candidate comparison. Templates produce SQL; parameters bind values; deterministic code formats the result. This post unpacks the four architectural decisions that separate decomposition-as-guardrail from the single-prompt pattern, with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. [Two Weeks, One Refactor](/blog/aegis-v2-velocity) tells the delivery chronology. [Aegis: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths](/blog/text-to-sql) examines the controls and failure paths.
 
-<VisualizationContainer minHeight={500} caption="The Aegis cascade. Five sequential stages cut by two dashed walls. Band 1 — intent (LLM, JSON-schema constrained). Wall 1: the declared intent payload is limited to the query and catalog metadata. Band 2 — KPI detect (deterministic embeddings) → disambiguation gate (LLM when the candidate set falls inside the ambiguity band; clarify when the operating acceptance threshold is not met). Wall 2: the database path accepts reviewed templates with parameter binds rather than free-form model SQL. Band 3 — template-based SQL generation with parameter binding → deterministic formatting. Transactional storage supports the catalog, embeddings, templates, query records, and audit records.">
-<AegisCascade />
+<VisualizationContainer minHeight={0} caption={AEGIS_PRACTITIONER_DECISIONS.caption} variant="open">
+  <AegisDecisionSpineFigure content={AEGIS_PRACTITIONER_DECISIONS} />
 </VisualizationContainer>
 
 ## Constraints before choices
@@ -58,7 +58,7 @@ Does the system give the LLM the natural-language question and ask for SQL? Or d
   decision="Who turns natural language into validated SQL: a single LLM call, or a decomposed pipeline?"
   options={[
     {
-      name: 'Decomposed five-stage pipeline (LLM use bounded to S1 + S3)',
+      name: 'Decomposed five-stage pipeline with bounded model use',
       summary: 'Intent parsing (LLM) → KPI detection (embeddings) → disambiguation gate (LLM if needed) → SQL generation (reviewed template + parameters) → formatting (deterministic). Typed stage contracts make controls and failures testable at their boundaries.',
       chosen: true,
       pros: [
@@ -114,7 +114,7 @@ Does the system give the LLM the natural-language question and ask for SQL? Or d
   ]}
 />
 
-<DecisionRationale option="Decomposed five-stage pipeline (LLM use bounded to S1 + S3)">
+<DecisionRationale option="Decomposed five-stage pipeline with bounded model use">
 Three reasons, in order. First: **decomposition is a guardrail.** Each stage has a narrow contract, a testable interface, and clear failure modes. When the disambiguation gate fires, the SQL stage has not run yet. Before SQL generation runs, the resolved KPI and parameters must pass validation. That structure gives the system explicit stop points and makes the data flow easier to inspect; it does not remove the need for end-to-end tests and runtime monitoring.
 
 Second: **the controls are testable per stage.** The SQL stage&rsquo;s reviewed-template and parameter-binding contract does not rely on the LLM emitting executable SQL. Schema checks belong to the template library and structural validator. Disambiguation behavior belongs to the confidence gate and its empirically chosen threshold. Local contracts make failures easier to test, trace, and audit, while their effectiveness still depends on configuration, validation coverage, and the evaluation distribution.
@@ -126,14 +126,14 @@ The cost is the upfront template library and per-stage contract design, followed
 
 ### Decision 2 · KPI detection method
 
-Once the intent is parsed, the system has a metric reference (μ, the user&rsquo;s phrase for the KPI they want). The catalog contains overlapping names and related definitions. How does the system produce a useful candidate set?
+Once the intent is parsed, the system has the user&rsquo;s phrase for the KPI they want. The catalog contains overlapping names and related definitions. How does the system produce a useful candidate set?
 
 <OptionsConsidered
   decision="How does the system map a metric reference to a candidate set of KPIs in the catalog?"
   options={[
     {
       name: 'Sentence embeddings + cosine similarity threshold',
-      summary: 'Each catalog KPI is embedded by name + definition + metadata. The metric reference is embedded too. Candidates are retrieved by cosine similarity above a threshold τ_min.',
+      summary: 'Each catalog KPI is embedded from its name, definition, and reviewed metadata. The metric phrase is embedded too. A configured retrieval policy returns a bounded candidate shortlist.',
       chosen: true,
       pros: [
         'Can retrieve common abbreviation and full-name pairs such as "NIM" and "Net Interest Margin" even when their tokens differ',
@@ -175,7 +175,7 @@ Once the intent is parsed, the system has a metric reference (μ, the user&rsquo
 <DecisionRationale option="Sentence embeddings + cosine similarity threshold">
 The catalog contains abbreviations and full names that exact keyword matching can miss. *NIM* is a common abbreviation for *Net Interest Margin*, so an embedding model can place the two names near one another even when their tokens differ. That proximity is only candidate-retrieval evidence: each bank&rsquo;s reported definition and catalog metadata still need to be checked during disambiguation.
 
-The detection stage&rsquo;s job is *recall*, not precision. It returns a candidate set <em>K<sub>c</sub></em>, not a single answer. Precision is the next stage&rsquo;s job: the disambiguation gate decides whether the candidate set is unambiguous (top candidate dominates) or whether the LLM (or, ultimately, the user) needs to break the tie. Separating recall from precision is what lets the embedding stage stay deterministic and lets the disambiguation stage stay LLM-bounded.
+The detection stage&rsquo;s job is *recall*, not precision. It returns a candidate shortlist, not a single answer. Precision is the next stage&rsquo;s job: the disambiguation gate decides whether one candidate is clearly supported or whether the model, and ultimately the user, needs to break the tie. Separating recall from precision keeps retrieval deterministic and bounds model use to the ambiguity decision.
 </DecisionRationale>
 
 ### Decision 3 · SQL generation safety model
@@ -271,7 +271,7 @@ Some KPI references are unambiguous. Some are not. What does the system do when 
     },
     {
       name: 'Always clarify (return candidates; let the user pick)',
-      summary: 'Whenever |K_c| > 1, return the candidate list and have the user choose.',
+      summary: 'Whenever more than one candidate remains, return the candidate list and have the user choose.',
       pros: [
         'Moves the final KPI choice to the user when several candidates remain',
         'No LLM disambiguation cost',
@@ -296,38 +296,8 @@ Model readiness is evaluated rather than assumed. Over-confidence on near-duplic
 The synthetic example below shows how a cost-to-income peer-comparison question can move through the declared control path. It illustrates the architecture without reproducing deployed identifiers, scores, thresholds, results, or timings.
 
 <StepThrough
-  steps={[
-    {
-      label: 'S1 · Parse intent',
-      title: 'The intent model returns a typed tuple I = (μ, τ, δ, ω)',
-      content: 'A schema-constrained call maps the question into a typed intent: metric reference, time window, comparison shape, and output format. The declared stage contract permits query text and reviewed catalog metadata rather than financial values; payload tests and monitoring provide operating evidence for that boundary.',
-    },
-    {
-      label: 'S2 · KPI detection',
-      title: 'Embedding similarity returns candidate set K_c',
-      content: 'The metric reference is embedded and compared with reviewed catalog metadata. The candidate set contains reported and adjusted variants plus related efficiency measures, and the score margin falls inside the configured ambiguity band.',
-    },
-    {
-      label: 'S3 · Disambiguation gate',
-      title: 'Ambiguity band → disambiguator or clarification',
-      content: 'The disambiguator receives the question and reviewed candidate metadata under the declared payload contract. Its score is treated as an operating signal, not a pointwise probability of correctness. For this illustration the selection clears the configured acceptance threshold; otherwise the system would list candidates and ask the user to clarify.',
-    },
-    {
-      label: 'S4 · SQL generation',
-      title: 'Template selected; parameters bound',
-      content: 'The resolved KPI and comparison shape select a reviewed peer-comparison time-series template. The KPI, period, and entity set bind as typed parameters. Allow-list, AST, operation-type, parameter, and known-hazard checks run before the parameterized statement can cross Wall 2.',
-    },
-    {
-      label: 'Database execution',
-      title: 'Prepared statement runs against the values store',
-      content: 'The database executes the prepared statement and returns a bounded comparison result for the requested period and authorized entity scope. This example intentionally omits production row counts and latency.',
-    },
-    {
-      label: 'S5 · Format result',
-      title: 'Deterministic formatter emits the response',
-      content: 'The formatter builds the requested comparison table and cites the resolved KPI name and definition. The declared audit path records the query, typed intent, selected catalog entry and score, reviewed template reference, bound-parameter metadata, and response subject to access, minimization, and retention controls.',
-    },
-  ]}
+  label="Follow one illustrative request"
+  steps={AEGIS_PRACTITIONER_WALKTHROUGH}
 />
 
 ## Before and after
@@ -345,12 +315,12 @@ The synthetic example below shows how a cost-to-income peer-comparison question 
     ),
   }}
   after={{
-    label: 'Aegis v2: decomposed pipeline + walls',
+    label: 'Aegis v2: decomposed, bounded query path',
     content: (
       <ul className="list-disc space-y-2 pl-5">
         <li>Analysts ask in natural language; the first stage emits a typed intent.</li>
         <li>Embeddings retrieve candidates, then the confidence gate accepts or asks for clarification.</li>
-        <li>Most catalog additions become reviewed data and embedding updates rather than new query rules.</li>
+        <li>For existing supported query shapes, many catalog additions become reviewed data and embedding updates rather than new query rules.</li>
         <li>Validation and clarification make uncertainty visible before SQL execution.</li>
       </ul>
     ),
@@ -359,7 +329,7 @@ The synthetic example below shows how a cost-to-income peer-comparison question 
 
 ## What transfers
 
-The *family* this architecture belongs to is the LLM-as-Router pattern (see [Astraeus practitioner post](/blog/astraeus-llm-as-router-framework) for the cross-domain analytics variant). The general shape: bound the LLM to *intent* and *judgment under uncertainty*; deterministic code does compute and produces SQL/results. Walls separate the LLM context from data and from emitted SQL. Decomposition is one guardrail among validation, access control, testing, and monitoring.
+The *family* this architecture belongs to is the LLM-as-Router pattern. [LLM-as-Router in Practice — Four Decisions](/blog/astraeus-llm-as-router-framework) examines the cross-domain analytics variant. The general shape: bound the LLM to *intent* and *judgment under uncertainty*; deterministic code performs calculation and produces the registered query and result. Declared application contracts separate model-mediated work from data access and executable SQL. Decomposition is one guardrail among validation, access control, testing, and monitoring.
 
 What transfers across instances of the family is the *shape*: the bounded LLM surface area, confidence gates where uncertainty triggers clarification, and a deterministic compute or generation backbone. What does *not* transfer is the specific load-bearing piece: in Astraeus it is hierarchy-aware allocation math across roughly 40,000 leaf-level cost centres; in Aegis it is the reviewed template library plus parameterized binding. Each system is built around the part that has to be most precise. The LLM is kept on the narrowest practical surface, while tests, validation, access controls, and monitoring enforce the boundaries in operation.
 

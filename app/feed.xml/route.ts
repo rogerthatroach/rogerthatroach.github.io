@@ -36,7 +36,7 @@ export function GET(): Response {
     <title>Harmilap Singh Dhaliwal — Writings</title>
     <link>${SITE_URL}/blog</link>
     <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />
-    <description>Technical whitepapers and practitioner deep-dives on production AI/ML.</description>
+    <description>Technical notes, decision guides, and builder stories about production AI/ML.</description>
     <language>en</language>
 ${items}
   </channel>

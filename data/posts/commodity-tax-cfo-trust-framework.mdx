@@ -1,22 +1,19 @@
 import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
 import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
 import DecisionRationale from '@/components/blog/framework/DecisionRationale'
-import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
 import Glossed from '@/components/resume/story/Glossed'
-import { CommodityTaxPipeline } from "@/components/blog/BlogDiagrams"
+import { CommodityTaxDecisionMapFigure, CommodityTaxInvestigationFigure } from '@/components/visualizations/commodity-tax'
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import { COMMODITY_TAX_PRACTITIONER_DECISIONS, COMMODITY_TAX_PRACTITIONER_INVESTIGATION } from '@/data/visualizations/commodityTax'
 
 In September 2022 I joined <Glossed>CFO Group</Glossed> at RBC as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the <Glossed>Commodity Tax</Glossed> return process, a manual workflow that consumed finance analysts for months per cycle.
 
 By Q4 2023, the process took **90 minutes**. The metric earned the **CFO Group RBC Quarterly Team Award**. More importantly, it earned the credibility to propose Aegis, Astraeus, and eventually PAR Assist, a cascade that shaped the next three years.
 
-This post walks the architectural decisions that made it land: under explicit constraints, against named alternatives, with the reasoning that produced each call. The narrative version of this story lives in the [builder companion](/blog/commodity-tax-cfo-trust). The formal frame (pipeline as a sequence of provenance-preserving graph rewrites, Tableau as a parallel presentation layer derived from the same provenance algebra) lives in the [formal post](/blog/commodity-tax-provenance).
+This post examines two architecture decisions under explicit constraints, with the alternatives, trade-offs, and residual costs kept visible. [How Commodity Tax Built CFO Trust](/blog/commodity-tax-cfo-trust) tells the delivery story. [Commodity Tax: Making a Financial Pipeline Inspectable](/blog/commodity-tax-provenance) explains the five-stage calculation path, recorded lineage, configured inspection views, and evidence-failure cases.
 
-<VisualizationContainer
-  minHeight={500}
-  caption="The architecture. Five-stage pipeline (Extract → Reconcile → Category map → Aggregate → Return) on the left; parallel Tableau inspection views on the right. Configured drill-throughs follow retained lineage toward associated source rows. Transparency runs alongside compute — not only at the end."
->
-  <CommodityTaxPipeline />
+<VisualizationContainer minHeight={0} caption={COMMODITY_TAX_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <CommodityTaxDecisionMapFigure content={COMMODITY_TAX_PRACTITIONER_DECISIONS} />
 </VisualizationContainer>
 
 ## Constraints before choices
@@ -78,7 +75,7 @@ The first decision was close to obvious. The second decision is the whole post.
         'Scales to full-cycle extraction in one pass; no batching gymnastics',
         'CDP is the sanctioned platform for PII-adjacent workloads, staying inside avoids a governance fight',
         'Code is maintainable by other data scientists, not just me',
-        'Native lineage tracking on CDP supports the auditability constraint downstream',
+        'Retained pipeline identifiers and records can support configured lineage paths downstream',
       ],
       cons: [
         'Steeper onboarding vs. pandas for collaborators unfamiliar with Spark',
@@ -116,12 +113,9 @@ The first decision was close to obvious. The second decision is the whole post.
   option="PySpark on CDP"
   summary="Match the data scale (hard constraint) and stay inside the sanctioned platform (regulatory)."
 >
-  <p>
-    PySpark matched the known full-cycle GL volume, and <Glossed>CDP</Glossed> was the sanctioned enterprise platform. Pandas would have required explicit batching and memory-management work at that scale, while SAS would have split this workflow from the Python stack used for the planned AI-adjacent work. The choice favored scale fit, platform fit, and maintainability.
-  </p>
-  <p>
-    A subtlety worth naming: this decision didn&rsquo;t earn any stakeholder trust. Finance leadership did not care which dataframe library produced the numbers. The compute decision was about <em>making the second decision possible</em>: once compute was solved, attention could move to the architectural call that did earn trust.
-  </p>
+  PySpark matched the known full-cycle GL volume, and <Glossed>CDP</Glossed> was the sanctioned enterprise platform. Pandas would have required explicit batching and memory-management work at that scale, while SAS would have split this workflow from the Python stack used for the planned AI-adjacent work. The choice favored scale fit, platform fit, and maintainability.
+
+  A subtlety worth naming: this decision didn&rsquo;t earn any stakeholder trust. Finance leadership did not care which dataframe library produced the numbers. The compute decision was about <em>making the second decision possible</em>: once compute was solved, attention could move to the architectural call that did earn trust.
 </DecisionRationale>
 
 ### Decision 2 · Output architecture
@@ -188,60 +182,28 @@ This is the decision that built trust.
 
 <DecisionRationale
   option="Tableau as the transparency layer"
-  summary="Output was the side effect; transparency was the product."
+  summary="The return was the deliverable; inspection made it reviewable."
 >
-  <p>
-    This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation, even one with bugs in v1, built a debuggable, auditable relationship between the analysts and the system.
-  </p>
-  <p>
-    In the evaluated workflow, this addressed the main constraints together: retained lineage for review, authorized inspection at configured stages, Tableau familiarity for the finance team, and a presentation layer shaped around the PySpark outputs.
-  </p>
-  <p>
-    The structural reason this can work: when the pipeline records complete, correctly associated lineage for a stage, the dashboard can reuse that relation rather than implement a second lineage path. Dashboard semantics, access controls, and performance still require separate engineering and review. The <a href="/blog/commodity-tax-provenance">formal post</a> states those assumptions and failure modes explicitly.
-  </p>
+  This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation, even one with bugs in v1, built a debuggable, auditable relationship between the analysts and the system.
+
+  In the evaluated workflow, this addressed the main constraints together: retained lineage for review, authorized inspection at configured stages, Tableau familiarity for the finance team, and a presentation layer shaped around the PySpark outputs.
+
+  The structural reason this can work: when the pipeline retains usable, correctly associated lineage for a stage, the dashboard can reuse that relation rather than implement a second lineage path. Dashboard semantics, access controls, and performance still require separate engineering and review. <a href="/blog/commodity-tax-provenance">The technical note</a> states those assumptions and failure modes explicitly.
 </DecisionRationale>
 
 ## The stakeholder-trust loop
 
 The dashboards supported a repeatable review pattern: when an analyst questioned an aggregate, the team could inspect the recorded pipeline state together, follow a configured lineage path toward associated rows, and either reconcile the result or correct a mapping. The view did not prove that a number or rule was correct; it made the evidence and the point of disagreement easier to inspect.
 
+<VisualizationContainer minHeight={0} caption={COMMODITY_TAX_PRACTITIONER_INVESTIGATION.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <CommodityTaxInvestigationFigure content={COMMODITY_TAX_PRACTITIONER_INVESTIGATION} />
+</VisualizationContainer>
+
 By Q4 2023, the cycle took 90 minutes and the work received the CFO Group RBC Quarterly Team Award. The shared review surface was a contributing design choice; that does not establish that one interface alone caused adoption.
 
 ## Impact
 
-<BeforeAfterDiff
-  heading="What changed"
-  before={{
-    label: 'Before',
-    hint: 'Pre-automation',
-    content: (
-      <>
-        <p>Months per cycle of manual spreadsheet work.</p>
-        <ul className="mt-2 list-disc pl-5 text-xs">
-          <li>Finance analysts blocked on GL extraction</li>
-          <li>Category mappings held in tribal knowledge</li>
-          <li>Edge cases rediscovered every cycle</li>
-          <li>Review depended on manual reconciliation rather than a shared stage-by-stage lineage view</li>
-        </ul>
-      </>
-    ),
-  }}
-  after={{
-    label: 'After',
-    hint: 'Q4 2023 onward',
-    content: (
-      <>
-        <p><strong className="text-text-primary">90 minutes</strong> per cycle. The roughly $600M allocation was computed through deterministic PySpark stages for the recorded inputs, rules, and code version.</p>
-        <ul className="mt-2 list-disc pl-5 text-xs">
-          <li>CFO Group RBC Quarterly Team Award (Q4 2023)</li>
-          <li>Configured outputs expose recorded lineage toward their associated journal rows</li>
-          <li>Shared Tableau views support joint investigation of anomalies</li>
-          <li>Rule changes remain governed through explicit review and versioning</li>
-        </ul>
-      </>
-    ),
-  }}
-/>
+The process was reduced from months to 90 minutes per cycle. Separately, it covered a roughly $600M allocation per cycle. The work received the CFO Group RBC Quarterly Team Award (Q4 2023). Those outcomes sit outside the architecture figures: configured inspection made review more direct, but did not establish correctness by itself.
 
 ## What this opened
 
@@ -253,7 +215,7 @@ Every one of those projects was technically ambitious. None of them would have b
 
 One scope call I&rsquo;d revisit: the first dashboard set surfaced provenance for *outputs* but not for *rules*. Analysts could use configured views to follow supported lineage paths from a derived number toward associated source GL rows, but the rules that produced each category mapping lived in PySpark code, modifiable only by the data team. New tax categories or re-categorizations of existing GL accounts therefore required code changes and redeploys.
 
-In retrospect I&rsquo;d have built a *mapping-rules dashboard* earlier, letting analysts propose rule additions directly (still requiring code-review approval before production) and turning the mapping layer from a single-person bottleneck into a shared surface. Formally (see the [provenance post](/blog/commodity-tax-provenance) §7), this is a missing presentation function: a <em>π<sub>ρ</sub></em> over the rule set itself, not just <em>π<sub>i</sub></em> over the data states. The transparency principle was useful for outputs; applying it to rules earlier would have reduced later coordination and redeployment work.
+In retrospect I&rsquo;d have built a *mapping-rules review surface* earlier, letting analysts propose rule additions while keeping code review and production approval explicit. The first dashboard set exposed evidence for outputs, but not the rule set that produced each category mapping. Giving reviewers a governed way to inspect proposed rule changes could have reduced coordination and redeployment work without turning a dashboard edit into an automatic production change.
 
 ## The pattern
 

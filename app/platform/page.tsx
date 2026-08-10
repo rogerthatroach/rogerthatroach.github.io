@@ -111,7 +111,7 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
           href="/blog/enterprise-agentic-ai-architecture"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          formal post
+          technical note
         </Link>
         ).
       </>
@@ -126,7 +126,7 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
           href="/blog/agentic-ai"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          formal post
+          technical note
         </Link>
         ).
       </>
@@ -137,12 +137,12 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
     evidence: (
       <>
         Typed MCP tool registry &rarr; Postgres audit log (PAR Assist);
-        provenance algebra (
+        recorded lineage and configured inspection views (
         <Link
           href="/blog/commodity-tax-provenance"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          formal post
+          technical note
         </Link>
         ).
       </>
@@ -152,13 +152,13 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
     surface: 'LLM safety / guardrails',
     evidence: (
       <>
-        Defense-in-depth: calibration &rarr; AST validation &rarr;
-        template fallback (
+        Staged controls: semantic candidate retrieval &rarr; explicit
+        clarification &rarr; reviewed templates and parameter binding (
         <Link
           href="/blog/text-to-sql"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          formal post
+          technical note
         </Link>
         ).
       </>

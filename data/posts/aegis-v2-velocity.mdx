@@ -1,5 +1,6 @@
-import { AegisCascade } from "@/components/blog/BlogDiagrams"
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import { AegisMilestoneFigure, AegisStructuralDiffFigure } from '@/components/visualizations/aegis';
+import { AEGIS_BUILDER_DIFF, AEGIS_BUILDER_MILESTONES } from '@/data/visualizations/aegis';
 
 Aegis v2 was a two-week concurrent refactor of the production v1 system, not a separate greenfield build. I was simultaneously running Astraeus development and the 2025 summer intern program. The refactor landed while v1 continued serving analysts.
 
@@ -25,24 +26,25 @@ A later approved model generation closed enough of the gap in our evaluations. I
 
 That&rsquo;s the unlock that made the two-week sprint possible. Not architecture clarity in isolation. Architecture clarity *plus* a model that crossed the reliability bar.
 
+<VisualizationContainer minHeight={0} caption={AEGIS_BUILDER_MILESTONES.caption} variant="open">
+  <AegisMilestoneFigure content={AEGIS_BUILDER_MILESTONES} />
+</VisualizationContainer>
+
 ## The five-stage pipeline
 
 The spine of v2 is a decomposed pipeline where each stage owns one concern:
 
 1. **Intent parsing:** approved LLM with constrained generation against a JSON schema. Returns a typed intent tuple: which KPI, which time window, which comparison shape, which output format. Validation retries on schema violation; clarification request on persistent failure.
-2. **KPI detection:** deterministic embedding similarity search over the catalog. Returns a candidate set <em>K<sub>c</sub></em>.
-3. **Disambiguation gate:** if the top candidate dominates by a clear margin, accept it. If candidates cluster (the near-duplicate problem), the LLM gets the candidate names + definitions (no values) and chooses, with a calibrated confidence score. If confidence drops below 1&minus;&epsilon;, the system asks the user.
-4. **SQL generation:** template-based with parameter binding. Templates are pre-authored, schema-whitelisted SQL with typed placeholders. A defense-in-depth validation layer runs whitelist checks (allowed tables/columns), AST checks (SELECT-only, no DDL), parameter type checks, and a deny-list of forbidden keywords as a safety net.
+2. **KPI detection:** deterministic embedding similarity search over the catalog. Returns a ranked candidate shortlist.
+3. **Disambiguation gate:** if one candidate meets the evaluated acceptance policy, it can proceed. If several candidates remain plausible, a model compares their names and definitions. A model score is a routing signal, not a correctness probability; unresolved cases return to the user.
+4. **SQL generation:** template-based with parameter binding. Templates are pre-authored, schema-allow-listed SQL with typed placeholders. Structural, read-operation, identifier, and parameter-type checks run before execution.
 5. **Result formatting:** deterministic. Output shape (table / chart / narrative / single value) was fixed in the intent tuple at Stage 1.
 
-<VisualizationContainer
-  minHeight={500}
-  caption="Figure 1: The pipeline + two walls. LLM use is bounded to stages 1 and 3. Wall 1: intent calls are designed to receive metadata rather than KPI values. Wall 2: the database path accepts reviewed templates with parameter binds rather than free-form model SQL. Decomposition narrows the surface; validation and monitoring enforce it."
->
-  <AegisCascade />
+<VisualizationContainer minHeight={0} caption={AEGIS_BUILDER_DIFF.caption} variant="open">
+  <AegisStructuralDiffFigure content={AEGIS_BUILDER_DIFF} />
 </VisualizationContainer>
 
-The formal paper states the assumptions behind the safety controls: reviewed templates, parameter binding, schema validation, allow-lists, and confidence-gated disambiguation. These controls reduce the query surface but do not prove injection impossible; template review, validator coverage, access controls, and runtime monitoring remain necessary. Each stage is independently testable and has an explicit fallback. The LLM handles structured intent and ambiguous-candidate selection within schemas and confidence thresholds; database access and numerical computation remain in code.
+[The technical note](/blog/text-to-sql) states the assumptions behind the controls: reviewed templates, parameter binding, schema validation, allow-lists, and confidence-gated disambiguation. These controls reduce the query surface but do not prove injection impossible; template review, validator coverage, access controls, and runtime monitoring remain necessary. Each stage is independently testable and has an explicit fallback. The LLM handles structured intent and ambiguous-candidate selection within schemas and confidence thresholds; database access and numerical computation remain in code.
 
 ## What the two-week refactor actually required
 

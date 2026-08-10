@@ -1,362 +1,113 @@
-import { PermissionCascade, EventModelAnimation } from "@/components/blog/BlogDiagrams"
-import AstraeusCascade from '@/components/blog/diagrams/AstraeusCascade'
-import MathBlock from '@/components/blog/MathBlock';
-import { tex } from '@/lib/katex';
-import InlineEquation from '@/components/blog/InlineEquation';
-import TheoremBlock from '@/components/blog/TheoremBlock';
-import VisualizationContainer from '@/components/blog/VisualizationContainer';
-import CitationRef from '@/components/blog/CitationRef';
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
+import CitationRef from '@/components/blog/CitationRef'
+import {
+  AstraeusEventModelFigure,
+  AstraeusPermissionCascadeFigure,
+  AstraeusTechnicalOverviewFigure,
+} from '@/components/visualizations/astraeus'
+import {
+  ASTRAEUS_EVENT_MODEL,
+  ASTRAEUS_PERMISSION_CASCADE,
+  ASTRAEUS_TECHNICAL_OVERVIEW,
+} from '@/data/visualizations/astraeus'
 
-## Abstract
+Astraeus answers a deceptively simple kind of question: a finance leader asks for headcount, compensation cost, or open positions across an authorized part of the organization and expects an answer they can use. The language is flexible. The calculation and access rules cannot be.
 
-Large Language Models (LLMs) have demonstrated strong natural-language capability, yet their probabilistic outputs and opaque reasoning present challenges for enterprise financial systems that need reproducible computation, fine-grained access control, and regulatory auditability. This paper presents an architectural pattern (**LLM-as-Router**) that limits models to intent parsing and answer phrasing while conventional code performs entitlement checks and numerical computation. We describe two application boundaries (metadata-oriented inputs on the way down, authorized aggregates on the way up), state the assumptions under which raw-record payloads stay outside application-managed model context, and identify residual risks that still require testing and monitoring. The production implementation at a major bank's CFO Group uses 5 to 8 approved-model calls per query across four stages (gate, parallel metadata extraction, answer, synthesis) around Cython-compiled Python compute that performs event-level ins-outs math across ~40,000 cost centres, turning days-long line-of-business requests into interactive analysis across authorized hierarchy scopes.
+The architecture therefore separates responsibilities rather than treating one model call as the system. Foundation-model stages interpret the request and shape the response. Conventional code resolves entitlement, reads governed data, performs the calculation, and validates the handoffs. The numerical path is repeatable for fixed inputs, data, code, and configuration; model routing and prose remain probabilistic.
 
-<VisualizationContainer minHeight={500} caption="Figure 1. The Cascade. Two dashed boundaries separate the three bands: LLM intent (gate / parallel metadata extraction), deterministic Cython-compiled compute with permission cascade and event-level ins-outs math, LLM answer and synthesis (1 answer call on the simple path, or 3 parallel answer calls plus 1 synthesis call on the cross-domain path). The declared application path sends metadata toward compute and authorized structured aggregates toward answer calls; payload tests and monitoring verify that boundary. Transactional persistence supports the compute and audit paths.">
-  <AstraeusCascade />
+This note is about that boundary: what crosses it, what evidence can test it, and where the design can still fail.
+
+## The responsibility split
+
+The useful question is not whether an LLM can call tools or produce a plausible financial answer. It is which responsibilities may remain probabilistic without weakening access control or moving calculation into generated prose.
+
+That separation makes failures easier to locate. A routing error is not the same failure as a stale entitlement mapping. A correct aggregate with misleading prose is not the same failure as incorrect arithmetic. Each needs different evidence and a different fallback.
+
+<VisualizationContainer minHeight={0} caption={ASTRAEUS_TECHNICAL_OVERVIEW.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <AstraeusTechnicalOverviewFigure content={ASTRAEUS_TECHNICAL_OVERVIEW} />
 </VisualizationContainer>
 
-## 1. Introduction
+The figure describes the intended application path. It does not prove that every integration follows it. Queries can contain sensitive information, aggregates can themselves be sensitive, and logs or telemetry can create a second exposure surface. A privacy boundary therefore requires call-site inventory, payload inspection, access control, retention rules, and incident handling in addition to typed interfaces <CitationRef id={4} />.
 
-Enterprise AI systems operating on sensitive financial data have to combine three different properties: natural-language interpretation, reproducible numerical computation, and fine-grained access control. Architectures that place data and arithmetic inside one model call make those properties harder to test independently <CitationRef id={1} /><CitationRef id={2} />.
+## Four bounded model stages
 
-The pattern decomposes the system into components with distinct responsibilities: a model-based intent layer, a stateful compute layer, and model-based answer phrasing over authorized aggregate results. This does not make the full response deterministic or eliminate exposure risk; it makes the numerical and entitlement paths independently testable and narrows what application data the model receives.
+Astraeus uses five to eight foundation-model calls across four stages. The count varies with the query shape, but the responsibility split does not.
 
-The contributions of this paper are:
+**1. Gate.** The first stage checks whether the request belongs to a supported domain and screens for out-of-scope or suspicious input. It returns a typed routing decision. Because this is a model decision, false accepts and false rejects remain possible; validation and a safe refusal path are part of the operating design.
 
-1. A formal definition of the **LLM-as-Router** architecture pattern for enterprise AI
-2. A conditional analysis of the application-managed model-context boundary and its residual risks
-3. A formalization of permission-to-SQL entitlement translation under explicit mapping assumptions
-4. A production implementation at enterprise scale
+**2. Metadata extraction.** Domain-scoped calls extract request metadata in parallel. They work from the user query and reviewed domain descriptions, not from direct access to operational stores. Their outputs must satisfy the domain contract before the deterministic path can use them. An invalid or incomplete payload stops or clarifies the request rather than silently broadening it.
 
-## 2. Problem Formulation
+**3. Answer shaping.** After entitlement and calculation, one or more answer calls receive structured aggregates for the authorized scope. These calls turn values into a readable response. They do not recompute the values, and their output is checked against the aggregate payload.
 
-### 2.1 System Requirements
+**4. Synthesis.** A cross-domain request may require a final model call to combine domain-specific answers. Numerical joins and reconciliation happen before this stage. Synthesis can organize and explain the result, but it can still omit context or introduce an unsupported interpretation.
 
-Let <InlineEquation html={tex("\\mathcal{Q}")} /> denote the space of natural language queries, <InlineEquation html={tex("\\mathcal{D}")} /> the space of sensitive enterprise data, and <InlineEquation html={tex("\\mathcal{R}")} /> the space of formatted responses. We seek a function <InlineEquation html={tex("f: \\mathcal{Q} \\rightarrow \\mathcal{R}")} /> such that:
+The model-facing stages use approved foundation-model endpoints through an internal multi-provider model gateway. Provider choice is not the architectural control. The controls are the payload contract, the deterministic work between model stages, the validation at each handoff, and the fallback when a stage does not clear its checks.
 
-<TheoremBlock variant="definition" number={1} title="System Requirements">
-  <div className="mb-3">
-    <strong>Requirement 1 (Semantic Understanding).</strong> Semantically equivalent queries should map to the same validated intent representation, subject to the supported intent schema:
-  </div>
-  <MathBlock html={tex("q_1 \\equiv_{\\text{sem}} q_2 \\implies \\phi(q_1) = \\phi(q_2)", true)} />
-  <div className="mb-3">
-    <strong>Requirement 2 (Reproducible Computation).</strong> For a validated intent <InlineEquation html={tex("\\phi(q)")} />, fixed versioned inputs, and a fixed entitlement snapshot, the numerical compute function should return the same structured result <InlineEquation html={tex("r^*")} />:
-  </div>
-  <MathBlock html={tex("g(\\mathcal{D}|_{P(u)}, \\phi(q)) = r^*", true)} />
-  <div className="mb-1 text-xs text-text-tertiary">
-    where <InlineEquation html={tex("\\phi(q)")} /> is the structured representation of <InlineEquation html={tex("q")} /> and <InlineEquation html={tex("g")} /> is a deterministic computation function.
-  </div>
-  <div className="mb-3 mt-3">
-    <strong>Requirement 3 (Raw-Record Boundary).</strong> Application-managed model inputs should exclude raw workforce and financial records <InlineEquation html={tex("\\mathcal{D}_{\\text{raw}}")} />. User queries and authorized aggregates remain in model context:
-  </div>
-  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{raw}} = \\emptyset", true)} />
-  <div className="mb-3">
-    <strong>Requirement 4 (Entitlement Enforcement).</strong> For a user <InlineEquation html={tex("u")} /> with permission set <InlineEquation html={tex("P(u)")} />, the visible data must be restricted:
-  </div>
-  <MathBlock html={tex("f_u(q) = g(\\mathcal{D}|_{P(u)}, \\phi(q))", true)} />
-  <div className="text-xs text-text-tertiary">
-    where <InlineEquation html={tex("\\mathcal{D}|_{P(u)}")} /> denotes <InlineEquation html={tex("\\mathcal{D}")} /> filtered to the subset authorized for <InlineEquation html={tex("u")} />.
-  </div>
-</TheoremBlock>
+Repeated-prompt studies in code generation illustrate that model output can vary under similar settings <CitationRef id={3} />. Astraeus therefore treats its own model-shaped stages as probabilistic and evaluates them accordingly. The narrower claim is that the calculation path is repeatable for fixed authorized inputs and a retained data/configuration state, not that the complete natural-language response is deterministic.
 
-### 2.2 Why Monolithic LLM Architectures Fail
+## Entitlement translation belongs in code
 
-A monolithic architecture passes both the query and relevant data into a single LLM call:
+The entitlement problem starts in Enterprise Performance Management, where permissions reflect organizational domains, access groups, people, cost centres, and hierarchy position. The calculation store needs an executable filter. The figure follows the five handoffs that translate one into the other and shows the stop condition at each boundary.
 
-<MathBlock html={tex("f_{\\text{mono}}(q) = \\mathcal{L}(q, \\mathcal{D}_{\\text{relevant}})", true)} />
+Roughly 40,000 cost centres form the leaf level shared by the business-segment and geographic hierarchies. The business-segment hierarchy has 18 levels and roughly 9,000 rollups. A request may target one approved slice or cross several supported domains, but the same entitlement translation determines the rows available to the calculation.
 
-When <InlineEquation html={tex("\\mathcal{D}_{\\text{relevant}}")} /> contains raw records, this shape exceeds the Requirement 3 boundary. It also puts numerical reasoning in a probabilistic component: the same prompt can produce different outputs across invocations <CitationRef id={3} />, and temperature zero does not guarantee stability across model versions or API updates.
-
-## 3. Architecture: LLM-as-Router
-
-### 3.1 Formal Definition
-
-<TheoremBlock variant="definition" number={2} title="LLM-as-Router Architecture">
-  <div className="mb-2">
-    A system <InlineEquation html={tex("\\mathcal{S}")} /> implements the LLM-as-Router pattern if it decomposes into intent, computation, and answer-shaping components:
-  </div>
-  <MathBlock html={tex("\\mathcal{S} = \\mathcal{L}_{\\text{answer}} \\circ \\mathcal{A}_{\\text{compute}} \\circ \\mathcal{L}_{\\text{route}}", true)} />
-  <div className="mb-1">where:</div>
-  <ul className="list-inside list-disc space-y-1">
-    <li>
-      <InlineEquation html={tex("\\mathcal{L}_{\\text{route}}: \\mathcal{Q} \\rightarrow \\mathcal{I}")} /> is a <strong>routing function</strong> implemented by an LLM, mapping natural language queries to a structured intent space <InlineEquation html={tex("\\mathcal{I}")} />
-    </li>
-    <li>
-      <InlineEquation html={tex("\\mathcal{A}_{\\text{compute}}: \\mathcal{I} \\times \\mathcal{D} \\rightarrow \\mathcal{R}_{\\text{structured}}")} /> is a <strong>computation function</strong> implemented by deterministic modules, mapping validated intents and entitled data to structured results
-    </li>
-    <li>
-      <InlineEquation html={tex("\\mathcal{L}_{\\text{answer}}")} /> receives authorized structured aggregates and phrases them for the user; its output is checked against the structured result
-    </li>
-    <li>
-      Application-managed model inputs exclude <InlineEquation html={tex("\\mathcal{D}_{\\text{raw}}")} /> under the boundary assumptions in Section 4
-    </li>
-  </ul>
-</TheoremBlock>
-
-### 3.2 Intent Space
-
-The intent space <InlineEquation html={tex("\\mathcal{I}")} /> is a structured schema:
-
-<MathBlock html={tex("\\mathcal{I} = \\{(c, \\theta, \\tau, \\omega) \\mid c \\in \\mathcal{C},\\; \\theta \\in \\Theta,\\; \\tau \\in \\mathcal{T},\\; \\omega \\in \\Omega\\}", true)} />
-
-where:
-
-- <InlineEquation html={tex("c \\in \\mathcal{C} = \\{\\text{headcount}, \\text{cost}, \\text{positions}\\}")} /> is the **domain class**
-- <InlineEquation html={tex("\\theta \\in \\Theta")} /> is the **query parameter set** (time range, organizational scope, comparison type)
-- <InlineEquation html={tex("\\tau \\in \\mathcal{T}")} /> is the **temporal specification** (point-in-time, range, trend)
-- <InlineEquation html={tex("\\omega \\in \\Omega")} /> is the **output format** (table, chart, summary, report)
-
-The intent space is finite and enumerable, which lets downstream compute modules validate a known set of structured inputs rather than accept open-ended natural language. The model's intent selection remains probabilistic and is evaluated separately.
-
-### 3.3 Call Layering and Stage Orchestration
-
-The production system organizes LLM work into **5 to 8 calls per query** arranged in four stages. Stages 1 and 2 sit on the LLM *intent* side of the compute boundary; stages 3 and 4 sit on the LLM *answer-shaping* side, downstream of deterministic numerical computation.
-
-**Stage 1 — Gate (one LLM call).** A single gate call screens the query for three concerns at the door: relevance to Astraeus, prompt-injection indicators, and membership in the scoped domain set. A rejection terminates this path. The gate is one control, not proof that adversarial inputs cannot pass.
-
-**Stage 2 — Parallel metadata extraction (three parallel LLM calls).** Three metadata-extract calls fire in parallel, one per domain (Headcount, HR Costs / EPM, Open Positions). Under the declared stage contract, each call receives the query and reviewed metadata rather than direct access to operational data stores, then returns domain-scoped metadata (time range, organizational scope, comparison shape). This is the final LLM touch before the first wall. The deterministic Python layer between stages handles dispatch, parallelization, entitlement checks at relevant handoffs, and typed JSON validation contracts.
-
-**Stage 3 — Answer (one or three LLM calls; branches by query complexity).** After the deterministic compute layer returns authorized aggregates, the system branches. On the simple path (single-domain query), one answer call composes the response and stage 4 is skipped. On the cross-domain path, three answer calls fire in parallel, one per domain, each phrasing its slice from the aggregate it owns. These calls do see aggregate values, and their phrasing is probabilistic.
-
-**Stage 4 — Synthesis (one LLM call, cross-domain path only).** When stage 3 fans out across domains, a final synthesis call combines the three domain-specific answers. Inputs are typed and structured; numerical reconciliation is computed before the call, and the generated response is checked against the structured aggregate payload. A failed check follows a fallback path rather than being accepted as evidence of correctness. Total calls: 5 on the simple path (gate + 3 metadata + 1 answer); 8 on the cross-domain path (gate + 3 metadata + 3 answer + 1 synthesis).
-
-Formally, the computation layer between the walls consists of <InlineEquation html={tex("k")} /> specialized deterministic compute modules <InlineEquation html={tex("\\{A_1, A_2, \\ldots, A_k\\}")} />, each handling a partition of the domain class space:
-
-<MathBlock html={tex("\\mathcal{A}_{\\text{compute}}(i, \\mathcal{D}) = A_{c(i)}(\\theta(i), \\tau(i), \\omega(i), \\mathcal{D}|_{P(u)})", true)} />
-
-In the production system <InlineEquation html={tex("k = 3")} />: cost, headcount, and open-positions compute modules. When a query spans more than one supported domain, eligible modules can run concurrently against the same versioned snapshot. Each produces an isolated typed output, and a separately tested merge combines those outputs. This is an operating contract for the conventional compute layer, not a proof that arbitrary parallel execution is equivalent to a selected single-module path. Model-based answer calls remain stochastic and are checked separately against their authorized aggregate inputs.
-
-## 4. Application-Managed Data Boundary
-
-### 4.1 Threat Model
-
-For this analysis, assume the model provider processes submitted context but that any submitted value could be retained or exposed. This is one bounded threat scenario <CitationRef id={4} />, not a complete security model: compromised application code, user-entered sensitive text, authorization defects, model-output leakage, and logging systems must be assessed separately.
-
-<TheoremBlock variant="definition" number={3} title="Application-Managed Context Set">
-  <div>
-    The application-managed context set <InlineEquation html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L})")} /> is the union of system prompts, metadata, and generated payloads the application supplies to model calls. User-authored query text is tracked separately because a user can place sensitive content in it:
-  </div>
-  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) = \\bigcup_{t} \\bigl(\\text{input}_t(\\mathcal{L}) \\setminus \\{q_t\\}\\bigr)", true)} />
-</TheoremBlock>
-
-<TheoremBlock variant="theorem" number={1} title="Raw-Record Exclusion Under Declared Inputs">
-  <div>
-    Let <InlineEquation html={tex("\\mathcal{D}_{\\text{raw}}")} /> be raw workforce and financial records and <InlineEquation html={tex("\\mathcal{A}_{\\text{authorized}}")} /> be aggregates already filtered for the requesting user. If routing calls receive only reviewed prompts and schema metadata, answer calls receive only <InlineEquation html={tex("\\mathcal{A}_{\\text{authorized}}")} />, and neither set contains raw-record payloads, then:
-  </div>
-  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\cap \\mathcal{D}_{\\text{raw}} = \\emptyset", true)} />
-</TheoremBlock>
-
-<TheoremBlock variant="proof">
-  <div className="mb-2">
-    Under the stated input contract, application-managed routing context is drawn from reviewed prompts and schema metadata, while answer context is drawn from authorized aggregate results:
-  </div>
-  <MathBlock html={tex("\\mathcal{E}_{\\text{app}}(\\mathcal{L}) \\subseteq \\mathcal{P}_{\\text{reviewed}} \\cup \\mathcal{M}_{\\text{schema}} \\cup \\mathcal{A}_{\\text{authorized}}", true)} />
-  <div>
-    The empty-intersection result follows only from the declared disjointness assumption. It is a specification to test, not evidence that the implementation always satisfies it. Payload classification, authorization, aggregate construction, and call-site inventory are all load-bearing controls.
-  </div>
-</TheoremBlock>
-
-<TheoremBlock variant="remark">
-  <div>
-    This boundary does not mean zero data exposure. Model calls contain user query text and authorized aggregates, either of which may be sensitive. Users can also paste raw values into a query. Provider terms, encryption, retention, DLP, redaction, output validation, and incident response remain necessary controls.
-  </div>
-</TheoremBlock>
-
-### 4.2 Boundary Enforcement
-
-The raw-record boundary depends on all model call sites honoring the declared contract. The production design narrows and tests that surface through:
-
-1. **Interface typing:** The routing function's declared input accepts query text and reviewed prompt metadata rather than a raw-record payload. Types reduce accidental coupling but do not stop unsafe values inside strings.
-2. **Network isolation:** The model-calling service does not hold database credentials; authorized aggregate payloads arrive through a narrower application interface.
-3. **Call-site inventory and testing:** Registered call sites, payload schemas, redaction tests, and controlled inspection provide evidence that raw-record fields are not sent. Logging itself follows minimization and access-control rules rather than retaining unrestricted prompt contents.
-
-## 5. Entitlement Model: Permission-to-SQL Translation
-
-### 5.1 The Translation Problem
-
-Enterprise Performance Management (EPM) systems enforce access control through multidimensional domain permissions: a user may see certain intersections of dimensions (e.g., "Risk division × North America × FY2025") but not others. SQL databases enforce access through row-level predicates. Translating between these models is non-trivial because domain permissions are *conjunctive* over dimensions while SQL predicates are *disjunctive* over rows.
-
-### 5.2 Formal Model
-
-<TheoremBlock variant="definition" number={4} title="EPM Permission Structure">
-  <div>
-    An enterprise permission set for user <InlineEquation html={tex("u")} /> is a set of authorized dimension intersections:
-  </div>
-  <MathBlock html={tex("P(u) = \\{(d_1^{(j)}, d_2^{(j)}, \\ldots, d_n^{(j)})\\}_{j=1}^{m}", true)} />
-  <div>
-    where each <InlineEquation html={tex("d_i^{(j)} \\in D_i")} /> is an element of dimension <InlineEquation html={tex("i")} /> (organizational unit, geography, time period, etc.).
-  </div>
-</TheoremBlock>
-
-<TheoremBlock variant="definition" number={5} title="SQL Entitlement Filter">
-  <div className="mb-2">
-    The corresponding SQL filter is a predicate <InlineEquation html={tex("\\sigma_u")} /> such that for any row <InlineEquation html={tex("r")} /> in the data table:
-  </div>
-  <MathBlock html={tex("\\sigma_u(r) = \\text{true} \\iff \\exists j: \\bigwedge_{i=1}^{n} r.d_i = d_i^{(j)}", true)} />
-  <div>
-    That is, a row is visible if and only if its dimension values match at least one authorized intersection.
-  </div>
-</TheoremBlock>
-
-### 5.3 The Translation Pipeline
-
-The production system implements this translation as a four-mapping pipeline:
-
-<MathBlock html={tex("\\text{Domains} \\xrightarrow{\\alpha} \\text{Access Groups} \\xrightarrow{\\beta} \\text{Entity Sets} \\xrightarrow{\\gamma} \\text{Cost-Centre Filters} \\xrightarrow{\\delta} \\text{SQL WHERE Clauses}", true)} />
-
-**Stage <InlineEquation html={tex("\\alpha")} />:** Extract permission grants from EPM as structured tuples <InlineEquation html={tex("(u, D_1, D_2, \\ldots, D_n)")} />.
-
-**Stage <InlineEquation html={tex("\\beta")} />:** Map permission grants to security group memberships. Security groups represent natural organizational boundaries (e.g., "Division A Managers") and serve as a caching layer. Permissions change slowly, so pre-computing group-to-employee mappings avoids runtime entitlement queries.
-
-**Stage <InlineEquation html={tex("\\gamma")} />:** Expand security groups to the entitled set of cost centres. The cost centre is the most granular unit of the org model — the shared leaf of the business-segment and geographical hierarchies; headcount and workforce events are measured over cost centres (see Section 6).
-
-**Stage <InlineEquation html={tex("\\delta")} />:** Compile the cost-centre set into parameterized SQL WHERE clauses:
-
-<div className="mb-4 overflow-x-auto rounded-sm bg-surface p-4">
-  <code className="font-mono text-xs text-text-secondary">
-    WHERE cost_centre_id IN (SELECT cost_centre_id FROM entitlements WHERE user_id = :current_user)
-  </code>
-</div>
-
-<TheoremBlock variant="proposition" number={2} title="Conditional Entitlement Monotonicity">
-  <div>
-    If every translation stage is complete, monotone with respect to set inclusion, evaluated against the same versioned entitlement snapshot, and compiled without a broader fallback, then a user with a permission subset receives a data subset:
-  </div>
-  <MathBlock html={tex("P(u_1) \\subseteq P(u_2) \\implies \\mathcal{D}|_{P(u_1)} \\subseteq \\mathcal{D}|_{P(u_2)}", true)} />
-</TheoremBlock>
-
-<TheoremBlock variant="proof">
-  <div>
-    Under the stated assumptions, composition of the monotone mappings <InlineEquation html={tex("\\alpha, \\beta, \\gamma, \\delta")} /> preserves subset relationships. The mathematical result does not establish that production mappings are complete or correctly configured; differential authorization tests, snapshot/version checks, fail-closed behavior, and access reviews provide that operating evidence.
-  </div>
-</TheoremBlock>
-
-<VisualizationContainer minHeight={400} caption="Figure 2: Permission-to-SQL translation pipeline. Toggle between two different permission sets to see how the output SQL changes at each stage.">
-  <PermissionCascade />
+<VisualizationContainer minHeight={0} caption={ASTRAEUS_PERMISSION_CASCADE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <AstraeusPermissionCascadeFigure content={ASTRAEUS_PERMISSION_CASCADE} />
 </VisualizationContainer>
 
-## 6. Event-Driven Data Model
+The figure is a map of responsibilities, not evidence that authorization is correct. Four operating tests add evidence beyond the handoff checks shown above:
 
-### 6.1 Events vs. Snapshots
+- **Narrower users remain narrower.** Differential tests compare users with deliberately nested scopes and verify that the resolved row sets preserve that relationship.
+- **Every delivery path uses the same check.** Dashboard, conversational, and report flows are tested for alternate routes around entitlement resolution.
+- **Hierarchy changes are regression-tested.** Reorganizations, new rollups, and cost-centre moves can change a result without changing application code.
+- **Query construction stays bounded.** Identifiers come from reviewed configuration, values bind as parameters, and the generated filter is inspected before execution.
 
-Traditional HR analytics systems use periodic snapshot models: headcount at time <InlineEquation html={tex("t")} /> is a count of active employees in a snapshot table. This approach suffers from reconciliation errors when employees transfer between organizational units within the same reporting period.
+These checks provide evidence for the configured routes and test cases. They do not guarantee that an undiscovered integration, stale catalog, or operational mistake cannot violate the intended boundary.
 
-We instead model workforce movements as a stream of discrete events at the transactional, per-employee level.
+## Calculation remains conventional
 
-<TheoremBlock variant="definition" number={6} title="Workforce Event">
-  <div className="mb-2">
-    A workforce event <InlineEquation html={tex("e")} /> is a tuple:
-  </div>
-  <MathBlock html={tex("e = (\\text{employee}_{\\text{id}},\\; \\text{event}_{\\text{id}},\\; \\text{event\\_type},\\; \\text{timestamp},\\; \\text{source\\_rollup},\\; \\text{target\\_rollup})", true)} />
-  <div>
-    where <InlineEquation html={tex("\\text{event\\_type} \\in \\{\\text{New Hire},\\; \\text{Departure},\\; \\text{Lateral Move Out},\\; \\text{Lateral Move In},\\; \\text{Promotion},\\; \\text{Demotion}\\}")} />.
-  </div>
-</TheoremBlock>
+Once the authorized row set and typed request are available, Cython-compiled Python performs the domain calculation. The model does not decide entitlement and does not perform the final numerical aggregation in prose. With fixed inputs, data snapshot, code, and configuration, this layer can be regression-tested against expected structured results.
 
-### 6.2 Automatic Reconciliation
+That does not make an answer automatically correct. A valid calculation can still operate on stale source data. A model can route a question to the wrong supported shape. A hierarchy can be versioned incorrectly. Answer shaping can overstate what an aggregate means. The benefit of the split is that those failures are separable: calculation tests do not have to prove language understanding, and model evaluation does not have to stand in for authorization tests.
 
-<TheoremBlock variant="theorem" number={2} title="Intra-Rollup Transfer Netting Under Paired Events">
-  <div>
-    For any rollup <InlineEquation html={tex("R")} />, if a transfer is represented by one correctly paired, de-duplicated Move Out and Move In event, and both positions <InlineEquation html={tex("p_1, p_2 \\in R")} />, then its net headcount contribution to <InlineEquation html={tex("R")} /> is zero:
-  </div>
-  <MathBlock html={tex("\\Delta H(R) = \\sum_{e \\in \\text{events}(R)} \\text{sign}(e) = (+1)_{\\text{Move In}} + (-1)_{\\text{Move Out}} = 0", true)} />
-</TheoremBlock>
+## Events and snapshots answer different questions
 
-<TheoremBlock variant="proof">
-  <div>
-    Given the paired-event premise, the Lateral Move Out from <InlineEquation html={tex("p_1")} /> contributes <InlineEquation html={tex("-1")} /> and the Lateral Move In to <InlineEquation html={tex("p_2")} /> contributes <InlineEquation html={tex("+1")} />. Since both positions belong to <InlineEquation html={tex("R")} />, the contribution is <InlineEquation html={tex("-1 + 1 = 0")} />. Missing pairs, duplicate events, late-arriving corrections, or hierarchy-version errors violate the premise and require reconciliation checks.
-  </div>
-</TheoremBlock>
+Workforce movement is a useful counterexample to the idea that one representation is sufficient. Snapshots show the stock at two reporting points; paired movement records can explain whether a change occurred within one rollup, across two rollups, or cannot yet be reconciled from the available evidence.
 
-The event representation makes correct netting testable, but it does not make source or mapping defects impossible. Pairing, uniqueness, completeness, and hierarchy-version checks are what establish the premise in operation.
-
-<VisualizationContainer minHeight={400} caption="Figure 3: Event model illustration. Select a destination to see how Lateral Move Out and Lateral Move In events fire, with headcount counters updating as the simulated events are applied.">
-  <EventModelAnimation />
+<VisualizationContainer minHeight={0} caption={ASTRAEUS_EVENT_MODEL.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <AstraeusEventModelFigure content={ASTRAEUS_EVENT_MODEL} />
 </VisualizationContainer>
 
-## 7. Production Implementation
+This is not an argument that snapshots are defective. They remain useful for point-in-time reporting and independent reconciliation. Events are useful when the question is about joins, departures, or transfers between two selected scopes. Their advantage also depends on correctly paired, de-duplicated records and the hierarchy version in effect at the time. Missing or late events require explicit reconciliation rather than a mathematical assumption that the data must balance.
 
-The architecture has been deployed in production at a major bank's CFO Group since November 2025. The table summarizes published implementation characteristics; it is not a performance evaluation.
+## Production evidence
 
-<div className="my-6 overflow-x-auto">
-  <table className="w-full text-sm">
-    <thead>
-      <tr className="border-b border-border-subtle text-left text-text-tertiary">
-        <th className="pb-2 pr-4 font-medium">Characteristic</th>
-        <th className="pb-2 font-medium">Value</th>
-      </tr>
-    </thead>
-    <tbody className="text-text-secondary">
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">LLM model</td>
-        <td className="py-2 font-mono">Approved production model</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">LLM calls per query</td>
-        <td className="py-2 font-mono">5 to 8 in 4 stages (1 gate · 3 parallel metadata · 1 or 3 answer · 0 or 1 synthesis)</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Deterministic compute</td>
-        <td className="py-2 font-mono">Cython-compiled Python</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Cost centres (leaf unit)</td>
-        <td className="py-2 font-mono">~40,000 (leaves; arbitrary-combination queryable)</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Parent rollups</td>
-        <td className="py-2 font-mono">~9,000</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">User-facing analysis</td>
-        <td className="py-2 font-mono">Interactive across supported, authorized hierarchy scopes</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Compute path</td>
-        <td className="py-2 font-mono">Cython-optimized for supported production query shapes</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Answer-stage parallelism (Stage 3, cross-domain path)</td>
-        <td className="py-2 font-mono">3 parallel answer calls (Cost / Headcount / Open Positions), then 1 synthesis call</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">LLM data exposure</td>
-        <td className="py-2 font-mono">No raw-record payloads by declared interface; queries and authorized aggregates remain in context</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4">Entitlement model</td>
-        <td className="py-2 font-mono">permission-to-SQL (per Section 5)</td>
-      </tr>
-      <tr>
-        <td className="py-2 pr-4">Persistence</td>
-        <td className="py-2 font-mono">Transactional records for events · entitlements · hierarchies · audit</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+I conceived, architected, and built Astraeus, then led its cross-functional productionisation with frontend and infrastructure peers. It has operated in the CFO Group since November 2025 across a dashboard, a conversational interface, and inbox-ready HTML reports.
 
-The system supports financial analysis through three channels: a dynamic dashboard, a conversational interface, and inbox-ready HTML reports, each using the shared entitlement path described above.
+The published production shape is deliberately specific:
 
-### 7.1 The "Impossible" Capability
+- five to eight model calls across four bounded stages;
+- Cython-compiled Python for the deterministic calculation path;
+- entitlement resolution across roughly 40,000 cost-centre leaves, an 18-level business-segment hierarchy with roughly 9,000 rollups, and a geographic hierarchy;
+- typed handoffs between routing, compute, answer, and synthesis;
+- structured operational records for the configured request path; and
+- interactive answers for supported, authorized query shapes that previously required analyst-led email and spreadsheet work.
 
-Before Astraeus, dynamic *ins-outs* analysis (*"who joined, left, or transferred between selected groups over a selected time window"*) was off the table. With roughly 40,000 leaf-level cost centres queryable in authorized combinations, precomputing the combinatorial subset-selection space is infeasible. Astraeus reframes each supported request as **linear-in-events**: workforce movements are modelled as joiner, leaver, and transfer events (Section 6); at query time the Cython-compiled compute filters the event log by time window and hierarchy scope, netting intra-rollup movements to zero (Theorem 2). The implementation supports interactive ins-outs analysis across authorized hierarchy scopes; the Cython path is optimized for those production query shapes.
+Evidence comes from several layers rather than from the diagram alone: representative model evaluations, schema and payload tests, entitlement test cases, fixed-input calculation regressions, hierarchy-version checks, output comparisons, logs, monitoring, and user review. Each supports a different part of the claim.
 
-## 8. Related Work
+## Known limits
 
-The separation of LLM reasoning from data computation relates to several active research threads:
+The responsibility split reduces the number of things any one probabilistic component is asked to do. It does not eliminate probabilistic behavior or operational risk.
 
-**Tool-use architectures.** ReAct <CitationRef id={5} /> and Toolformer <CitationRef id={6} /> demonstrate LLMs using external tools. This implementation uses a narrower application data contract: routing calls receive queries and metadata, while answer calls receive authorized aggregates rather than raw workforce records.
+- The gate and metadata stages can misunderstand a request.
+- A user can place sensitive information directly in query text.
+- Authorized aggregates can still require handling controls.
+- Entitlement catalogs and hierarchy mappings can become stale.
+- Supported query shapes do not cover every financial question.
+- Output checks can catch changed values without catching every misleading interpretation.
+- Logs are useful only when coverage, retention, minimization, and access controls are maintained.
+- A generated answer remains an aid to a responsible user, not a substitute for ownership of the decision.
 
-**Guardrailed generation.** NeMo Guardrails <CitationRef id={7} /> and similar frameworks add safety filters around LLM outputs. This architecture is complementary: it narrows and tests the declared inputs to each model call rather than relying only on output filters. Payload classification, redaction, and call-site coverage remain fallible controls that require monitoring.
-
-**Text-to-SQL.** DIN-SQL <CitationRef id={8} /> and DAIL-SQL <CitationRef id={9} /> achieve strong results on benchmarks but assume the LLM can access schema and data. This implementation keeps raw records in the compute layer: intent calls use schema metadata, while answer calls receive authorized aggregates.
-
-**Agentic frameworks.** LangGraph <CitationRef id={10} />, AutoGen <CitationRef id={11} />, and CrewAI provide orchestration primitives. The contribution here is an explicit separation of model, compute, and entitlement responsibilities, together with assumptions that can be tested at their boundaries.
-
-## 9. Conclusion
-
-The LLM-as-Router pattern separates natural-language interpretation from numerical computation and entitlement enforcement. Under declared input, mapping, and snapshot assumptions, the model describes useful boundary properties; production confidence still depends on authorization tests, payload inspection, output validation, monitoring, and human accountability.
-
-The key insight is simple but consequential: **use LLMs for what they're good at (understanding language), and use deterministic systems for what they're good at (computing answers).** The architectural boundary between these two capabilities is where trust is built.
+The design should therefore be judged by a concrete question: can a reviewer trace each responsibility to the component that owns it, the evidence that tests it, and the fallback used when it fails? If the answer is yes, the architecture is governable. If responsibilities blur across the boundary, a polished response can hide which control actually broke.
 
 {/* References and Further Reading rendered by PostLayout from data/posts/index.ts */}

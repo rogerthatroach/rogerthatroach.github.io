@@ -1,4 +1,3 @@
-import AstraeusCascade from '@/components/blog/diagrams/AstraeusCascade'
 import CitationRef from '@/components/blog/CitationRef'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
@@ -6,15 +5,17 @@ import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
 import DecisionRationale from '@/components/blog/framework/DecisionRationale'
 import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
 import StepThrough from '@/components/blog/framework/StepThrough'
+import { AstraeusDecisionMapFigure } from '@/components/visualizations/astraeus'
+import { ASTRAEUS_PRACTITIONER_DECISIONS } from '@/data/visualizations/astraeus'
 
 Finance leadership asks questions that cross three domains in one sentence: *"headcount by division, crossed with open positions, crossed with tenure."* The calculation needs to be repeatable for the same authorized inputs, data snapshot, and configuration; the request must be scoped by entitlement; and the path needs to return within an interactive latency target. The equivalent workflow previously took days and produced line-of-business-level results only.
 
 A common prototype pattern is to give the LLM broad tool access and let it iterate toward an answer: one model, function-calling into a financial data store through a ReAct-style loop. It is fast to prototype and easy to demo, but it expands the data, entitlement, and audit surface that must be governed in regulated finance.
 
-Astraeus went the other way: five to eight foundation-model calls per query across four bounded stages, with a deterministic Cython-compiled Python layer between two dashed walls. A permission-to-SQL entitlement cascade is applied *before* compute, not after. The declared interfaces limit the LLM stages to scoped metadata and structured aggregates; typed contracts, access controls, tests, logs, and monitoring are needed to verify that the deployed paths preserve those limits. This post unpacks the four architectural decisions, the alternatives that were considered, and the residual risks. The narrative of making those calls lives in the [builder companion](/blog/astraeus-llm-as-router). A deeper control analysis lives in the [formal post](/blog/agentic-ai).
+Astraeus went the other way: five to eight foundation-model calls per query across four bounded stages, with a deterministic Cython-compiled Python layer between two declared application contracts. A permission-to-SQL entitlement cascade is applied *before* compute, not after. The declared interfaces limit the LLM stages to scoped metadata and structured aggregates; typed contracts, access controls, tests, logs, and monitoring are needed to verify that the deployed paths preserve those limits. This post unpacks the four architectural decisions, the alternatives that were considered, and the residual risks. [Why I Chose LLM-as-Router Over a Monolithic Agent](/blog/astraeus-llm-as-router) tells the delivery story. [Astraeus: Bounded LLM Roles for Financial Analytics](/blog/agentic-ai) examines the mechanism, evidence, and failure paths.
 
-<VisualizationContainer minHeight={500} caption="The Cascade. Two dashed walls separate three bands: Band 1 LLM intent (Stage 1 Gate, then Stage 2 three parallel metadata extractions), Band 2 deterministic Cython compute with the permission cascade and employee-event-level ins/outs calculations across the entitled cost-centre set, Band 3 LLM answer and synthesis (Stage 3: 1 Answer call on the simple path, or 3 parallel Answer calls on the cross-domain path; Stage 4: 1 Synthesis call on the cross-domain path). The declared interface passes parsed metadata down and structured aggregates up; tests and monitoring verify the boundary. Transactional storage supports the records needed by the controlled path.">
-<AstraeusCascade />
+<VisualizationContainer minHeight={0} caption={ASTRAEUS_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <AstraeusDecisionMapFigure content={ASTRAEUS_PRACTITIONER_DECISIONS} />
 </VisualizationContainer>
 
 ## Constraints before choices
@@ -35,8 +36,8 @@ Four constraints shaped the decisions below: two regulatory, one hard-technical,
     },
     {
       kind: 'hard',
-      label: 'Interactive latency across 40K+ cost centres',
-      detail: 'The interactive experience needs a low-latency compute path across ~40K cost-centre leaves and ~9K rollups in the business-segment hierarchy, with a parallel geographical hierarchy over the same leaves. Precomputing the combinatorial subset-selection space is infeasible. Profiling and load tests must define which data volumes and query shapes meet the target.',
+      label: 'Interactive response over authorized hierarchy slices',
+      detail: 'The interactive experience needs a low-latency compute path across roughly 40,000 cost-centre leaves and roughly 9,000 rollups in the business-segment hierarchy, with a parallel geographical hierarchy over the same leaves. Precomputing the combinatorial subset-selection space is infeasible. Profiling and load tests must define which data volumes and query shapes meet the target.',
     },
     {
       kind: 'soft',
@@ -59,7 +60,7 @@ Where does the LLM sit in the control flow? Is it driving, or is it advising?
   options={[
     {
       name: 'LLM-as-Router + deterministic compute',
-      summary: 'The LLM classifies intent and extracts metadata; deterministic Python executes the computation. Two dashed walls separate intent from compute from synthesis.',
+      summary: 'The LLM classifies intent and extracts metadata; deterministic Python executes the computation. Declared application contracts separate intent, compute, and synthesis.',
       chosen: true,
       pros: [
         'Scoped interfaces minimize model-visible data; tests and monitoring check that the deployed boundary matches the design',
@@ -99,16 +100,16 @@ Where does the LLM sit in the control flow? Is it driving, or is it advising?
       ],
     },
     {
-      name: 'Multi-agent system (CrewAI / AutoGen style)',
+      name: 'Multiple model-backed specialists',
       summary: 'Multiple LLM-backed agents negotiate work, each specialized for a subdomain.',
       pros: [
         'Clean conceptual split of domain concerns',
         'Rich academic literature on coordination patterns',
       ],
       cons: [
-        'Multi-agent governance was not cleared for production at the bank at first-deployment time',
-        'More LLM surface area for data leakage, not less',
-        'Adds orchestration complexity without reducing the determinism or audit problems',
+        'Adds model-mediated actors and handoffs that this problem does not require',
+        'Expands the context and coordination surface rather than narrowing it',
+        'Adds orchestration complexity without resolving entitlement or calculation ownership',
       ],
     },
   ]}
@@ -126,7 +127,7 @@ The cost of this shape is that the deterministic compute layer has to be built a
 
 ### Decision 2 · Computation layer
 
-Once the LLM is out of the compute path, *what* does compute? Supported cross-domain query shapes over ~40K leaf-level cost centres need employee-event-level netting semantics applied over movement events, not aggregates over snapshots. The compute layer is where the interactive latency target lives or dies.
+Once the LLM is out of the compute path, *what* does compute? Supported cross-domain query shapes over roughly 40,000 leaf-level cost centres need employee-event-level netting semantics applied over movement events, not aggregates over snapshots. The compute layer is where the interactive latency target lives or dies.
 
 <OptionsConsidered
   decision="What technology implements employee-event-level ins-outs math at interactive latency?"
@@ -354,7 +355,7 @@ A concrete CFO query (*"show me headcount by division, crossed with open positio
     {
       title: 'Step 3 · Entitlement cascade (deterministic, no LLM)',
       caption: 'domain to access to entities to cost centres to SQL',
-      content: "The user's identity flows through the five-step permission cascade. Domain permissions: which Astraeus domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Cost centres: which subset of the ~40,000 leaves does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Structured logs record each step. A privilege check at this handoff confirms the resolved scope against the current entitlement view.",
+      content: "The user's identity flows through the five-step permission cascade. Domain permissions: which Astraeus domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Cost centres: which subset of the roughly 40,000 leaves does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Structured logs record each step. A privilege check at this handoff confirms the resolved scope against the current entitlement view.",
     },
     {
       title: 'Step 4 · Compute (Cython, no LLM)',
@@ -381,7 +382,7 @@ The five-step cascade is the engineering that made this architecture shippable i
 1. **Domain permissions.** The EPM organizes data into domains; the user identity resolves to a set of domain permissions. This is a direct lookup against the entitlement catalog.
 2. **Access groups.** Domain permissions map to access groups with finer-grained scope: business line, geography, grain. The mapping is maintained in EPM and pulled via a periodic catalog sync.
 3. **Entities.** Access groups map to the employee records the user is entitled to see: visible headcount, visible organizational rollups.
-4. **Cost centres.** The atomic routing unit: ~40,000 leaves shared by an 18-level business-segment hierarchy with ~9,000 rollups and a geographic hierarchy. Queries resolve to the entitled subset that the calculation operates over.
+4. **Cost centres.** The atomic routing unit: roughly 40,000 leaves shared by an 18-level business-segment hierarchy with roughly 9,000 rollups and a geographic hierarchy. Queries resolve to the entitled subset that the calculation operates over.
 5. **SQL WHERE clause.** The cost-centre set materializes into a SQL predicate that Postgres applies at query time. The declared compute path requires this predicate; tests and monitoring are responsible for detecting an alternate or misconfigured path.
 
 The decision to reuse EPM rather than build a parallel model reduced the control surface. The bank already had review and change-management processes around the EPM catalog. Forking the permission model outside EPM would have created another model to review and synchronize, with drift risk whenever the source catalog changed.
@@ -432,7 +433,7 @@ Configured model calls, compute steps, and entitlement resolutions write structu
 
 ## Timeline + velocity
 
-Astraeus went from the first design outline to production in ~5 months, with v2 cycles continuing after. The architecture stabilized early; most of the engineering time after month two went into the permission cascade, the Cython-compiled compute layer, and the employee-event-level ins/outs calculations. Stakeholder conversations (explaining, repeatedly, why LLM-as-Router was the right shape rather than the seductive monolithic pattern) ran in parallel through the first three months. The [builder companion](/blog/astraeus-llm-as-router) has the narrative of that stretch.
+Astraeus went from the first design outline to production in ~5 months, with v2 cycles continuing after. The architecture stabilized early; most of the engineering time after month two went into the permission cascade, the Cython-compiled compute layer, and the employee-event-level ins/outs calculations. Stakeholder conversations (explaining, repeatedly, why LLM-as-Router was the right shape rather than the seductive monolithic pattern) ran in parallel through the first three months. [Why I Chose LLM-as-Router Over a Monolithic Agent](/blog/astraeus-llm-as-router) tells the story of that stretch.
 
 ## What's next: Astraeus v2
 
@@ -453,6 +454,6 @@ The LLM-as-Router pattern is not specific to CFO analytics. It applies anywhere:
 - Permission enforcement should be implemented outside the model and verified with tests, logs, and monitoring
 - The cost of a wrong answer exceeds the cost of a slightly less elegant architecture
 
-Astraeus was the first production shape this pattern took inside RBC; it now underlies other systems: PAR Assist's agentic envelope is the same LLM-as-Router principle with a richer action vocabulary (see [the PAR practitioner post](/blog/enterprise-agentic-ai-framework) for the MCP-tools variant). Aegis v2's text-to-SQL is LLM-as-Router with tighter intent classification and a guardrailed SQL surface.
+Astraeus was the first production shape this pattern took inside RBC; it now underlies other systems. PAR Assist applies the separation with a richer action vocabulary; [PAR Assist: Four Decisions Behind a Reviewable Drafting Workflow](/blog/enterprise-agentic-ai-framework) explains that variant. Aegis v2 applies a related boundary to intent classification and a constrained SQL surface.
 
 The pattern transfers across system types because the constraints are shared. Giving an LLM broad data and tool access raises the same governance questions in many regulated-enterprise settings. LLM-as-Router is one compact response, provided its declared boundaries are verified in the deployed system.

@@ -30,13 +30,13 @@ export interface BlogPostMeta {
    * coming in can see which of a project's multiple posts to open
    * first without opening all of them.
    *
-   *   - 'formal'       — technical register with definitions, math, and stated assumptions
+   *   - 'technical'    — architecture + evidence + failure modes
    *   - 'practitioner' — decisions + options considered + rationale
-   *   - 'builder'      — narrative / director / story register
+   *   - 'builder'      — chronology + judgment + leadership
    *
    * Posts without this field render no tag.
    */
-  register?: 'formal' | 'practitioner' | 'builder';
+  register?: 'technical' | 'practitioner' | 'builder';
 }
 
 export interface Reference {
@@ -74,52 +74,42 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'agentic-ai',
-      title: 'Agentic Architecture with Bounded LLM Roles for Enterprise Financial Analytics',
-      subtitle: 'A Separation-of-Concerns Approach to LLM-Powered Decision Systems',
+      title: 'Astraeus: Bounded LLM Roles for Financial Analytics',
+      subtitle: 'How intent routing, entitlement filtering, deterministic calculation, and output checks divide responsibility in a production CFO analytics system.',
       date: '2026-03-01',
-      tags: ['Agentic AI', 'LLM Routing', 'Enterprise Security', 'Entitlement Modeling'],
-      readingTime: '20 min read',
+      tags: ['LLM Routing', 'Entitlements', 'Deterministic Computation', 'Financial Analytics', 'Failure Modes'],
+      readingTime: '10 min read',
       abstract:
-        'We describe an LLM-as-Router architecture that separates natural-language interpretation from entitlement resolution and deterministic calculation. The system works across ~40,000 cost-centre leaves shared by an 18-level business-segment hierarchy with ~9,000 rollups and a geographic hierarchy. Typed interfaces, access controls, validation, logs, tests, and monitoring constrain the model/data boundary; the post states the assumptions and residual risks rather than treating the design as a proof of confidentiality.',
-      updated: '2026-08-01',
+        'Astraeus places model-mediated intent and answer shaping around a conventional entitlement and calculation path. This note traces the inputs, outputs, controls, and failure modes at each boundary; explains permission-to-SQL translation and the event-versus-snapshot distinction; and states what the production evidence does and does not establish.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'astraeus',
-      register: 'formal',
+      register: 'technical',
     },
     references: [
-      { id: 1, authors: 'Zhao, W.X. et al.', title: 'A Survey of Large Language Models', venue: 'arXiv preprint arXiv:2303.18223', year: 2023, url: 'https://arxiv.org/abs/2303.18223' },
-      { id: 2, authors: 'Sun, Z. et al.', title: 'TrustLLM: Trustworthiness in Large Language Models', venue: 'arXiv preprint arXiv:2401.05561', year: 2024, url: 'https://arxiv.org/abs/2401.05561' },
       { id: 3, authors: 'Ouyang, S. et al.', title: 'LLM is Like a Box of Chocolates: the Non-determinism of ChatGPT in Code Generation', venue: 'arXiv preprint arXiv:2308.02828', year: 2023, url: 'https://arxiv.org/abs/2308.02828' },
       { id: 4, authors: 'Li, H. et al.', title: 'Privacy in Large Language Models: Attacks, Defenses and Future Directions', venue: 'arXiv preprint arXiv:2310.10383', year: 2023, url: 'https://arxiv.org/abs/2310.10383' },
-      { id: 5, authors: 'Yao, S. et al.', title: 'ReAct: Synergizing Reasoning and Acting in Language Models', venue: 'ICLR', year: 2023 },
-      { id: 6, authors: 'Schick, T. et al.', title: 'Toolformer: Language Models Can Teach Themselves to Use Tools', venue: 'NeurIPS', year: 2023 },
-      { id: 7, authors: 'Rebedea, T. et al.', title: 'NeMo Guardrails: A Toolkit for Controllable and Safe LLM Applications', venue: 'EMNLP (Demo)', year: 2023 },
-      { id: 8, authors: 'Pourreza, M. & Rafiei, D.', title: 'DIN-SQL: Decomposed In-Context Learning of Text-to-SQL with Self-Correction', venue: 'NeurIPS', year: 2023 },
-      { id: 9, authors: 'Gao, D. et al.', title: 'Text-to-SQL Empowered by Large Language Models: A Benchmark Evaluation', venue: 'VLDB', year: 2024 },
-      { id: 10, authors: 'LangChain, Inc.', title: 'LangGraph Documentation', venue: 'langchain-ai.github.io/langgraph', year: 2024, url: 'https://langchain-ai.github.io/langgraph/' },
-      { id: 11, authors: 'Wu, Q. et al.', title: 'AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation', venue: 'arXiv preprint arXiv:2308.08155', year: 2023, url: 'https://arxiv.org/abs/2308.08155' },
     ],
     furtherReading: [
-      { title: 'LangChain Documentation', url: 'https://docs.langchain.com/', description: 'Framework for building LLM-powered applications with tool use and agent orchestration.' },
-      { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for connecting AI assistants to external data sources and tools.' },
-      { title: 'Microsoft Responsible AI Standard', url: 'https://www.microsoft.com/en-us/ai/responsible-ai', description: 'Framework for responsible AI development in enterprise contexts.' },
-      { title: 'Google SAIF', url: 'https://www.saif.google/secure-ai-framework', description: 'Secure AI Framework for protecting AI systems in production.' },
+      { title: 'Why I Chose LLM-as-Router Over a Monolithic Agent', url: '/blog/astraeus-llm-as-router', description: 'The builder story about the consequential architecture call and the work required to productionise it.' },
+      { title: 'LLM-as-Router in Practice — Four Decisions', url: '/blog/astraeus-llm-as-router-framework', description: 'A decision guide to the alternatives, trade-offs, and residual risks behind the same system.' },
+      { title: 'Astraeus — Case Study', url: '/projects/astraeus', description: 'A concise account of the problem, contribution, architecture, operating state, and limits.' },
     ],
   },
   {
     meta: {
       slug: 'text-to-sql',
-      title: 'Guardrailed Text-to-SQL for Financial Benchmarking',
-      subtitle: 'A Multi-Stage Pipeline with Bounded Safety Properties',
+      title: 'Aegis: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
+      subtitle: 'How semantic candidate retrieval, evaluated clarification, reviewed SQL templates, parameter binding, and database controls constrain financial benchmarking queries.',
       date: '2026-02-08',
-      tags: ['Text-to-SQL', 'Semantic Similarity', 'SQL Injection Prevention', 'Enterprise NLP'],
-      readingTime: '18 min read',
+      tags: ['Text-to-SQL', 'Semantic Retrieval', 'Ambiguity', 'SQL Safety Controls', 'Failure Paths'],
+      readingTime: '9 min read',
       abstract:
-        'We present a five-stage decomposed pipeline — intent parsing, KPI detection via embedding similarity, LLM-assisted disambiguation, reviewed-template SQL generation, and deterministic formatting — for converting natural-language financial queries into a constrained query surface. Allowlisted identifiers, parameter binding, structural validation, and confidence-gated clarification provide defense in depth; the post also states the limits of those controls.',
-      updated: '2026-08-01',
+        'Aegis separates intent parsing, catalog candidate retrieval, ambiguity handling, reviewed query construction, and deterministic formatting. This note explains the input, output, primary control, and failure response at each stage; treats clarification as a normal outcome; and keeps free-form model output away from database execution.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'aegis',
-      register: 'formal',
+      register: 'technical',
     },
     references: [
       { id: 1, authors: 'Pourreza, M. & Rafiei, D.', title: 'DIN-SQL: Decomposed In-Context Learning of Text-to-SQL with Self-Correction', venue: 'NeurIPS', year: 2023 },
@@ -127,101 +117,76 @@ export const POSTS: BlogPost[] = [
       { id: 3, authors: 'Dong, X. et al.', title: 'C3: Zero-shot Text-to-SQL with ChatGPT', venue: 'arXiv preprint arXiv:2307.07306', year: 2023, url: 'https://arxiv.org/abs/2307.07306' },
       { id: 4, authors: 'Yu, T. et al.', title: 'Spider: A Large-Scale Human-Labeled Dataset for Complex and Cross-Domain Semantic Parsing and Text-to-SQL Task', venue: 'EMNLP', year: 2018, url: 'https://yale-lily.github.io/spider' },
       { id: 5, authors: 'Reimers, N. & Gurevych, I.', title: 'Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks', venue: 'EMNLP', year: 2019, url: 'https://www.sbert.net/' },
-      { id: 6, authors: 'Kadavath, S. et al.', title: 'Language Models (Mostly) Know What They Know', venue: 'arXiv preprint arXiv:2207.05221', year: 2022, url: 'https://arxiv.org/abs/2207.05221' },
       { id: 7, authors: 'OWASP Foundation', title: 'SQL Injection Prevention Cheat Sheet', venue: 'owasp.org', year: 2023, url: 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html' },
-      { id: 8, authors: 'Zhong, V., Xiong, C. & Socher, R.', title: 'Seq2SQL: Generating Structured Queries from Natural Language using Reinforcement Learning', venue: 'arXiv preprint arXiv:1709.00103', year: 2017, url: 'https://arxiv.org/abs/1709.00103' },
-      { id: 9, authors: 'Karpukhin, V. et al.', title: 'Dense Passage Retrieval for Open-Domain Question Answering', venue: 'EMNLP', year: 2020 },
     ],
     furtherReading: [
-      { title: 'Spider Benchmark Leaderboard', url: 'https://yale-lily.github.io/spider', description: 'Leading benchmark for evaluating text-to-SQL systems on complex, cross-domain queries.' },
-      { title: 'OWASP SQL Injection Guide', url: 'https://owasp.org/www-community/attacks/SQL_Injection', description: 'Comprehensive resource on SQL injection attack vectors and prevention strategies.' },
-      { title: 'Sentence Transformers', url: 'https://www.sbert.net/', description: 'Library for computing dense vector representations of sentences for semantic similarity.' },
+      { title: 'Two Weeks, One Refactor: Velocity, Clarity, and Model Readiness', url: '/blog/aegis-v2-velocity', description: 'The builder story about why the focused two-week refactor was possible and how the production team integrated it.' },
+      { title: 'Decomposition as Guardrail — Four Decisions', url: '/blog/aegis-decomposition-framework', description: 'The decision guide to decomposition, candidate retrieval, reviewed templates, and clarification trade-offs.' },
+      { title: 'Aegis — Case Study', url: '/projects/aegis', description: 'A concise account of the product, contribution boundary, five-stage design, and operating state.' },
     ],
   },
   {
     meta: {
       slug: 'closed-loop',
-      title: 'Closed-Loop Thinking as a Cross-Domain Design Heuristic',
-      subtitle: 'From industrial PSO to enterprise AI: what transfers, and what does not',
+      title: 'What Happens After a Model Predicts?',
+      subtitle: 'Four core design questions plus a feedback test, grounded in operator-reviewed combustion tuning and tested against later enterprise systems.',
       date: '2026-01-15',
-      tags: ['PSO', 'Closed-Loop Control', 'Digital Twins', 'Systems Thinking', 'Agentic AI'],
-      readingTime: '25 min read',
+      tags: ['PSO', 'Human-in-the-Loop', 'Industrial ML', 'Systems Design', 'Feedback Loops'],
+      readingTime: '10 min read',
       abstract:
-        'We use four questions — observe, estimate, choose, act — as a bounded analogy across industrial optimization, cloud document processing, financial process automation, and enterprise AI. The comparison keeps each system’s different objectives, evidence, controls, and failure modes explicit.',
-      updated: '2026-08-01',
+        'A model output is not yet a useful system. This note starts with 84 regression models, Particle Swarm Optimization, and operator-reviewed combustion settings at Maizuru, then tests four recurring questions—observe, estimate, choose, act—plus a return-path check against later document, finance, and model-assisted workflows. The questions transfer; the mechanisms and guarantees do not.',
+      updated: '2026-08-09',
       status: 'published',
-      register: 'formal',
+      register: 'technical',
     },
     references: [
       { id: 1, authors: 'Kennedy, J. & Eberhart, R.', title: 'Particle Swarm Optimization', venue: 'Proceedings of ICNN\'95 — International Conference on Neural Networks', year: 1995 },
       { id: 2, authors: 'Shi, Y. & Eberhart, R.', title: 'A Modified Particle Swarm Optimizer', venue: 'Proceedings of IEEE International Conference on Evolutionary Computation', year: 1998 },
       { id: 3, authors: 'Poli, R., Kennedy, J. & Blackwell, T.', title: 'Particle Swarm Optimization: An Overview', venue: 'Swarm Intelligence', year: 2007 },
-      { id: 4, authors: 'Clerc, M. & Kennedy, J.', title: 'The Particle Swarm — Explosion, Stability, and Convergence in a Multidimensional Complex Space', venue: 'IEEE Transactions on Evolutionary Computation', year: 2002 },
-      { id: 5, authors: 'Grieves, M.', title: 'Digital Twin: Manufacturing Excellence through Virtual Factory Replication', venue: 'White Paper, Florida Institute of Technology', year: 2014 },
-      { id: 6, authors: 'Tao, F. et al.', title: 'Digital Twin in Industry: State-of-the-Art', venue: 'IEEE Transactions on Industrial Informatics', year: 2019 },
-      { id: 7, authors: 'Coello Coello, C.A., Lamont, G.B. & Van Veldhuizen, D.A.', title: 'Evolutionary Algorithms for Solving Multi-Objective Problems', venue: '2nd ed., Springer', year: 2007 },
-      { id: 8, authors: 'Deb, K. et al.', title: 'A Fast and Elitist Multiobjective Genetic Algorithm: NSGA-II', venue: 'IEEE Transactions on Evolutionary Computation', year: 2002 },
-      { id: 9, authors: 'LangChain, Inc.', title: 'LangGraph Documentation', venue: 'langchain-ai.github.io/langgraph', year: 2024, url: 'https://langchain-ai.github.io/langgraph/' },
-      { id: 10, authors: 'Wu, Q. et al.', title: 'AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation', venue: 'arXiv preprint arXiv:2308.08155', year: 2023, url: 'https://arxiv.org/abs/2308.08155' },
-      { id: 11, authors: 'Gamma, E., Helm, R., Johnson, R. & Vlissides, J.', title: 'Design Patterns: Elements of Reusable Object-Oriented Software', venue: 'Addison-Wesley', year: 1994 },
     ],
     furtherReading: [
       { title: 'Particle Swarm Optimization: A Comprehensive Survey', url: 'https://link.springer.com/article/10.1007/s11831-021-09694-4', description: 'Modern survey covering PSO variants, convergence analysis, and multi-objective extensions.' },
-      { title: 'Digital Twins at NIST', url: 'https://www.nist.gov/digital-twins', description: 'NIST resources on digital-twin definitions, engineering, validation, and standardization.' },
-      { title: 'LLM Powered Autonomous Agents', url: 'https://lilianweng.github.io/posts/2023-06-23-agent/', description: 'Comprehensive overview of LLM-based agent architectures and their applications.' },
+      { title: 'Combustion Tuning — Case Study', url: '/projects/combustion-tuning', description: 'The project context, contribution boundary, operator gate, and production outcome behind the industrial example.' },
     ],
   },
   {
     meta: {
       slug: 'enterprise-agentic-ai-architecture',
-      title: 'Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Field-Group Retrieval',
-      subtitle: 'A separation-of-concerns approach to LLM-powered workflow orchestration inside a single-agent governance envelope, with explicit assumptions for context boundaries, tool logging, and field-group retrieval.',
+      title: 'PAR Assist: One Agent, Bounded Tools, Reviewable Drafting',
+      subtitle: 'How retained state, field-scoped evidence, ownership-aware merge, coverage checks, and human review shape a production drafting workflow.',
       date: '2026-03-22',
-      tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'PostgreSQL', 'Formal Methods'],
-      readingTime: '12 min read',
+      tags: ['LangGraph', 'MCP', 'Field-Scoped Retrieval', 'Single-Agent Systems', 'Human Review'],
+      readingTime: '7 min read',
       abstract:
-        'We describe an agentic workflow system as a directed graph with persistent state, typed MCP tool contracts, and two-stage field-group retrieval with bounded, group-scoped extraction calls. The design bounds model context, routes application actions through a typed tool registry, scopes retrieval by field group, and keeps control in a single-agent graph. The post makes the assumptions and residual limits of those controls explicit alongside the production implementation.',
-      updated: '2026-08-01',
+        'PAR Assist uses one LangGraph orchestrator to guide drafting across retained sessions. Typed MCP tools handle bounded workflow actions; field-scoped retrieval supplies evidence to extraction tasks; ownership-aware merge and coverage checks surface collisions and gaps for author review. The post explains where these controls help, what evidence they preserve, and which failures still require human judgment.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'par-assist',
-      register: 'formal',
+      register: 'technical',
     },
     references: [
-      { id: 1, authors: 'Yao, S. et al.', title: 'ReAct: Synergizing Reasoning and Acting in Language Models', venue: 'ICLR', year: 2023 },
-      { id: 2, authors: 'Schick, T. et al.', title: 'Toolformer: Language Models Can Teach Themselves to Use Tools', venue: 'NeurIPS', year: 2023 },
-      { id: 3, authors: 'Wang, L. et al.', title: 'A Survey on Large Language Model based Autonomous Agents', venue: 'arXiv preprint arXiv:2308.11432', year: 2023, url: 'https://arxiv.org/abs/2308.11432' },
-      { id: 4, authors: 'Wu, Q. et al.', title: 'AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation', venue: 'arXiv preprint arXiv:2308.08155', year: 2023, url: 'https://arxiv.org/abs/2308.08155' },
       { id: 5, authors: 'Anthropic', title: 'Model Context Protocol Specification', venue: 'modelcontextprotocol.io', year: 2024, url: 'https://modelcontextprotocol.io/' },
       { id: 6, authors: 'LangChain, Inc.', title: 'LangGraph: Multi-Actor Applications with LLMs', venue: 'LangChain, Inc.', year: 2024, url: 'https://langchain-ai.github.io/langgraph/' },
       { id: 7, authors: 'Lewis, P. et al.', title: 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks', venue: 'NeurIPS', year: 2020 },
-      { id: 8, authors: 'Guu, K. et al.', title: 'REALM: Retrieval-Augmented Language Model Pre-Training', venue: 'ICML', year: 2020 },
-      { id: 9, authors: 'Reimers, N. & Gurevych, I.', title: 'Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks', venue: 'EMNLP', year: 2019, url: 'https://www.sbert.net/' },
-      { id: 10, authors: 'Li, H. et al.', title: 'Privacy in Large Language Models: Attacks, Defenses and Future Directions', venue: 'arXiv preprint arXiv:2310.10383', year: 2023, url: 'https://arxiv.org/abs/2310.10383' },
-      { id: 11, authors: 'Patil, S. et al.', title: 'Gorilla: Large Language Model Connected with Massive APIs', venue: 'arXiv preprint arXiv:2305.15334', year: 2023, url: 'https://arxiv.org/abs/2305.15334' },
-      { id: 12, authors: 'Wei, J. et al.', title: 'Chain-of-Thought Prompting Elicits Reasoning in Large Language Models', venue: 'NeurIPS', year: 2022 },
-      { id: 13, authors: 'Mialon, G. et al.', title: 'Augmented Language Models: A Survey', venue: 'Transactions on Machine Learning Research', year: 2023 },
-      { id: 14, authors: 'Johnson, J. et al.', title: 'Billion-Scale Similarity Search with GPUs', venue: 'IEEE Transactions on Big Data', year: 2021 },
     ],
     furtherReading: [
-      { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Official docs for building multi-actor applications with LLMs as directed graphs with persistent state.' },
-      { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for connecting AI assistants to external data sources and tools with typed contracts.' },
-      { title: 'pgvector: Open-Source Vector Similarity Search for PostgreSQL', url: 'https://github.com/pgvector/pgvector', description: 'Extension adding vector similarity search to PostgreSQL for vector-backed retrieval.' },
-      { title: 'Weng, L. "LLM Powered Autonomous Agents"', url: 'https://lilianweng.github.io/posts/2023-06-23-agent/', description: 'Comprehensive survey of LLM-based agent architectures, planning, tool use, and memory systems.' },
-      { title: 'Microsoft Responsible AI Standard', url: 'https://www.microsoft.com/en-us/ai/responsible-ai', description: 'Framework for responsible AI development and governance controls.' },
+      { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Graph-based workflow orchestration with state, conditional routing, and checkpoints.' },
+      { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Typed interfaces for tools and model-accessible capabilities.' },
+      { title: 'Retrieval-Augmented Generation', url: 'https://arxiv.org/abs/2005.11401', description: 'The original RAG paper; useful background for retrieval as one component of the workflow.' },
     ],
   },
   {
     meta: {
       slug: 'enterprise-agentic-ai-framework',
-      title: 'Enterprise Agentic AI Architecture — Practitioner Rewrite',
+      title: 'PAR Assist: Four Decisions Behind a Reviewable Drafting Workflow',
       subtitle:
-        'The same PAR Assist system in practitioner register. Constraints, options considered, and architectural decisions are first-class structure; formal math sits as a bottom appendix for readers who want it.',
+        'Why one graph owns orchestration, tools stay bounded, evidence is scoped by field group, and missing coverage returns to clarification.',
       date: '2026-04-22',
       tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Single-Agent Envelope'],
       readingTime: '10 min read',
       abstract:
-        'PAR Assist — the first true agentic AI platform approved for production at the bank — was architected inside a single-agent governance envelope. LangGraph coordinates retained workflow state, template selection is an MCP tool, two-stage field-group retrieval scopes context, bounded extraction calls feed an ownership-aware merge, and a coverage loop surfaces follow-ups. The post examines the four architectural decisions, their trade-offs, and the assumptions behind the controls.',
-      updated: '2026-08-01',
+        'A decision guide to PAR Assist’s production v1 architecture: single-agent orchestration, typed tool boundaries, field-scoped retrieval, and bounded extraction with ownership-aware merge. It compares the main alternatives, explains the trade-offs, and keeps coverage gaps and human review explicit.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'par-assist',
       register: 'practitioner',
@@ -237,29 +202,29 @@ export const POSTS: BlogPost[] = [
       { id: 13, authors: 'Mialon, G. et al.', title: 'Augmented Language Models: A Survey', venue: 'Transactions on Machine Learning Research', year: 2023 },
     ],
     furtherReading: [
-      { title: 'Enterprise Agentic AI Architecture (original formal post)', url: '/blog/enterprise-agentic-ai-architecture', description: 'The sibling post — same system, formal register, with definitions, configured design contracts, and explicit operating assumptions. Compare with this rewrite to see the register swap.' },
-      { title: 'How We Built PAR Assist (builder story)', url: '/blog/par-assist-building', description: 'The third register — conversational builder story, same architecture.' },
+      { title: 'PAR Assist: One Agent, Bounded Tools, Reviewable Drafting', url: '/blog/enterprise-agentic-ai-architecture', description: 'The technical note on mechanism, evidence boundaries, failure paths, and residual risk.' },
+      { title: 'How We Built PAR Assist: From One-Page Vision to Production Platform', url: '/blog/par-assist-building', description: 'The production journey from one-page vision through pilot and full CFO Group launch.' },
     ],
   },
   {
     meta: {
       slug: 'par-assist-building',
       title: 'How We Built PAR Assist: From One-Page Vision to Production Platform',
-      subtitle: 'A builder-register companion to the formal architecture post — the story, decisions, and leadership lessons behind the first true agentic AI platform approved for production at the bank.',
+      subtitle: 'How a one-page vision became a launched drafting platform, and what the journey taught about scope, parallel work, and review boundaries.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '9 min read',
       abstract:
-        'The story of how a one-page vision became PAR Assist, the first true agentic AI platform approved for production at the bank (pilot April 2026; full CFO Group launch across all geographies May 2026). The concept was handed to the 2025 Amplify cohort as an ideation exercise to explore the problem space; the production platform was then built end-to-end. Architecture decisions as trade-offs, not theorems: why LangGraph fit the branching workflow, why MCP tools form the action boundary, how field-group retrieval scopes extraction, and how ownership-aware merge and retained trace records support review inside a single-agent governance envelope. Plus three leadership lessons about scoping, parallel execution, and translating vision into shipped systems.',
-      updated: '2026-08-01',
+        'The story of how a one-page vision became PAR Assist: an Amplify ideation exercise, a production build, an April 2026 pilot, and full CFO Group launch across all geographies in May. The focus is the product journey, the consequential architecture calls, and three leadership lessons about scoping, parallel execution, and turning vision into a production system.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'par-assist',
       register: 'builder',
     },
     references: [],
     furtherReading: [
-      { title: 'Enterprise Agentic AI Architecture (the formal companion)', url: '/blog/enterprise-agentic-ai-architecture', description: 'The formal post that defines the context, tool-boundary, and retrieval-scoping controls and the assumptions they depend on. Same system, different register.' },
-      { title: 'Closed-Loop Thinking as a Cross-Domain Design Heuristic', url: '/blog/closed-loop', description: 'A bounded comparison between industrial PSO and enterprise AI, including what does not transfer across domains.' },
+      { title: 'PAR Assist: One Agent, Bounded Tools, Reviewable Drafting', url: '/blog/enterprise-agentic-ai-architecture', description: 'The technical note on context, tool, retrieval, merge, coverage, and review boundaries.' },
+      { title: 'What Happens After a Model Predicts?', url: '/blog/closed-loop', description: 'A bounded comparison between industrial PSO and enterprise AI, including what does not transfer across domains.' },
       { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Official docs for directed-graph workflow orchestration with persistent state.' },
       { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for typed tool contracts between AI assistants and external systems.' },
       { title: 'pgvector', url: 'https://github.com/pgvector/pgvector', description: 'Vector similarity search for PostgreSQL, used here as part of a bounded field-group retrieval pattern.' },
@@ -270,13 +235,13 @@ export const POSTS: BlogPost[] = [
       slug: 'astraeus-llm-as-router',
       title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
       subtitle:
-        'A builder-register companion to the formal Astraeus architecture paper \u2014 the pressure to build the seductive option, and why I didn\u2019t.',
+        'The architecture choice that kept entitlement and financial calculation outside the model, and the production work needed to make that boundary real.',
       date: '2026-04-18',
       tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'Astraeus'],
       readingTime: '7 min read',
       abstract:
         'This is the story of rejecting a monolithic, broad-access agent while building Astraeus, a production analytics platform for the CFO Group. It explains why LLM-as-Router keeps entitlement and calculation outside the model, what the permission-to-SQL work required, and where typed boundaries, tests, logging, and monitoring are still needed because the architecture does not prove its own enforcement.',
-      updated: '2026-08-01',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'astraeus',
       register: 'builder',
@@ -284,17 +249,17 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'Agentic Architecture with Bounded LLM Roles (the formal companion)',
+        title: 'Astraeus: Bounded LLM Roles for Financial Analytics',
         url: '/blog/agentic-ai',
-        description: 'The technical companion describing the LLM-as-Router boundary, its controls, assumptions, and residual risks.',
+        description: 'The technical note on the LLM-as-Router boundary, its controls, evidence, failure paths, and residual risks.',
       },
       {
-        title: 'LLM-as-Router in Practice (the practitioner rewrite)',
+        title: 'LLM-as-Router in Practice \u2014 Four Decisions',
         url: '/blog/astraeus-llm-as-router-framework',
-        description: 'The same architecture in practitioner register \u2014 four decisions as first-class structure with options considered, constraint cards, and decision rationale for each.',
+        description: 'A decision guide to the alternatives, trade-offs, and residual risks behind the same system.',
       },
       {
-        title: 'How We Built PAR Assist',
+        title: 'How We Built PAR Assist: From One-Page Vision to Production Platform',
         url: '/blog/par-assist-building',
         description: 'A different system that uses typed MCP tool contracts and registered workflow records rather than Astraeus\u2019s deterministic compute wall.',
       },
@@ -310,13 +275,13 @@ export const POSTS: BlogPost[] = [
       slug: 'astraeus-llm-as-router-framework',
       title: 'LLM-as-Router in Practice \u2014 Four Decisions',
       subtitle:
-        'A practitioner-register rewrite of the Astraeus architecture. Constraints, options considered, and decision rationale for each of the four calls that separate LLM-as-Router from the seductive monolithic pattern.',
+        'Four architecture decisions that separate model-assisted intent and answer shaping from entitlement-aware deterministic calculation.',
       date: '2026-04-23',
       tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'Entitlement', 'Astraeus'],
       readingTime: '14 min read',
       abstract:
-        'Astraeus separates model-assisted intent and answer shaping from a deterministic Cython compute path. This post compares four decisions: orchestration shape, computation layer, pre-compute entitlement enforcement, and answer/synthesis strategy. It makes the typed boundary, access-control dependencies, validation, logs, tests, monitoring, and residual risks explicit; the builder companion carries the delivery story and the technical companion develops the control analysis.',
-      updated: '2026-08-01',
+        'Astraeus separates model-assisted intent and answer shaping from a deterministic Cython compute path. This guide compares four decisions: orchestration shape, computation layer, pre-compute entitlement enforcement, and answer strategy. It keeps the alternatives, trade-offs, access-control dependencies, validation, monitoring, and residual risks explicit.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'astraeus',
       register: 'practitioner',
@@ -324,19 +289,19 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'Agentic Architecture with Bounded LLM Roles (the formal companion)',
+        title: 'Astraeus: Bounded LLM Roles for Financial Analytics',
         url: '/blog/agentic-ai',
-        description: 'The sibling post \u2014 same system, formal register, with definitions, configured design contracts, and explicit operating assumptions. Compare with this rewrite to see the register swap.',
+        description: 'The technical note on system responsibilities, entitlement boundaries, production evidence, and failure paths.',
       },
       {
-        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent (the builder story)',
+        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
         url: '/blog/astraeus-llm-as-router',
-        description: 'The third register \u2014 conversational builder narrative, pushback against the seductive option, team + scope detail.',
+        description: 'The delivery story behind the architecture call, including the pressure, scope, and productionisation work.',
       },
       {
-        title: 'Enterprise Agentic AI Architecture \u2014 Practitioner Rewrite (PAR Assist)',
+        title: 'PAR Assist: Four Decisions Behind a Reviewable Drafting Workflow',
         url: '/blog/enterprise-agentic-ai-framework',
-        description: 'The same register applied to PAR Assist \u2014 MCP tools as the action boundary, field-group retrieval, single-agent envelope.',
+        description: 'A decision guide to single-agent orchestration, bounded tools, field-scoped retrieval, and coverage handling.',
       },
       {
         title: 'LangGraph Documentation',
@@ -346,7 +311,7 @@ export const POSTS: BlogPost[] = [
       {
         title: 'Cython: Python with C Performance',
         url: 'https://cython.readthedocs.io/',
-        description: 'The compiled-Python toolchain behind the event-level ins-outs math.',
+        description: 'The compiled-Python toolchain used by the deterministic event-level calculation path.',
       },
       {
         title: 'Astraeus \u2014 Case Study',
@@ -360,13 +325,13 @@ export const POSTS: BlogPost[] = [
       slug: 'aegis-decomposition-framework',
       title: 'Decomposition as Guardrail — Four Decisions',
       subtitle:
-        'A practitioner-register rewrite of the Aegis architecture. Constraints, options considered, and decision rationale for each of the four calls that separate decomposition-as-guardrail from the single-prompt text-to-SQL pattern.',
+        'Four decisions that constrain intent parsing, candidate retrieval, ambiguity handling, and reviewed SQL construction.',
       date: '2026-04-26',
       tags: ['Text-to-SQL', 'Decomposition', 'SQL Safety', 'Embeddings', 'Calibration', 'Aegis'],
       readingTime: '13 min read',
       abstract:
-        'A practitioner companion to the technical text-to-SQL note and the builder story. It compares four decisions: decomposed orchestration, embedding-based KPI detection, reviewed SQL templates with parameter binding, and confidence-gated clarification. A six-step query walkthrough and v1-to-v2 comparison show how the boundaries work in practice. The thesis: bound the LLM to intent and judgment under uncertainty; use decomposition as one layer of the guardrail.',
-      updated: '2026-08-01',
+        'This guide compares four decisions: decomposed orchestration, semantic KPI candidate retrieval, reviewed SQL templates with parameter binding, and confidence-gated clarification. A six-step query walkthrough and v1-to-v2 comparison show how the boundaries work in practice. The thesis: bound the LLM to intent and judgment under uncertainty; use decomposition as one layer of the guardrail.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'aegis',
       register: 'practitioner',
@@ -374,17 +339,17 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'Guardrailed Text-to-SQL (the formal companion)',
+        title: 'Aegis: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
         url: '/blog/text-to-sql',
-        description: 'The formal paper on the five-stage pipeline: reviewed templates, parameter binding, schema checks, confidence-gated disambiguation, and model readiness as a precondition.',
+        description: 'The technical note on the five-stage pipeline, its controls, evidence, and explicit clarification and failure paths.',
       },
       {
-        title: 'Two Weeks, One Product (the builder companion)',
+        title: 'Two Weeks, One Refactor: Velocity, Clarity, and Model Readiness',
         url: '/blog/aegis-v2-velocity',
         description: 'The narrative of when those calls landed and how a later model cleared the held-out calibration bar for a shelved design.',
       },
       {
-        title: 'LLM-as-Router in Practice (the sister practitioner post)',
+        title: 'LLM-as-Router in Practice — Four Decisions',
         url: '/blog/astraeus-llm-as-router-framework',
         description: 'The same family of architectural decisions applied to cross-domain analytics. Aegis and Astraeus share the family resemblance; the load-bearing piece differs.',
       },
@@ -414,9 +379,9 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'Guardrailed Text-to-SQL (the formal companion)',
+        title: 'Aegis: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
         url: '/blog/text-to-sql',
-        description: 'The formal paper on the five-stage pipeline: a constrained SQL surface, confidence-gated disambiguation, and schema validation.',
+        description: 'The technical note on semantic candidate retrieval, clarification, reviewed templates, parameter binding, and database controls.',
       },
       {
         title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
@@ -433,15 +398,15 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'commodity-tax-cfo-trust-framework',
-      title: 'How Commodity Tax Built CFO Trust — Framework A/B',
+      title: 'Commodity Tax: Two Decisions Behind a Reviewable Workflow',
       subtitle:
-        'The builder story recast around constraints, alternatives, trade-offs, a before-and-after comparison, and a bounded stakeholder-review loop.',
+        'Why the pipeline ran on the sanctioned data platform and exposed configured inspection views to the analysts reviewing its output.',
       date: '2026-04-21',
-      tags: ['Leadership', 'Framework A/B', 'Stakeholder Management', 'PySpark', 'Tableau'],
+      tags: ['Leadership', 'Decision Making', 'Stakeholder Review', 'PySpark', 'Tableau'],
       readingTime: '9 min read',
       abstract:
-        'A decision-oriented version of the builder post on automating the Commodity Tax process. It examines two pivotal choices—PySpark on CDP and Tableau as a transparency layer—then connects the trade-offs to the before-and-after workflow and a repeatable stakeholder-review pattern.',
-      updated: '2026-08-01',
+        'A decision guide to two choices in the Commodity Tax automation: use PySpark on the sanctioned data platform for repeatable calculation, and provide configured Tableau views for investigation. It compares the alternatives, trade-offs, and residual costs without treating visibility as proof of correctness.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'practitioner',
@@ -449,14 +414,14 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'Original builder-register version (for A/B comparison)',
+        title: 'How Commodity Tax Built CFO Trust',
         url: '/blog/commodity-tax-cfo-trust',
-        description: 'Same story, pure prose — no framework components. Read side-by-side to see what the framework adds.',
+        description: 'The delivery story behind the first production workflow and its analyst investigation loop.',
       },
       {
-        title: 'How We Built PAR Assist (practitioner companion)',
+        title: 'How We Built PAR Assist: From One-Page Vision to Production Platform',
         url: '/blog/par-assist-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. PAR Assist story wouldn\u2019t have happened without the trust built here.',
+        description: 'A later builder story about moving from a one-page vision through pilot and full CFO Group launch.',
       },
       {
         title: 'Commodity Tax — Case Study',
@@ -468,48 +433,38 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'commodity-tax-provenance',
-      title: 'Pipeline as Graph Rewrite — A Provenance Algebra for Auditable Process Automation',
+      title: 'Commodity Tax: Making a Financial Pipeline Inspectable',
       subtitle:
-        'Formalizing the architecture behind a regulated-finance automation: five-stage pipeline as composed graph rewrites, Tableau dashboards as a parallel presentation layer derived from the same provenance relation.',
+        'How a five-stage calculation path, recorded lineage, configured Tableau views, and analyst review help investigate a questioned value without treating visibility as proof of correctness.',
       date: '2026-04-26',
-      tags: ['Provenance', 'Process Automation', 'Auditability', 'Graph Rewrites', 'Regulated Finance'],
-      readingTime: '15 min read',
+      tags: ['Data Lineage', 'Process Automation', 'Tableau', 'Analyst Review', 'Financial Controls'],
+      readingTime: '8 min read',
       abstract:
-        'A technical treatment of the five-stage Commodity Tax pipeline (extract → reconcile → category map → aggregate → return) using graph-rewrite and provenance notation. It separates observed implementation behavior from the assumptions required for lineage reconstruction and replay, then shows how Tableau exposed intermediate states for review. The trust model is presented as a hypothesis informed by the delivery experience, not as a proven quantitative law.',
-      updated: '2026-08-01',
+        'The Commodity Tax workflow separates a five-stage calculation path from configured inspection views. This note explains what recorded lineage must retain, how an analyst traces one questioned value, what happens when evidence is missing or inconsistent, and why visibility supports investigation without validating sources, rules, joins, or the return.',
+      updated: '2026-08-09',
       status: 'published',
       projectId: 'commodity-tax',
-      register: 'formal',
+      register: 'technical',
     },
     references: [
-      { id: 1, authors: 'Kimball, R. & Caserta, J.', title: 'The Data Warehouse ETL Toolkit', venue: 'Wiley', year: 2004 },
-      { id: 2, authors: 'Ehrig, H. et al.', title: 'Fundamentals of Algebraic Graph Transformation', venue: 'Springer', year: 2006 },
-      { id: 3, authors: 'PCAOB', title: 'Auditing Standard No. 5 — An Audit of Internal Control Over Financial Reporting', venue: 'Public Company Accounting Oversight Board', year: 2007 },
       { id: 4, authors: 'Cui, Y., Widom, J. & Wiener, J. L.', title: 'Tracing the Lineage of View Data in a Warehousing Environment', venue: 'ACM Transactions on Database Systems', year: 2000 },
       { id: 5, authors: 'Cheney, J., Chiticariu, L. & Tan, W. C.', title: 'Provenance in Databases: Why, How, and Where', venue: 'Foundations and Trends in Databases', year: 2009 },
-      { id: 6, authors: 'COSO', title: 'Internal Control — Integrated Framework', venue: 'Committee of Sponsoring Organizations of the Treadway Commission', year: 2013 },
-      { id: 7, authors: 'Lee, J. D. & See, K. A.', title: 'Trust in Automation: Designing for Appropriate Reliance', venue: 'Human Factors', year: 2004 },
     ],
     furtherReading: [
       {
-        title: 'How Commodity Tax Built CFO Trust (the builder companion)',
+        title: 'How Commodity Tax Built CFO Trust',
         url: '/blog/commodity-tax-cfo-trust',
-        description: 'The narrative of how configured Tableau views gave analysts and the delivery team a shared surface for investigating questioned numbers.',
+        description: 'The builder story about the first delivery, the analyst investigation loop, and the credibility earned through production work.',
       },
       {
-        title: 'How Commodity Tax Built CFO Trust — Framework A/B (the practitioner companion)',
-        url: '/blog/commodity-tax-cfo-trust-framework',
-        description: 'The practitioner-register version with explicit constraints, options considered, and decision rationale callouts.',
-      },
-      {
-        title: 'Closed-Loop Thinking as a Cross-Domain Design Heuristic',
+        title: 'What Happens After a Model Predicts?',
         url: '/blog/closed-loop',
-        description: 'A bounded observe-estimate-choose-act heuristic across industrial PSO, cloud pipelines, enterprise finance, and AI.',
+        description: 'A bounded comparison of observation, estimation, decision, action, and feedback across unlike systems.',
       },
       {
         title: 'Commodity Tax — Case Study',
         url: '/projects/commodity-tax',
-        description: 'Project case study: context, the pipeline + transparency rail, and the stakeholder-review pattern.',
+        description: 'Project case study: context, the five-stage calculation path, configured inspection surfaces, and the analyst-review pattern.',
       },
     ],
   },
@@ -532,14 +487,14 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'How We Built PAR Assist (practitioner companion)',
+        title: 'How We Built PAR Assist: From One-Page Vision to Production Platform',
         url: '/blog/par-assist-building',
-        description: 'The other builder-register post in this corpus — same voice, different system. PAR Assist story wouldn\u2019t have happened without the trust built here.',
+        description: 'A later builder story about moving from a one-page vision through pilot and full CFO Group launch.',
       },
       {
-        title: 'Closed-Loop Thinking as a Cross-Domain Design Heuristic',
+        title: 'What Happens After a Model Predicts?',
         url: '/blog/closed-loop',
-        description: 'A bounded cross-domain design heuristic spanning industrial PSO, cloud pipelines, enterprise finance, and AI.',
+        description: 'A bounded comparison of observation, estimation, decision, action, and feedback across unlike systems.',
       },
       {
         title: 'Commodity Tax — Case Study',
@@ -552,9 +507,9 @@ export const POSTS: BlogPost[] = [
         description: 'The pipeline backbone used for large-scale General Ledger extraction.',
       },
       {
-        title: 'Tableau for Data Engineering Transparency',
+        title: 'Tableau',
         url: 'https://www.tableau.com/',
-        description: 'Used here as a trust and audit layer, not just an output surface — the architectural decision that made this project land.',
+        description: 'Used here for configured inspection views that support analyst investigation and review.',
       },
     ],
   },

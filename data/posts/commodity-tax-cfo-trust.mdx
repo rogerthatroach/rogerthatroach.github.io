@@ -1,5 +1,6 @@
-import { CommodityTaxPipeline } from "@/components/blog/BlogDiagrams"
+import { CommodityTaxProcessContrastFigure, CommodityTaxTrustLoopFigure } from '@/components/visualizations/commodity-tax'
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import { COMMODITY_TAX_BUILDER_CONTRAST, COMMODITY_TAX_BUILDER_LOOP } from '@/data/visualizations/commodityTax'
 
 In September 2022 I joined RBC&rsquo;s CFO Group as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the Commodity Tax return process, a manual workflow that consumed finance analysts for months per cycle.
 
@@ -27,22 +28,21 @@ The obvious technical stack was straightforward: PySpark on CDP for the extracti
 
 The decision that mattered wasn&rsquo;t technical. It was architectural-as-stakeholder-management.
 
-I built Tableau dashboards **not as the output of the pipeline, but as its transparency layer.**
+I built Tableau dashboards **not as the calculator, but as configured inspection surfaces beside the pipeline.**
 
-Each configured stage of the automation (the GL pull, the reconciliation, the category mapping, the aggregation) had a dashboard view that let a tax analyst inspect the recorded pipeline state. If a number looked wrong, the analyst could follow the recorded lineage toward associated journal rows. If a mapping surprised them, the dashboard showed the recorded rule version that produced it.
+Relevant stages exposed recorded state through Tableau. When a number looked wrong, an authorized analyst could follow an available lineage path toward associated journal rows and see the recorded mapping outcome or version. The views exposed evidence for investigation; they did not validate the source population, mapping logic, joins, or resulting amount.
 
-This is subtle but it&rsquo;s the whole thing. The finance team didn&rsquo;t need to trust me. They needed to trust the pipeline. A black-box automation that produced a correct answer would have been worse than the manual process, because the first time something looked off, everyone would revert to the spreadsheets. A transparent automation, even one with bugs in v1, built a debuggable, auditable relationship between the analysts and the system.
-
-<VisualizationContainer
-  minHeight={500}
-  caption="Five-stage pipeline (Extract → Reconcile → Category map → Aggregate → Return) with a parallel Tableau dashboard rail. Configured drill-throughs let authorized analysts follow recorded lineage toward associated GL rows. Transparency runs alongside compute, not only at the end."
->
-  <CommodityTaxPipeline />
+<VisualizationContainer minHeight={0} caption={COMMODITY_TAX_BUILDER_CONTRAST.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <CommodityTaxProcessContrastFigure content={COMMODITY_TAX_BUILDER_CONTRAST} />
 </VisualizationContainer>
 
 ## Where the approach proved useful
 
-The transparency layer gave analysts and the delivery team a shared review surface. When an aggregate looked wrong, the supported path moved from the return preview through recorded category mappings toward associated journal rows. That investigation could confirm the recorded logic or identify a mapping that needed correction before the pipeline was rerun and reconciled.
+The transparency layer gave analysts and the delivery team a shared review surface. A questioned aggregate could move through inspection, an available recorded path, reconciliation or an approved correction, and a reviewed rerun.
+
+<VisualizationContainer minHeight={0} caption={COMMODITY_TAX_BUILDER_LOOP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <CommodityTaxTrustLoopFigure content={COMMODITY_TAX_BUILDER_LOOP} />
+</VisualizationContainer>
 
 The dashboards did not establish correctness on their own: source quality, rule quality, access controls, and complete lineage still mattered. They made an anomaly easier to localize and discuss than a final spreadsheet or PDF would have. By Q4 2023, the cycle took 90 minutes and the work received a CFO Group RBC Quarterly Team Award; the interface was one contributor to the review workflow, not the sole cause of that result.
 
@@ -50,7 +50,7 @@ The dashboards did not establish correctness on their own: source quality, rule 
 
 - **Months → 90 minutes** per cycle
 - **CFO Group RBC Quarterly Team Award** (Q4 2023)
-- A production pipeline that&rsquo;s processed every cycle since, with Tableau dashboards still serving as the monitoring surface
+- A production pipeline with Tableau dashboards supporting configured monitoring and inspection
 - A finance team that started bringing ideas to the AI team, not the other way around
 
 ## What I&rsquo;d do differently
@@ -63,7 +63,7 @@ In retrospect I&rsquo;d have built a *mapping-rules dashboard* earlier, letting 
 
 By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose Aegis v1 (a rules-based benchmarking engine for the Big 6 Canadian banks) and get the air cover to build it. When Aegis v1 shipped, I could propose Aegis v2, the AI-native refactor, and deliver it in two weeks while Astraeus productionization was already underway. When Astraeus reached production scale, I had the credibility to conceive PAR Assist, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the production platform end-to-end for a full CFO Group launch across all geographies.
 
-Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. The Commodity Tax was underwriting every subsequent bet.
+Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. Commodity Tax was underwriting every subsequent bet.
 
 ## The pattern
 

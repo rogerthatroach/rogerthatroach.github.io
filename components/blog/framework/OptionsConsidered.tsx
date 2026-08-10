@@ -47,7 +47,7 @@ export default function OptionsConsidered({
   return (
     <figure className="my-8 not-prose">
       <div className="mb-4">
-        <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
+        <p className="font-mono text-xs uppercase tracking-widest text-accent">
           {heading}
         </p>
         <p className="mt-1 text-sm font-medium text-text-primary">{decision}</p>
@@ -65,7 +65,7 @@ export default function OptionsConsidered({
             )}
           >
             {option.chosen && (
-              <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-background">
+              <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-background">
                 <Check size={10} aria-hidden="true" />
                 Chosen
               </span>
@@ -83,7 +83,7 @@ export default function OptionsConsidered({
 
             <dl className="mt-3 grid grid-cols-1 gap-3 text-xs sm:grid-cols-2">
               <div>
-                <dt className="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                <dt className="mb-1 font-mono text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                   Pros
                 </dt>
                 <dd>
@@ -97,7 +97,7 @@ export default function OptionsConsidered({
                 </dd>
               </div>
               <div>
-                <dt className="mb-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-rose-700 dark:text-rose-300">
+                <dt className="mb-1 font-mono text-xs font-semibold uppercase tracking-wider text-rose-700 dark:text-rose-300">
                   Cons
                 </dt>
                 <dd>

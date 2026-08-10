@@ -13,11 +13,11 @@ interface PostCardProps {
 
 // Wabi-sabi glyphs for the three register marks. Picked for restraint
 // over loudness — single characters, muted, generous space around them.
-// '§' rigid section mark fits formal/theorem register; '¶' pilcrow fits
-// the prose of decisions and options; '◯' open circle fits narrative/
-// story register (emptiness, spaciousness, the wabi-sabi side).
+// '◇' marks architecture and evidence; '¶' pilcrow fits the prose of
+// decisions and options; '◯' open circle fits narrative/story register
+// (emptiness, spaciousness, the wabi-sabi side).
 const REGISTER_MARK: Record<NonNullable<BlogPostMeta['register']>, { glyph: string; label: string }> = {
-  formal:       { glyph: '§', label: 'formal' },
+  technical:    { glyph: '◇', label: 'technical' },
   practitioner: { glyph: '¶', label: 'practitioner' },
   builder:      { glyph: '◯', label: 'builder' },
 };

@@ -42,10 +42,10 @@ export interface CaseStudy {
    *  Rendered after the Context section when set. */
   sequencing?: string;
   sections: CaseStudySection;
-  // Canonical formal deep-dive post (Track 1: Technical Explorations).
+  // Canonical technical note (Track 1: mechanism, evidence, and failure paths).
   blogPostSlug?: string;
-  // Builder-register companion post (Track 2: Building in Practice).
-  // Semantically distinct: same system, different register.
+  // Builder story (Track 2: chronology, judgment, and leadership).
+  // Semantically distinct: same system, different reader question.
   companionBlogPostSlug?: string;
 }
 
@@ -95,7 +95,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       impact:
         '$3M in annual cost savings attributed to the combustion-tuning program. This project led to two Star of the Month awards (Nov 2017, Jan 2019).',
       inProduction:
-        'The model was deployed as an operational tool at the plant, with operators reviewing recommended settings during combustion-tuning cycles. Subsequent sensor observations could be reviewed against the recommendations; feedback alone did not imply an automatic model update.',
+        'The system was delivered as an operational tool at the plant, with operators reviewing recommended settings during combustion-tuning cycles. Subsequent sensor observations could be reviewed against the recommendations; feedback alone did not imply an automatic model update.',
       lessonsLearned:
         'This project taught me that the hardest part of ML is often the action boundary. Getting plant operators to assess recommendations required translating model outputs into concrete control settings and preserving their authority to accept, modify, or reject them. I later reused the questions around observation, estimation, choice, and action as a design heuristic — not as a claim that enterprise AI inherits control-system guarantees.',
     },
@@ -159,16 +159,16 @@ export const CASE_STUDIES: CaseStudy[] = [
         'Months → 90 minutes per cycle on a roughly $600M tax allocation. CFO Group RBC Quarterly Team Award (Q4 2023). The delivery helped establish credibility for subsequent AI initiatives in the CFO Group.',
     },
     sequencing:
-      'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with dashboards the CFO could audit, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then refactor it into Aegis v2 in a concurrent 2-week sprint (2025), then Astraeus (production 2025), then conceive PAR Assist and build it end-to-end after handing the concept to the 2025 Amplify cohort for problem-space ideation (pilot launched April 2026). Each project underwrote the next one\'s scope. The Commodity Tax wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
+      'Commodity Tax was the cascade origin. When I joined the CFO Group in 2022, nobody had asked me to build AI — I was hired to automate a tax process. Delivering that in under a year, with configured views finance stakeholders could inspect, earned the credibility to propose Aegis v1 (Big 6 bank benchmarking, 2024), then refactor it into Aegis v2 in a concurrent 2-week sprint (2025), then Astraeus (production 2025), then conceive PAR Assist and build it end-to-end after handing the concept to the 2025 Amplify cohort for problem-space ideation (pilot launched April 2026). Each project underwrote the next one\'s scope. The Commodity Tax project wasn\'t about tax — it was about proving I could deliver production systems in regulated finance before asking for license to build something ambitious.',
     blogPostSlug: 'commodity-tax-provenance',
     companionBlogPostSlug: 'commodity-tax-cfo-trust',
     leadershipCallout:
-      'This was my first project at RBC — and I treated it as an audition. By choosing Tableau as a transparency layer (not just an output), I gave finance stakeholders a way to inspect configured stages and recorded lineage. The delivery helped build the credibility to propose Aegis, Astraeus, and PAR Assist. The months-to-90-minutes metric became a concrete result to discuss with CFO leadership.',
+      'This was my first project at RBC — and I treated it as an audition. By choosing Tableau as an inspection layer (not just an output), I gave finance stakeholders a way to inspect configured stages and available recorded lineage. The delivery helped build the credibility to propose Aegis, Astraeus, and PAR Assist. The months-to-90-minutes metric became a concrete result to discuss with CFO leadership.',
     sections: {
       context:
         'The Commodity Tax return process within RBC\'s CFO Group was a massive manual effort — finance teams spent months each cycle extracting data from General Ledger journals, reconciling figures, and preparing tax returns. The process was error-prone, time-consuming, and consumed significant analyst bandwidth that could be directed at higher-value work.',
       myRole:
-        'Lead developer and primary stakeholder liaison. I owned the technical solution end-to-end and was the bridge between the finance team (who understood the tax process) and the AI team (who could automate it). This was my first project at RBC and an important credibility-building delivery.',
+        'Lead developer and primary stakeholder liaison. I owned the automation solution end-to-end, translating the finance team\'s tax process into a PySpark pipeline and configured Tableau inspection views. This was my first project at RBC and an important credibility-building delivery.',
       stakeholders:
         'CFO Group finance team (tax analysts and managers), Enterprise Finance leadership, Director AI (governance and priority alignment).',
       challenge:
@@ -181,18 +181,18 @@ export const CASE_STUDIES: CaseStudy[] = [
         },
         {
           option: 'PySpark pipeline + Tableau dashboards',
-          prosAndCons: 'PySpark handles General Ledger extraction at scale; Tableau provides the visibility finance teams need to trust and verify results. Incremental approach — automate extraction first, then add monitoring.',
+          prosAndCons: 'PySpark handles General Ledger extraction; Tableau provides configured views for finance teams to inspect recorded state and investigate results. Incremental approach — automate extraction first, then add monitoring.',
           chosen: true,
         },
       ],
       decision:
-        'We chose PySpark for the heavy data extraction (GL journals are massive) paired with Tableau dashboards for financial KPI monitoring. The dashboards were critical — they gave the finance team visibility into what the automation was doing, which built trust. This wasn\'t just a technical choice; it was a stakeholder management strategy.',
+        'We chose PySpark for General Ledger extraction paired with configured Tableau views for inspection. The dashboards gave the finance team a familiar way to review recorded pipeline state and investigate anomalies. This wasn\'t just a technical choice; it was a stakeholder-management strategy.',
       implementation:
-        'Built a PySpark pipeline for General Ledger Journal data extraction at scale, replacing the manual process. Created advanced Tableau dashboards for financial KPI monitoring that gave tax analysts interactive visibility into the data flow. The pipeline codified the institutional knowledge about GL-to-tax-category mappings that had previously lived in spreadsheets and people\'s heads.',
+        'Built a PySpark pipeline for General Ledger Journal data extraction, replacing the manual process. Created configured Tableau inspection views that let tax analysts review selected recorded states and supported lineage paths. The pipeline codified institutional knowledge about GL-to-tax-category mappings that had previously lived in spreadsheets and people\'s heads.',
       impact:
         'Reduced the Commodity Tax return process from months to 90 minutes. Recognized with the CFO Group RBC Quarterly Team Award (Q4 2023). The result gave leadership concrete evidence that the team could deliver measurable value and strengthened the case for later AI work.',
       inProduction:
-        'Running in production within the CFO Group. The automated pipeline processes each tax cycle, with Tableau dashboards providing ongoing monitoring and verification for the finance team.',
+        'Running in production within the CFO Group. Tableau dashboards provide configured monitoring and inspection surfaces for the finance team; source, rule, join, and output correctness remain separate review responsibilities.',
       lessonsLearned:
         'The biggest lesson was that the technical solution is sometimes the easy part. Building trust with finance stakeholders required making configured stages and lineage inspectable — hence Tableau as the transparency layer. The “months to 90 minutes” result helped subsequent proposals, and reinforced that a first project in a new organization is also an audition.',
     },
@@ -323,9 +323,9 @@ export const CASE_STUDIES: CaseStudy[] = [
       context:
         'Project Approval Requests (PARs) are a critical governance process at RBC for significant initiatives, and drafting them involves metadata, policies, historical examples, and institutional knowledge. I conceived PAR Assist to transform that drafting process. The concept was handed to 2025 Amplify interns as an ideation exercise to explore the problem space; I then built the production system end-to-end as the first true agentic AI platform approved for production at the bank.',
       myRole:
-        'Conceived the product vision, designed the agentic architecture, and built the production system end-to-end: ingestion paths, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), transactional workflow state, vector-backed field-group retrieval, and frontend integration. Production deployment runs through GFT (RBC\'s Global Functions Technology team) on OpenShift via CI/CD.',
+        'Conceived the product vision, designed the agentic architecture, and built the production system end-to-end: ingestion paths, the LangGraph state graph, the MCP tool layer (template selection, field assignment, conflict resolution, ambiguity detection), transactional workflow state, vector-backed field-group retrieval, and frontend integration. Cross-functional production partners supported deployment and operation.',
       stakeholders:
-        'CFO Group leadership (sponsor), enterprise stakeholders across the bank (PAR authors in every department), Director AI (governance and priority), 2025 Amplify interns (problem-space ideation exploration), GFT (Global Functions Technology, RBC\'s infrastructure team) for OpenShift CI/CD production deployment.',
+        'CFO Group leadership (sponsor), CFO Group authors across all geographies, Director AI (governance and priority), 2025 Amplify interns (problem-space ideation exploration), and cross-functional production partners.',
       challenge:
         'Two problems stacked on top of each other. The domain problem: PARs are not standardized — different templates for different initiative types, conflicting policies, ambiguous fields, institutional knowledge that lives in people\'s heads. The meta problem: this was the first true agentic AI platform approved for production at the bank, and its governance envelope was a single-agent design. The architecture had to support branching dialogs, parallel specialized work, and multi-turn state without multi-agent orchestration, while routing actions through typed contracts that produce structured audit records.',
       optionsConsidered: [

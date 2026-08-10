@@ -3,37 +3,27 @@ import { POSTS } from '@/data/posts';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
 import { PROJECTS } from '@/data/projects';
 import PostLayout from './PostLayout';
-import AgenticAiPost from '@/data/posts/agentic-ai.mdx';
-import TextToSqlPost from '@/data/posts/text-to-sql.mdx';
-import ClosedLoopPost from '@/data/posts/closed-loop.mdx';
-import EnterpriseAgenticAiPost from '@/data/posts/enterprise-agentic-ai.mdx';
-import EnterpriseAgenticAiFrameworkPost from '@/data/posts/enterprise-agentic-ai-framework.mdx';
-import ParAssistBuildingPost from '@/data/posts/par-assist-building.mdx';
-import CommodityTaxCfoTrustPost from '@/data/posts/commodity-tax-cfo-trust.mdx';
-import CommodityTaxCfoTrustFrameworkPost from '@/data/posts/commodity-tax-cfo-trust-framework.mdx';
-import AstraeusRouterPost from '@/data/posts/astraeus-llm-as-router.mdx';
-import AstraeusRouterFrameworkPost from '@/data/posts/astraeus-llm-as-router-framework.mdx';
-import AegisVelocityPost from '@/data/posts/aegis-v2-velocity.mdx';
-import AegisFrameworkPost from '@/data/posts/aegis-decomposition-framework.mdx';
-import CommodityTaxProvenancePost from '@/data/posts/commodity-tax-provenance.mdx';
+
+type PostModule = { default: React.ComponentType };
 
 // Only published post bodies are imported into this server-side registry. Keeping
-// the registry static ensures the complete article appears in exported/no-JS HTML
-// without reintroducing draft bodies into a shared client bundle.
-const POST_COMPONENTS: Record<string, React.ComponentType> = {
-  'agentic-ai': AgenticAiPost,
-  'text-to-sql': TextToSqlPost,
-  'closed-loop': ClosedLoopPost,
-  'enterprise-agentic-ai-architecture': EnterpriseAgenticAiPost,
-  'enterprise-agentic-ai-framework': EnterpriseAgenticAiFrameworkPost,
-  'par-assist-building': ParAssistBuildingPost,
-  'commodity-tax-cfo-trust': CommodityTaxCfoTrustPost,
-  'commodity-tax-cfo-trust-framework': CommodityTaxCfoTrustFrameworkPost,
-  'astraeus-llm-as-router': AstraeusRouterPost,
-  'astraeus-llm-as-router-framework': AstraeusRouterFrameworkPost,
-  'aegis-v2-velocity': AegisVelocityPost,
-  'aegis-decomposition-framework': AegisFrameworkPost,
-  'commodity-tax-provenance': CommodityTaxProvenancePost,
+// the registry explicit ensures drafts remain absent. Route-selective imports keep
+// unrelated client visualizations out of each article bundle while preserving the
+// complete server-rendered body in exported HTML.
+const POST_LOADERS: Record<string, () => Promise<PostModule>> = {
+  'agentic-ai': () => import('@/data/posts/agentic-ai.mdx'),
+  'text-to-sql': () => import('@/data/posts/text-to-sql.mdx'),
+  'closed-loop': () => import('@/data/posts/closed-loop.mdx'),
+  'enterprise-agentic-ai-architecture': () => import('@/data/posts/enterprise-agentic-ai.mdx'),
+  'enterprise-agentic-ai-framework': () => import('@/data/posts/enterprise-agentic-ai-framework.mdx'),
+  'par-assist-building': () => import('@/data/posts/par-assist-building.mdx'),
+  'commodity-tax-cfo-trust': () => import('@/data/posts/commodity-tax-cfo-trust.mdx'),
+  'commodity-tax-cfo-trust-framework': () => import('@/data/posts/commodity-tax-cfo-trust-framework.mdx'),
+  'astraeus-llm-as-router': () => import('@/data/posts/astraeus-llm-as-router.mdx'),
+  'astraeus-llm-as-router-framework': () => import('@/data/posts/astraeus-llm-as-router-framework.mdx'),
+  'aegis-v2-velocity': () => import('@/data/posts/aegis-v2-velocity.mdx'),
+  'aegis-decomposition-framework': () => import('@/data/posts/aegis-decomposition-framework.mdx'),
+  'commodity-tax-provenance': () => import('@/data/posts/commodity-tax-provenance.mdx'),
 };
 
 interface BlogPostShellProps {
@@ -41,13 +31,13 @@ interface BlogPostShellProps {
   meta: BlogPostMeta;
 }
 
-export default function BlogPostShell({ slug, meta }: BlogPostShellProps) {
-  const Content = POST_COMPONENTS[slug];
+export default async function BlogPostShell({ slug, meta }: BlogPostShellProps) {
+  const loadContent = POST_LOADERS[slug];
   const post = POSTS.find((p) => p.meta.slug === slug);
 
   // Find the case study that links to this blog post via either the
-  // canonical formal post (blogPostSlug) or the practitioner companion
-  // (companionBlogPostSlug). Both registers link back to the same case study.
+  // canonical technical post (blogPostSlug) or the practitioner companion
+  // (companionBlogPostSlug). Both reader paths link back to the same case study.
   const caseStudy = CASE_STUDIES.find(
     (cs) => cs.blogPostSlug === slug || cs.companionBlogPostSlug === slug,
   );
@@ -56,7 +46,9 @@ export default function BlogPostShell({ slug, meta }: BlogPostShellProps) {
     ? { title: project.title, path: `/projects/${project.id}` }
     : undefined;
 
-  if (!Content) return null;
+  if (!loadContent) return null;
+
+  const { default: Content } = await loadContent();
 
   return (
     <PostLayout

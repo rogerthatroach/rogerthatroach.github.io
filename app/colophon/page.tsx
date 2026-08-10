@@ -58,10 +58,10 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Diagrams',
     value: (
       <>
-        ReactFlow for interactive architecture diagrams with animated
-        bezier edges. Custom node types (hero hub, dot, rail, label) for
-        non-rectangular shapes. Hand-authored SVG where layout is static.
-        KaTeX rendered at module scope for math. PAR Assist{' '}
+        Server-rendered HTML, CSS, and SVG figures backed by typed content
+        and native semantic structure. Interactive figures begin with a useful
+        static frame and keep their complete explanation available without
+        motion or interaction. PAR Assist{' '}
         <a
           href="/blog/enterprise-agentic-ai-framework"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
@@ -76,10 +76,10 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Writing framework',
     value: (
       <>
-        Decision-oriented posts surface constraints, alternatives, trade-offs,
-        walkthroughs, and before-and-after comparisons. Mathematical detail
-        moves to a technical companion when it helps rather than leading every
-        story.
+        Decision guides surface constraints, alternatives, trade-offs,
+        walkthroughs, and before-and-after comparisons. Technical notes use
+        plain language to explain mechanisms, evidence, boundaries, and
+        failure paths.
       </>
     ),
   },

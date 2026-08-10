@@ -68,17 +68,17 @@ export const PAPERS: Paper[] = [
     ],
     related: [
       {
-        title: 'Enterprise Agentic AI Architecture (formal post)',
+        title: 'PAR Assist: One Agent, Bounded Tools, Reviewable Drafting',
         url: '/blog/enterprise-agentic-ai-architecture',
-        note: 'The formal companion: graph theory + MCP tool contracts.',
+        note: 'The technical note on orchestration, evidence scope, failure paths, and review.',
       },
       {
-        title: 'Closed-loop thinking as a cross-domain design heuristic',
+        title: 'What Happens After a Model Predicts?',
         url: '/blog/closed-loop',
         note: 'The bounded four-question comparison this paper builds on.',
       },
       {
-        title: 'Commodity Tax — how the CFO Group came to trust AI',
+        title: 'Commodity Tax: Two Decisions Behind a Reviewable Workflow',
         url: '/blog/commodity-tax-cfo-trust-framework',
         note: 'The stakeholder-trust ground game the paper codifies.',
       },

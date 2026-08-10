@@ -1,12 +1,19 @@
-'use client';
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import { ParFieldGroupFigure, ParOverviewFigure } from '@/components/visualizations/par';
+import { PAR_CASE_OVERVIEW, PAR_CASE_STUDY_INTRO, PAR_FIELD_GROUP_LENS } from '@/data/visualizations/par';
 
-/**
- * PAR Assist architecture diagram — used on /projects/par-assist.
- *
- * Single source of truth: re-exports the "envelope" diagram built for
- * the blog post (`components/blog/diagrams/AgenticArchitecturePAR.tsx`).
- * The case study and the formal blog post render exactly the same
- * architecture visual — any drift is a bug, not a feature.
- */
-
-export { default } from '@/components/blog/diagrams/AgenticArchitecturePAR';
+export default function PARAssistDiagram() {
+  return (
+    <div>
+      <p className="max-w-3xl border-l-2 border-text-primary pl-4 text-sm leading-relaxed text-text-secondary">
+        {PAR_CASE_STUDY_INTRO}
+      </p>
+      <VisualizationContainer minHeight={0} caption={PAR_CASE_OVERVIEW.caption} variant="open">
+        <ParOverviewFigure content={PAR_CASE_OVERVIEW} />
+      </VisualizationContainer>
+      <VisualizationContainer minHeight={0} caption={PAR_FIELD_GROUP_LENS.caption} variant="open">
+        <ParFieldGroupFigure content={PAR_FIELD_GROUP_LENS} />
+      </VisualizationContainer>
+    </div>
+  );
+}

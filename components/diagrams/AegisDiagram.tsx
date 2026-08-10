@@ -1,13 +1,11 @@
-'use client';
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import { AegisCaseSpineFigure } from '@/components/visualizations/aegis';
+import { AEGIS_CASE_SPINE } from '@/data/visualizations/aegis';
 
-/**
- * Aegis architecture diagram — used on /projects/aegis.
- *
- * Single source of truth: re-exports the "Cascade" diagram built for
- * the formal blog post (`components/blog/diagrams/AegisCascade.tsx`).
- * The case study and the blog post render exactly the same architecture
- * visual — any drift is a bug, not a feature. Matches the Astraeus +
- * PAR Assist pattern.
- */
-
-export { default } from '@/components/blog/diagrams/AegisCascade';
+export default function AegisDiagram() {
+  return (
+    <VisualizationContainer minHeight={0} caption={AEGIS_CASE_SPINE.caption} variant="open">
+      <AegisCaseSpineFigure content={AEGIS_CASE_SPINE} />
+    </VisualizationContainer>
+  );
+}

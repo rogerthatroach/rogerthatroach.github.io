@@ -1,22 +1,20 @@
-import CombustionDiagram from '@/components/diagrams/CombustionDiagram';
-import DocumentIntelligenceDiagram from '@/components/diagrams/DocumentIntelligenceDiagram';
-import CommodityTaxDiagram from '@/components/diagrams/CommodityTaxDiagram';
-import AegisDiagram from '@/components/diagrams/AegisDiagram';
-import AstraeusDiagram from '@/components/diagrams/AstraeusDiagram';
-import PARAssistDiagram from '@/components/diagrams/PARAssistDiagram';
+type DiagramModule = { default: React.ComponentType };
 
-// Static registry: each leaf remains a Client Component, but Next can render its
-// semantic fallback into the exported case-study HTML.
-const DIAGRAMS: Record<string, React.ComponentType> = {
-  'combustion-tuning': CombustionDiagram,
-  'document-intelligence': DocumentIntelligenceDiagram,
-  'commodity-tax': CommodityTaxDiagram,
-  'aegis': AegisDiagram,
-  'astraeus': AstraeusDiagram,
-  'par-assist': PARAssistDiagram,
+// Resolve only the selected case-study figure so each route loads its own
+// explanation rather than every project renderer.
+const DIAGRAM_LOADERS: Record<string, () => Promise<DiagramModule>> = {
+  'combustion-tuning': () => import('@/components/diagrams/CombustionDiagram'),
+  'document-intelligence': () => import('@/components/diagrams/DocumentIntelligenceDiagram'),
+  'commodity-tax': () => import('@/components/diagrams/CommodityTaxDiagram'),
+  'aegis': () => import('@/components/diagrams/AegisDiagram'),
+  'astraeus': () => import('@/components/diagrams/AstraeusDiagram'),
+  'par-assist': () => import('@/components/diagrams/PARAssistDiagram'),
 };
 
-export default function ProjectDiagram({ slug }: { slug: string }) {
-  const Diagram = DIAGRAMS[slug];
-  return Diagram ? <Diagram /> : null;
+export default async function ProjectDiagram({ slug }: { slug: string }) {
+  const loadDiagram = DIAGRAM_LOADERS[slug];
+  if (!loadDiagram) return null;
+
+  const { default: Diagram } = await loadDiagram();
+  return <Diagram />;
 }

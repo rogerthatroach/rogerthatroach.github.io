@@ -1,7 +1,8 @@
-import { AgenticArchitecturePAR } from '@/components/blog/BlogDiagrams'
+import { ParActorFigure, ParMilestoneFigure } from '@/components/visualizations/par'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
+import { PAR_BUILDER_ACTORS, PAR_BUILDER_MILESTONES } from '@/data/visualizations/par'
 
-> **A conversational companion to the formal post [Enterprise Agentic AI Architecture: Formal Foundations for LangGraph, MCP, and Field-Group Retrieval](/blog/enterprise-agentic-ai-architecture).** That post models the system as a directed graph with typed MCP tool contracts, two-stage field-group retrieval, and bounded group-scoped extraction calls, and states the assumptions behind its context boundary. This one tells the story: how a one-page vision became the first true agentic AI platform approved for production at the bank, what architecture decisions I made and why, and the leadership lessons that had nothing to do with the code.
+> **This is the delivery story.** For the mechanism, evidence boundaries, and failure paths, read [PAR Assist: One Agent, Bounded Tools, Reviewable Drafting](/blog/enterprise-agentic-ai-architecture). Here, the focus is how a one-page vision became the first true agentic AI platform approved for production at the bank, which architecture calls mattered, and what the work taught me about scope and leadership.
 
 ---
 
@@ -9,8 +10,8 @@ PAR Assist began as a one-page plan for an AI system that would transform how RB
 
 This is the story of how it happened, what I learned about translating a one-page vision into an enterprise product, and why the hardest part had nothing to do with technology.
 
-<VisualizationContainer minHeight={400} caption="PAR Assist at a glance: the dashed envelope is the v1 single-agent governance scope. Intake → template MCP tool with guided dialog → field-group retrieval → bounded, group-scoped extraction → ownership-aware merge → coverage + follow-ups loop. Transactional workflow state, vector-backed retrieval, and structured trace records support the registered path. The rest of the post explains why each piece is shaped the way it is.">
-<AgenticArchitecturePAR />
+<VisualizationContainer minHeight={0} caption={PAR_BUILDER_MILESTONES.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<ParMilestoneFigure content={PAR_BUILDER_MILESTONES} />
 </VisualizationContainer>
 
 ## The problem
@@ -24,6 +25,10 @@ This wasn&rsquo;t a search problem. It was an orchestration problem.
 The one-page plan framed the question simply: what if an AI assistant could guide a PAR author through the drafting process, step by step, with relevant context at the right moment? Not a chatbot. An agentic platform that tracks workflow state, retrieves scoped context, surfaces policy conflicts for author review, and supports the configured PAR types.
 
 I handed the concept to the 2025 Amplify cohort I was managing as an ideation exercise to explore the problem space. The exploration considered several shapes for a PAR-drafting assistant and sharpened what mattered (process guidance, not search) and what didn&rsquo;t (free-form chat, more RAG layers stacked on top of each other). Then I built the production platform end-to-end.
+
+<VisualizationContainer minHeight={0} caption={PAR_BUILDER_ACTORS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<ParActorFigure content={PAR_BUILDER_ACTORS} />
+</VisualizationContainer>
 
 ## The architecture decisions
 
@@ -70,24 +75,7 @@ PAR Assist is not a control system. The same four questions&mdash;what is observ
 - **Choose.** Parallel group-scoped extraction feeds an ownership-aware merge; collisions and uncovered inputs route to review or follow-up.
 - **Act.** The workflow renders a draft, retains available source references, and records registered workflow events in transactional storage.
 
-The comparison with Particle Swarm Optimization on a 900MW generating unit is deliberately limited: the questions recur, but the objectives and guarantees do not. The formal post [sets out that boundary](/blog/closed-loop). This post is the version I&rsquo;d tell you at lunch.
-
----
-
-## Cite as
-
-```bibtex
-@misc{dhaliwal2026parassist,
-  author  = {Dhaliwal, Harmilap Singh},
-  title   = {How We Built PAR Assist: From One-Page Vision to Production Platform},
-  year    = {2026},
-  month   = {April},
-  url     = {https://rogerthatroach.github.io/blog/par-assist-building},
-  note    = {Companion to the formal architecture post}
-}
-```
-
-Or plain text: *Dhaliwal, Harmilap Singh. (April 2026). How We Built PAR Assist: From One-Page Vision to Production Platform. https://rogerthatroach.github.io/blog/par-assist-building.*
+The comparison with Particle Swarm Optimization on a 900MW generating unit is deliberately limited: the questions recur, but the objectives and guarantees do not. [What Happens After a Model Predicts?](/blog/closed-loop) sets out that boundary. This post stays with the delivery story.
 
 ---
 

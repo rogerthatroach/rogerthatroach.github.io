@@ -1,7 +1,4 @@
-import { AgenticArchitecturePAR } from '@/components/blog/BlogDiagrams'
-import MathBlock from '@/components/blog/MathBlock'
-import InlineEquation from '@/components/blog/InlineEquation'
-import TheoremBlock from '@/components/blog/TheoremBlock'
+import { ParDecisionFigure } from '@/components/visualizations/par'
 import CitationRef from '@/components/blog/CitationRef'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
@@ -10,17 +7,13 @@ import DecisionRationale from '@/components/blog/framework/DecisionRationale'
 import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
 import StepThrough from '@/components/blog/framework/StepThrough'
 import Glossed from '@/components/resume/story/Glossed'
-import { tex } from '@/lib/katex'
+import { PAR_PRACTITIONER_DECISIONS } from '@/data/visualizations/par'
 
 Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews: high-stakes, document-heavy workflows riddled with institutional knowledge that lives in people's heads rather than systems.
 
 A chatbot alone does not cover that workflow. The user needs something that understands where they are in a multi-step process, holds context across the session, pulls relevant reference material at the right moment, and surfaces contradictions between policy sources so the author can resolve them.
 
 Retrieval-augmented generation is one component of the design <CitationRef id={7} />. The system-level problem is orchestration over a structured form. This post walks through the architecture at <Glossed>PAR Assist</Glossed> inside <Glossed>RBC CFO Group</Glossed>, the first true agentic AI platform approved for production at the bank.
-
-<VisualizationContainer minHeight={400} caption="The envelope. The dashed boundary is the v1 governance scope — one agent, one approved surface. Inside: intake (document and image parsing) → template MCP tool with decision-tree dialog → stage-1 groups hub → bounded parallel extraction lanes (one per relevant field group, each with scoped reference chunks and target fields) → ownership-aware merge → coverage analyzer with clarify-loop back to template. A transactional state rail and vector-backed retrieval layer support the workflow.">
-<AgenticArchitecturePAR />
-</VisualizationContainer>
 
 ## Constraints before choices
 
@@ -54,6 +47,10 @@ Four constraints shaped every decision below. One is governance, two are regulat
 ## The four architectural decisions
 
 Four calls separate PAR Assist from a clever chatbot. Each one mapped to an explicit options comparison before it landed.
+
+<VisualizationContainer minHeight={0} caption={PAR_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<ParDecisionFigure content={PAR_PRACTITIONER_DECISIONS} />
+</VisualizationContainer>
 
 ### Decision 1 · Orchestration framework
 
@@ -371,10 +368,10 @@ Three quality layers run through the system, each at a different node in the gra
     },
     {
       title: 'Feb 2026: development begins',
-      caption: 'parallel to Astraeus productionization and Aegis v2 refactor',
+      caption: 'alongside Astraeus productionization and other active delivery',
       content: (
         <>
-          Real development started after holidays and team restructuring. PAR Assist ran in parallel with Astraeus productionization and the tail end of Aegis v2 refactor: three workstreams, one team, three different architectural registers.
+          Real development started after holidays and team restructuring. PAR Assist ran alongside Astraeus productionization and other active delivery: multiple workstreams, one team, and distinct engineering demands.
         </>
       ),
     },
@@ -435,48 +432,6 @@ A multi-agent successor is in pilot. Further details will follow in a coordinate
 The pattern (**governance-shaped orchestration + typed action boundary + field-group retrieval + concurrent scoped extraction + retained workflow state**) is a candidate for enterprise workflows that combine (a) multi-turn state, (b) structured-form target outputs, and (c) regulatory audit requirements. PAR drafting is one instance. Applying it elsewhere still requires domain-specific controls, evaluation, and evidence.
 
 The implementation can change while those control questions remain useful: what context reaches the model, which actions have typed contracts, what state is retained, where collisions surface, and how each boundary is tested.
-
----
-
-## Formal notation appendix
-
-The sections above are the practitioner treatment. For readers who want the mathematical framing (the agentic workflow as a graph <InlineEquation html={tex("G = (V, E, \\mathcal{S}, \\delta)")} />, retrieval as a composition over field-group scopes, and the assumptions behind registered-action logging) the [sibling post](/blog/enterprise-agentic-ai-architecture) carries the full treatment. A compressed version appears below.
-
-<TheoremBlock variant="definition" number={1} title="System requirements (formal)">
-Let <InlineEquation html={tex("\\mathcal{W}")} /> denote the space of enterprise workflows, <InlineEquation html={tex("\\mathcal{U}")} /> user utterances, <InlineEquation html={tex("\\mathcal{D}")} /> the document corpus, <InlineEquation html={tex("\\mathcal{D}_g \\subseteq \\mathcal{D}")} /> the potentially overlapping references associated with group <InlineEquation html={tex("g")} />, and <InlineEquation html={tex("\\mathcal{S}")} /> the workflow-state space. Target fields, unlike reference subsets, have one expected owner group. System <InlineEquation html={tex("\\mathcal{F}")} /> is designed around:
-
-<MathBlock html={tex("s_{t+1} = \\delta(s_t, u_t, a_t), \\quad \\delta: \\mathcal{S} \\times \\mathcal{U} \\times \\mathcal{A} \\to \\mathcal{S}", true)} />
-
-<MathBlock html={tex("\\text{retrieve}(q, s_t) = \\bigoplus_{g \\in G(q)} R_g(q, s_t, \\mathcal{D}_g)", true)} />
-
-<MathBlock html={tex("\\forall a \\in \\mathcal{A}_{\\text{registered}}: a = \\text{Tool}_k(\\text{input}_k) \\land \\operatorname{commit}(a) \\implies a \\in \\text{AuditLog}", true)} />
-</TheoremBlock>
-
-<TheoremBlock variant="definition" number={2} title="Agentic workflow graph">
-An agentic workflow system is a directed graph <InlineEquation html={tex("G = (V, E, \\mathcal{S}, \\delta)")} /> where <InlineEquation html={tex("V")} /> includes at minimum <InlineEquation html={tex("\\{v_{\\text{intake}}, v_{\\text{template}}, v_{\\text{retrieve}}, v_{\\text{extract}}, v_{\\text{merge}}, v_{\\text{coverage}}, v_{\\text{respond}}\\}")} />, <InlineEquation html={tex("E \\subseteq V \\times V")} />, and each node reads from and writes to <InlineEquation html={tex("\\mathcal{S}")} /><CitationRef id={6} />.
-</TheoremBlock>
-
-<MathBlock html={tex("v_{\\text{next}} = \\text{Router}(s_t) = \\begin{cases} v_{\\text{clarify}} & \\text{if open\\_followups}(s_t) \\\\ v_{\\text{resolve}} & \\text{if conflict}(s_t) \\\\ v_{\\text{extract}} & \\text{if groups\\_pending}(s_t) \\\\ v_{\\text{respond}} & \\text{if coverage\\_clear}(s_t) \\end{cases}", true)} />
-
-<MathBlock html={tex("\\underbrace{\\mathcal{L}}_{\\text{LLMs reason}} \\circ \\underbrace{\\mathcal{T}}_{\\text{tools act}} \\circ \\underbrace{\\mathcal{R}}_{\\text{code controls flow}} \\circ \\underbrace{\\mathcal{S}}_{\\text{state persists}}", true)} />
-
-That separation makes the workflow easier to govern in a regulated environment<CitationRef id={3} /><CitationRef id={13} />: narrow context, typed boundaries, explicit assumptions, and controls that can be tested.
-
----
-
-## Cite as
-
-```bibtex
-@misc{dhaliwal2026enterpriseagenticframework,
-  author = {Dhaliwal, Harmilap Singh},
-  title  = {Enterprise Agentic AI Architecture (framework rewrite): Decisions, Options Considered, and Control Assumptions},
-  year   = {2026},
-  month  = {April},
-  url    = {https://rogerthatroach.github.io/blog/enterprise-agentic-ai-framework}
-}
-```
-
-*Dhaliwal, Harmilap Singh. (April 2026). Enterprise Agentic AI Architecture (framework rewrite). https://rogerthatroach.github.io/blog/enterprise-agentic-ai-framework.*
 
 ---
 
