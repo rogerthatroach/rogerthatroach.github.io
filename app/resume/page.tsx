@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Linkedin, ChevronDown } from 'lucide-react';
+import { Download, Linkedin, ChevronDown } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import ResumeMetrics from '@/components/resume/ResumeMetrics';
@@ -67,8 +67,16 @@ export default function ResumePage() {
               collapsed sections beneath — open what matters.
             </p>
 
-            {/* External profile */}
+            {/* Printable resume + external profile */}
             <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a
+                href="/resume.pdf"
+                download="Harmilap-Singh-Dhaliwal-Resume.pdf"
+                className="group inline-flex min-h-11 items-center gap-2 rounded-lg border border-accent/30 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background print:hidden"
+              >
+                <Download size={16} aria-hidden="true" />
+                Download résumé PDF (2 pages)
+              </a>
               <a
                 href={HERO.links.linkedin}
                 target="_blank"
