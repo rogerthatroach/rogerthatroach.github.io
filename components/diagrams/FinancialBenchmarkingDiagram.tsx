@@ -1,13 +1,11 @@
-'use client';
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import { FinancialBenchmarkingCaseSpineFigure } from '@/components/visualizations/financialBenchmarking';
+import { FINANCIAL_BENCHMARKING_CASE_SPINE } from '@/data/visualizations/financialBenchmarking';
 
-/**
- * FinancialBenchmarking architecture diagram — used on /projects/financialBenchmarking.
- *
- * Single source of truth: re-exports the "Cascade" diagram built for
- * the formal blog post (`components/blog/diagrams/FinancialBenchmarkingCascade.tsx`).
- * The case study and the blog post render exactly the same architecture
- * visual — any drift is a bug, not a feature. Matches the WorkforceAnalytics +
- * AI/LLM Drafting Platform pattern.
- */
-
-export { default } from '@/components/blog/diagrams/FinancialBenchmarkingCascade';
+export default function FinancialBenchmarkingDiagram() {
+  return (
+    <VisualizationContainer minHeight={0} caption={FINANCIAL_BENCHMARKING_CASE_SPINE.caption} variant="open">
+      <FinancialBenchmarkingCaseSpineFigure content={FINANCIAL_BENCHMARKING_CASE_SPINE} />
+    </VisualizationContainer>
+  );
+}

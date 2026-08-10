@@ -448,7 +448,7 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             </div>
           </motion.div>
 
-          {/* Blog Post CTAs — formal deep-dive + optional builder-register companion */}
+          {/* Blog post CTAs: technical note plus an optional builder story. */}
           {(showFormalBlogCta || showCompanionBlogCta) && (
             <motion.div
               initial={false}
@@ -459,9 +459,9 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             >
               {showFormalBlogCta && caseStudy.blogPostSlug && (
                 <div className="rounded-lg border border-accent/20 bg-accent-muted p-6">
-                  <p className="text-sm font-medium text-text-primary">Technical Deep Dive</p>
+                  <p className="text-sm font-medium text-text-primary">Mechanism and failure paths</p>
                   <p className="mt-2 text-sm text-text-secondary">
-                    The architecture, assumptions, trade-offs, and implementation details.
+                    How the system works, what evidence supports it, and where its controls can fail.
                   </p>
                   <Link
                     href={`/blog/${caseStudy.blogPostSlug}`}
@@ -474,15 +474,15 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
               )}
               {showCompanionBlogCta && caseStudy.companionBlogPostSlug && (
                 <div className="rounded-lg border border-border-subtle bg-surface/50 p-6">
-                  <p className="text-sm font-medium text-text-primary">The Builder&rsquo;s Story</p>
+                  <p className="text-sm font-medium text-text-primary">Decisions and delivery</p>
                   <p className="mt-2 text-sm text-text-secondary">
-                    The conversational version: decisions, trade-offs, and the leadership lessons behind the code.
+                    Why the choices were made, what they cost, and how the work reached production.
                   </p>
                   <Link
                     href={`/blog/${caseStudy.companionBlogPostSlug}`}
                     className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-text-primary"
                   >
-                    Read the companion post
+                    Read the delivery story
                     <ArrowRight size={14} />
                   </Link>
                 </div>

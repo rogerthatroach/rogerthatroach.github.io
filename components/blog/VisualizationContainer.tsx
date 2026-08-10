@@ -3,6 +3,7 @@ interface VisualizationContainerProps {
   minHeight?: number;
   caption?: string;
   className?: string;
+  variant?: 'framed' | 'open';
 }
 
 export default function VisualizationContainer({
@@ -10,17 +11,22 @@ export default function VisualizationContainer({
   minHeight = 400,
   caption,
   className,
+  variant = 'framed',
 }: VisualizationContainerProps) {
+  const isOpen = variant === 'open';
+
   return (
-    <figure className={`my-8 ${className ?? ''}`} aria-label={caption ? undefined : 'Interactive diagram'}>
+    <figure className={`${isOpen ? 'visualization-open my-12' : 'my-8'} ${className ?? ''}`} aria-label={caption ? undefined : 'Interactive diagram'}>
       <div
-        className="overflow-hidden rounded-xl border border-border-subtle bg-surface/50"
+        className={isOpen
+          ? 'overflow-visible bg-transparent'
+          : 'overflow-hidden rounded-xl border border-border-subtle bg-surface/50'}
         style={{ minHeight }}
       >
         {children}
       </div>
       {caption && (
-        <figcaption className="mt-2 text-center text-xs text-text-tertiary">
+        <figcaption className={`${isOpen ? 'mt-4 text-left leading-relaxed' : 'mt-2 text-center'} text-xs text-text-tertiary`}>
           {caption}
         </figcaption>
       )}

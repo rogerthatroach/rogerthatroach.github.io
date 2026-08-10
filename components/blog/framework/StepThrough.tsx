@@ -52,7 +52,7 @@ export default function StepThrough({
   return (
     <figure className="my-8 not-prose">
       {label && (
-        <p className="mb-3 font-mono text-[10px] uppercase tracking-widest text-accent">
+        <p className="mb-3 font-mono text-xs uppercase tracking-widest text-accent">
           {label}
         </p>
       )}
@@ -98,14 +98,15 @@ export default function StepThrough({
           </AnimatePresence>
         </div>
 
-        {/* Nav + progress dots */}
-        <div className="mt-5 flex items-center justify-between gap-3">
+        {/* Authored mobile navigation: step targets get their own row so all
+            controls remain 44px without clipping a narrow article column. */}
+        <div className="mt-5 grid grid-cols-2 items-center gap-3 sm:grid-cols-[auto_1fr_auto]">
           <button
             type="button"
             onClick={prev}
             disabled={idx === 0}
             className={cn(
-              'inline-flex min-h-11 items-center gap-1 rounded-md border px-3 py-2 text-xs font-semibold transition-colors',
+              'col-start-1 row-start-2 inline-flex min-h-11 items-center gap-1 justify-self-start rounded-md border px-3 py-2 text-xs font-semibold transition-colors sm:row-start-1',
               idx === 0
                 ? 'border-border-subtle text-text-tertiary opacity-50'
                 : 'border-border-subtle text-text-secondary hover:border-accent/40 hover:text-accent'
@@ -117,7 +118,11 @@ export default function StepThrough({
             Prev
           </button>
 
-          <div className="flex" role="group" aria-label="Choose a step">
+          <div
+            className="col-span-2 col-start-1 row-start-1 flex justify-self-center sm:col-span-1 sm:col-start-2"
+            role="group"
+            aria-label="Choose a step"
+          >
             {steps.map((step, i) => (
               <button
                 key={i}
@@ -126,7 +131,7 @@ export default function StepThrough({
                 aria-pressed={i === idx}
                 aria-controls={panelId}
                 aria-label={`Go to step ${i + 1}: ${step.title}`}
-                className="group flex h-11 min-w-6 items-center justify-center px-1.5"
+                className="group flex h-11 min-w-11 items-center justify-center px-2"
               >
                 <span
                   className={cn(
@@ -145,7 +150,7 @@ export default function StepThrough({
             onClick={next}
             disabled={idx === total - 1}
             className={cn(
-              'inline-flex min-h-11 items-center gap-1 rounded-md border px-3 py-2 text-xs font-semibold transition-colors',
+              'col-start-2 row-start-2 inline-flex min-h-11 items-center gap-1 justify-self-end rounded-md border px-3 py-2 text-xs font-semibold transition-colors sm:col-start-3 sm:row-start-1',
               idx === total - 1
                 ? 'border-border-subtle text-text-tertiary opacity-50'
                 : 'border-accent/40 bg-accent-muted text-accent hover:border-accent hover:bg-accent hover:text-background'

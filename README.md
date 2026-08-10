@@ -4,15 +4,14 @@ Personal portfolio of **Harmilap Singh Dhaliwal** — AI & Data Science Lead.
 Live at **[rogerthatroach.github.io](https://rogerthatroach.github.io)**.
 
 A career arc from industrial Digital Twins to production agentic AI in RBC's CFO Group,
-told through interactive case studies, technical whitepapers, and architecture
-diagrams.
+told through interactive case studies, technical notes, and visual explanations.
 
 ## Stack
 
 - **Next.js 16** (App Router) with `output: 'export'` → fully static
 - **TypeScript** (strict) · **Tailwind CSS** · **Framer Motion**
-- **MDX** blog/papers · **@xyflow/react** (ReactFlow) architecture diagrams ·
-  **Three.js** hero particle field · **KaTeX** math (pre-rendered at build)
+- **MDX** blog/papers · server-rendered **HTML/CSS/SVG** visual explanations ·
+  **Three.js** hero particle field
 - Deployed to **GitHub Pages** via GitHub Actions (SHA-pinned), with a daily
   rebuild so future-dated posts auto-publish
 

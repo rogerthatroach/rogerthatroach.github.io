@@ -6,12 +6,12 @@ import ProjectAccordion, { type AccordionGroup } from '@/components/blog/Project
 /**
  * Blog index — interactive shell.
  *
- * Owns the register-filter state (formal · practitioner · builder).
+ * Owns the register-filter state (technical · practitioner · builder).
  * Renders the sticky title block + filter chips + accordion in one
  * client surface so chip selection and accordion filtering stay in
  * sync without context plumbing.
  *
- * Sort order within each group: formal → practitioner → builder
+ * Sort order within each group: technical → practitioner → builder
  * (matches the legend); date as secondary sort within the same
  * register.
  *
@@ -26,27 +26,27 @@ import ProjectAccordion, { type AccordionGroup } from '@/components/blog/Project
  * Groups with zero posts after filtering are hidden.
  */
 
-type Register = 'formal' | 'practitioner' | 'builder';
+type Register = 'technical' | 'practitioner' | 'builder';
 
 const REGISTER_ORDER: Record<Register, number> = {
-  formal: 0,
+  technical: 0,
   practitioner: 1,
   builder: 2,
 };
 
 const REGISTER_GLYPH: Record<Register, string> = {
-  formal: '§',
+  technical: '◇',
   practitioner: '¶',
   builder: '◯',
 };
 
 const REGISTER_GLOSS: Record<Register, string> = {
-  formal: 'definitions · assumptions · math',
+  technical: 'architecture · evidence · failure modes',
   practitioner: 'decisions · options considered · rationale',
   builder: 'story · lessons · leadership',
 };
 
-const REGISTERS: Register[] = ['formal', 'practitioner', 'builder'];
+const REGISTERS: Register[] = ['technical', 'practitioner', 'builder'];
 
 export default function BlogIndexClient({ groups }: { groups: AccordionGroup[] }) {
   const [selected, setSelected] = useState<Set<Register>>(() => new Set());

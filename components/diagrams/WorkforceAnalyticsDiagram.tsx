@@ -1,13 +1,16 @@
-'use client';
+import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import { WorkforceAnalyticsCaseOverviewFigure } from '@/components/visualizations/workforceAnalytics';
+import { WORKFORCE_ANALYTICS_CASE_INTRO, WORKFORCE_ANALYTICS_CASE_OVERVIEW } from '@/data/visualizations/workforceAnalytics';
 
-/**
- * WorkforceAnalytics architecture diagram — used on /projects/workforceAnalytics.
- *
- * Single source of truth: re-exports the "Cascade" diagram built for
- * the formal blog post (`components/blog/diagrams/WorkforceAnalyticsCascade.tsx`).
- * The case study and the blog post render exactly the same architecture
- * visual — any drift is a bug, not a feature. Matches the PAR pattern
- * where FundingRequestDiagram re-exports AgenticArchitecturePAR.
- */
-
-export { default } from '@/components/blog/diagrams/WorkforceAnalyticsCascade';
+export default function WorkforceAnalyticsDiagram() {
+  return (
+    <div>
+      <p className="max-w-3xl border-l-2 border-text-primary pl-4 text-sm leading-relaxed text-text-secondary">
+        {WORKFORCE_ANALYTICS_CASE_INTRO}
+      </p>
+      <VisualizationContainer minHeight={0} caption={WORKFORCE_ANALYTICS_CASE_OVERVIEW.caption} variant="open">
+        <WorkforceAnalyticsCaseOverviewFigure content={WORKFORCE_ANALYTICS_CASE_OVERVIEW} />
+      </VisualizationContainer>
+    </div>
+  );
+}

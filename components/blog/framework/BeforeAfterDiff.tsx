@@ -37,7 +37,7 @@ export default function BeforeAfterDiff({
   return (
     <figure className="my-8 not-prose">
       {heading && (
-        <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-accent">
+        <p className="mb-4 font-mono text-xs uppercase tracking-widest text-accent">
           {heading}
         </p>
       )}
@@ -84,14 +84,14 @@ function Pane({
       <div className="mb-2 flex items-baseline justify-between gap-2">
         <strong
           className={cn(
-            'font-mono text-[10px] font-semibold uppercase tracking-wider',
+            'font-mono text-xs font-semibold uppercase tracking-wider',
             tone === 'before' ? 'text-text-tertiary' : 'text-accent'
           )}
         >
           {pane.label}
         </strong>
         {pane.hint && (
-          <span className="font-mono text-[10px] text-text-tertiary">
+          <span className="font-mono text-xs text-text-tertiary">
             {pane.hint}
           </span>
         )}

@@ -1,215 +1,101 @@
-import { CommodityTaxPipeline } from "@/components/blog/BlogDiagrams"
-import MathBlock from '@/components/blog/MathBlock';
-import { tex } from '@/lib/katex';
-import InlineEquation from '@/components/blog/InlineEquation';
+import { CommodityTaxFormalPipelineFigure, CommodityTaxFormalTraceFigure } from '@/components/visualizations/commodity-tax'
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
 import CitationRef from '@/components/blog/CitationRef';
+import { COMMODITY_TAX_FORMAL_PIPELINE, COMMODITY_TAX_FORMAL_TRACE } from '@/data/visualizations/commodityTax'
 
-## 1. Introduction
+## 1. Calculation and inspection are different jobs
 
-Process automation in regulated finance has a property that most software engineering treats as separate: every output number must be defensible against an auditor, a regulator, or a skeptical domain expert who has built years of intuition about what the numbers should look like. The standard pipeline-as-ETL pattern <CitationRef id={1} /> (extract, transform, load) can satisfy functional requirements but does not, on its own, make a result inspectable.
+The Commodity Tax workflow produces a financial return from General Ledger journal rows. That calculation path and the surfaces used to inspect it are related, but they are not the same system responsibility.
 
-The gap is provenance. Functional accuracy requires the output to match approved rule application over the correct source population. A reconstructable chain from the output back to associated journal entries, together with versioned transformations and review evidence, makes that result inspectable; lineage alone does not establish that the business rules or source data were correct.
+The calculation path applies transformations in a fixed order. Each stage receives a defined input, produces a defined output, and passes that output to the next stage. Its job is to compute the return consistently under the rules and data supplied for that run.
 
-This paper describes the architecture used to automate the Commodity Tax return process at a major Canadian bank, where the engineering target was not just functional correctness but *provenance preservation across pipeline composition*. We model the pipeline as a sequence of graph rewrites <CitationRef id={2} />, each rewrite carrying a typed provenance relation. When transformations emit complete, correctly associated lineage edges, the recorded graph supports inspection from an output node back toward its source rows in the General Ledger journals. We then characterize the *transparency layer* (the parallel surface of Tableau dashboards through which stakeholders interact with the provenance chain) as a separate but composable abstraction over the same lineage model.
+The inspection path helps an authorized analyst examine selected intermediate results and the recorded relationships between them. Its job is to help answer questions such as: Which journal rows contributed to this value? Which category mapping was applied? At what point did the amount change? A configured Tableau view can make those questions easier to pursue, but viewing a number does not validate the source population, approve the rule that produced it, or sign off the return.
 
-The architectural punchline is that *transparency is not a feature appended to compute*. It is a parallel structure derived from the same provenance relation used by the pipeline. Building both together reuses lineage plumbing, although dashboard semantics, access controls, and presentation still require separate engineering and review.
+This separation is the central design point. Inspection should be built from the same retained identifiers and derivation records as calculation, while remaining an independent read and review concern. If the dashboard reconstructs its own version of the pipeline, the displayed explanation can drift away from the calculation it is meant to explain.
 
-## 2. Problem Formulation
+## 2. The five-stage calculation path
 
-### 2.1 The Pipeline Domain
+The public architecture has five fixed conceptual stages:
 
-The system operates on General Ledger (GL) journal rows in scope for a tax-reporting period. Let:
+1. **Extract.** Select the journal rows in scope for the reporting period and carry forward the identifiers needed to locate them again.
+2. **Reconcile.** Normalize and compare records across contributing sources, retaining the relationship between reconciled rows and their recorded inputs.
+3. **Category Map.** Apply the configured tax-category mappings and retain which mapping and version contributed to each classified record.
+4. **Aggregate.** Combine classified records into the values required by the return while retaining their recorded contributing population.
+5. **Return.** Assemble the reporting output and the metadata needed to identify the run, period, and rule versions behind it.
 
-- <InlineEquation html={tex("\\mathcal{J} = \\{j_1, j_2, \\ldots, j_n\\}")} /> be the set of in-scope GL journal rows for the period
-- <InlineEquation html={tex("\\mathcal{B}")} /> be the set of tax-category buckets (e.g., recoverable, allocated, exempt)
-- <InlineEquation html={tex("\\mathcal{R}")} /> be the space of returns, one number per bucket, plus metadata
+The stages are sequential, but inspection does not have to mimic a left-to-right walkthrough. An analyst usually begins with a questioned output and moves backward. The architecture therefore needs both a forward calculation path and a backward route through the evidence that was retained.
 
-The pipeline must implement <InlineEquation html={tex("F: \\mathcal{J} \\rightarrow \\mathcal{R}")} /> with the properties below.
-
-### 2.2 Design Objectives
-
-**Functional accuracy.** For each tax cycle, the produced return should match the result of applying the approved, versioned tax rules <InlineEquation html={tex("\\rho")} /> to the in-scope journal population:
-
-<MathBlock html={tex("F(\\mathcal{J}) = \\rho(\\mathcal{J})", true)} />
-
-That equality is an objective to test through reconciliation; the notation does not establish that <InlineEquation html={tex("\\mathcal{J}")} /> is complete or that <InlineEquation html={tex("\\rho")} /> is correct.
-
-**Recorded lineage.** For each in-scope derived value <InlineEquation html={tex("v")} />, the system should retain a finite set of source rows connected to <InlineEquation html={tex("v")} /> through recorded, versioned transformation edges:
-
-<MathBlock html={tex("P(v) = \\{j \\in \\mathcal{J} : j \\leadsto v \\text{ in } E^*\\}", true)} />
-
-This defines what the lineage graph records. It does not claim that the recorded set is complete until edge emission, joins, filters, and aggregation coverage have been tested.
-
-**Authorized inspectability.** For configured stages, an authorized reviewer should have a presentation function over the recorded graph state, user scope, and view parameters:
-
-<MathBlock html={tex("\\pi_i: (G_i, u, p) \\rightharpoonup \\text{View}_i", true)} />
-
-The partial arrow matters: a view may be unavailable because the stage is not surfaced, the reviewer lacks access, or the retained evidence is incomplete.
-
-**Reproducibility.** Given fixed inputs, a versioned rule set, code, dependencies, and execution configuration, a rerun should produce an equivalent return. Byte-identical artifacts are not assumed unless serialization and environment details are also fixed.
-
-## 3. Pipeline as a Sequence of Graph Rewrites
-
-### 3.1 The Five-Stage Decomposition
-
-The pipeline factors <InlineEquation html={tex("F")} /> into five sequential stages, each implemented as a typed graph rewrite over a labelled graph carrying provenance:
-
-<MathBlock html={tex("F = s_5 \\circ s_4 \\circ s_3 \\circ s_2 \\circ s_1", true)} />
-
-<div className="my-6 overflow-x-auto">
-  <table className="w-full text-sm">
-    <thead>
-      <tr className="border-b border-border-subtle text-left text-text-tertiary">
-        <th className="pb-2 pr-4 font-medium">Stage</th>
-        <th className="pb-2 pr-4 font-medium">Function</th>
-        <th className="pb-2 font-medium">Transformation</th>
-      </tr>
-    </thead>
-    <tbody className="text-text-secondary">
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4"><InlineEquation html={tex("s_1")} /></td>
-        <td className="py-2 pr-4">Extract</td>
-        <td className="py-2"><InlineEquation html={tex("\\mathcal{J}_{\\text{raw}} \\rightarrow \\mathcal{J}_{\\text{typed}}")} />: load GL rows into typed PySpark dataframes</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4"><InlineEquation html={tex("s_2")} /></td>
-        <td className="py-2 pr-4">Reconcile</td>
-        <td className="py-2"><InlineEquation html={tex("\\mathcal{J}_{\\text{typed}} \\rightarrow \\mathcal{J}_{\\text{rec}}")} />: align journals to the tax-period reporting boundary</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4"><InlineEquation html={tex("s_3")} /></td>
-        <td className="py-2 pr-4">Category map</td>
-        <td className="py-2"><InlineEquation html={tex("\\mathcal{J}_{\\text{rec}} \\rightarrow \\mathcal{J}_{\\text{cat}}")} />: assign each row to a tax-category bucket via rule lookup</td>
-      </tr>
-      <tr className="border-b border-border-subtle/50">
-        <td className="py-2 pr-4"><InlineEquation html={tex("s_4")} /></td>
-        <td className="py-2 pr-4">Aggregate</td>
-        <td className="py-2"><InlineEquation html={tex("\\mathcal{J}_{\\text{cat}} \\rightarrow \\mathcal{V}")} />: sum per bucket</td>
-      </tr>
-      <tr>
-        <td className="py-2 pr-4"><InlineEquation html={tex("s_5")} /></td>
-        <td className="py-2 pr-4">Return</td>
-        <td className="py-2"><InlineEquation html={tex("\\mathcal{V} \\rightarrow \\mathcal{R}")} />: format aggregated values into the canonical return shape</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<VisualizationContainer
-  minHeight={500}
-  caption="Figure 1: Pipeline + transparency rail. The compute path (left) is a sequence of typed graph rewrites. The Tableau dashboard column (right) is a parallel surface derived from the same recorded provenance relation. Configured drill-throughs traverse lineage from a stage view toward its recorded source GL rows."
->
-  <CommodityTaxPipeline />
+<VisualizationContainer minHeight={0} caption={COMMODITY_TAX_FORMAL_PIPELINE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <CommodityTaxFormalPipelineFigure content={COMMODITY_TAX_FORMAL_PIPELINE} />
 </VisualizationContainer>
 
-### 3.2 Provenance-Carrying Graphs
+## 3. What recorded lineage must retain
 
-We model each intermediate state <InlineEquation html={tex("\\mathcal{J}_k")} /> as a labelled directed graph <InlineEquation html={tex("G_k = (V_k, E_k, L_k)")} /> where:
+Database-lineage research distinguishes the records that contributed to an output from the operations that transformed them <CitationRef id={4} /><CitationRef id={5} />. This pipeline uses a coarser operational version of that idea: stable identifiers and derivation records connect retained stage outputs to the inputs recorded for them.
 
-- <InlineEquation html={tex("V_k")} /> is the set of data nodes after stage <InlineEquation html={tex("s_k")} />
-- <InlineEquation html={tex("E_k \\subseteq V_k \\times V_{k-1}")} /> is the *provenance edge set*, each edge <InlineEquation html={tex("(v, u)")} /> records that <InlineEquation html={tex("v \\in V_k")} /> was derived from <InlineEquation html={tex("u \\in V_{k-1}")} />
-- <InlineEquation html={tex("L_k")} /> is the labelling function carrying derivation metadata (rule applied, timestamp, version)
+For that evidence to support an investigation, several conditions have to hold:
 
-Each stage <InlineEquation html={tex("s_k")} /> is a graph rewrite that constructs <InlineEquation html={tex("G_k")} /> from <InlineEquation html={tex("G_{k-1}")} /> while extending the provenance edge set:
+- **Contributing inputs are retained.** When a row affects a derived value, its identifier remains associated with that derivation.
+- **Associations point to the right records.** A retained identifier is useful only if joins and mappings connect it to the input that actually contributed.
+- **Rules are identifiable.** Category mappings and other material transformations carry the version needed to understand which rule was applied.
+- **Identifiers remain resolvable.** Keys survive the relevant joins, filters, and intermediate datasets for the supported review period.
+- **Aggregations preserve their contributing population.** A total can be investigated only when the records included in that total remain associated with it.
 
-<MathBlock html={tex("s_k: G_{k-1} \\mapsto G_k \\text{ such that } E_k \\supseteq \\bigl(\\text{rewrite\\_edges}(s_k, V_{k-1})\\bigr)", true)} />
+These are implementation conditions to test, not properties conferred by calling the data “lineage.” A dropped join key can sever a path. A many-to-many join can duplicate contributions. An overwritten mapping can make a prior classification difficult to explain. A filter can remove a record without retaining why it left the population.
 
-### 3.3 Composition Assumptions and Invariants
+The safest description is therefore **recorded lineage**. It says what the system retained without implying that unrecorded or incorrectly associated evidence can somehow be recovered later.
 
-The recursive lineage notation remains useful, but it is an implementation contract rather than a proof that a deployed pipeline satisfies it. For a source row <InlineEquation html={tex("v \\in V_0")} />, define <InlineEquation html={tex("P(v) = \\{v\\}")} />. For a derived node <InlineEquation html={tex("v \\in V_k")} /> with recorded parent nodes <InlineEquation html={tex("\\{u_1, \\ldots, u_m\\} \\subseteq V_{k-1}")} />, define its recorded ancestry as:
+## 4. Investigating one questioned value
 
-<MathBlock html={tex("P(v) = \\bigcup_{i=1}^{m} P(u_i)", true)} />
+Suppose an analyst questions a value in the return. The investigation begins at that value and works backward through the recorded path:
 
-Using that recursion for inspection depends on explicit conditions:
+1. Identify the aggregate and reporting period associated with the questioned value.
+2. Expand the aggregate to the category-level records retained as contributors.
+3. Inspect the mappings recorded for those records, including the applicable rule versions.
+4. Follow the reconciled records back toward the extracted journal rows associated with them.
+5. Compare the displayed evidence with the source material and the analyst's understanding of the rule.
 
-- **Edge completeness:** every in-scope transformation records every input row that contributes to a derived node.
-- **Correct association:** each edge points to the right parent node and carries the applicable rule and version identifiers.
-- **Stable identity:** node and join identifiers remain resolvable across the retained intermediate datasets.
-- **Aggregation coverage:** every term included in an aggregate is represented in its recorded parent set.
+That investigation can end in three different ways. The recorded path may explain the value. It may reveal an inconsistent mapping, join, or source record that needs correction. Or it may stop because the required evidence was not retained or cannot be resolved. The third outcome is not a weaker version of the first two; it is a distinct evidence gap that should remain visible.
 
-These are invariants to test and monitor, not consequences of drawing the graph. Dropped joins, many-to-many duplication, filters that discard lineage, mutable rules without version identifiers, and dashboard joins that diverge from pipeline joins can all make the recorded ancestry incomplete or misleading.
+<VisualizationContainer minHeight={0} caption={COMMODITY_TAX_FORMAL_TRACE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <CommodityTaxFormalTraceFigure content={COMMODITY_TAX_FORMAL_TRACE} />
+</VisualizationContainer>
 
-### 3.4 Aggregation Lineage
+## 5. Missing or inconsistent evidence
 
-For a sum whose contributing values have been completely recorded, the intended ancestry is the union of their recorded ancestry sets:
+A usable investigation path has to represent failure rather than route around it. When a contributing identifier is missing, a dashboard should stop at the last supported stage instead of presenting an inferred source path. When the calculation and inspection joins disagree, the discrepancy should become a defect to reconcile rather than a cosmetic dashboard issue.
 
-<MathBlock html={tex("P\\bigl(\\sum_{i} v_i\\bigr) = \\bigcup_i P(v_i)", true)} />
+Common failure cases include:
 
-This is a bookkeeping rule for the lineage implementation, conditional on complete edges and correct aggregation semantics. It does not demonstrate that the source population, mapping rules, or resulting amount is correct. Subject to those boundaries, an analyst can expand an aggregated number toward its recorded contributing rows by traversing the graph.
+- A source row contributes to an aggregate but its identifier is dropped during an intermediate transformation.
+- A many-to-many join inflates a value while the inspection view displays only distinct records.
+- A category mapping changes without retaining the version used by an earlier run.
+- The dashboard applies a filter or join that differs from the calculation path.
+- An analyst has access to the derived value but not to one of the recorded source datasets.
+- A corrected source record exists, but the affected calculation has not yet been rerun and reviewed.
 
-## 4. The Transparency Layer as Parallel Structure
+The operating response depends on the failure. A missing association may require lineage repair. A source defect may require a governed correction. A mapping issue may require rule review. An authorization limit may require a different reviewer. In every case, the evidence state should remain separate from the disposition: “unresolved” is more accurate than an explanation assembled from incomplete records.
 
-### 4.1 Dashboards as Presentations
+## 6. Configured Tableau inspection views
 
-The Tableau dashboard for stage <InlineEquation html={tex("s_i")} /> is formalized as a presentation function <InlineEquation html={tex("\\pi_i")} /> over the graph state <InlineEquation html={tex("G_i")} />:
+Tableau provided configured inspection surfaces associated with relevant pipeline stages. It was familiar to the finance users involved, and it could present filtered stage outputs and drill-down paths without introducing a separate custom interface.
 
-<MathBlock html={tex("\\pi_i: G_i \\rightarrow \\text{HTMLView}_i", true)} />
+Those views are useful only to the extent that their joins, filters, rule labels, and authorization behavior match the retained pipeline records. They require their own semantic checks and maintenance. A dashboard can be available while its query is stale; it can display the right total while omitting a contributing row; or it can show a complete recorded path built from an incomplete source population.
 
-The presentation function is intended to be read-only: given the same graph state, authorized user scope, and view parameters, it should return an equivalent view without modifying <InlineEquation html={tex("G_i")} />. This separates inspection from computation while leaving authorization, semantic correctness, and view-query testing as explicit responsibilities.
+The dashboards therefore support investigation, not automated approval. They provide a shared surface on which an analyst and the delivery team can examine the same questioned value and locate where their interpretations diverge.
 
-### 4.2 Drill-Through as Provenance-Edge Traversal
+## 7. Reconcile, correct, rerun, review
 
-A drill-through interaction (an analyst clicking from a derived number back to the rows recorded as contributing to it) is a backward traversal of the provenance edge set. Given an aggregated value <InlineEquation html={tex("v \\in V_k")} />, define the configured traversal as:
+The human workflow continues after drill-down. An analyst raises a question, inspects the configured evidence, and reconciles the recorded derivation against the applicable source and rule. If the issue is a source record, mapping, or transformation defect, the correction follows the governed path for that artifact. The affected calculation is then rerun, and the resulting value and evidence are reviewed again.
 
-<MathBlock html={tex("\\text{drill}(v) = \\{u \\in V_0 : (v, \\ldots, u) \\in (E_1 \\cup \\cdots \\cup E_k)^*\\}", true)} />
+This loop matters because changing a dashboard annotation does not change the calculation, and changing a source or rule does not update an already-produced return until the relevant stages run again. The review surface and the compute path must stay connected without being confused for one another.
 
-where <InlineEquation html={tex("(E_1 \\cup \\cdots \\cup E_k)^*")} /> is the transitive closure of the recorded provenance edges back to <InlineEquation html={tex("s_0")} />. For a final-stage value, the closure is <InlineEquation html={tex("(E_1 \\cup E_2 \\cup E_3 \\cup E_4 \\cup E_5)^*")} />.
+The configured views exposed selected outputs and recorded paths, but not the full rulebook. Category mappings remained in transformation code, and changes continued through the data team's review and release controls. That boundary limited what an analyst could inspect directly and kept a dashboard annotation from becoming an ungoverned rule change.
 
-The drill-through is consistent with the recorded graph only when its query traverses the same versioned edges and applies the intended authorization filters. It can surface the intended source rows only to the extent that edge emission, joins, and dashboard semantics are complete and correct. It cannot expose lineage that was never recorded, validate the source population or business rules, or establish that an authorized view contains every row in the underlying population.
+## 8. What visibility cannot prove
 
-### 4.3 Reusing Lineage Still Has Costs
+Recorded lineage can make a question more focused. It can show which records and rule versions the supported path associated with a value. It can help distinguish a mapping issue from a source issue and give the team a common place to investigate.
 
-A naive reading of this architecture suggests the transparency layer is free: once provenance is preserved, dashboards are just queries over the provenance graph. This is partially correct: the *information* needed for the dashboards is already in <InlineEquation html={tex("G_k")} />. What is not free is the *presentation engineering*: choosing what to show, how to summarize at each stage, and how to design the navigation between stages so that an analyst’s drill-through is fluent rather than mechanical.
+It cannot establish that the original source population was complete, that every retained association is accurate, that a business rule was approved, that an analyst saw every relevant record, or that the resulting return should be accepted. It also cannot recover evidence that was never recorded.
 
-The transparency layer can reuse the pipeline’s lineage plumbing, but it still carries costs for dashboard authoring, semantic validation, access control, performance, and maintenance. Building both surfaces together avoided a second lineage implementation in this case; that is an observed design advantage, not a universal cost guarantee.
-
-## 5. Inspection and Reviewer Confidence
-
-### 5.1 Qualitative Delivery Observation
-
-During delivery, reviewer questions were easier to investigate when an output exposed a path through recorded transformation stages toward its contributing source rows. Drill-through gave the team a practical way to move from “this number looks wrong” to either an explanation of the recorded derivation or a focused defect investigation.
-
-This was a qualitative workflow observation, not a measured trust function. No causal adoption threshold, fixed number of review cycles, or zero-anomaly point is claimed here. Reviewer confidence can also depend on source quality, rule governance, access controls, reconciliation evidence, operating history, and the quality of the manual comparison process.
-
-### 5.2 Boundary of the Observation
-
-Lineage can reduce the effort required to investigate an output, but it does not make the output correct or guarantee adoption. An incomplete lineage graph can create false confidence, while a system without embedded drill-through may still be reviewable through other evidence. The relevant design lesson is narrower: when lineage already exists, exposing it through an authorized inspection surface can make review more direct.
-
-## 6. Implementation Notes
-
-### 6.1 PySpark + CDP
-
-The compute pipeline runs as a sequence of PySpark jobs on Cloudera Data Platform (CDP). Each stage emits an intermediate dataset with stable identifiers carried forward as provenance keys. CDP supplies logging and access-control capabilities <CitationRef id={3} />; whether the deployment meets a particular control requirement depends on configuration, review, and operating evidence.
-
-### 6.2 Tableau as the Presentation Layer
-
-Tableau was chosen over a custom inspection UI for two reasons: (a) the finance team already had Tableau muscle memory; introducing a new tool would have added adoption cost on top of automation cost, and (b) Tableau joins could implement the configured lineage traversal in a familiar drill-down interface. Correctness still depends on those joins matching the versioned pipeline relations and applying the intended authorization filters.
-
-### 6.3 Provenance Mechanism
-
-In the deployment, provenance is preserved through stable join keys carried forward across stages, with explicit provenance tables for the category-mapping stage where the derivation is non-trivial. The full mechanism is implementation-specific and not the focus of this paper. The lineage relationships above apply only when the mechanism records complete, correctly associated edges for every transformation in scope.
-
-## 7. What I Would Build Differently
-
-The first dashboard set surfaced provenance for *outputs* but not for *rules*. An analyst could drill from a derived number back to the source GL rows, but the rules that produced each category mapping lived in PySpark code, modifiable only by the data team. New tax categories or re-categorizations of existing GL accounts therefore required code changes and redeploys.
-
-Formally, this is a missing presentation function. Let <InlineEquation html={tex("\\rho")} /> be the rule set. The dashboards include <InlineEquation html={tex("\\pi_i")} /> over data states <InlineEquation html={tex("G_i")} /> but no <InlineEquation html={tex("\\pi_\\rho")} /> over the rule set itself. A *mapping-rules dashboard* would have provided <InlineEquation html={tex("\\pi_\\rho")} />, letting analysts inspect, propose, and (with code-review approval) extend rules through the same drill-down idiom they already used for outputs.
-
-This is the second-order application of the transparency-as-architecture principle: transparency over outputs can make review more direct; transparency over the *rules that produce the outputs* can support shared ownership.
-
-## 8. Related Work
-
-**Provenance in databases.** The data-provenance literature <CitationRef id={4} /><CitationRef id={5} /> formalizes why-provenance and how-provenance for SQL queries. Our pipeline operates at a coarser granularity (rows-to-rows across pipeline stages, not tuple-to-tuple within a single query) but shares the algebraic structure.
-
-**Internal-control frameworks.** COSO’s Internal Control—Integrated Framework <CitationRef id={6} /> frames objectives and principles for effective internal control; it does not prescribe an ETL architecture. The design described here treats provenance as a first-class pipeline object that can also support a parallel transparency surface, while control effectiveness still depends on implementation and operating evidence.
-
-**Human-in-the-loop systems.** Human-AI interaction research <CitationRef id={7} /> examines how explanations and inspection affect reliance and review. The delivery observation here is qualitative; it does not establish a causal trust model.
-
-## 9. Conclusion
-
-Process automation in regulated finance has a property that ordinary ETL does not address on its own: every output must be defensible to a domain expert who has built years of intuition about what the numbers should look like. Functional correctness and auditability are both necessary; neither is sufficient without valid source data, approved rules, effective controls, and human review.
-
-The architecture above pairs a five-stage pipeline that records provenance edges with a Tableau presentation layer whose drill-throughs traverse those recorded edges. The shared lineage structure reduces duplicate data plumbing and makes the two surfaces composable, subject to lineage-completeness and dashboard-semantic checks.
-
-The deeper claim is that *transparency is not a feature*. It is an architectural concern for systems that take auditability seriously. Surfacing derivations gives reviewers evidence they can inspect; whether that earns enough trust to replace a manual process still depends on accuracy, control effectiveness, operating history, and accountable human decisions.
+The bounded lesson is practical: calculation should retain enough derivation evidence for authorized inspection, inspection should expose gaps and inconsistencies rather than conceal them, and accountable analysts should decide what those findings mean. Visibility improves the quality of the investigation only when the records beneath it deserve confidence.

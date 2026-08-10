@@ -1,8 +1,8 @@
 'use client';
 
-// Root error boundary. This site is heavily client-hydrated (Three.js,
-// ReactFlow, KaTeX, the blue-rose SPA); without this, an unhandled client
-// render error shows React's blank screen with no recovery. global-error
+// Root error boundary. This site includes client-hydrated visualizations and
+// the blue-rose SPA; without this, an unhandled client render error shows
+// React's blank screen with no recovery. global-error
 // replaces the root layout, so it must render its own <html>/<body>.
 export default function GlobalError({
   reset,
