@@ -90,7 +90,7 @@ export default function TableOfContents() {
 
   return (
     <nav
-      className="fixed top-28 hidden w-52 xl:block"
+      className="fixed top-28 hidden w-52 2xl:block"
       style={{ left: 'max(1rem, calc((100vw - 64rem) / 2 - 14rem))' }}
     >
       <div className="max-h-[calc(100vh-8rem)] overflow-y-auto border-l border-border-subtle pl-4">
