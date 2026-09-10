@@ -11,6 +11,7 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
+  generateBuildId: async () => process.env.GITHUB_SHA ?? 'local-static-export',
 };
 
 module.exports = withMDX(nextConfig);
