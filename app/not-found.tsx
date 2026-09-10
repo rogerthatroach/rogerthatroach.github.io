@@ -25,7 +25,7 @@ export default function NotFound() {
         className="mx-auto flex min-h-[calc(100vh-160px)] max-w-content items-center px-6 py-28 md:px-16"
       >
         <div className="max-w-2xl">
-          <p className="font-mono text-[11px] uppercase tracking-widest text-text-tertiary">
+          <p className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
             § 404
           </p>
 

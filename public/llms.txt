@@ -1,27 +1,33 @@
 # Harmilap Singh Dhaliwal
 
-> AI & Data Science Lead. 8+ years of progressive AI/ML — from industrial
-> Digital Twins to production agentic AI for RBC's CFO Group and multi-stage LLM
-> analytics platforms in regulated finance.
+> Machine learning engineer and AI & Data Science Lead with 8+ years building
+> production systems across industrial ML, document intelligence, financial
+> analytics, text-to-SQL, and reviewed agentic workflows.
 
 ## Start here
 
 - [Home](https://rogerthatroach.github.io/): Positioning, career arc, project index.
-- [Resume](https://rogerthatroach.github.io/resume): Career arc, skills, education, awards, writing.
+- [Resume](https://rogerthatroach.github.io/resume): Career chronology, selected work, skills, education, awards, and writing.
 - [Projects](https://rogerthatroach.github.io/projects): Case studies with architecture diagrams.
-- [Writings](https://rogerthatroach.github.io/blog): Technical whitepapers and practitioner deep-dives.
-- [Papers](https://rogerthatroach.github.io/papers): Published papers and clearly labeled working notes.
-- [Platform](https://rogerthatroach.github.io/platform): How production AI is built and served.
-- [About](https://rogerthatroach.github.io/about): Thesis and background.
+- [Writings](https://rogerthatroach.github.io/blog): Technical notes, decision guides, and builder stories.
+- [Platform](https://rogerthatroach.github.io/platform): Application-level patterns across the production AI case studies.
+- [About](https://rogerthatroach.github.io/about): Operating practice and background.
 
 ## Project case studies
 
-- [AI/LLM Drafting Platform](https://rogerthatroach.github.io/projects/funding-request-drafting): The first true agentic AI platform approved for production at the bank; launched across the full CFO Group in all geographies in May 2026.
-- [WorkforceAnalytics](https://rogerthatroach.github.io/projects/workforceAnalytics): LLM-as-router analytics platform over financial hierarchies.
-- [FinancialBenchmarking](https://rogerthatroach.github.io/projects/financialBenchmarking): NL→SQL benchmarking system.
-- [Commodity Tax](https://rogerthatroach.github.io/projects/commodity-tax): Months → 90 minutes process automation.
-- [Document Intelligence](https://rogerthatroach.github.io/projects/document-intelligence): Document AI extraction pipeline.
-- [Combustion Tuning](https://rogerthatroach.github.io/projects/combustion-tuning): Industrial Digital Twin, $3M/yr savings.
+- [AI/LLM Drafting Platform](https://rogerthatroach.github.io/projects/project-approval-drafting): The first true agentic AI platform approved for production at the bank; launched across the full CFO Group in all geographies in May 2026.
+- [AI/LLM Workforce Analytics Platform](https://rogerthatroach.github.io/projects/workforce-analytics): Built March–November 2025; production financial analytics with model-mediated language work around code-owned entitlement and calculation.
+- [Financial Peer Benchmarking Platform](https://rogerthatroach.github.io/projects/financial-peer-benchmarking): One production product across v1 and its two-week v2 text-to-SQL refactor.
+- [Commodity Tax](https://rogerthatroach.github.io/projects/commodity-tax): PySpark and Tableau process automation that reduced a months-long workflow to 90 minutes for a roughly $600M allocation.
+- [Document Intelligence](https://rogerthatroach.github.io/projects/document-intelligence): A hybrid component that improved checkbox-detection accuracy from roughly 70% to 99.95%; this is not an end-to-end pipeline score.
+- [Combustion Tuning](https://rogerthatroach.github.io/projects/combustion-tuning): 84 regression models and bounded PSO for operator-reviewed settings on one 900 MW Maizuru unit; $3M in annual savings.
+
+## Evidence boundaries
+
+- Exactly three production AI systems at RBC: AI/LLM drafting, AI/LLM workforce analytics, and financial peer benchmarking. Commodity Tax is process automation; a separate weekend prototype is not production.
+- The AI/LLM drafting platform’s production version has one LangGraph orchestration scope. Its bounded tool routines are not independent agents.
+- The regulated-finance systems use approved foundation-model endpoints; no fine-tuning work is claimed.
+- Model and retrieval scores route review or clarification. They are not correctness guarantees.
 
 ## Notes
 

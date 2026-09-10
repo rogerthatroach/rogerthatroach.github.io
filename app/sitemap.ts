@@ -1,12 +1,10 @@
 import type { MetadataRoute } from 'next';
 import { PROJECTS } from '@/data/projects';
 import { POSTS, isPostPublic } from '@/data/posts';
-import { PAPERS, isPaperPublic } from '@/data/papers';
+import { SITE_URL } from '@/data/site';
 
 // Next 16 requires force-static on metadata routes under output:'export'.
 export const dynamic = 'force-static';
-
-const SITE_URL = 'https://rogerthatroach.github.io';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -18,15 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/resume`, changeFrequency: 'monthly', priority: 0.9 },
     { url: `${SITE_URL}/now`, changeFrequency: 'monthly', priority: 0.4 },
     { url: `${SITE_URL}/colophon`, changeFrequency: 'yearly', priority: 0.3 },
-    { url: `${SITE_URL}/papers`, changeFrequency: 'monthly', priority: 0.7 },
   ];
-
-  const paperRoutes: MetadataRoute.Sitemap = PAPERS.filter(isPaperPublic).map((p) => ({
-    url: `${SITE_URL}/papers/${p.slug}`,
-    lastModified: p.publishedAt ? new Date(p.publishedAt) : undefined,
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
 
   const projectRoutes: MetadataRoute.Sitemap = PROJECTS.map((p) => ({
     url: `${SITE_URL}/projects/${p.id}`,
@@ -41,5 +31,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...projectRoutes, ...postRoutes, ...paperRoutes];
+  return [...staticRoutes, ...projectRoutes, ...postRoutes];
 }

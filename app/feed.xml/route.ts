@@ -1,9 +1,8 @@
 import { POSTS, isPostPublic } from '@/data/posts';
+import { PERSON_NAME, SITE_URL } from '@/data/site';
 
 // RSS 2.0 feed for the blog, generated at build time (static export).
 export const dynamic = 'force-static';
-
-const SITE_URL = 'https://rogerthatroach.github.io';
 
 function esc(s: string): string {
   return s
@@ -33,7 +32,7 @@ export function GET(): Response {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Harmilap Singh Dhaliwal — Writings</title>
+    <title>${PERSON_NAME} — Writings</title>
     <link>${SITE_URL}/blog</link>
     <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />
     <description>Technical notes, decision guides, and builder stories about production AI/ML.</description>

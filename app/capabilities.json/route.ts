@@ -1,11 +1,16 @@
 import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
+import {
+  PRODUCTION_SYSTEMS_COUNT,
+  PUBLIC_AS_OF_DATE,
+  YEARS_EXPERIENCE,
+} from '@/data/canonical';
+import { isPostSlugPublic } from '@/data/posts';
+import { PERSON_NAME, SITE_DESCRIPTION, SITE_URL } from '@/data/site';
 
 // Machine-readable capabilities manifest generated from the same typed data
 // as the human-facing case studies. Linked from public/llms.txt and <head>.
 export const dynamic = 'force-static';
-
-const SITE_URL = 'https://rogerthatroach.github.io';
 
 export function GET(): Response {
   const projects = PROJECTS.map((p) => {
@@ -17,40 +22,46 @@ export function GET(): Response {
       role: p.role,
       era: cs?.era,
       timeline: cs?.timeline,
-      status: cs?.status ?? 'shipped',
+      status: cs?.status ?? 'not-specified',
       stack: p.stack,
       metric: { value: p.heroMetric.value, label: p.heroMetric.label },
-      // problem/decision/impact come from the case study's TL;DR when present
-      // (one honest sentence each); otherwise the project caption stands in.
-      problem: cs?.tldr?.problem,
-      decision: cs?.tldr?.decision,
-      impact: cs?.tldr?.impact ?? p.caption,
+      problem: cs?.narrative.problem,
+      contribution: cs?.narrative.contribution,
+      decision: cs?.narrative.decision?.selectedApproach,
+      outcomeAndState: cs?.narrative.outcomeAndState ?? p.caption,
+      limits: cs?.narrative.limits,
       url: `${SITE_URL}/projects/${p.id}`,
-      deepDive: cs?.blogPostSlug ? `${SITE_URL}/blog/${cs.blogPostSlug}` : undefined,
+      deepDive: isPostSlugPublic(cs?.blogPostSlug)
+        ? `${SITE_URL}/blog/${cs?.blogPostSlug}`
+        : undefined,
     };
   });
 
-  // Current implementation taxonomy, kept alongside the project data so the
-  // manifest does not imply techniques that the production systems did not use.
   const approachTaxonomy = {
     modeling:
-      'TCS digital-twin work was regression (84 models); Humana was classification; FinancialBenchmarking is NL→SQL extraction + ranking; WorkforceAnalytics / AI/LLM Drafting Platform / BRIEFING_PROTOTYPE are LLM pipelines; Commodity Tax was process automation. Task type is matched to the problem, not assumed.',
+      'Combustion Tuning used 84 regression models and bounded optimization. Document Intelligence used OCR, computer vision, and a Random Forest for checkbox detection. Financial peer benchmarking uses a guarded text-to-SQL path. Commodity Tax is deterministic process automation. The AI/LLM workforce analytics and drafting platforms use models only inside declared workflow boundaries.',
     retrieval:
-      'AI/LLM Drafting Platform uses LLM-assisted routing to select a scoped field group, followed by dense semantic retrieval within that scope. WorkforceAnalytics uses model-assisted intent routing around a deterministic compute path. Neither production path is presented as BM25, sparse, hybrid, or RRF.',
-    fineTuning:
-      'In regulated-finance production the work is consuming foundation-model API endpoints; fine-tuning was out of scope by policy, not framed as a deliberate technical choice.',
+      'The AI/LLM drafting platform routes requests to a configured field group before dense semantic retrieval within that scope. The AI/LLM workforce analytics platform uses model-assisted intent routing around code-owned entitlement, data access, and calculation. No shipped sparse, hybrid, or reciprocal-rank-fusion path is claimed.',
+    modelAdaptation:
+      'The regulated-finance systems consume approved foundation-model endpoints. No fine-tuning work is claimed.',
     evaluation:
-      'RAG/LLM evaluation combines LLM-as-judge with extensive human testing, feeding evidence into Model Risk review. The systems use bespoke logging and monitoring rather than third-party evaluation libraries.',
-    dataBoundary:
-      'In WorkforceAnalytics, scoped model stages handle gate, metadata extraction, answer shaping, and synthesis; a separate deterministic path owns entitlement resolution, data access, and calculation. Typed contracts, access controls, validation, logging, tests, and monitoring constrain the boundary; configuration and integration errors remain residual risks.',
+      'Model-assisted systems use LLM-as-judge alongside extensive human testing, with evidence prepared for Model Risk review. Bespoke tracing and logging support investigation; scores do not replace accountable review.',
+    responsibilityBoundaries:
+      'Model-mediated interpretation and drafting are separated from deterministic calculation, authorization, reviewed query construction, and human action. The exact boundary differs by system and remains subject to configuration, testing, monitoring, and review.',
   };
 
   const manifest = {
-    name: 'Harmilap Singh Dhaliwal',
-    title: 'AI/ML Engineering Lead — production AI in regulated finance',
+    name: PERSON_NAME,
+    title: 'Machine learning engineer and AI/data science lead',
     url: SITE_URL,
-    summary:
-      '8+ years in AI/ML — industrial digital twins → cloud document intelligence → financial NL→SQL and agentic AI in regulated finance. Three production AI systems at a major Canadian bank; approximately 1.5 years focused on agentic and LLM systems.',
+    summary: SITE_DESCRIPTION,
+    experience: {
+      asOf: PUBLIC_AS_OF_DATE,
+      aiAndMachineLearning: `${YEARS_EXPERIENCE} years`,
+      regulatedFinanceProductionAi: '~4 years',
+      agenticAndLlmSystems: '18 months',
+      productionAiSystemsAtRbc: PRODUCTION_SYSTEMS_COUNT,
+    },
     projects,
     approachTaxonomy,
     links: {

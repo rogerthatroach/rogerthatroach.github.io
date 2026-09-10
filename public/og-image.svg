@@ -19,7 +19,7 @@
   <g transform="translate(80, 130)">
     <!-- Eyebrow -->
     <text font-family="monospace" font-size="14" letter-spacing="4" fill="#b07a82" opacity="0.9">
-      AI &amp; DATA SCIENCE LEAD · RBC CFO GROUP
+      MACHINE LEARNING ENGINEER · AI &amp; DATA SCIENCE LEAD
     </text>
 
     <!-- Name -->
@@ -27,23 +27,23 @@
       Harmilap Singh Dhaliwal
     </text>
 
-    <!-- Tagline (matches hero) -->
+    <!-- Portfolio identity -->
     <text y="110" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#a09890">
-      Architecting agentic AI inside RBC&#8217;s CFO Group.
+      Production systems from concept to delivery.
     </text>
 
     <!-- Accent line -->
     <rect y="140" width="200" height="1" fill="url(#accent-line)"/>
 
-    <!-- Headline claim (matches hero bio opening) -->
+    <!-- Broad portfolio scope -->
     <text y="195" font-family="system-ui, -apple-system, sans-serif" font-size="30" font-weight="600" fill="#f0ece8">
-      First true agentic AI platform approved for production at the bank
+      Text, search, applied ML, and governed AI
     </text>
     <text y="232" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#8a8078">
-      Full CFO Group launch across all geographies, May 2026. 8+ years
+      8+ years across industrial ML, document intelligence, and
     </text>
     <text y="259" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#8a8078">
-      of progressive AI/ML, from power generation to enterprise AI.
+      regulated finance. Hands-on from architecture through operation.
     </text>
 
     <!-- Metrics row -->
@@ -51,11 +51,11 @@
       <text font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">$3M</text>
       <text x="85" font-family="monospace" font-size="12" fill="#8a8078" dy="4">annual savings</text>
 
-      <text x="280" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">Interactive</text>
-      <text x="555" font-family="monospace" font-size="12" fill="#8a8078" dy="4">CFO analytics</text>
+      <text x="280" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">99.95%</text>
+      <text x="415" font-family="monospace" font-size="12" fill="#8a8078" dy="4">checkbox detection</text>
 
-      <text x="720" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">CFO Group</text>
-      <text x="900" font-family="monospace" font-size="12" fill="#8a8078" dy="4">all geographies</text>
+      <text x="720" font-family="monospace" font-size="28" font-weight="700" fill="#f0ece8">3</text>
+      <text x="755" font-family="monospace" font-size="12" fill="#8a8078" dy="4">production AI systems at RBC</text>
     </g>
   </g>
 
