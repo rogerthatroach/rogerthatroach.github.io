@@ -14,15 +14,9 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Styling',
     value: (
       <>
-        Tailwind CSS with CSS-variable-backed theme tokens. {THEMES.length}{' '}
-        themes live behind the palette picker in the nav:{' '}
-        {THEMES.map((theme, index) => (
-          <span key={theme.id}>
-            {index > 0 && (index === THEMES.length - 1 ? ', and ' : ', ')}
-            <span className="font-mono">{theme.name}</span> ({theme.description})
-          </span>
-        ))}
-        .
+        Tailwind CSS 4 with CSS-variable-backed theme tokens. The palette
+        picker exposes {THEMES.length} themes built from the same semantic
+        color relationships.
       </>
     ),
   },
@@ -30,17 +24,10 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Typography',
     value: (
       <>
-        <a
-          href="https://rsms.me/inter/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          Inter
-        </a>{' '}
-        for body. <span className="font-mono">JetBrains Mono</span> for
-        eyebrows, metrics, and technical chips. Both loaded via{' '}
-        <span className="font-mono">next/font</span>.
+        <span className="font-mono">Fraunces</span> for display type,{' '}
+        <span className="font-mono">Inter</span> for body copy, and{' '}
+        <span className="font-mono">JetBrains Mono</span> for labels and code.
+        All three are self-hosted through <span className="font-mono">next/font</span>.
       </>
     ),
   },
@@ -48,9 +35,8 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Motion',
     value: (
       <>
-        Framer Motion, with{' '}
-        <span className="font-mono">prefers-reduced-motion</span> handling in
-        interactive components.
+        Framer Motion for selected transitions. Motion supplements the copy
+        and static figure states rather than carrying an explanation alone.
       </>
     ),
   },
@@ -58,28 +44,18 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
     label: 'Diagrams',
     value: (
       <>
-        Server-rendered HTML, CSS, and SVG figures backed by typed content
-        and native semantic structure. Interactive figures begin with a useful
-        static frame and keep their complete explanation available without
-        motion or interaction. AI/LLM Drafting Platform{' '}
-        <a
-          href="/blog/enterprise-agentic-ai-framework"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          envelope diagram
-        </a>{' '}
-        is the current worked example.
+        HTML, CSS, and SVG backed by typed content. Interaction is added where
+        changing state clarifies a sequence, comparison, or trade-off; the
+        initial frame carries the primary idea.
       </>
     ),
   },
   {
-    label: 'Writing framework',
+    label: 'Content',
     value: (
       <>
-        Decision guides surface constraints, alternatives, trade-offs,
-        walkthroughs, and before-and-after comparisons. Technical notes use
-        plain language to explain mechanisms, evidence, boundaries, and
-        failure paths.
+        Case studies and posts live in typed data and MDX. They are organized
+        around mechanism, evidence, boundaries, and stated limits.
       </>
     ),
   },
@@ -101,35 +77,16 @@ const ROWS: { label: string; value: React.ReactNode }[] = [
         rel="noopener noreferrer"
         className="inline-flex items-center gap-1.5 text-accent underline underline-offset-4 hover:text-text-primary"
       >
-        <Github size={14} />
+        <Github size={14} aria-hidden="true" />
         rogerthatroach/rogerthatroach.github.io
       </a>
     ),
   },
 ];
 
-const PRINCIPLES: { heading: string; body: string }[] = [
-  {
-    heading: 'First principles',
-    body: 'Decompose to root causes before writing code. No cargo-culting. If a dependency, pattern, or abstraction can&rsquo;t be justified, remove it.',
-  },
-  {
-    heading: 'Zero waste',
-    body: 'Remove unused code and just-in-case abstractions when they are found. Keep the public source focused.',
-  },
-  {
-    heading: 'Copy-first, animation-last',
-    body: 'Text does the work. Motion is texture, not substitute. Reduced-motion users see the same content, instantly.',
-  },
-  {
-    heading: 'Measure twice, cut once',
-    body: 'Plan, confirm, execute. Type checks and production builds are followed by route, keyboard, and rendered-text review before publication.',
-  },
-];
-
 const META_TITLE = 'Colophon';
 const META_DESCRIPTION =
-  'Typefaces, framework, hosting, and design principles behind this site. Craft notes.';
+  'Framework, typography, figures, hosting, and public-source notes for this portfolio.';
 const META_PATH = '/colophon';
 
 export const metadata: Metadata = {
@@ -165,22 +122,17 @@ export default function ColophonPage() {
           href="/"
           className="mb-6 inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} aria-hidden="true" />
           Home
         </Link>
 
         <div className="max-w-2xl">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
+          <p className="font-mono text-xs uppercase tracking-widest text-accent">
             Colophon
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
-            What this site is made of.
+            Technical stack and publishing choices.
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-            Typefaces, framework, hosting, and the design principles I kept
-            coming back to. Not exhaustive. Just the ones that shaped what
-            shipped.
-          </p>
 
           {/* Stack table */}
           <dl className="mt-10 divide-y divide-border-subtle overflow-hidden rounded-xl border border-border-subtle bg-surface/30">
@@ -189,7 +141,7 @@ export default function ColophonPage() {
                 key={r.label}
                 className="grid grid-cols-1 gap-1 p-4 sm:grid-cols-[9rem_1fr] sm:gap-4 sm:p-5"
               >
-                <dt className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                <dt className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
                   {r.label}
                 </dt>
                 <dd className="text-sm leading-relaxed text-text-secondary">
@@ -199,21 +151,14 @@ export default function ColophonPage() {
             ))}
           </dl>
 
-          {/* Principles */}
           <h2 className="mt-12 text-xl font-semibold text-text-primary">
-            Principles
+            Public source
           </h2>
-          <ol className="mt-4 space-y-5">
-            {PRINCIPLES.map((p, i) => (
-              <li key={i} className="border-l-2 border-accent/40 pl-5">
-                <p className="font-semibold text-text-primary">{p.heading}</p>
-                <p
-                  className="mt-1 text-sm leading-relaxed text-text-secondary"
-                  dangerouslySetInnerHTML={{ __html: p.body }}
-                />
-              </li>
-            ))}
-          </ol>
+          <p className="mt-3 border-l-2 border-accent/40 pl-5 text-sm leading-relaxed text-text-secondary">
+            The linked repository is public. Anything tracked there
+            should be treated as published material, including source comments,
+            metadata, and assets.
+          </p>
         </div>
       </main>
       <Footer />

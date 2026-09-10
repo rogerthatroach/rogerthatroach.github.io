@@ -23,7 +23,7 @@ const LEVELS: LevelMap[] = [
   {
     level: 'Physical',
     id: 'tcs',
-    highlight: '84 ML models · PSO · $3M/yr saved on a 900MW Maizuru unit',
+    highlight: '84 ML models · PSO · $3M/yr saved on a 900 MW Maizuru unit',
     href: '/projects/combustion-tuning',
   },
   {
@@ -41,8 +41,8 @@ const LEVELS: LevelMap[] = [
   {
     level: 'Intelligent',
     id: 'rbc-lead',
-    highlight: 'AI/LLM Drafting Platform + WorkforceAnalytics · LangGraph · pgvector · text-to-SQL',
-    href: '/projects/funding-request-drafting',
+    highlight: 'AI/LLM drafting + workforce analytics · LangGraph · pgvector · text-to-SQL',
+    href: '/projects/project-approval-drafting',
   },
 ];
 
@@ -50,12 +50,9 @@ export default function ThesisMapping() {
   return (
     <section aria-labelledby="thesis-heading" className="my-10">
       <div className="mb-5">
-        <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
-          The heuristic, mapped
-        </p>
         <h2
           id="thesis-heading"
-          className="mt-1 text-lg font-semibold text-text-primary sm:text-xl"
+          className="text-lg font-semibold text-text-primary sm:text-xl"
         >
           Four domains, four recurring questions.
         </h2>
@@ -78,10 +75,10 @@ export default function ThesisMapping() {
               )}
             >
               <div className="sm:border-r sm:border-border-subtle sm:pr-5">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
+                <p className="font-mono text-xs uppercase tracking-widest text-accent">
                   {level}
                 </p>
-                <p className="mt-0.5 font-mono text-[11px] text-text-tertiary">
+                <p className="mt-0.5 font-mono text-xs text-text-tertiary">
                   {node.period}
                 </p>
               </div>

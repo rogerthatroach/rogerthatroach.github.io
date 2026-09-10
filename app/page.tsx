@@ -9,10 +9,6 @@ import SectionProgress from '@/components/SectionProgress';
 import Footer from '@/components/Footer';
 import ProjectsHybridTable from '@/components/projects/ProjectsHybridTable';
 
-// NowBuilding removed — "current work" is surfaced by Journey's top role
-// card (rbc-lead) with its role-details overlay; /now page carries the
-// Sivers-style monthly focus line. Removing avoided duplicate content
-// and resolved the id="now" namespace collision with the /now page.
 const HOME_SECTIONS = [
   { id: 'hero', label: 'Intro' },
   { id: 'through-line', label: 'Through-line' },
@@ -31,12 +27,8 @@ export default function Home() {
   }).filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
-    <main id="main-content">
-      {/* WebSite JSON-LD — reinforces the brand/site entity on the homepage.
-          The LCP portrait is preloaded automatically by Next from the Hero
-          <img fetchpriority="high" srcSet sizes> (correct 194/244 imageSizes);
-          a manual <link rel=preload> here was removed — it carried a stale
-          160/202 hint that conflicted with the real layout. */}
+    <>
+      {/* WebSite JSON-LD reinforces the site entity on the homepage. */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -51,43 +43,39 @@ export default function Home() {
       />
       <Nav />
       <SectionProgress sections={HOME_SECTIONS} />
-      <Hero />
+      <main id="main-content">
+        <Hero />
 
-      {/* Career through-line and supporting metrics. */}
-      <MetricsRibbon />
+        {/* Career through-line and supporting metrics. */}
+        <MetricsRibbon />
 
-      {/* The Journey — interactive career timeline (click any role for
-          headline metric + transition story + per-project decision
-          rationale via floating RoleOverlay). Placed above Projects so
-          the reader sees the arc before the individual works. */}
-      <SkillTimeline expanded heading="The Journey" />
+        <SkillTimeline expanded heading="The Journey" />
 
-      {/* Projects — compact list on homepage, full mosaic on /projects */}
-      <section id="work" className="px-6 py-14 md:px-16">
-        <div className="mx-auto max-w-content">
-          <div className="mb-6 flex items-baseline justify-between gap-4">
-            <h2 className="font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">Projects</h2>
-            <Link
-              href="/projects"
-              className="group inline-flex items-center gap-1.5 text-sm font-medium text-accent transition-colors hover:text-text-primary"
-            >
-              See all case studies
-              <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-            </Link>
+        <section id="work" className="px-6 py-14 md:px-16">
+          <div className="mx-auto max-w-content">
+            <div className="mb-6 flex items-baseline justify-between gap-4">
+              <h2 className="font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">Projects</h2>
+              <Link
+                href="/projects"
+                className="group inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-accent transition-colors hover:text-text-primary"
+              >
+                See all case studies
+                <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </div>
+            <p className="mb-6 max-w-2xl text-sm text-text-secondary">
+              Six systems across {YEARS_EXPERIENCE} years. From power plant combustion tuning to agentic AI
+              launched across RBC&rsquo;s full CFO Group.
+            </p>
+
+            <ProjectsHybridTable rows={projectRows} />
           </div>
-          <p className="mb-6 max-w-2xl text-sm text-text-secondary">
-            Six systems across {YEARS_EXPERIENCE} years. From power plant combustion tuning to agentic AI
-            launched across RBC&rsquo;s full CFO Group.
-          </p>
+        </section>
 
-          <ProjectsHybridTable rows={projectRows} />
-        </div>
-      </section>
-
-      {/* Recognition: the close */}
-      <RecognitionSection />
+        <RecognitionSection />
+      </main>
 
       <Footer />
-    </main>
+    </>
   );
 }

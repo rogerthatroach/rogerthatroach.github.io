@@ -1,23 +1,24 @@
+import { HANDS_ON_PCT } from './canonical';
+
 export const ABOUT = {
-  opener: 'I believe the best technical leaders still build.',
+  opener: 'I lead best when I stay close to the work.',
   paragraphs: [
-    "That's why I stay ~70% hands-on. Designing architectures, writing code, debugging production systems, while leading a growing AI team at RBC's CFO Group. Not because I have to. Because the moment a technical leader stops building, they start making decisions based on abstractions instead of reality.",
-    "Three things I've learned building AI systems across power plants, cloud pipelines, and enterprise finance:",
+    `I remain ${HANDS_ON_PCT} hands-on: shaping architecture, writing and reviewing code, testing system behaviour, and following releases into production. I also lead cross-functional delivery, manage one Senior AI Scientist, oversee interns, and contribute to AI/ML hiring.`,
   ],
   beliefs: [
     {
-      lead: 'First, the architecture IS the product.',
-      body: "Not the model, not the prompt, not the framework. The decisions about what the LLM touches and what it doesn't, that's what makes an AI system trustworthy in a regulated environment. In the current LLM systems, models handle language-shaped work while deterministic code owns governed calculation paths. That separation isn't a constraint. It's the design.",
+      lead: 'Keep responsibility explicit.',
+      body: 'I decide which work may be model-mediated, which must remain deterministic, what evidence is retained, and where a person must review or act. Those boundaries matter more than the novelty of any model or framework.',
     },
     {
-      lead: 'Second, the best leaders translate vision into shipped systems.',
-      body: "AI/LLM Drafting Platform is the first true agentic AI platform approved for production at the bank. I conceived it, gave the 2025 Amplify interns the problem space as an ideation exercise, then built the production platform end-to-end; it launched across the full CFO Group in all geographies in May 2026. For WorkforceAnalytics, I conceived, architected, and built the platform, then led its cross-functional productionisation as days-long headcount-movement requests became interactive analysis across authorized CFO Group hierarchy scopes. The work that matters is the arc from a one-page plan to a system shipping to real users; architecture diagrams without production builds are PowerPoint.",
+      lead: 'Build the path to production, not only the architecture.',
+      body: 'For the AI/LLM drafting platform, I carried the work from a one-page product vision through implementation, pilot, and full CFO Group launch. For the AI/LLM workforce analytics platform, I conceived, architected, and built the system while leading its cross-functional production delivery. Direct building and coordinated delivery are both part of the job.',
     },
     {
-      lead: 'Third, trust requires more than accuracy in regulated AI.',
-      body: "The hardest thing in production AI at a regulated institution isn\u2019t getting the answer right \u2014 it\u2019s getting the humans who own the decision to trust the system that produced it. Commodity Tax\u2019s Tableau transparency layer, WorkforceAnalytics\u2019s permission entitlement modeling, AI/LLM Drafting Platform\u2019s MCP-tool audit trail: at every stage the architecture has to survive stakeholder audit. That\u2019s the job.",
+      lead: 'Treat trust as an operating requirement.',
+      body: 'Accuracy is one input. Reviewable evidence, scoped access, clear failure paths, and follow-through after release determine whether people can use a system responsibly. Those controls differ by domain and remain subject to testing, monitoring, and human judgment.',
     },
   ],
   closer:
-    'I\u2019m always open to conversations about building AI teams, shipping GenAI in regulated industries, and what "production-ready" actually means when the CFO is watching.',
+    'I\u2019m interested in conversations about hands-on AI leadership, production ML systems, and responsible deployment in complex organizations.',
 } as const;

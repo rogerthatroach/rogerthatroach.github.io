@@ -19,13 +19,13 @@ export const EDUCATION: Education[] = [
     degree: 'Post-Graduate Certificate, Big Data Analytics',
     institution: 'Georgian College',
     years: '2021',
-    detail: 'Barrie, Ontario. Bridge from India ML career to Canadian cloud + banking stack.',
+    detail: 'Barrie, Ontario.',
   },
   {
     degree: 'B.Eng, Electronics & Communications Engineering',
     institution: 'Thapar University',
     years: '2012 – 2016',
-    detail: 'Patiala, India. Electrical engineering foundations — signal processing, control systems, embedded.',
+    detail: 'Patiala, India.',
   },
 ];
 

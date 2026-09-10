@@ -30,7 +30,7 @@ interface SkillTimelineProps {
    * expand inline — the overlay floats above the viewport so the timeline
    * stays at rest.
    *
-   * Used on both the homepage (under "The Journey") and /resume.
+   * Used on the homepage under "The Journey".
    */
   expanded?: boolean;
   /** Section title override. Defaults vary by mode — see component. */
@@ -68,7 +68,12 @@ function groupByOrg(nodes: TimelineNode[]): TimelineGroup[] {
 function groupDateRange(nodes: TimelineNode[]): string {
   const parsed = nodes.map((n) => {
     const parts = n.period.split(/[–-]/).map((s) => s.trim());
-    return { start: parseInt(parts[0] ?? '', 10), end: parts[1] ?? '' };
+    const startYear = parts[0]?.match(/\b(?:19|20)\d{2}\b/)?.[0];
+    const endYear = parts[1]?.match(/\b(?:19|20)\d{2}\b/)?.[0];
+    return {
+      start: startYear ? Number(startYear) : Number.NaN,
+      end: endYear ?? parts[1] ?? '',
+    };
   });
   const starts = parsed.map((p) => p.start).filter(Number.isFinite);
   const earliestStart = Math.min(...starts);
@@ -143,7 +148,7 @@ function RoleCard({
         <button
           type="button"
           onClick={onOpen}
-          className="js-role-details-trigger palette-text group mt-5 inline-flex items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-3 py-1.5 text-xs font-semibold transition-all hover:border-accent/40 hover:bg-surface"
+          className="js-role-details-trigger palette-text group mt-5 inline-flex min-h-11 items-center gap-1.5 rounded-md border border-border-subtle bg-surface/70 px-3 py-1.5 text-xs font-semibold transition-all hover:border-accent/40 hover:bg-surface"
         >
           Open role details
           <ChevronRight
@@ -165,7 +170,7 @@ function RoleCard({
             )}
             {node.transitionStory && (
               <div>
-                <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                <h4 className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
                   Why this move
                 </h4>
                 <p className="mt-1 leading-relaxed">{node.transitionStory}</p>
@@ -173,7 +178,7 @@ function RoleCard({
             )}
             {node.teamContext && (
               <div>
-                <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                <h4 className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
                   Team shape
                 </h4>
                 <p className="mt-1 leading-relaxed">{node.teamContext}</p>
@@ -181,7 +186,7 @@ function RoleCard({
             )}
             {node.projects && node.projects.length > 0 && (
               <div>
-                <h4 className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                <h4 className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
                   Projects
                 </h4>
                 <ul className="mt-2 space-y-4">

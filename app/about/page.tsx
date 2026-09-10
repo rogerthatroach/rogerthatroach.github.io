@@ -5,7 +5,7 @@ import Footer from '@/components/Footer';
 
 const META_TITLE = 'About';
 const META_DESCRIPTION =
-  'Leadership philosophy, beliefs about building AI systems in regulated environments, and resume.';
+  'Operating practice for building bounded, reviewable AI and machine-learning systems in regulated environments.';
 const META_PATH = '/about';
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <main id="main-content">
+    <>
       {/* Priority-hinted preload for the portrait (LCP candidate on /about). */}
       <link
         {...({
@@ -43,10 +43,10 @@ export default function AboutPage() {
         } as React.HTMLAttributes<HTMLLinkElement>)}
       />
       <Nav />
-      <div className="pt-16">
+      <main id="main-content" className="pt-16">
         <AboutSection />
-      </div>
+      </main>
       <Footer />
-    </main>
+    </>
   );
 }

@@ -4,27 +4,25 @@ import { ArrowLeft } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 
-// Update this file every ~6 weeks. Sivers convention: three bullets,
-// concrete, present-tense. https://nownownow.com
 const UPDATED = 'August 2026';
 
 const BULLETS: { heading: string; body: string }[] = [
   {
-    heading: 'Shipping',
-    body: 'AI/LLM Drafting Platform is the first true agentic AI platform approved for production at the bank. Its pilot launched in April 2026, followed by a full CFO Group launch across all geographies in May. The production system uses a single-agent governance envelope, LangGraph on Postgres, two-stage field-group retrieval, and bounded parallel extraction calls.',
+    heading: 'Operating',
+    body: 'Supporting the AI/LLM drafting platform in production after its May 2026 full CFO Group launch: reviewing user feedback, investigating observed behavior, and following changes through evaluation and release.',
   },
   {
-    heading: 'Building',
-    body: 'A multi-agent successor is in pilot. Further details will follow in a coordinated publication.',
+    heading: 'Piloting',
+    body: 'A multi-agent successor is in pilot. The current work is centered on user testing and carrying pilot findings into the next reviewed iteration.',
   },
   {
-    heading: 'Thinking about',
-    body: 'How production feedback can improve coverage checks without widening the reviewed system boundary.',
+    heading: 'Improving',
+    body: 'Turning production feedback into clearer test cases, coverage checks, and follow-through without widening the reviewed application boundary.',
   },
 ];
 
 const META_TITLE = 'Now';
-const META_DESCRIPTION = `What I'm focused on, as of ${UPDATED}. Three bullets, updated every few weeks. Sivers convention.`;
+const META_DESCRIPTION = `Current production-support, pilot, and evaluation work as of ${UPDATED}.`;
 const META_PATH = '/now';
 
 export const metadata: Metadata = {
@@ -60,30 +58,22 @@ export default function NowPage() {
           href="/"
           className="mb-6 inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} aria-hidden="true" />
           Home
         </Link>
 
         <div className="max-w-2xl">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
+          <p className="font-mono text-xs uppercase tracking-widest text-accent">
             Now · updated {UPDATED}
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
-            What I&rsquo;m focused on.
+            Current focus.
           </h1>
-          <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-            A <a
-              href="https://nownownow.com/about"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-accent underline underline-offset-4 hover:text-text-primary"
-            >/now</a> page, in the Derek Sivers sense: current focus in three bullets, updated every few weeks. Not an activity log. Not a changelog. The answer to &ldquo;what are you up to?&rdquo;
-          </p>
 
           <ol className="mt-10 space-y-6">
             {BULLETS.map((b, i) => (
               <li key={i} className="border-l-2 border-accent/40 pl-5">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
+                <p className="font-mono text-xs uppercase tracking-widest text-accent">
                   {b.heading}
                 </p>
                 <p className="mt-2 text-base leading-relaxed text-text-primary">
@@ -92,11 +82,6 @@ export default function NowPage() {
               </li>
             ))}
           </ol>
-
-          <p className="mt-10 text-xs text-text-tertiary">
-            If this is stale &mdash; more than ~6 weeks from the date above
-            &mdash; it&rsquo;s my fault. Ping me and I&rsquo;ll refresh it.
-          </p>
         </div>
       </main>
       <Footer />

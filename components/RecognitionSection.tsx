@@ -50,7 +50,7 @@ export default function RecognitionSection() {
                 <h3 className="text-sm font-semibold leading-snug text-text-primary">
                   {award.title}
                 </h3>
-                <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                <p className="mt-0.5 font-mono text-xs uppercase tracking-widest text-text-tertiary">
                   {award.org} · {award.year}
                 </p>
                 {award.detail && (

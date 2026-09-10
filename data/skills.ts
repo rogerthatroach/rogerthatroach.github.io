@@ -1,18 +1,18 @@
 /**
- * Categorized skill inventory for the /resume Skill Grid.
+ * Selected capabilities for the /resume skill grid.
  *
- * Skills can include a first-shipped year and an anchor project or link.
- * Leadership context is represented in the timeline rather than as a
- * filter category.
+ * This is an evidence map, not an exhaustive tool inventory. Each entry names
+ * the public work that best demonstrates the capability; dates and proficiency
+ * scores are deliberately omitted because neither establishes current depth.
  */
 
 export type SkillCategory =
-  | 'genai'
-  | 'ml-dl'
-  | 'data-eng'
-  | 'cloud'
-  | 'platform-infra'
-  | 'viz-frontend';
+  | 'agent-workflows'
+  | 'retrieval-query'
+  | 'ml-optimization'
+  | 'data-automation'
+  | 'cloud-delivery'
+  | 'interfaces-analysis';
 
 export interface SkillCategoryMeta {
   id: SkillCategory;
@@ -23,102 +23,246 @@ export interface SkillCategoryMeta {
 export interface Skill {
   name: string;
   category: SkillCategory;
-  /** Year first shipped to production (where known). */
-  firstShipped?: number;
-  /** Anchor artifact — the project where this skill is best demonstrated. */
-  anchorProject?: string;
-  /** Optional link to the anchor project's case study or blog post. */
+  evidence: string;
   anchorLink?: string;
 }
 
+export const SKILL_TAXONOMY_SUMMARY =
+  'Selected capabilities tied to public project evidence. Filters change the lens, not a proficiency score.';
+
 export const SKILL_CATEGORIES: SkillCategoryMeta[] = [
   {
-    id: 'genai',
-    label: 'GenAI & Agentic',
-    description: 'Agentic orchestration, multi-layer RAG, text-to-SQL, embeddings.',
+    id: 'agent-workflows',
+    label: 'Agent workflows',
+    description:
+      'Stateful orchestration, bounded tool use, evaluation, and human review in production finance systems.',
   },
   {
-    id: 'ml-dl',
-    label: 'Traditional ML & DL',
-    description: 'Regression, classification, clustering, optimization, deep learning.',
+    id: 'retrieval-query',
+    label: 'Retrieval & query',
+    description:
+      'Scoped semantic retrieval, catalog ranking, and reviewed text-to-SQL paths.',
   },
   {
-    id: 'data-eng',
-    label: 'Data Engineering',
-    description: 'Distributed processing, relational + vector stores, ETL pipelines.',
+    id: 'ml-optimization',
+    label: 'ML & optimization',
+    description:
+      'Regression, classification, computer vision, and bounded search from production and research work.',
   },
   {
-    id: 'cloud',
-    label: 'Cloud & Platforms',
-    description: 'GCP + Vertex AI, enterprise managed platforms.',
+    id: 'data-automation',
+    label: 'Data & automation',
+    description:
+      'Python, SQL, distributed processing, and compiled compute behind repeatable data products.',
   },
   {
-    id: 'platform-infra',
-    label: 'Platform & Infra',
-    description: 'API services, container runtimes, multi-vendor LLM gateway integration, audit + observability.',
+    id: 'cloud-delivery',
+    label: 'Cloud & delivery',
+    description:
+      'Managed cloud services, API integration, access controls, and traceable operations.',
   },
   {
-    id: 'viz-frontend',
-    label: 'Viz & Frontend',
-    description: 'BI dashboards, React LLM frontends, statistical visualization.',
+    id: 'interfaces-analysis',
+    label: 'Interfaces & analysis',
+    description:
+      'Analyst-facing review surfaces, financial analytics, and production frontends.',
   },
 ];
 
 export const SKILLS: Skill[] = [
-  // ─── GenAI & Agentic ───
-  { name: 'LangGraph', category: 'genai', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'MCP (Model Context Protocol)', category: 'genai', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'Field-group RAG (two-stage retrieval)', category: 'genai', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'Text-to-SQL', category: 'genai', firstShipped: 2025, anchorProject: 'FinancialBenchmarking v2', anchorLink: '/projects/financialBenchmarking' },
-  { name: 'Embeddings / semantic search', category: 'genai', firstShipped: 2025, anchorProject: 'FinancialBenchmarking v2 KPI disambiguation', anchorLink: '/projects/financialBenchmarking' },
-  { name: 'Prompt engineering', category: 'genai', firstShipped: 2024, anchorProject: 'All RBC GenAI work' },
-  { name: 'LLM evaluation', category: 'genai', firstShipped: 2025, anchorProject: 'FinancialBenchmarking v2 + WorkforceAnalytics' },
-  { name: 'Intent parsing / routing', category: 'genai', firstShipped: 2025, anchorProject: 'WorkforceAnalytics (LLM for routing only)', anchorLink: '/projects/workforceAnalytics' },
-  { name: 'BERT / early transformers', category: 'genai', firstShipped: 2021, anchorProject: 'IBM DataJam (side)' },
+  // Agent workflows
+  {
+    name: 'LangGraph',
+    category: 'agent-workflows',
+    evidence: 'AI/LLM drafting · one reviewed orchestration graph',
+    anchorLink: '/projects/project-approval-drafting',
+  },
+  {
+    name: 'MCP tool contracts',
+    category: 'agent-workflows',
+    evidence: 'AI/LLM drafting · bounded typed tool routines',
+    anchorLink: '/projects/project-approval-drafting',
+  },
+  {
+    name: 'Stateful workflow orchestration',
+    category: 'agent-workflows',
+    evidence: 'AI/LLM drafting · retained drafting and clarification path',
+    anchorLink: '/projects/project-approval-drafting',
+  },
+  {
+    name: 'Human-in-the-loop review',
+    category: 'agent-workflows',
+    evidence: 'AI/LLM drafting · author review, clarification, and stop paths',
+    anchorLink: '/projects/project-approval-drafting',
+  },
+  {
+    name: 'LLM evaluation',
+    category: 'agent-workflows',
+    evidence: 'Production finance AI · LLM-as-judge plus extensive human testing',
+    anchorLink: '/platform',
+  },
 
-  // ─── Traditional ML & DL ───
-  { name: 'TensorFlow', category: 'ml-dl', firstShipped: 2017, anchorProject: 'TCS — Combustion Tuning' },
-  { name: 'PyTorch', category: 'ml-dl', firstShipped: 2018, anchorProject: 'TCS — LSTM on Ammonium Bisulphate deposition' },
-  { name: 'scikit-learn', category: 'ml-dl', firstShipped: 2017, anchorProject: 'TCS' },
-  { name: 'XGBoost', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Transformer Life Prediction' },
-  { name: 'Regression', category: 'ml-dl', firstShipped: 2017, anchorProject: 'Combustion — 84 independent models', anchorLink: '/projects/combustion-tuning' },
-  { name: 'Classification', category: 'ml-dl', firstShipped: 2017, anchorProject: 'Coal classification (5 algorithms)' },
-  { name: 'Clustering (kMeans)', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Coal clustering' },
-  { name: 'PSO (Particle Swarm Optimization)', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Combustion closed-loop', anchorLink: '/projects/combustion-tuning' },
-  { name: 'LSTM / RNN', category: 'ml-dl', firstShipped: 2018, anchorProject: 'Ammonium Bisulphate deposition' },
-  { name: 'CNN / Computer Vision', category: 'ml-dl', firstShipped: 2019, anchorProject: 'Math Notation Detection (2nd/600)' },
-  { name: 'Feature engineering', category: 'ml-dl', firstShipped: 2017, anchorProject: '90+ sensors → Combustion models', anchorLink: '/projects/combustion-tuning' },
+  // Retrieval and query systems
+  {
+    name: 'Dense semantic retrieval',
+    category: 'retrieval-query',
+    evidence: 'AI/LLM drafting · retrieval scoped by field group',
+    anchorLink: '/projects/project-approval-drafting',
+  },
+  {
+    name: 'Embeddings and similarity ranking',
+    category: 'retrieval-query',
+    evidence: 'Financial peer benchmarking · bounded KPI candidate retrieval',
+    anchorLink: '/projects/financial-peer-benchmarking',
+  },
+  {
+    name: 'Text-to-SQL',
+    category: 'retrieval-query',
+    evidence: 'Financial peer benchmarking · five-stage accept-or-clarify path',
+    anchorLink: '/projects/financial-peer-benchmarking',
+  },
+  {
+    name: 'Intent parsing and routing',
+    category: 'retrieval-query',
+    evidence: 'Peer benchmarking and workforce analytics · typed supported scopes',
+    anchorLink: '/projects/workforce-analytics',
+  },
+  {
+    name: 'Parameterized query construction',
+    category: 'retrieval-query',
+    evidence: 'Financial peer benchmarking · reviewed patterns with bound values',
+    anchorLink: '/projects/financial-peer-benchmarking',
+  },
 
-  // ─── Data Engineering ───
-  { name: 'PostgreSQL (+ pgvector)', category: 'data-eng', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform storage', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'PySpark', category: 'data-eng', firstShipped: 2022, anchorProject: 'Commodity Tax automation', anchorLink: '/projects/commodity-tax' },
-  { name: 'SQL', category: 'data-eng', firstShipped: 2018, anchorProject: 'FinancialBenchmarking v2 text-to-SQL (anchor)', anchorLink: '/projects/financialBenchmarking' },
-  { name: 'PySpark on Cloudera Data Platform (CDP)', category: 'data-eng', firstShipped: 2022, anchorProject: 'Commodity Tax + Journal Entry automation', anchorLink: '/projects/commodity-tax' },
-  { name: 'CDP (Cloudera Data Platform)', category: 'data-eng', firstShipped: 2023, anchorProject: 'Journal entry automation' },
-  { name: 'ETL pipeline design', category: 'data-eng', firstShipped: 2017, anchorProject: 'TCS sensor pipelines', anchorLink: '/projects/combustion-tuning' },
-  { name: 'Chunking & embedding pipelines', category: 'data-eng', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform document ingestion', anchorLink: '/projects/funding-request-drafting' },
+  // Machine learning and optimization
+  {
+    name: 'Regression modeling',
+    category: 'ml-optimization',
+    evidence: 'Combustion Tuning · 84 independent models',
+    anchorLink: '/projects/combustion-tuning',
+  },
+  {
+    name: 'Particle Swarm Optimization',
+    category: 'ml-optimization',
+    evidence: 'Combustion Tuning · bounded candidates for operator review',
+    anchorLink: '/projects/combustion-tuning',
+  },
+  {
+    name: 'Random Forest classification',
+    category: 'ml-optimization',
+    evidence: 'Document Intelligence · checked-versus-unchecked classification',
+    anchorLink: '/projects/document-intelligence',
+  },
+  {
+    name: 'OpenCV',
+    category: 'ml-optimization',
+    evidence: 'Document Intelligence · pixel-level checkbox localization',
+    anchorLink: '/projects/document-intelligence',
+  },
+  {
+    name: 'Model selection and cross-validation',
+    category: 'ml-optimization',
+    evidence: 'Combustion Tuning · fold-level model comparison and error analysis',
+    anchorLink: '/projects/combustion-tuning',
+  },
+  // Data and automation
+  {
+    name: 'Python',
+    category: 'data-automation',
+    evidence: 'Industrial ML, finance automation, and production AI systems',
+    anchorLink: '/projects',
+  },
+  {
+    name: 'SQL',
+    category: 'data-automation',
+    evidence: 'Commodity Tax, peer benchmarking, and workforce analytics data paths',
+    anchorLink: '/projects/financial-peer-benchmarking',
+  },
+  {
+    name: 'PySpark',
+    category: 'data-automation',
+    evidence: 'Commodity Tax · deterministic General Ledger pipeline',
+    anchorLink: '/projects/commodity-tax',
+  },
+  {
+    name: 'ETL and data pipelines',
+    category: 'data-automation',
+    evidence: 'Combustion, document, and finance automation work',
+    anchorLink: '/projects',
+  },
+  {
+    name: 'Cython',
+    category: 'data-automation',
+    evidence: 'Workforce analytics · deterministic event-level calculations',
+    anchorLink: '/projects/workforce-analytics',
+  },
+  // Cloud and delivery
+  {
+    name: 'Google Cloud',
+    category: 'cloud-delivery',
+    evidence: 'Document Intelligence · client-delivery environment',
+    anchorLink: '/projects/document-intelligence',
+  },
+  {
+    name: 'Vertex AI',
+    category: 'cloud-delivery',
+    evidence: 'Document classification and entity-extraction work',
+    anchorLink: '/projects/document-intelligence',
+  },
+  {
+    name: 'Document AI',
+    category: 'cloud-delivery',
+    evidence: 'Humana · OCR and document structure',
+    anchorLink: '/projects/document-intelligence',
+  },
+  {
+    name: 'Foundation-model API integration',
+    category: 'cloud-delivery',
+    evidence: 'Production finance AI · approved model endpoints',
+    anchorLink: '/platform',
+  },
+  {
+    name: 'Entitlement-aware data access',
+    category: 'cloud-delivery',
+    evidence: 'Workforce analytics · authorized record scope resolved before calculation',
+    anchorLink: '/projects/workforce-analytics',
+  },
+  {
+    name: 'Tracing and structured logging',
+    category: 'cloud-delivery',
+    evidence: 'Production finance AI · bespoke operational evidence',
+    anchorLink: '/platform',
+  },
+  {
+    name: 'API service design',
+    category: 'cloud-delivery',
+    evidence: 'AI/LLM workforce analytics and drafting · production application services',
+    anchorLink: '/platform',
+  },
 
-  // ─── Cloud & Platforms ───
-  { name: 'Google Cloud Platform', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana Document Understanding', anchorLink: '/projects/document-intelligence' },
-  { name: 'Vertex AI', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana entity extraction', anchorLink: '/projects/document-intelligence' },
-  { name: 'AutoML', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana pipelines' },
-  { name: 'Document AI', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana OCR layer', anchorLink: '/projects/document-intelligence' },
-  { name: 'BigQuery / BigTable', category: 'cloud', firstShipped: 2022, anchorProject: 'Humana data infrastructure', anchorLink: '/projects/document-intelligence' },
-  { name: 'Dataiku', category: 'cloud', firstShipped: 2023, anchorProject: 'RBC managed Jupyter environment' },
-
-  // ─── Platform & Infra ───
-  { name: 'OpenShift (consumer-side via CI/CD)', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Services I own deployed to OCP via GFT CI/CD', anchorLink: '/platform' },
-  { name: 'FastAPI / API services', category: 'platform-infra', firstShipped: 2024, anchorProject: 'WorkforceAnalytics + AI/LLM Drafting Platform orchestration services', anchorLink: '/platform' },
-  { name: 'Multi-provider model routing', category: 'platform-infra', firstShipped: 2024, anchorProject: 'Approved foundation-model endpoints through an internal gateway', anchorLink: '/platform' },
-  { name: 'Permission cascade / authorization', category: 'platform-infra', firstShipped: 2025, anchorProject: 'WorkforceAnalytics 5-stage entitlement', anchorLink: '/projects/workforceAnalytics' },
-  { name: 'Audit logging (Postgres-backed)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'AI/LLM Drafting Platform typed-MCP audit trail', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'Typed MCP tool registry', category: 'platform-infra', firstShipped: 2026, anchorProject: 'AI/LLM Drafting Platform tool dispatcher', anchorLink: '/projects/funding-request-drafting' },
-  { name: 'Cython (production compute paths)', category: 'platform-infra', firstShipped: 2025, anchorProject: 'WorkforceAnalytics event-level ins-outs math', anchorLink: '/projects/workforceAnalytics' },
-
-  // ─── Viz & Frontend ───
-  { name: 'Tableau', category: 'viz-frontend', firstShipped: 2022, anchorProject: 'Chick-fil-A → RBC CFO dashboards' },
-  { name: 'React', category: 'viz-frontend', firstShipped: 2024, anchorProject: 'RBC LLM frontends' },
-  { name: 'ggplot2', category: 'viz-frontend', firstShipped: 2017, anchorProject: 'TCS visualizations' },
-  { name: 'matplotlib', category: 'viz-frontend', firstShipped: 2017 },
-  { name: 'Shiny (R)', category: 'viz-frontend', firstShipped: 2020, anchorProject: 'Johns Hopkins capstone — n-gram language model' },
+  // Interfaces and analysis
+  {
+    name: 'Tableau',
+    category: 'interfaces-analysis',
+    evidence: 'Commodity Tax and enterprise finance automation',
+    anchorLink: '/projects/commodity-tax',
+  },
+  {
+    name: 'React',
+    category: 'interfaces-analysis',
+    evidence: 'AI/LLM drafting frontend integration and this portfolio',
+    anchorLink: '/projects/project-approval-drafting',
+  },
+  {
+    name: 'Financial analytics',
+    category: 'interfaces-analysis',
+    evidence: 'Commodity Tax, financial peer benchmarking, and workforce analytics',
+    anchorLink: '/projects',
+  },
+  {
+    name: 'Analyst inspection workflows',
+    category: 'interfaces-analysis',
+    evidence: 'Commodity Tax · analyst investigation beside calculation',
+    anchorLink: '/projects/commodity-tax',
+  },
 ];

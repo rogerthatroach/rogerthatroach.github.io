@@ -3,17 +3,16 @@
 Personal portfolio of **Harmilap Singh Dhaliwal** — AI & Data Science Lead.
 Live at **[rogerthatroach.github.io](https://rogerthatroach.github.io)**.
 
-A career arc from industrial Digital Twins to production agentic AI in RBC's CFO Group,
-told through interactive case studies, technical notes, and visual explanations.
+A public record of production ML and AI work across industrial systems, cloud
+document intelligence, financial automation, and agentic workflows.
 
 ## Stack
 
 - **Next.js 16** (App Router) with `output: 'export'` → fully static
 - **TypeScript** (strict) · **Tailwind CSS** · **Framer Motion**
-- **MDX** blog/papers · server-rendered **HTML/CSS/SVG** visual explanations ·
-  **Three.js** hero particle field
-- Deployed to **GitHub Pages** via GitHub Actions (SHA-pinned), with a daily
-  rebuild so future-dated posts auto-publish
+- **MDX** writing · server-rendered **HTML/CSS/SVG** visual explanations ·
+  self-hosted fonts · restrained optional motion
+- Deployed to **GitHub Pages** via SHA-pinned GitHub Actions
 
 ## Architecture
 
@@ -28,4 +27,6 @@ nvm use            # pinned Node (see .nvmrc)
 npm install
 npm run dev        # local dev server
 npm run build      # static export → ./out
+npm run verify:export  # metadata, links, claims, and machine-output gate
+npm run check      # typecheck + build + exported-site verification
 ```

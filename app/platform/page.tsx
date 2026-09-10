@@ -6,195 +6,89 @@ import Footer from '@/components/Footer';
 
 const META_TITLE = 'Platform';
 const META_DESCRIPTION =
-  'Platform patterns behind production AI: approved model access, containerized runtime, transactional state, vector retrieval, and audit controls.';
+  'Application-level patterns across production systems and automation, including bounded model use, governed data access, evidence, and review.';
 
-const STACK: { title: string; body: React.ReactNode }[] = [
+const PATTERNS: { title: string; body: string }[] = [
   {
-    title: 'Internal multi-provider model gateway',
-    body: (
-      <>
-        Production AI systems route approved LLM calls through an internal
-        multi-provider model gateway. It centralizes authentication, rate
-        limiting, audit logging, and endpoint selection. Gateway configuration
-        routes approved requests to approved foundation-model endpoints.
-      </>
-    ),
+    title: 'Shared model access',
+    body: 'The applications described here call approved foundation-model endpoints through a shared internal multi-provider gateway. I build those consumer applications and their controls; another team owns the gateway itself.',
   },
   {
-    title: 'OpenShift (OCP pods)',
-    body: (
-      <>
-        Kubernetes-based runtime. Containerized FastAPI services,
-        OCP-managed scaling, rollout, secrets, and network policy.
-        The bank systems described here ship as OCP-deployable artifacts on the
-        standard CI/CD pipeline. OCP itself is operated by GFT
-        (Global Functions Technology); my role is consumer-side
-        &mdash; designing services to deploy cleanly into the
-        pipeline they own.
-      </>
-    ),
+    title: 'Managed delivery',
+    body: 'Services are packaged and released through the bank’s standard managed runtime and delivery controls. The portfolio describes application behavior, not cluster, network, or deployment topology.',
   },
   {
-    title: 'PostgreSQL + pgvector',
-    body: (
-      <>
-        Transactional storage supports application state, trace records,
-        embeddings, and vector search across separated roles.
-        AI/LLM Drafting Platform runs production RAG on this stack: a field-group
-        classifier selects relevant groups, bounded retrieval pulls
-        candidates from <span className="font-mono">pgvector</span>,
-        scoped extraction calls feed an ownership-aware merge, and registered
-        MCP dispatches are recorded alongside retained workflow state.
-      </>
-    ),
+    title: 'Product-specific state and retrieval',
+    body: 'Storage and retrieval differ by product. A workflow may retain application state, use scoped dense retrieval, or preserve record lineage where available; these are design choices, not one universal stack.',
   },
   {
-    title: 'Postgres-backed audit + observability',
-    body: (
-      <>
-        Structured request logs, per-tool dispatch records, model
-        invocation metadata, refusal reasons &mdash; written to
-        Postgres alongside application state on the registered path. Record
-        completeness still depends on successful writes, route coverage, and
-        retention. Retained records support SQL-based reconstruction of a
-        final answer&rsquo;s normal execution path.
-      </>
-    ),
-  },
-];
-
-const ACTIVITIES: { lead: string; body: string }[] = [
-  {
-    lead: 'Design AI services that integrate with this stack.',
-    body: 'Through an internal multi-provider model gateway (approved endpoint access, rate limiting, audit), on OCP (containerized, observable), on Postgres (state + audit + embeddings).',
-  },
-  {
-    lead: 'Define the contract.',
-    body: 'What does "an AI service at RBC" look like? Typed APIs, structured logs, explicit audit records, approved foundation-model endpoints through an internal multi-provider gateway, RAG via pgvector. The architectural pattern is the artifact.',
-  },
-  {
-    lead: 'Hands-on at the complex levels.',
-    body: '~70% hands-on. LangGraph orchestrator on Postgres. Field-group RAG schema. Typed MCP tool registry. Optimized Cython compute paths. Permission cascade for entitlement.',
+    title: 'Evaluation, evidence, and review',
+    body: 'Model-mediated behavior is tested with task-specific evaluation and human review. Traces, logs, coverage checks, and inspection surfaces support investigation, but none is presented as a guarantee on its own.',
   },
 ];
 
 const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
   {
-    surface: 'Multi-provider model API integration',
+    surface: 'Bounded agent workflow',
     evidence: (
       <>
-        Approved foundation-model endpoints across{' '}
+        One agent coordinates bounded tool routines, scoped evidence,
+        coverage checks, and review in{' '}
         <Link
-          href="/projects/workforceAnalytics"
+          href="/projects/project-approval-drafting"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          WorkforceAnalytics
-        </Link>{' '}
-        and{' '}
-        <Link
-          href="/projects/funding-request-drafting"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          AI/LLM Drafting Platform
+          the AI/LLM drafting platform
         </Link>
         .
       </>
     ),
   },
   {
-    surface: 'Vector database / RAG architecture',
+    surface: 'Governed analytics',
     evidence: (
       <>
-        <span className="font-mono">pgvector</span> + two-stage
-        field-group retrieval (
+        A model routes analytical intent while entitlement-aware deterministic
+        code retrieves and calculates within approved scopes in{' '}
         <Link
-          href="/blog/enterprise-agentic-ai-architecture"
+          href="/projects/workforce-analytics"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          technical note
+          the AI/LLM workforce analytics platform
         </Link>
-        ).
+        .
       </>
     ),
   },
   {
-    surface: 'Authentication / authorization',
+    surface: 'Guarded text-to-SQL',
     evidence: (
       <>
-        5-stage permission cascade (
+        Candidate retrieval, clarification, reviewed templates, and parameter
+        binding constrain database execution in{' '}
         <Link
-          href="/blog/agentic-ai"
+          href="/projects/financial-peer-benchmarking"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          technical note
+          the financial peer benchmarking platform
         </Link>
-        ).
+        .
       </>
     ),
   },
   {
-    surface: 'Audit logging / observability',
+    surface: 'Lineage and inspection',
     evidence: (
       <>
-        Typed MCP tool registry &rarr; Postgres audit log (AI/LLM Drafting Platform);
-        recorded lineage and configured inspection views (
+        Record lineage where joins and mappings preserve it, configured
+        inspection views, and analyst correction in{' '}
         <Link
-          href="/blog/commodity-tax-provenance"
+          href="/projects/commodity-tax"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
-          technical note
+          Commodity Tax
         </Link>
-        ).
-      </>
-    ),
-  },
-  {
-    surface: 'LLM safety / guardrails',
-    evidence: (
-      <>
-        Staged controls: semantic candidate retrieval &rarr; explicit
-        clarification &rarr; reviewed templates and parameter binding (
-        <Link
-          href="/blog/text-to-sql"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          technical note
-        </Link>
-        ).
-      </>
-    ),
-  },
-  {
-    surface: 'Model-as-router pattern',
-    evidence: (
-      <>
-        LLM proposes route; deterministic enforcement downstream (
-        <Link
-          href="/projects/workforceAnalytics"
-          className="text-accent underline underline-offset-4 hover:text-text-primary"
-        >
-          WorkforceAnalytics case study
-        </Link>
-        ).
-      </>
-    ),
-  },
-  {
-    surface: 'Container runtime',
-    evidence: (
-      <>
-        OpenShift (OCP) &mdash; consumer-side. Services I own deploy
-        through GFT&rsquo;s standard CI/CD pipeline; GFT operates the
-        runtime.
-      </>
-    ),
-  },
-  {
-    surface: 'Unified state store',
-    evidence: (
-      <>
-        PostgreSQL &mdash; application state, audit log, and embeddings
-        in one system.
+        .
       </>
     ),
   },
@@ -241,73 +135,49 @@ export default function PlatformPage() {
           href="/"
           className="mb-6 inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} aria-hidden="true" />
           Home
         </Link>
 
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
-            Platform
+          <p className="font-mono text-xs uppercase tracking-widest text-accent">
+            Engineering patterns
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
-            The platform underneath.
+            Application boundaries.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-            The systems on the home page &mdash; AI/LLM Drafting Platform, WorkforceAnalytics,
-            FinancialBenchmarking &mdash; don&rsquo;t exist in isolation. They sit on a
-            stack that defines what &ldquo;an AI service at RBC&rdquo;
-            actually means: how it talks to LLMs, where it runs, how it
-            stores state, how it gets audited. This page describes that
-            stack and what I do at this layer.
+            The systems share a small set of application-level patterns. They
+            do not map RBC&rsquo;s internal infrastructure. Shared enterprise
+            services are described only far enough to distinguish the
+            applications I build from services other teams run.
           </p>
 
-          {/* The stack */}
           <h2 className="mt-12 text-xl font-semibold text-text-primary">
-            The stack
+            Shared constraints, varied implementations
           </h2>
           <dl className="mt-5 divide-y divide-border-subtle overflow-hidden rounded-xl border border-border-subtle bg-surface/30">
-            {STACK.map((s) => (
+            {PATTERNS.map((pattern) => (
               <div
-                key={s.title}
+                key={pattern.title}
                 className="grid grid-cols-1 gap-1 p-4 sm:grid-cols-[12rem_1fr] sm:gap-4 sm:p-5"
               >
-                <dt className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                  {s.title}
+                <dt className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
+                  {pattern.title}
                 </dt>
                 <dd className="text-sm leading-relaxed text-text-secondary">
-                  {s.body}
+                  {pattern.body}
                 </dd>
               </div>
             ))}
           </dl>
 
-          {/* What I do at this layer */}
           <h2 className="mt-12 text-xl font-semibold text-text-primary">
-            What I do at this layer
-          </h2>
-          <ol className="mt-4 space-y-5">
-            {ACTIVITIES.map((a, i) => (
-              <li key={i} className="border-l-2 border-accent/40 pl-5">
-                <p className="font-semibold text-text-primary">{a.lead}</p>
-                <p className="mt-1 text-sm leading-relaxed text-text-secondary">
-                  {a.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-6 rounded-lg border border-border-subtle bg-surface/30 p-4 text-sm leading-relaxed text-text-secondary">
-            The internal multi-provider model gateway is owned and operated by
-            another RBC team. The systems documented here integrate through
-            that shared service; my role is on the consumer side.
-          </p>
-
-          {/* Capability map */}
-          <h2 className="mt-12 text-xl font-semibold text-text-primary">
-            Capability map
+            Where the patterns appear
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-text-secondary">
-            Each row maps a platform-engineering surface to where I demonstrate
-            it in production case studies and technical posts.
+            Implementations vary by system, and not every case study is an AI
+            system.
           </p>
           <dl className="mt-5 divide-y divide-border-subtle overflow-hidden rounded-xl border border-border-subtle bg-surface/30">
             {CAPABILITIES.map((c) => (
@@ -315,7 +185,7 @@ export default function PlatformPage() {
                 key={c.surface}
                 className="grid grid-cols-1 gap-1 p-4 sm:grid-cols-[14rem_1fr] sm:gap-4 sm:p-5"
               >
-                <dt className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+                <dt className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
                   {c.surface}
                 </dt>
                 <dd className="text-sm leading-relaxed text-text-secondary">

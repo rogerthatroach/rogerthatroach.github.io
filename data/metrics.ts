@@ -1,30 +1,20 @@
 import {
-  YEARS_EXPERIENCE,
   DIGITAL_TWIN_SAVINGS,
+  HUMANA_ACCURACY,
+  HUMANA_BASELINE_ACCURACY,
+  COMMODITY_TAX_EFFICIENCY,
   PRODUCTION_SYSTEMS_COUNT,
-  AWARDS_COUNT,
 } from './canonical';
 
 export interface Metric {
   value: string;
-  numericValue?: number;
-  prefix?: string;
-  suffix?: string;
   label: string;
   context: string;
 }
 
-// Display variants ('40K+', '2wk') deliberately differ from canonical
-// long forms ('~40,000', '2 weeks'). MetricsRibbon animates to the
-// numericValue and tacks on the suffix, so the short display form is a
-// rendering concern, not a truth concern.
 export const METRICS: Metric[] = [
-  // Years rendered as static text so YEARS_EXPERIENCE's "N+" form
-  // displays cleanly. Other entries with numeric+suffix still animate.
-  { value: YEARS_EXPERIENCE, label: 'Years in AI/ML', context: '2016–present' },
-  { value: DIGITAL_TWIN_SAVINGS, numericValue: 3, prefix: '$', suffix: 'M', label: 'Cost Savings Delivered', context: 'Digital Twin — annual' },
-  { value: String(PRODUCTION_SYSTEMS_COUNT), numericValue: PRODUCTION_SYSTEMS_COUNT, label: 'Production AI Systems', context: 'AI/LLM Drafting Platform, WorkforceAnalytics, FinancialBenchmarking (v1 → v2 refactor)' },
-  { value: '40K+', numericValue: 40, suffix: 'K+', label: 'Cost Centres Analyzed', context: 'WorkforceAnalytics — authorized hierarchy scopes' },
-  { value: '2wk', numericValue: 2, suffix: 'wk', label: 'Fastest Refactor', context: 'FinancialBenchmarking v1 → v2 concurrent sprint' },
-  { value: String(AWARDS_COUNT), numericValue: AWARDS_COUNT, label: 'Awards & Recognition', context: 'RBC + TCS' },
+  { value: DIGITAL_TWIN_SAVINGS, label: 'Cost Savings Delivered', context: 'Digital Twin — annual' },
+  { value: HUMANA_ACCURACY, label: 'Checkbox Detection Accuracy', context: `Humana — up from ${HUMANA_BASELINE_ACCURACY}` },
+  { value: COMMODITY_TAX_EFFICIENCY, label: 'Commodity Tax Processing', context: 'RBC CFO Group' },
+  { value: String(PRODUCTION_SYSTEMS_COUNT), label: 'Production AI Systems', context: 'Drafting, workforce analytics, and peer benchmarking (v1 → v2 refactor)' },
 ] as const;
