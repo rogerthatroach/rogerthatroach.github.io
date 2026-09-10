@@ -76,7 +76,7 @@ export default function ArcProgress({ eras }: { eras: TimelineNode[] }) {
               >
                 <span
                   className={cn(
-                    'font-mono text-[10px] uppercase tracking-widest transition-all',
+                    'font-mono text-xs uppercase tracking-widest transition-all',
                     isActive
                       ? 'text-accent opacity-100'
                       : 'text-text-tertiary opacity-0 group-hover:opacity-100'

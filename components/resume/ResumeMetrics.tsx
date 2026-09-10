@@ -1,9 +1,8 @@
 import {
-  DIGITAL_TWIN_SAVINGS,
-  HUMANA_ACCURACY,
-  COMMODITY_TAX_EFFICIENCY,
   PRODUCTION_SYSTEMS_COUNT,
+  YEARS_EXPERIENCE,
 } from '@/data/canonical';
+import { CAREER_SCOPE } from '@/data/timeline';
 
 /**
  * Four-number headline strip for /resume. Static render (no counter
@@ -12,24 +11,24 @@ import {
  */
 const RESUME_METRICS = [
   {
-    value: DIGITAL_TWIN_SAVINGS,
-    label: 'Cost Savings Delivered',
-    context: 'Digital Twin — annual',
+    value: YEARS_EXPERIENCE,
+    label: 'Years in Applied AI/ML',
+    context: 'Industrial, cloud, and financial systems',
   },
   {
-    value: HUMANA_ACCURACY,
-    label: 'Checkbox Detection Accuracy',
-    context: 'Humana — up from a ~70% baseline',
+    value: '~4 yrs',
+    label: 'Production Finance AI',
+    context: 'Regulated financial services',
   },
   {
-    value: COMMODITY_TAX_EFFICIENCY,
-    label: 'Commodity Tax Processing',
-    context: 'RBC CFO — months → 90 min',
+    value: '18 mo',
+    label: 'Agentic and LLM Systems',
+    context: 'Architecture through production operation',
   },
   {
     value: String(PRODUCTION_SYSTEMS_COUNT),
-    label: 'Production AI Systems',
-    context: 'AI/LLM Drafting Platform · WorkforceAnalytics · FinancialBenchmarking',
+    label: 'Bank Production AI Systems',
+    context: `${CAREER_SCOPE.bankProductionSystems.join(' · ')} (v1 + v2)`,
   },
 ];
 
@@ -44,7 +43,9 @@ export default function ResumeMetrics() {
           <span className="sr-only"> — </span>
           <span className="mt-2 text-xs font-medium text-text-primary">{m.label}</span>
           <span className="sr-only">; </span>
-          <span className="mt-0.5 text-[10px] text-text-tertiary">{m.context}</span>
+          <span className="mt-0.5 text-xs leading-relaxed text-text-tertiary">
+            {m.context}
+          </span>
         </div>
       ))}
     </div>

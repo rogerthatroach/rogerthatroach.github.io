@@ -27,11 +27,11 @@ export default function AwardsPanel() {
             <p className="text-xs font-semibold leading-snug text-text-primary">
               {award.title}
             </p>
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+            <p className="mt-0.5 font-mono text-xs uppercase tracking-widest text-text-tertiary">
               {award.org} · {award.year}
             </p>
             {award.detail && (
-              <p className="mt-1 text-[11px] leading-relaxed text-text-secondary">
+              <p className="mt-1 text-xs leading-relaxed text-text-secondary">
                 {award.detail}
               </p>
             )}

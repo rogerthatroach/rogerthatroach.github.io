@@ -8,9 +8,8 @@ import { GLOSSARY } from '@/data/glossary';
  * Usage: <Glossed>{someTextContainingTerms}</Glossed>
  *
  * Matching strategy: split on /(term1|term2|...)/ with longest terms
- * first (so "Maizuru 900MW" is tried before "Maizuru"). Terms that
- * resolve to a GLOSSARY entry render as HoverTerm; everything else
- * renders as a Fragment of plain text.
+ * first. Terms that resolve to a GLOSSARY entry render as HoverTerm;
+ * everything else renders as a Fragment of plain text.
  *
  * Deterministic server-safe — no hooks, no state. Can render in SSR.
  */

@@ -157,7 +157,7 @@ export default function RoleOverlay({
         {/* Transition story */}
         {node.transitionStory && (
           <div className="mt-5">
-            <h3 className="mb-1 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+            <h3 className="mb-1 font-mono text-xs uppercase tracking-widest text-text-tertiary">
               Why this move
             </h3>
             <p className="text-sm leading-relaxed text-text-secondary">
@@ -169,7 +169,7 @@ export default function RoleOverlay({
         {/* Team shape */}
         {node.teamContext && (
           <div className="mt-4">
-            <h3 className="mb-1 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+            <h3 className="mb-1 font-mono text-xs uppercase tracking-widest text-text-tertiary">
               Team shape
             </h3>
             <p className="text-sm leading-relaxed text-text-secondary">
@@ -193,7 +193,7 @@ export default function RoleOverlay({
         {/* Projects with decision rationale — static, no cascade */}
         {node.projects && node.projects.length > 0 && (
           <div className="mt-5">
-            <h3 className="mb-2 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+            <h3 className="mb-2 font-mono text-xs uppercase tracking-widest text-text-tertiary">
               Projects
             </h3>
             <ul className="space-y-3">
@@ -204,7 +204,7 @@ export default function RoleOverlay({
                       {project.name}
                     </strong>
                     {project.metric && (
-                      <span className="font-mono text-[10px] text-text-tertiary">
+                      <span className="font-mono text-xs text-text-tertiary">
                         {project.metric.value}
                       </span>
                     )}
@@ -214,7 +214,7 @@ export default function RoleOverlay({
                   </p>
                   {project.decisionRationale && (
                     <p className="mt-2 rounded-md bg-background/40 p-2.5 text-xs leading-relaxed text-text-secondary">
-                      <span className="mr-2 font-mono text-[9px] font-semibold uppercase tracking-wider text-accent">
+                      <span className="mr-2 font-mono text-xs font-semibold uppercase tracking-wider text-accent">
                         Decision
                       </span>
                       <Glossed>{project.decisionRationale}</Glossed>
@@ -246,7 +246,7 @@ export default function RoleOverlay({
           </div>
         )}
 
-        <p className="mt-5 font-mono text-[10px] text-text-tertiary">
+        <p className="mt-5 font-mono text-xs text-text-tertiary">
           ESC or click outside to close
         </p>
       </motion.div>

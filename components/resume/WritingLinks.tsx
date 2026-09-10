@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, FileText, ScrollText } from 'lucide-react';
+import { ArrowRight, FileText } from 'lucide-react';
 
 const LINKS = [
   {
@@ -7,14 +7,7 @@ const LINKS = [
     icon: FileText,
     title: 'Engineering blog',
     summary:
-      'Deep-dives: AI/LLM Drafting Platform architecture, WorkforceAnalytics LLM-as-Router, commodity-tax CFO trust, combustion tuning with operators, text-to-SQL.',
-  },
-  {
-    href: '/papers',
-    icon: ScrollText,
-    title: 'Long-form papers (in progress)',
-    summary:
-      'Clearly labeled working notes on AI inside bank CFO functions. Drafts are not presented as published or citable work.',
+      'Technical notes, decision guides, and builder stories tied to the production case studies.',
   },
 ];
 

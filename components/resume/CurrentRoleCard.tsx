@@ -50,7 +50,7 @@ export default function CurrentRoleCard() {
 
       {current.teamContext && (
         <div className="mt-4 border-t border-border-subtle pt-3">
-          <p className="font-mono text-[10px] uppercase tracking-widest text-text-secondary">
+          <p className="font-mono text-xs uppercase tracking-widest text-text-secondary">
             Team shape
           </p>
           <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
