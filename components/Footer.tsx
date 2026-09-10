@@ -19,15 +19,15 @@ export default function Footer() {
     <footer className="border-t border-border-subtle px-6 py-5 md:px-16">
       <div className="mx-auto max-w-content">
         {/* Row 1 — socials · meta · location */}
-        <div className="flex flex-col items-center gap-3 text-[11px] text-text-tertiary sm:flex-row sm:justify-between sm:gap-6">
+        <div className="flex flex-col items-center gap-3 text-xs text-text-tertiary sm:flex-row sm:justify-between sm:gap-6">
           {/* Left — socials */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
             <a
               href={HERO.links.linkedin}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
-              className="transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
+              className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
             >
               <Linkedin size={16} />
             </a>
@@ -36,14 +36,14 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
-              className="transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
+              className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
             >
               <Github size={16} />
             </a>
             <a
               href={`mailto:${HERO.links.email}`}
               aria-label="Email"
-              className="transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
+              className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-accent focus-visible:text-accent focus-visible:outline-accent"
             >
               <Mail size={16} />
             </a>
@@ -54,13 +54,10 @@ export default function Footer() {
             aria-label="Meta"
             className="flex items-center gap-4 font-mono uppercase tracking-widest"
           >
-            <Link href="/now" className="transition-colors hover:text-accent">
+            <Link href="/now" className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 transition-colors hover:text-accent">
               Now
             </Link>
-            <Link href="/papers" className="transition-colors hover:text-accent">
-              Papers
-            </Link>
-            <Link href="/colophon" className="transition-colors hover:text-accent">
+            <Link href="/colophon" className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 transition-colors hover:text-accent">
               Colophon
             </Link>
             <button
@@ -70,13 +67,13 @@ export default function Footer() {
                   document.dispatchEvent(new Event('cmdk:open'));
                 }
               }}
-              className="hidden items-center gap-1.5 normal-case tracking-normal transition-colors hover:text-accent sm:inline-flex"
+              className="hidden min-h-11 items-center gap-1.5 px-1 normal-case tracking-normal transition-colors hover:text-accent sm:inline-flex"
               aria-label="Open search (Cmd or Ctrl K)"
             >
-              <kbd className="rounded-sm border border-border-subtle bg-surface/50 px-1.5 py-0.5 text-[10px] tracking-normal">
+              <kbd className="rounded-sm border border-border-subtle bg-surface/50 px-1.5 py-0.5 text-xs tracking-normal">
                 ⌘K
               </kbd>
-              <span className="text-[11px]">Search</span>
+              <span className="text-xs">Search</span>
             </button>
           </nav>
 
@@ -84,10 +81,8 @@ export default function Footer() {
           <div>{HERO.location}</div>
         </div>
 
-        {/* Row 2 — copyright, centered alone. Same tertiary token as
-           Now/Papers/Colophon (full strength — the prior /75 dialed it below
-           WCAG AA contrast, the one a11y ding site-wide). Theme-aware. */}
-        <div className="mt-3 text-center text-[11px] font-light tracking-wide text-text-tertiary">
+        {/* Row 2 — copyright, centered alone with theme-aware tertiary text. */}
+        <div className="mt-3 text-center text-xs font-light tracking-wide text-text-tertiary">
           © {new Date().getFullYear()} {HERO.name}
         </div>
       </div>

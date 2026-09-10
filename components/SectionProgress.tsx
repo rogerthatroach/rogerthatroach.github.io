@@ -10,11 +10,10 @@ export interface ProgressSection {
 
 /**
  * Fixed right-rail section progress dots. Active dot tracks the viewport
- * via IntersectionObserver; click to jump. Label appears on hover and
+ * via IntersectionObserver; links jump to each section. Label appears on hover and
  * while the section is active. Desktop-only (hidden below lg).
  *
- * Keeps the central column uncluttered — replaces the old Hero "Scroll"
- * prompt with a persistent, low-ink wayfinder.
+ * Keeps the central column uncluttered with a persistent, low-ink wayfinder.
  */
 export default function SectionProgress({
   sections,
@@ -58,12 +57,6 @@ export default function SectionProgress({
     };
   }, [sections]);
 
-  const scrollTo = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   return (
     <nav
       aria-label="Page sections"
@@ -74,16 +67,15 @@ export default function SectionProgress({
           const isActive = s.id === activeId;
           return (
             <li key={s.id}>
-              <button
-                type="button"
-                onClick={() => scrollTo(s.id)}
+              <a
+                href={`#${s.id}`}
                 aria-label={`Jump to section ${i + 1}: ${s.label}`}
                 aria-current={isActive ? 'step' : undefined}
-                className="group flex items-center gap-3"
+                className="group flex min-h-11 min-w-11 items-center justify-end gap-3"
               >
                 <span
                   className={cn(
-                    'select-none whitespace-nowrap font-mono text-[10px] uppercase tracking-widest transition-all duration-300',
+                    'select-none whitespace-nowrap font-mono text-xs uppercase tracking-widest transition-all duration-300',
                     isActive
                       ? 'text-accent opacity-100'
                       : 'text-text-tertiary opacity-0 group-hover:opacity-100'
@@ -106,7 +98,7 @@ export default function SectionProgress({
                     )}
                   />
                 </span>
-              </button>
+              </a>
             </li>
           );
         })}

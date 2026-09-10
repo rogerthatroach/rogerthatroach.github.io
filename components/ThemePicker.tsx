@@ -55,6 +55,7 @@ export default function ThemePicker() {
   const [current, setCurrent] = useState<ThemeId>(DEFAULT_THEME_ID);
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -69,7 +70,10 @@ export default function ThemePicker() {
       }
     };
     const onEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
     };
     document.addEventListener('mousedown', onClickOutside);
     document.addEventListener('keydown', onEscape);
@@ -82,6 +86,7 @@ export default function ThemePicker() {
   const select = (id: ThemeId) => {
     setCurrent(id);
     setOpen(false);
+    window.requestAnimationFrame(() => triggerRef.current?.focus());
     // Smooth color crossfade scoped to the swap: enable the `.theme-transition`
     // rule (globals.css) for the ~320ms it takes, then remove it — so there's
     // no permanent hover/INP recalc tax. Skipped under reduced-motion.
@@ -103,11 +108,12 @@ export default function ThemePicker() {
   return (
     <div ref={menuRef} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((s) => !s)}
         aria-label="Change theme"
-        aria-haspopup="menu"
         aria-expanded={open}
+        aria-controls="theme-options"
         className="relative flex h-11 w-11 items-center justify-center rounded-full border border-border-subtle bg-surface text-text-secondary backdrop-blur-xs transition duration-150 hover:bg-surface-hover hover:text-text-primary active:scale-90"
       >
         {/* Current theme shown as a tri-color ring: bg, accent, text */}
@@ -131,7 +137,8 @@ export default function ThemePicker() {
           this always-rendered Nav component. `hidden` (display:none) when
           closed keeps it out of the tab order + a11y tree. */}
       <div
-        role="menu"
+        id="theme-options"
+        role="group"
         aria-label="Theme options"
         className={cn(
           'absolute right-0 top-[calc(100%+8px)] z-50 w-56 origin-top-right overflow-hidden rounded-xl border border-border-subtle bg-surface shadow-xl',
@@ -142,7 +149,7 @@ export default function ThemePicker() {
         )}
       >
             <div className="border-b border-border-subtle px-3 py-1.5">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
+              <p className="font-mono text-xs uppercase tracking-widest text-text-tertiary">
                 Theme
               </p>
             </div>
@@ -153,12 +160,11 @@ export default function ThemePicker() {
                   <li key={theme.id}>
                     <button
                       type="button"
-                      role="menuitemradio"
-                      aria-checked={isActive}
+                      aria-pressed={isActive}
                       onClick={() => select(theme.id)}
                       title={theme.description}
                       className={cn(
-                        'group flex w-full items-center gap-2.5 px-3 py-1.5 text-left transition-colors',
+                        'group flex min-h-11 w-full items-center gap-2.5 px-3 py-1.5 text-left transition-colors',
                         isActive
                           ? 'bg-accent-muted'
                           : 'hover:bg-surface-hover'

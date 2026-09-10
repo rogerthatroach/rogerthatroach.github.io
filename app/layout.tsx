@@ -1,24 +1,37 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono, Fraunces } from 'next/font/google';
+import localFont from 'next/font/local';
 import CommandPalette from '@/components/CommandPalette';
 import MotionProvider from '@/components/MotionProvider';
+import InternalNavigationProvider from '@/components/navigation/InternalNavigationProvider';
 import {
   DARK_THEME_IDS,
   DEFAULT_THEME_ID,
   THEME_DATA_ATTRIBUTES,
   THEME_IDS,
 } from '@/data/themes';
+import {
+  CURRENT_ROLE,
+  PERSON_NAME,
+  SITE_DESCRIPTION,
+  SITE_TITLE,
+  SITE_URL,
+  SOCIAL_IMAGE_PATH,
+} from '@/data/site';
 import './globals.css';
 
-const inter = Inter({
-  subsets: ['latin'],
+const inter = localFont({
+  src: './fonts/inter-latin.woff2',
   variable: '--font-inter',
+  weight: '100 900',
+  style: 'normal',
   display: 'swap',
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
+const jetbrainsMono = localFont({
+  src: './fonts/jetbrains-mono-latin.woff2',
   variable: '--font-jetbrains',
+  weight: '100 800',
+  style: 'normal',
   display: 'swap',
 });
 
@@ -26,16 +39,13 @@ const jetbrainsMono = JetBrains_Mono({
 // blog/case-study titles. Body prose stays in Inter; tech chips + mono
 // eyebrows stay in JetBrains Mono. Pairs naturally with the sakura /
 // wabi-sabi palette.
-const fraunces = Fraunces({
-  subsets: ['latin'],
+const fraunces = localFont({
+  src: './fonts/fraunces-latin.woff2',
   variable: '--font-fraunces',
-  weight: ['400', '500', '600', '700'],
+  weight: '400 700',
+  style: 'normal',
   display: 'swap',
 });
-
-const SITE_URL = 'https://rogerthatroach.github.io';
-const SITE_DESCRIPTION =
-  'AI & Data Science Lead building production AI in regulated finance, from industrial digital twins and document intelligence to governed agentic systems.';
 
 function serializeForInlineScript(value: unknown): string {
   return JSON.stringify(value)
@@ -58,32 +68,32 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
-    template: '%s | Harmilap Singh Dhaliwal',
+    default: SITE_TITLE,
+    template: `%s | ${PERSON_NAME}`,
   },
   description: SITE_DESCRIPTION,
   openGraph: {
-    title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     url: SITE_URL,
-    siteName: 'Harmilap Singh Dhaliwal',
+    siteName: PERSON_NAME,
     locale: 'en_US',
     type: 'website',
     images: [
       {
-        url: '/og-image.png',
+        url: SOCIAL_IMAGE_PATH,
         width: 1200,
         height: 630,
         type: 'image/png',
-        alt: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
+        alt: `${PERSON_NAME} — ${CURRENT_ROLE}`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Harmilap Singh Dhaliwal — AI & Data Science Lead',
+    title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: ['/og-image.png'],
+    images: [SOCIAL_IMAGE_PATH],
   },
   robots: {
     index: true,
@@ -154,7 +164,12 @@ export default function RootLayout({
   // class + data-theme on <html> before hydration, so the server/client <html>
   // attributes intentionally differ. Scoped to that one element.
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}
+    >
       <head>
         {/* Best-effort hardening via <meta> (GitHub Pages can't set response
             headers). Only directives that don't break a static Next export
@@ -177,8 +192,8 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'Person',
               '@id': `${SITE_URL}/#person`,
-              name: 'Harmilap Singh Dhaliwal',
-              jobTitle: 'AI & Data Science Lead',
+              name: PERSON_NAME,
+              jobTitle: CURRENT_ROLE,
               url: SITE_URL,
               sameAs: [
                 'https://www.linkedin.com/in/harmilapsingh',
@@ -187,9 +202,9 @@ export default function RootLayout({
               knowsAbout: [
                 'Artificial Intelligence',
                 'Machine Learning',
-                'Agentic AI',
-                'Data Science',
-                'Enterprise AI Architecture',
+                'Information Retrieval',
+                'Natural Language Processing',
+                'Production ML Systems',
               ],
             }),
           }}
@@ -211,12 +226,14 @@ export default function RootLayout({
             own WhiteLodgeGate (AES-GCM passphrase gate) inside the
             /blue-rose route, independent of the main portfolio. */}
         {/* MotionProvider → all Framer Motion honors prefers-reduced-motion. */}
-        <MotionProvider>
-          {children}
-          {/* ⌘K search — listens globally for Cmd/Ctrl+K and for the
-              `cmdk:open` custom event fired from mobile nav dropdown. */}
-          <CommandPalette />
-        </MotionProvider>
+        <InternalNavigationProvider>
+          <MotionProvider>
+            {children}
+            {/* ⌘K search — listens globally for Cmd/Ctrl+K and for the
+                `cmdk:open` custom event fired from mobile nav dropdown. */}
+            <CommandPalette />
+          </MotionProvider>
+        </InternalNavigationProvider>
       </body>
     </html>
   );

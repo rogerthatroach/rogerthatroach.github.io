@@ -7,13 +7,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MoreVertical, X, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ThemePicker from './ThemePicker';
-import { NAV_LINKS } from '@/data/nav';
+import { DETAIL_RETURN_FALLBACKS, NAV_LINKS } from '@/data/nav';
+import PreviousPathLink from './navigation/PreviousPathLink';
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
+  const detailFallback = pathname.startsWith(DETAIL_RETURN_FALLBACKS.blog.prefix)
+    ? DETAIL_RETURN_FALLBACKS.blog
+    : pathname.startsWith(DETAIL_RETURN_FALLBACKS.projects.prefix)
+      ? DETAIL_RETURN_FALLBACKS.projects
+      : null;
   // aria-current="page" for the active nav item; treats /blog/* etc. as
   // under their section root so deep pages still mark the right nav link.
   const isActive = (href: string) =>
@@ -28,7 +35,10 @@ export default function Nav() {
   useEffect(() => {
     if (!menuOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
     };
     const onClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -63,12 +73,21 @@ export default function Nav() {
       )}
     >
       <div className="mx-auto flex max-w-content items-center justify-between px-6 py-4 md:px-16">
-        <Link
-          href="/"
-          className="font-mono text-sm font-semibold tracking-wider text-text-primary transition-colors hover:text-accent"
-        >
-          HSD
-        </Link>
+        <div className="flex items-center gap-1">
+          {detailFallback && (
+            <PreviousPathLink
+              fallbackHref={detailFallback.href}
+              fallbackLabel={detailFallback.label}
+              compact
+            />
+          )}
+          <Link
+            href="/"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 font-mono text-sm font-semibold tracking-wider text-text-primary transition-colors hover:text-accent"
+          >
+            HSD
+          </Link>
+        </div>
 
         {/* Desktop — inline links */}
         <div className="hidden items-center gap-3 md:flex md:gap-6">
@@ -78,7 +97,7 @@ export default function Nav() {
                 key={link.href}
                 href={link.href}
                 aria-current={isActive(link.href) ? 'page' : undefined}
-                className="text-xs text-text-secondary transition-colors hover:text-text-primary aria-[current=page]:text-text-primary md:text-sm"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 text-xs text-text-secondary transition-colors hover:text-text-primary aria-[current=page]:text-text-primary md:text-sm"
               >
                 {link.label}
               </Link>
@@ -86,7 +105,7 @@ export default function Nav() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-xs text-text-secondary transition-colors hover:text-text-primary md:text-sm"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center px-2 text-xs text-text-secondary transition-colors hover:text-text-primary md:text-sm"
               >
                 {link.label}
               </a>
@@ -100,6 +119,7 @@ export default function Nav() {
             dropdown panel mirrors RoleOverlay's frosted-glass treatment. */}
         <div ref={menuRef} className="js-mobile-nav relative flex items-center gap-2 md:hidden">
           <motion.button
+            ref={menuButtonRef}
             type="button"
             onClick={() => setMenuOpen((s) => !s)}
             whileTap={{ scale: 0.9 }}
@@ -122,7 +142,8 @@ export default function Nav() {
             {menuOpen && (
               <motion.div
                 id="nav-mobile-menu"
-                role="menu"
+                role="group"
+                aria-label="Mobile navigation links"
                 initial={{ opacity: 0, y: -6, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -6, scale: 0.98 }}
@@ -133,34 +154,33 @@ export default function Nav() {
                   {/* Search trigger — mobile equivalent of ⌘K. Fires the
                       same cmdk:open custom event that the footer hint
                       button uses. */}
-                  <li role="none">
+                  <li>
                     <button
                       type="button"
-                      role="menuitem"
                       onClick={() => {
                         setMenuOpen(false);
+                        menuButtonRef.current?.focus();
                         document.dispatchEvent(new Event('cmdk:open'));
                       }}
-                      className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
+                      className="flex min-h-11 w-full items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
                     >
                       <Search size={14} aria-hidden="true" />
                       Search
                     </button>
                   </li>
-                  <li role="none" aria-hidden="true">
+                  <li aria-hidden="true">
                     <div className="mx-4 my-1 border-t border-border-subtle" />
                   </li>
                   {NAV_LINKS.map((link) => {
                     const isInternal =
                       link.href.startsWith('/') && !link.href.startsWith('/#');
                     const commonClass =
-                      'block px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent';
+                      'flex min-h-11 items-center px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent';
                     return (
-                      <li key={link.href} role="none">
+                      <li key={link.href}>
                         {isInternal ? (
                           <Link
                             href={link.href}
-                            role="menuitem"
                             aria-current={isActive(link.href) ? 'page' : undefined}
                             onClick={() => setMenuOpen(false)}
                             className={commonClass}
@@ -170,7 +190,6 @@ export default function Nav() {
                         ) : (
                           <a
                             href={link.href}
-                            role="menuitem"
                             onClick={() => setMenuOpen(false)}
                             className={commonClass}
                           >

@@ -197,23 +197,20 @@
     --color-diagram-grid: #ddd6c9;
   }
 
-  /* ── Theme moods — per-theme texture, accent glow, and particle hue that
-     give each palette a distinct "feel" beyond color. Grain shows behind
-     content on the light/paper themes; glow reads on the dark themes;
-     particle-hue tilts the (desktop, home-only) ParticleField toward each
-     accent. All decorative + compositor-only. Cascade mirrors the color
-     blocks above (light default → .dark → data-theme → themis-dark). */
+  /* ── Theme moods — per-theme texture and accent glow. Grain shows behind
+     content on the light/paper themes; glow reads on the dark themes.
+     Cascade mirrors the color blocks above. */
   /* --ambient-glow: strength of the per-theme radial accent haze behind the
      hero (.hero-glow). Higher on dark themes (glow reads on dark); lower on
      light/paper themes so it stays a soft wash that never hurts text contrast. */
-  :root  { --grain-opacity: 0.05; --accent-glow: 0px;    --particle-hue: 0deg;   --ambient-glow: 15%; }
-  .dark  { --grain-opacity: 0;    --accent-glow: 0.5rem; --particle-hue: 0deg;   --ambient-glow: 22%; }
-  html[data-theme='nord']            { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: -30deg; --ambient-glow: 26%; }
-  html[data-theme='solarized-dark']  { --grain-opacity: 0;    --accent-glow: 0.55rem; --particle-hue: -15deg; --ambient-glow: 24%; }
-  html[data-theme='monokai']         { --grain-opacity: 0;    --accent-glow: 0.7rem;  --particle-hue: 25deg;  --ambient-glow: 28%; }
-  html[data-theme='themis']          { --grain-opacity: 0.04; --accent-glow: 0px;     --particle-hue: 20deg;  --ambient-glow: 16%; }
-  html.dark[data-theme='themis']     { --grain-opacity: 0;    --accent-glow: 0.6rem;  --particle-hue: 20deg;  --ambient-glow: 26%; }
-  html[data-theme='paper']           { --grain-opacity: 0.07; --accent-glow: 0px;     --particle-hue: 10deg;  --ambient-glow: 12%; }
+  :root  { --grain-opacity: 0.05; --accent-glow: 0px;    --ambient-glow: 15%; }
+  .dark  { --grain-opacity: 0;    --accent-glow: 0.5rem; --ambient-glow: 22%; }
+  html[data-theme='nord']            { --grain-opacity: 0;    --accent-glow: 0.6rem;  --ambient-glow: 26%; }
+  html[data-theme='solarized-dark']  { --grain-opacity: 0;    --accent-glow: 0.55rem; --ambient-glow: 24%; }
+  html[data-theme='monokai']         { --grain-opacity: 0;    --accent-glow: 0.7rem;  --ambient-glow: 28%; }
+  html[data-theme='themis']          { --grain-opacity: 0.04; --accent-glow: 0px;     --ambient-glow: 16%; }
+  html.dark[data-theme='themis']     { --grain-opacity: 0;    --accent-glow: 0.6rem;  --ambient-glow: 26%; }
+  html[data-theme='paper']           { --grain-opacity: 0.07; --accent-glow: 0px;     --ambient-glow: 12%; }
 
   html {
     font-size: 110%;
@@ -432,6 +429,16 @@ html.dark .palette-border-l {
     height: auto !important;
     opacity: 1 !important;
     overflow: visible !important;
+  }
+
+  /* Native resume disclosures are closed on screen by default. Print their
+     complete contents so skills, education, awards, and writing are not lost. */
+  .resume-page details:not([open]) > :not(summary) {
+    display: block !important;
+  }
+
+  .resume-page details > summary svg {
+    display: none !important;
   }
 
   /* Hide the expand/collapse trigger buttons when printing */
