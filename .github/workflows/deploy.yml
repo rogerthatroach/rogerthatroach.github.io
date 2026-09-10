@@ -4,11 +4,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # Daily rebuild at 12:00 UTC so future-dated blog posts auto-publish
-  # on their frontmatter date without a manual redeploy. See
-  # isPostPublic() in data/posts/index.ts.
-  schedule:
-    - cron: '0 12 * * *'
 
 permissions:
   contents: read
@@ -24,9 +19,7 @@ concurrency:
 # (.github/dependabot.yml) keeps these SHAs current. Version in the
 # trailing comment.
 jobs:
-  # Quality gate — blocks the build/deploy if types don't check or a
-  # critical advisory lands. The local .githooks/ are bypassable
-  # (SKIP_CHECKS=1) and absent in the daily cron; this enforces in CI.
+  # Keep type safety and dependency advisories as an explicit deployment gate.
   check:
     runs-on: ubuntu-latest
     steps:
@@ -36,10 +29,8 @@ jobs:
           node-version-file: '.nvmrc'
           cache: npm
       - run: npm ci
-      - run: npx tsc --noEmit
-      # Gate on critical only (a known next@14 "high" is unexploitable on a
-      # static export with no server; it clears with the Next 16 upgrade).
-      - run: npm audit --audit-level=critical
+      - run: npm run typecheck
+      - run: npm audit --audit-level=high
 
   build:
     needs: check
@@ -54,6 +45,7 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+      - run: npm run verify:export
 
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
