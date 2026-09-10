@@ -6,7 +6,7 @@ import {
   HANDS_ON_PCT,
   HUMANA_ACCURACY,
   HUMANA_BASELINE_ACCURACY,
-  PROJECT_APPROVAL_DRAFTING_SCALE,
+  FUNDING_REQUEST_DRAFTING_SCALE,
   WORKFORCE_ANALYTICS_BUILD_WINDOW,
   WORKFORCE_ANALYTICS_COST_CENTRES,
   WORKFORCE_ANALYTICS_NAME,
@@ -67,7 +67,7 @@ export const TIMELINE: TimelineNode[] = [
     description:
       `Conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME} from March through its ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch while guiding the 2025 Amplify cohort and leading a focused two-week v1-to-v2 refactor of the ${FINANCIAL_BENCHMARKING_NAME}. Later drove the ${DRAFTING_PLATFORM_NAME} from concept to full CFO Group launch. Remain ${HANDS_ON_PCT} hands-on across architecture, implementation, evaluation, and production follow-through.`,
     skills: ['LangGraph', 'MCP', 'Semantic retrieval', 'Text-to-SQL', 'Python', 'React'],
-    milestone: `${PROJECT_APPROVAL_DRAFTING_SCALE} launch`,
+    milestone: `${FUNDING_REQUEST_DRAFTING_SCALE} launch`,
     accent: 'purple',
     logoPath: '/images/logos/rbc.svg',
     headlineMetric: {
@@ -86,8 +86,8 @@ export const TIMELINE: TimelineNode[] = [
         decisionRationale:
           'A single LangGraph orchestrator owns workflow state and review. Bounded MCP tool routines handle scoped work without being presented as additional agents; missing coverage returns to clarification or human review.',
         metric: { value: 'April → May 2026', label: 'pilot to full CFO Group launch' },
-        caseStudyLink: '/projects/project-approval-drafting',
-        blogLink: '/blog/project-approval-drafting-platform-building',
+        caseStudyLink: '/projects/funding-request-drafting',
+        blogLink: '/blog/funding-request-drafting-platform-building',
       },
       {
         name: WORKFORCE_ANALYTICS_NAME,
@@ -108,8 +108,8 @@ export const TIMELINE: TimelineNode[] = [
         caseStudyLink: '/projects/financial-peer-benchmarking',
       },
     ],
-    caseStudyLink: '/projects/project-approval-drafting',
-    blogLink: '/blog/project-approval-drafting-platform-building',
+    caseStudyLink: '/projects/funding-request-drafting',
+    blogLink: '/blog/funding-request-drafting-platform-building',
   },
   {
     id: 'rbc-senior',

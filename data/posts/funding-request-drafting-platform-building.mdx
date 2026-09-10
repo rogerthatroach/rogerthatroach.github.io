@@ -1,24 +1,24 @@
 import {
   FundingRequestActorFigure,
   FundingRequestMilestoneFigure,
-} from '@/components/visualizations/project-approval'
+} from '@/components/visualizations/funding-request'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import {
-  PROJECT_APPROVAL_BUILDER_ACTORS,
-  PROJECT_APPROVAL_BUILDER_MILESTONES,
-} from '@/data/visualizations/projectApproval'
+  FUNDING_REQUEST_BUILDER_ACTORS,
+  FUNDING_REQUEST_BUILDER_MILESTONES,
+} from '@/data/visualizations/fundingRequest'
 
 The AI/LLM Drafting Platform began with a one-page plan: guide an author through a project funding request instead of making them search for the right template, policy passage, or precedent on their own. The pilot launched in April 2026. A full CFO Group launch across all geographies followed in May.
 
 I wrote the initial plan, then gave the 2025 Amplify cohort a bounded ideation exercise around the problem. Their exploration widened the option set. I led the separate production work from architecture through full-stack implementation.
 
-<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_BUILDER_MILESTONES.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-  <FundingRequestMilestoneFigure content={PROJECT_APPROVAL_BUILDER_MILESTONES} />
+<VisualizationContainer minHeight={0} caption={FUNDING_REQUEST_BUILDER_MILESTONES.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <FundingRequestMilestoneFigure content={FUNDING_REQUEST_BUILDER_MILESTONES} />
 </VisualizationContainer>
 
 ## The job was guidance, not chat
 
-project funding requests govern significant initiatives. An author has to choose an applicable template, interpret guidance, gather supporting material, complete the fields that apply to the project, and resolve questions before review. The work is iterative because new information can change an earlier answer.
+Project funding requests govern significant initiatives. An author has to choose an applicable template, interpret guidance, gather supporting material, complete the fields that apply to the project, and resolve questions before review. The work is iterative because new information can change an earlier answer.
 
 That made a generic chatbot the wrong product shape. Search could find relevant passages, but it could not own the sequence of the drafting process. Free-form conversation could feel helpful while leaving the author unsure about what remained incomplete. The product needed to retain where the session stood, narrow evidence to the fields in scope, and return detected gaps to the author rather than quietly filling them.
 
@@ -38,8 +38,8 @@ That boundary was more than a governance accommodation. It forced each responsib
 
 The result still depended on state writes, mappings, validation, and review working as designed. The architecture made those dependencies visible; it did not turn generated content into a guaranteed answer.
 
-<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_BUILDER_ACTORS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-  <FundingRequestActorFigure content={PROJECT_APPROVAL_BUILDER_ACTORS} />
+<VisualizationContainer minHeight={0} caption={FUNDING_REQUEST_BUILDER_ACTORS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <FundingRequestActorFigure content={FUNDING_REQUEST_BUILDER_ACTORS} />
 </VisualizationContainer>
 
 ## What delivery demanded

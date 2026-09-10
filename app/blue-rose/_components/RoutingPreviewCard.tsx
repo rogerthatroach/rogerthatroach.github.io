@@ -16,7 +16,7 @@ interface RoutingPreviewCardProps {
 /**
  * RoutingPreviewCard — visualizes Diane's predicted approver chain
  * with rule-id provenance per step. Surfaces the routing intelligence
- * façade (Project Approval Request drafting narrative) wherever a submission has a
+ * façade (project funding request drafting narrative) wherever a submission has a
  * `diane.routingPreview` payload.
  *
  *  ┌──────────────────────────────────────────────┐

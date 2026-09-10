@@ -5,7 +5,7 @@ import {
   FINANCIAL_BENCHMARKING_NAME,
   HUMANA_ACCURACY,
   HUMANA_BASELINE_ACCURACY,
-  PROJECT_APPROVAL_DRAFTING_SCALE,
+  FUNDING_REQUEST_DRAFTING_SCALE,
   WORKFORCE_ANALYTICS_BUILD_WINDOW,
   WORKFORCE_ANALYTICS_NAME,
 } from './canonical';
@@ -103,16 +103,16 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     deepDivePath: '/projects/workforce-analytics',
   },
   {
-    id: 'project-approval-drafting',
+    id: 'funding-request-drafting',
     title: `${DRAFTING_PLATFORM_NAME}`,
     subtitle: 'Reviewed Agentic Workflow — RBC CFO Group',
     role: 'Conceived, architected, and built end-to-end',
     stack: ['LangGraph', 'MCP', 'Semantic retrieval', 'Foundation-model API'],
-    heroMetric: { value: PROJECT_APPROVAL_DRAFTING_SCALE, label: 'May 2026 launch' },
+    heroMetric: { value: FUNDING_REQUEST_DRAFTING_SCALE, label: 'May 2026 launch' },
     caption:
       'The platform uses one orchestration graph, bounded tool routines, scoped evidence, coverage checks, and author review to support project funding request drafting.',
     palette: { primary: '#93c5fd', primaryLight: '#1e40af' },
-    deepDivePath: '/projects/project-approval-drafting',
+    deepDivePath: '/projects/funding-request-drafting',
   },
 ];
 

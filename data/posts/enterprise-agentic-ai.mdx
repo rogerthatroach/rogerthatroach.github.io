@@ -2,14 +2,14 @@ import {
   FundingRequestFormalEnvelopeFigure,
   FundingRequestFormalFieldGroupFigure,
   FundingRequestTraceFigure,
-} from '@/components/visualizations/project-approval'
+} from '@/components/visualizations/funding-request'
 import CitationRef from '@/components/blog/CitationRef'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import {
-  PROJECT_APPROVAL_FORMAL_ENVELOPE,
-  PROJECT_APPROVAL_FORMAL_FIELD_GROUP,
-  PROJECT_APPROVAL_FORMAL_TRACE,
-} from '@/data/visualizations/projectApproval'
+  FUNDING_REQUEST_FORMAL_ENVELOPE,
+  FUNDING_REQUEST_FORMAL_FIELD_GROUP,
+  FUNDING_REQUEST_FORMAL_TRACE,
+} from '@/data/visualizations/fundingRequest'
 
 ## 1. The architecture problem
 
@@ -29,8 +29,8 @@ That ownership boundary matters because some work can run concurrently without b
 
 The graph also provides the explicit return paths that a linear happy-path flow would hide. Missing information can lead to clarification. Conflicting candidate values can lead to review. Incomplete coverage can stop draft assembly. A tool or state-write failure can stop progression rather than being treated as a completed step.
 
-<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_FORMAL_ENVELOPE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<FundingRequestFormalEnvelopeFigure content={PROJECT_APPROVAL_FORMAL_ENVELOPE} />
+<VisualizationContainer minHeight={0} caption={FUNDING_REQUEST_FORMAL_ENVELOPE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<FundingRequestFormalEnvelopeFigure content={FUNDING_REQUEST_FORMAL_ENVELOPE} />
 </VisualizationContainer>
 
 ## 3. Retained state is an operating contract
@@ -65,8 +65,8 @@ Retrieval then works in two bounded steps. First, the workflow identifies the fi
 
 This improves scope control, but it does not prove relevance or completeness. A stale field owner, a missing reference-to-group mapping, an indexing defect, or an overly broad group selection can still produce the wrong evidence set. The system therefore needs taxonomy review, retrieval evaluation on representative cases, mapping-version checks, and tests that verify the group filter is actually applied.
 
-<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_FORMAL_FIELD_GROUP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<FundingRequestFormalFieldGroupFigure content={PROJECT_APPROVAL_FORMAL_FIELD_GROUP} />
+<VisualizationContainer minHeight={0} caption={FUNDING_REQUEST_FORMAL_FIELD_GROUP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<FundingRequestFormalFieldGroupFigure content={FUNDING_REQUEST_FORMAL_FIELD_GROUP} />
 </VisualizationContainer>
 
 ## 6. Merge, coverage, and clarification
@@ -79,8 +79,8 @@ When coverage is missing or uncertain, the workflow returns to clarification or 
 
 This review boundary is part of the operating model. The system assists with evidence gathering and structured drafting; it does not become the accountable author. References and trace records help the reviewer inspect how a candidate value was formed, but they do not replace judgment about whether the value and its supporting source are appropriate.
 
-<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_FORMAL_TRACE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<FundingRequestTraceFigure content={PROJECT_APPROVAL_FORMAL_TRACE} />
+<VisualizationContainer minHeight={0} caption={FUNDING_REQUEST_FORMAL_TRACE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<FundingRequestTraceFigure content={FUNDING_REQUEST_FORMAL_TRACE} />
 </VisualizationContainer>
 
 ## 7. Context limits and residual risk

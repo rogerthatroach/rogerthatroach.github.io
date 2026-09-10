@@ -1,4 +1,4 @@
-import type { FundingRequestTraceContent } from '@/data/visualizations/projectApproval';
+import type { FundingRequestTraceContent } from '@/data/visualizations/fundingRequest';
 import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
 interface FundingRequestTraceFigureProps {
@@ -7,7 +7,7 @@ interface FundingRequestTraceFigureProps {
 
 export default function FundingRequestTraceFigure({ content }: FundingRequestTraceFigureProps) {
   return (
-    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+    <section className="funding-request-figure" aria-labelledby={`${content.id}-title`}>
       <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">

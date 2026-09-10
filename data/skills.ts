@@ -75,25 +75,25 @@ export const SKILLS: Skill[] = [
     name: 'LangGraph',
     category: 'agent-workflows',
     evidence: 'AI/LLM drafting · one reviewed orchestration graph',
-    anchorLink: '/projects/project-approval-drafting',
+    anchorLink: '/projects/funding-request-drafting',
   },
   {
     name: 'MCP tool contracts',
     category: 'agent-workflows',
     evidence: 'AI/LLM drafting · bounded typed tool routines',
-    anchorLink: '/projects/project-approval-drafting',
+    anchorLink: '/projects/funding-request-drafting',
   },
   {
     name: 'Stateful workflow orchestration',
     category: 'agent-workflows',
     evidence: 'AI/LLM drafting · retained drafting and clarification path',
-    anchorLink: '/projects/project-approval-drafting',
+    anchorLink: '/projects/funding-request-drafting',
   },
   {
     name: 'Human-in-the-loop review',
     category: 'agent-workflows',
     evidence: 'AI/LLM drafting · author review, clarification, and stop paths',
-    anchorLink: '/projects/project-approval-drafting',
+    anchorLink: '/projects/funding-request-drafting',
   },
   {
     name: 'LLM evaluation',
@@ -107,7 +107,7 @@ export const SKILLS: Skill[] = [
     name: 'Dense semantic retrieval',
     category: 'retrieval-query',
     evidence: 'AI/LLM drafting · retrieval scoped by field group',
-    anchorLink: '/projects/project-approval-drafting',
+    anchorLink: '/projects/funding-request-drafting',
   },
   {
     name: 'Embeddings and similarity ranking',
@@ -251,7 +251,7 @@ export const SKILLS: Skill[] = [
     name: 'React',
     category: 'interfaces-analysis',
     evidence: 'AI/LLM drafting frontend integration and this portfolio',
-    anchorLink: '/projects/project-approval-drafting',
+    anchorLink: '/projects/funding-request-drafting',
   },
   {
     name: 'Financial analytics',

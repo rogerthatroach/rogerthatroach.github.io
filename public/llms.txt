@@ -15,7 +15,7 @@
 
 ## Project case studies
 
-- [AI/LLM Drafting Platform](https://rogerthatroach.github.io/projects/project-approval-drafting): The first true agentic AI platform approved for production at the bank; launched across the full CFO Group in all geographies in May 2026.
+- [AI/LLM Drafting Platform](https://rogerthatroach.github.io/projects/funding-request-drafting): The first true agentic AI platform approved for production at the bank; launched across the full CFO Group in all geographies in May 2026.
 - [AI/LLM Workforce Analytics Platform](https://rogerthatroach.github.io/projects/workforce-analytics): Built March–November 2025; production financial analytics with model-mediated language work around code-owned entitlement and calculation.
 - [Financial Peer Benchmarking Platform](https://rogerthatroach.github.io/projects/financial-peer-benchmarking): One production product across v1 and its two-week v2 text-to-SQL refactor.
 - [Commodity Tax](https://rogerthatroach.github.io/projects/commodity-tax): PySpark and Tableau process automation that reduced a months-long workflow to 90 minutes for a roughly $600M allocation.

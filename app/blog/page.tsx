@@ -54,7 +54,7 @@ type ProjectId = NonNullable<BlogPost['meta']['projectId']>;
 // accent bar + mono eyebrow. Matches the era palette used in the
 // Journey section so the two surfaces read the same vocabulary.
 const PROJECT_ERA: Record<ProjectId, { label: string; dark: string; light: string }> = {
-  'project-approval-drafting':  { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
+  'funding-request-drafting':  { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
   'workforce-analytics':        { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
   'financial-peer-benchmarking': { label: 'Intelligent Systems', dark: '#93c5fd', light: '#1e40af' },
   'commodity-tax':        { label: 'Enterprise Analytics',  dark: '#fcd34d', light: '#92400e' },

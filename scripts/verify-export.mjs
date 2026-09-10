@@ -86,13 +86,13 @@ const requiredVisibleTextByRoute = new Map([
   ['/now', ['Now · updated August 2026', 'Current focus']],
   ['/platform', ['Application boundaries', 'They do not map RBC’s internal infrastructure']],
   ['/projects', ['AI/LLM Drafting Platform', 'Combustion Tuning']],
-  ['/projects/project-approval-drafting', ['Problem and context', 'One agent carries the draft from intake to review', 'A field group is a scope, not a specialist agent']],
+  ['/projects/funding-request-drafting', ['Problem and context', 'One agent carries the draft from intake to review', 'A field group is a scope, not a specialist agent']],
   ['/projects/workforce-analytics', ['Decision and trade-off', 'Outcome and operating state', 'Language stays at the edges; permissions and calculation stay in code']],
   ['/projects/financial-peer-benchmarking', ['Decision and trade-off', 'Outcome and operating state', 'One pipeline, two legitimate outcomes']],
   ['/projects/commodity-tax', ['Decision and trade-off', 'Outcome and operating state']],
   ['/projects/document-intelligence', ['Decision and trade-off', 'Outcome and operating state']],
   ['/projects/combustion-tuning', ['Decision and trade-off', 'Outcome and operating state']],
-  ['/blog/project-approval-drafting-platform-building', ['Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch']],
+  ['/blog/funding-request-drafting-platform-building', ['Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch']],
   ['/blog/enterprise-agentic-ai-architecture', ['AI/LLM Drafting: One Agent, Bounded Tools, Human Review']],
   ['/blog/agentic-ai', ['The numerical path is repeatable for fixed inputs, data, code, and configuration; model routing and prose remain probabilistic.']],
   ['/blog/text-to-sql', ["The model's score is a routing signal, not a correctness probability."]],
@@ -207,7 +207,7 @@ if (!existsSync(join(OUT, 'og-image.png'))) fail('/og-image.png: social preview 
 // the publication audit. Source-level constants cover the TypeScript data
 // layer, but MDX prose is literal text, so this is the only check that covers
 // every surface a reader actually sees.
-const RETIRED_PUBLIC_TERMS = ['FinancialBenchmarking', 'WorkforceAnalytics', 'AI/LLM Drafting Platform', 'ModelGateway']
+const RETIRED_PUBLIC_TERMS = ['FinancialBenchmarking', 'WorkforceAnalytics', 'AI/LLM Drafting Platform', 'ModelGateway', 'project funding request']
 
 for (const path of contentPages) {
   const route = routeForHtml(path)

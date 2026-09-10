@@ -17,7 +17,7 @@ interface DraftingOverlayProps {
 /**
  * DraftingOverlay — atmospheric handoff for file-attach drafting.
  *
- * Models the Project Approval Request drafting architecture made visible:
+ * Models the project funding request drafting architecture made visible:
  *
  *   ✦ pulsing
  *

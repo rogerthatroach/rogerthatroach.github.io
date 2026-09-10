@@ -71,7 +71,7 @@ export interface Submission {
   /**
    * Diane's analysis of this submission. Present only on submissions Diane
    * has been invoked on (per the single-agent governance envelope from the
-   * project funding request drafting platform: Diane runs only where she's invoked,
+   * Project funding request drafting platform: Diane runs only where she's invoked,
    * not over everything).
    * Absence renders as the "Diane was not invoked" empty state.
    */

@@ -21,7 +21,7 @@ const HEADER_FIELDS_LEFT: string[] = ['request_title', 'request_category', 'spon
 const HEADER_FIELDS_RIGHT: string[] = ['executive_sponsor', 'sponsor_delegate', 'par_contact', 'eds_contact', 'initiative_type'];
 
 /**
- * DocumentPreviewPanel — slide-out side panel rendering the PAR draft
+ * DocumentPreviewPanel — slide-out side panel rendering the funding request draft
  * as a formal funding-request document for a FICTIONAL institution
  * (Great Northern Bank — part of the White Lodge demo fiction; not
  * affiliated with any real bank).

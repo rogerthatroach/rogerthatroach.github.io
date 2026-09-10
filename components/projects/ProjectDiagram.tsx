@@ -8,7 +8,7 @@ const DIAGRAM_LOADERS: Record<string, () => Promise<DiagramModule>> = {
   'commodity-tax': () => import('@/components/diagrams/CommodityTaxDiagram'),
   'financial-peer-benchmarking': () => import('@/components/diagrams/FinancialBenchmarkingDiagram'),
   'workforce-analytics': () => import('@/components/diagrams/WorkforceAnalyticsDiagram'),
-  'project-approval-drafting': () => import('@/components/diagrams/FundingRequestDraftingDiagram'),
+  'funding-request-drafting': () => import('@/components/diagrams/FundingRequestDraftingDiagram'),
 };
 
 export default async function ProjectDiagram({ slug }: { slug: string }) {

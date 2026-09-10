@@ -15,7 +15,7 @@ import { fadeUp, staggerContainer } from '@/lib/motion';
  * exact-match lookup with rule-id provenance shown in audit).
  *
  * T4 upgrades to a three-mode editor (NL input ↔ When-Then cards ↔
- * visual graph) — same 8 rules, façade pattern from the Project Approval Request drafting successor.
+ * visual graph) — same 8 rules, façade pattern from the project funding request drafting successor.
  */
 export default function WorkflowsPage() {
   return (

@@ -1,4 +1,4 @@
-import type { FundingRequestFormalEnvelopeContent } from '@/data/visualizations/projectApproval';
+import type { FundingRequestFormalEnvelopeContent } from '@/data/visualizations/fundingRequest';
 import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
 interface FundingRequestFormalEnvelopeFigureProps {
@@ -7,7 +7,7 @@ interface FundingRequestFormalEnvelopeFigureProps {
 
 export default function FundingRequestFormalEnvelopeFigure({ content }: FundingRequestFormalEnvelopeFigureProps) {
   return (
-    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+    <section className="funding-request-figure" aria-labelledby={`${content.id}-title`}>
       <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">

@@ -1,4 +1,4 @@
-import type { FundingRequestDecisionContent } from '@/data/visualizations/projectApproval';
+import type { FundingRequestDecisionContent } from '@/data/visualizations/fundingRequest';
 import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
 interface FundingRequestDecisionFigureProps {
@@ -7,7 +7,7 @@ interface FundingRequestDecisionFigureProps {
 
 export default function FundingRequestDecisionFigure({ content }: FundingRequestDecisionFigureProps) {
   return (
-    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+    <section className="funding-request-figure" aria-labelledby={`${content.id}-title`}>
       <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">

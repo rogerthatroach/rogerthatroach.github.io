@@ -1,7 +1,7 @@
-import { FundingRequestDecisionFigure } from '@/components/visualizations/project-approval'
+import { FundingRequestDecisionFigure } from '@/components/visualizations/funding-request'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import StepThrough from '@/components/blog/framework/StepThrough'
-import { PROJECT_APPROVAL_PRACTITIONER_DECISIONS } from '@/data/visualizations/projectApproval'
+import { FUNDING_REQUEST_PRACTITIONER_DECISIONS } from '@/data/visualizations/fundingRequest'
 
 The AI/LLM Drafting Platform had to guide an author through a branching, multi-turn project funding request workflow without turning every useful piece of work into another agent. Production v1 therefore uses one LangGraph graph to own the workflow and registered MCP tool routines to perform bounded work inside it.
 
@@ -12,8 +12,8 @@ The AI/LLM Drafting Platform had to guide an author through a branching, multi-t
 3. **Evidence serves known targets.** The workflow drafts a structured document, so retrieval should support fields in scope rather than return one undifferentiated set of plausible passages.
 4. **The author remains accountable.** Missing coverage, conflicting candidates, and uncertain interpretation need a route back to clarification or review.
 
-<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-  <FundingRequestDecisionFigure content={PROJECT_APPROVAL_PRACTITIONER_DECISIONS} />
+<VisualizationContainer minHeight={0} caption={FUNDING_REQUEST_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <FundingRequestDecisionFigure content={FUNDING_REQUEST_PRACTITIONER_DECISIONS} />
 </VisualizationContainer>
 
 ## Decision 1: put one graph in charge

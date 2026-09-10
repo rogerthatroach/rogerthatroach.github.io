@@ -1,7 +1,7 @@
 /**
  * Project PAR — section + field schema.
  *
- * Mirrors the public Project Approval Request drafting form structure (11 sections,
+ * Mirrors the public project funding request drafting form structure (11 sections,
  * 3-state status pills) so stakeholders watching the White Lodge demo
  * recognize the same form shape they already know. White Lodge re-skins
  * the surface; the section + field taxonomy stays PAR-faithful.
@@ -43,7 +43,7 @@ export const PAR_SECTIONS: SectionSpec[] = [
     id: 'headers',
     title: 'Headers Information',
     description:
-      'Core metadata that identifies the initiative, its sponsors, and organizational context. This information is essential for Project Approval Request (PAR) tracking and governance.',
+      'Core metadata that identifies the initiative, its sponsors, and organizational context. This information is essential for project funding request (PAR) tracking and governance.',
     fields: [
       { key: 'request_title', label: 'Request Title', kind: 'text', required: true, maxLength: 400, dianeFillable: true },
       {

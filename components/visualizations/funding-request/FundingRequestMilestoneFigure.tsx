@@ -1,4 +1,4 @@
-import type { FundingRequestMilestoneContent } from '@/data/visualizations/projectApproval';
+import type { FundingRequestMilestoneContent } from '@/data/visualizations/fundingRequest';
 import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
 interface FundingRequestMilestoneFigureProps {
@@ -7,7 +7,7 @@ interface FundingRequestMilestoneFigureProps {
 
 export default function FundingRequestMilestoneFigure({ content }: FundingRequestMilestoneFigureProps) {
   return (
-    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+    <section className="funding-request-figure" aria-labelledby={`${content.id}-title`}>
       <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">

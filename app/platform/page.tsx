@@ -35,7 +35,7 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
         One agent coordinates bounded tool routines, scoped evidence,
         coverage checks, and review in{' '}
         <Link
-          href="/projects/project-approval-drafting"
+          href="/projects/funding-request-drafting"
           className="text-accent underline underline-offset-4 hover:text-text-primary"
         >
           the AI/LLM drafting platform

@@ -149,10 +149,10 @@ export interface FundingRequestTraceContent extends FundingRequestFigureBase {
   assumptions: readonly string[];
 }
 
-export const PROJECT_APPROVAL_CASE_STUDY_INTRO = 'The architecture resolves at two scales: the end-to-end drafting path and the bounded work inside each field group.';
+export const FUNDING_REQUEST_CASE_STUDY_INTRO = 'The architecture resolves at two scales: the end-to-end drafting path and the bounded work inside each field group.';
 
-export const PROJECT_APPROVAL_CASE_OVERVIEW: FundingRequestOverviewContent = {
-  id: 'project-approval-case-overview',
+export const FUNDING_REQUEST_CASE_OVERVIEW: FundingRequestOverviewContent = {
+  id: 'funding-request-case-overview',
   eyebrow: 'Case study · system orientation',
   title: 'One agent carries the draft from intake to review',
   thesis: 'The graph owns the workflow. Tool routines perform bounded work. The author owns the decision.',
@@ -202,8 +202,8 @@ export const PROJECT_APPROVAL_CASE_OVERVIEW: FundingRequestOverviewContent = {
   humanLabel: 'Human review is the final gate in this drafting path',
 };
 
-export const PROJECT_APPROVAL_FIELD_GROUP_LENS: FundingRequestFieldGroupContent = {
-  id: 'project-approval-field-group-lens',
+export const FUNDING_REQUEST_FIELD_GROUP_LENS: FundingRequestFieldGroupContent = {
+  id: 'funding-request-field-group-lens',
   eyebrow: 'Case study · one field-group lens',
   title: 'A field group is a scope, not a specialist agent',
   thesis: 'Evidence and target fields travel together through one bounded routine; workflow control stays with the graph.',
@@ -240,8 +240,8 @@ export const PROJECT_APPROVAL_FIELD_GROUP_LENS: FundingRequestFieldGroupContent 
   coverageReturn: 'Open input or collision remains → ask, review, and resume from a successfully retained checkpoint.',
 };
 
-export const PROJECT_APPROVAL_BUILDER_MILESTONES: FundingRequestMilestoneContent = {
-  id: 'project-approval-builder-milestones',
+export const FUNDING_REQUEST_BUILDER_MILESTONES: FundingRequestMilestoneContent = {
+  id: 'funding-request-builder-milestones',
   eyebrow: 'Delivery arc',
   title: 'A one-page vision became a production platform in five distinct phases',
   thesis: 'Vision, exploration, production work, pilot use, and launch stay separate; ideation does not collapse into production authorship.',
@@ -277,8 +277,8 @@ export const PROJECT_APPROVAL_BUILDER_MILESTONES: FundingRequestMilestoneContent
   ownershipDetail: 'Milap frames the concept, uses Amplify to widen the option set, then owns the distinct production build end to end.',
 };
 
-export const PROJECT_APPROVAL_BUILDER_ACTORS: FundingRequestActorContent = {
-  id: 'project-approval-builder-actors',
+export const FUNDING_REQUEST_BUILDER_ACTORS: FundingRequestActorContent = {
+  id: 'funding-request-builder-actors',
   eyebrow: 'Author workflow',
   title: 'The author begins and ends the workflow',
   thesis: 'The system organizes the middle: it narrows context, proposes candidate fields, and surfaces gaps and conflicts found by configured checks.',
@@ -314,8 +314,8 @@ export const PROJECT_APPROVAL_BUILDER_ACTORS: FundingRequestActorContent = {
   ],
 };
 
-export const PROJECT_APPROVAL_PRACTITIONER_DECISIONS: FundingRequestDecisionContent = {
-  id: 'project-approval-practitioner-decisions',
+export const FUNDING_REQUEST_PRACTITIONER_DECISIONS: FundingRequestDecisionContent = {
+  id: 'funding-request-practitioner-decisions',
   eyebrow: 'Decision map',
   title: 'Four operating pressures shaped four architecture choices',
   thesis: 'Each choice solves a specific operating problem and carries a visible maintenance cost.',
@@ -351,8 +351,8 @@ export const PROJECT_APPROVAL_PRACTITIONER_DECISIONS: FundingRequestDecisionCont
   footerDetail: 'The graph owns control; tools return bounded results; detected gaps and conflicts return to a person.',
 };
 
-export const PROJECT_APPROVAL_FORMAL_ENVELOPE: FundingRequestFormalEnvelopeContent = {
-  id: 'project-approval-formal-envelope',
+export const FUNDING_REQUEST_FORMAL_ENVELOPE: FundingRequestFormalEnvelopeContent = {
+  id: 'funding-request-formal-envelope',
   eyebrow: 'System boundary',
   title: 'One graph owns each transition in the reviewed v1 path',
   thesis: 'Concurrent extraction is bounded registered work inside the graph; no routine acquires independent workflow control.',
@@ -392,8 +392,8 @@ export const PROJECT_APPROVAL_FORMAL_ENVELOPE: FundingRequestFormalEnvelopeConte
   ],
 };
 
-export const PROJECT_APPROVAL_FORMAL_FIELD_GROUP: FundingRequestFormalFieldGroupContent = {
-  id: 'project-approval-formal-field-group',
+export const FUNDING_REQUEST_FORMAL_FIELD_GROUP: FundingRequestFormalFieldGroupContent = {
+  id: 'funding-request-formal-field-group',
   eyebrow: 'Retrieval and merge',
   title: 'Configured field ownership is disjoint; evidence may overlap',
   thesis: 'The configured owner map constrains which group may write each target field, while one source may support several groups.',
@@ -426,8 +426,8 @@ export const PROJECT_APPROVAL_FORMAL_FIELD_GROUP: FundingRequestFormalFieldGroup
   resultLabel: 'Validated merged candidates',
 };
 
-export const PROJECT_APPROVAL_FORMAL_TRACE: FundingRequestTraceContent = {
-  id: 'project-approval-formal-trace',
+export const FUNDING_REQUEST_FORMAL_TRACE: FundingRequestTraceContent = {
+  id: 'funding-request-formal-trace',
   eyebrow: 'Execution trace',
   title: 'Coverage decides whether the graph advances or asks',
   thesis: 'The normal path is inspectable only when the declared actions commit and the corresponding versions and records are retained.',
@@ -486,12 +486,12 @@ export const PROJECT_APPROVAL_FORMAL_TRACE: FundingRequestTraceContent = {
 };
 
 [
-  PROJECT_APPROVAL_CASE_OVERVIEW,
-  PROJECT_APPROVAL_FIELD_GROUP_LENS,
-  PROJECT_APPROVAL_BUILDER_MILESTONES,
-  PROJECT_APPROVAL_BUILDER_ACTORS,
-  PROJECT_APPROVAL_PRACTITIONER_DECISIONS,
-  PROJECT_APPROVAL_FORMAL_ENVELOPE,
-  PROJECT_APPROVAL_FORMAL_FIELD_GROUP,
-  PROJECT_APPROVAL_FORMAL_TRACE,
+  FUNDING_REQUEST_CASE_OVERVIEW,
+  FUNDING_REQUEST_FIELD_GROUP_LENS,
+  FUNDING_REQUEST_BUILDER_MILESTONES,
+  FUNDING_REQUEST_BUILDER_ACTORS,
+  FUNDING_REQUEST_PRACTITIONER_DECISIONS,
+  FUNDING_REQUEST_FORMAL_ENVELOPE,
+  FUNDING_REQUEST_FORMAL_FIELD_GROUP,
+  FUNDING_REQUEST_FORMAL_TRACE,
 ].forEach((spec) => validateVisualizationSpec(spec));

@@ -237,7 +237,7 @@ export default function DianePage() {
           className="mt-4 max-w-2xl text-[12px] leading-relaxed text-text-tertiary"
         >
           Diane runs only where she&apos;s invoked. Single-agent governance
-          envelope for the Project Approval Request drafting workflow — actions land in this ledger
+          envelope for the project funding request drafting workflow — actions land in this ledger
           structurally, not aspirationally.
         </motion.p>
 

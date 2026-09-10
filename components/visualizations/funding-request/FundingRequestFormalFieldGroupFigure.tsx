@@ -1,4 +1,4 @@
-import type { FundingRequestFormalFieldGroupContent } from '@/data/visualizations/projectApproval';
+import type { FundingRequestFormalFieldGroupContent } from '@/data/visualizations/fundingRequest';
 import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
 interface FundingRequestFormalFieldGroupFigureProps {
@@ -7,7 +7,7 @@ interface FundingRequestFormalFieldGroupFigureProps {
 
 export default function FundingRequestFormalFieldGroupFigure({ content }: FundingRequestFormalFieldGroupFigureProps) {
   return (
-    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+    <section className="funding-request-figure" aria-labelledby={`${content.id}-title`}>
       <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">

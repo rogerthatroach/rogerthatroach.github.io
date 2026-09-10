@@ -1,4 +1,4 @@
-import type { FundingRequestOverviewContent } from '@/data/visualizations/projectApproval';
+import type { FundingRequestOverviewContent } from '@/data/visualizations/fundingRequest';
 import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
 interface FundingRequestOverviewFigureProps {
@@ -9,7 +9,7 @@ export default function FundingRequestOverviewFigure({ content }: FundingRequest
   const [humanInput, ...agentStages] = content.stages;
 
   return (
-    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+    <section className="funding-request-figure" aria-labelledby={`${content.id}-title`}>
       <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">

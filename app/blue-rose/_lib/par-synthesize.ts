@@ -1,5 +1,5 @@
 /**
- * par-synthesize — pure functions that turn a completed PAR draft into
+ * par-synthesize — pure functions that turn a completed funding request draft into
  * a Submission + DianeAnnotation pair, modeling the Phase-1-vocabulary
  * synthesis that runs at submit time.
  *

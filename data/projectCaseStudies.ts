@@ -184,7 +184,7 @@ export const CASE_STUDIES: CaseStudy[] = [
     companionBlogPostSlug: 'workforce-analytics-model-boundary',
   },
   {
-    projectId: 'project-approval-drafting',
+    projectId: 'funding-request-drafting',
     timeline: '2025 – Present',
     era: 'Intelligent Systems',
     status: 'shipped',
@@ -209,6 +209,6 @@ export const CASE_STUDIES: CaseStudy[] = [
         'Tool routines propose bounded work inside the graph; they are not independent agents. The author remains responsible for reviewing, revising, and accepting the draft, and unavailable evidence cannot be treated as covered.',
     },
     blogPostSlug: 'enterprise-agentic-ai-architecture',
-    companionBlogPostSlug: 'project-approval-drafting-platform-building',
+    companionBlogPostSlug: 'funding-request-drafting-platform-building',
   },
 ];

@@ -1,4 +1,4 @@
-import type { FundingRequestFigureBase } from '@/data/visualizations/projectApproval';
+import type { FundingRequestFigureBase } from '@/data/visualizations/fundingRequest';
 
 interface FundingRequestFigureHeaderProps {
   content: FundingRequestFigureBase;

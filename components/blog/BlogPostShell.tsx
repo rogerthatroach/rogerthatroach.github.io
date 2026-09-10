@@ -15,7 +15,7 @@ const POST_LOADERS: Record<string, () => Promise<PostModule>> = {
   'closed-loop': () => import('@/data/posts/closed-loop.mdx'),
   'enterprise-agentic-ai-architecture': () => import('@/data/posts/enterprise-agentic-ai.mdx'),
   'enterprise-agentic-ai-framework': () => import('@/data/posts/enterprise-agentic-ai-framework.mdx'),
-  'project-approval-drafting-platform-building': () => import('@/data/posts/project-approval-drafting-platform-building.mdx'),
+  'funding-request-drafting-platform-building': () => import('@/data/posts/funding-request-drafting-platform-building.mdx'),
   'commodity-tax-cfo-trust': () => import('@/data/posts/commodity-tax-cfo-trust.mdx'),
   'commodity-tax-cfo-trust-framework': () => import('@/data/posts/commodity-tax-cfo-trust-framework.mdx'),
   'workforce-analytics-model-boundary': () => import('@/data/posts/workforce-analytics-llm-as-router.mdx'),

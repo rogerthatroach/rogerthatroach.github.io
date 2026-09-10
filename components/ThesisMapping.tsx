@@ -42,7 +42,7 @@ const LEVELS: LevelMap[] = [
     level: 'Intelligent',
     id: 'rbc-lead',
     highlight: 'AI/LLM drafting + workforce analytics · LangGraph · pgvector · text-to-SQL',
-    href: '/projects/project-approval-drafting',
+    href: '/projects/funding-request-drafting',
   },
 ];
 

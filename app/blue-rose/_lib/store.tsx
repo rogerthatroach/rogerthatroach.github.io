@@ -50,7 +50,7 @@ export type SubmissionTab = 'document' | 'thread' | 'context' | 'diane';
 export type RightPaneTab = SubmissionTab;
 
 /**
- * Per-field provenance tracker for the PAR draft. Marks whether a field
+ * Per-field provenance tracker for the funding request draft. Marks whether a field
  * value was authored by Diane (during a drafting chain) or by the user
  * (manual edit). Drives the dashed-border + amber-tint visual cue
  * required by §12 (AI-replied differentiation: Diane content never
@@ -75,7 +75,7 @@ interface ThemisState {
   splitRatio: number;
   queueFilters: QueueFilters;
   /**
-   * In-flight PAR draft (single, latest). Keyed by field-spec key. Reset
+   * In-flight funding request draft (single, latest). Keyed by field-spec key. Reset
    * on submit. Persists across reload via localStorage.
    */
   parDraft: Record<string, string | number | boolean>;

@@ -144,7 +144,7 @@ export const WORKFORCE_ANALYTICS_COST_CENTRES = '~40,000';
 export const WORKFORCE_ANALYTICS_ROLLUPS = '~9,000';
 
 /** Drafting-platform pilot launched April 2026; full CFO Group launch across all geographies May 2026. */
-export const PROJECT_APPROVAL_DRAFTING_SCALE = 'Full CFO Group';
+export const FUNDING_REQUEST_DRAFTING_SCALE = 'Full CFO Group';
 
 // ═══════════════════════════════════════════════════════════════════
 // TEAM
