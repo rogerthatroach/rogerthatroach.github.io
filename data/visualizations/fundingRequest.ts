@@ -1,3 +1,5 @@
+import { DRAFTING_PLATFORM_NAME } from '@/data/canonical'
+
 import { validateVisualizationSpec } from './validateVisualizationSpec';
 
 export interface FundingRequestFigureBase {
@@ -243,7 +245,7 @@ export const PROJECT_APPROVAL_BUILDER_MILESTONES: FundingRequestMilestoneContent
   eyebrow: 'Delivery arc',
   title: 'A one-page vision became a production platform in five distinct phases',
   thesis: 'Vision, exploration, production work, pilot use, and launch stay separate; ideation does not collapse into production authorship.',
-  caption: 'The AI/LLM Drafting Platform delivery arc: from a one-page product thesis to a full CFO Group launch across all geographies.',
+  caption: `The ${DRAFTING_PLATFORM_NAME} delivery arc: from a one-page product thesis to a full CFO Group launch across all geographies.`,
   milestones: [
     {
       marker: 'Vision',

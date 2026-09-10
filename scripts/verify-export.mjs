@@ -202,6 +202,23 @@ try {
 if (!existsSync(join(OUT, 'resume.pdf'))) fail('/resume.pdf: verified public résumé missing from export')
 if (!existsSync(join(OUT, 'og-image.png'))) fail('/og-image.png: social preview missing from export')
 
+// Retired internal names must never reappear in rendered output. The public
+// copy carries functional descriptions; the codenames below were removed by
+// the publication audit. Source-level constants cover the TypeScript data
+// layer, but MDX prose is literal text, so this is the only check that covers
+// every surface a reader actually sees.
+const RETIRED_PUBLIC_TERMS = ['FinancialBenchmarking', 'WorkforceAnalytics', 'AI/LLM Drafting Platform', 'ModelGateway']
+
+for (const path of contentPages) {
+  const route = routeForHtml(path)
+  const visibleText = renderedText(readFileSync(path, 'utf8'))
+  for (const term of RETIRED_PUBLIC_TERMS) {
+    if (visibleText.includes(term)) {
+      fail(`${route}: retired internal name “${term}” reappeared in rendered text`)
+    }
+  }
+}
+
 if (failures.length > 0) {
   console.error(`Export verification failed with ${failures.length} issue(s):`)
   for (const issue of failures) console.error(`- ${issue}`)

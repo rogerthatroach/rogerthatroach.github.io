@@ -1,8 +1,10 @@
 import {
+  COMMODITY_TAX_EFFICIENCY,
   DIGITAL_TWIN_SAVINGS,
+  DRAFTING_PLATFORM_NAME,
+  FINANCIAL_BENCHMARKING_NAME,
   HUMANA_ACCURACY,
   HUMANA_BASELINE_ACCURACY,
-  COMMODITY_TAX_EFFICIENCY,
   PROJECT_APPROVAL_DRAFTING_SCALE,
   WORKFORCE_ANALYTICS_BUILD_WINDOW,
   WORKFORCE_ANALYTICS_NAME,
@@ -78,7 +80,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   // Arc 4: Intelligent Systems (2024-present)
   {
     id: 'financial-peer-benchmarking',
-    title: 'Financial Peer Benchmarking Platform',
+    title: `${FINANCIAL_BENCHMARKING_NAME}`,
     subtitle: 'Guarded Text-to-SQL — RBC CFO Group',
     role: 'Built v1 end-to-end; refactored its benchmarking module for v2 in a 2-week concurrent sprint',
     stack: ['Text-to-SQL', 'Embeddings', 'Similarity Search', 'Intent Parsing'],
@@ -102,7 +104,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   },
   {
     id: 'project-approval-drafting',
-    title: 'AI/LLM Drafting Platform',
+    title: `${DRAFTING_PLATFORM_NAME}`,
     subtitle: 'Reviewed Agentic Workflow — RBC CFO Group',
     role: 'Conceived, architected, and built end-to-end',
     stack: ['LangGraph', 'MCP', 'Semantic retrieval', 'Foundation-model API'],

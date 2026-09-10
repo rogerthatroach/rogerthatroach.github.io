@@ -1,3 +1,5 @@
+import { DRAFTING_PLATFORM_NAME, FINANCIAL_BENCHMARKING_NAME } from '@/data/canonical'
+
 export interface BlogPostMeta {
   slug: string;
   title: string;
@@ -105,7 +107,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Text-to-SQL', 'Semantic Retrieval', 'Ambiguity', 'SQL Safety Controls', 'Failure Paths'],
       readingTime: '9 min read',
       abstract:
-        'The Financial Peer Benchmarking Platform separates intent parsing, catalog candidate retrieval, ambiguity handling, reviewed query construction, and deterministic formatting. Each stage has a declared input, output, primary control, and failure response; clarification is a normal outcome, and free-form model output never reaches database execution.',
+        `The ${FINANCIAL_BENCHMARKING_NAME} separates intent parsing, catalog candidate retrieval, ambiguity handling, reviewed query construction, and deterministic formatting. Each stage has a declared input, output, primary control, and failure response; clarification is a normal outcome, and free-form model output never reaches database execution.`,
       updated: '2026-08-09',
       status: 'published',
       projectId: 'financial-peer-benchmarking',
@@ -122,7 +124,7 @@ export const POSTS: BlogPost[] = [
     furtherReading: [
       { title: 'Financial Peer Benchmarking: What Made a Two-Week Refactor Possible', url: '/blog/financial-benchmarking-refactor', description: 'Why the focused two-week refactor was possible and how the production team integrated it.' },
       { title: 'Financial Peer Benchmarking: Four Decisions for Bounded Text-to-SQL', url: '/blog/financial-benchmarking-query-decisions', description: 'Decomposition, candidate retrieval, reviewed templates, and clarification trade-offs.' },
-      { title: 'Financial Peer Benchmarking Platform — Case Study', url: '/projects/financial-peer-benchmarking', description: 'Product, contribution boundary, five-stage design, and operating state.' },
+      { title: `${FINANCIAL_BENCHMARKING_NAME} — Case Study`, url: '/projects/financial-peer-benchmarking', description: 'Product, contribution boundary, five-stage design, and operating state.' },
     ],
   },
   {
@@ -158,7 +160,7 @@ export const POSTS: BlogPost[] = [
       tags: ['LangGraph', 'MCP', 'Field-Scoped Retrieval', 'Single-Agent Systems', 'Human Review'],
       readingTime: '7 min read',
       abstract:
-        'The AI/LLM Drafting Platform uses one LangGraph orchestrator to guide drafting across retained sessions. Typed MCP tools handle bounded workflow actions; field-scoped retrieval supplies evidence to extraction tasks; ownership-aware merge and coverage checks surface collisions and gaps for author review. These controls preserve evidence and expose failure paths without removing the need for human judgment.',
+        `The ${DRAFTING_PLATFORM_NAME} uses one LangGraph orchestrator to guide drafting across retained sessions. Typed MCP tools handle bounded workflow actions; field-scoped retrieval supplies evidence to extraction tasks; ownership-aware merge and coverage checks surface collisions and gaps for author review. These controls preserve evidence and expose failure paths without removing the need for human judgment.`,
       updated: '2026-08-09',
       status: 'published',
       projectId: 'project-approval-drafting',
@@ -170,9 +172,9 @@ export const POSTS: BlogPost[] = [
       { id: 7, authors: 'Lewis, P. et al.', title: 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks', venue: 'NeurIPS', year: 2020 },
     ],
     furtherReading: [
-      { title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch', url: '/blog/project-approval-drafting-platform-building', description: 'From initial product thesis through pilot and full CFO Group launch.' },
+      { title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`, url: '/blog/project-approval-drafting-platform-building', description: 'From initial product thesis through pilot and full CFO Group launch.' },
       { title: 'AI/LLM Drafting: Four Decisions Behind a Reviewable Workflow', url: '/blog/enterprise-agentic-ai-framework', description: 'Chosen approaches, strongest alternatives, costs, and residual risks.' },
-      { title: 'AI/LLM Drafting Platform — Case Study', url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
+      { title: `${DRAFTING_PLATFORM_NAME} — Case Study`, url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
       { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Graph-based workflow orchestration with state, conditional routing, and checkpoints.' },
       { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Typed interfaces for tools and model-accessible capabilities.' },
       { title: 'Retrieval-Augmented Generation', url: 'https://arxiv.org/abs/2005.11401', description: 'The original RAG paper; useful background for retrieval as one component of the workflow.' },
@@ -197,20 +199,20 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       { title: 'AI/LLM Drafting: One Agent, Bounded Tools, Human Review', url: '/blog/enterprise-agentic-ai-architecture', description: 'Mechanism, evidence boundaries, failure paths, and residual risk.' },
-      { title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch', url: '/blog/project-approval-drafting-platform-building', description: 'The production journey from one-page plan through pilot and full CFO Group launch.' },
-      { title: 'AI/LLM Drafting Platform — Case Study', url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
+      { title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`, url: '/blog/project-approval-drafting-platform-building', description: 'The production journey from one-page plan through pilot and full CFO Group launch.' },
+      { title: `${DRAFTING_PLATFORM_NAME} — Case Study`, url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
     ],
   },
   {
     meta: {
       slug: 'project-approval-drafting-platform-building',
-      title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch',
+      title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`,
       subtitle: 'How bounded exploration, one accountable workflow, and explicit review points turned an initial product thesis into a production drafting platform.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '5 min read',
       abstract:
-        'The AI/LLM Drafting Platform began as a one-page plan, used the 2025 Amplify cohort for bounded problem exploration, entered pilot in April 2026, and launched across the full CFO Group in May. Amplify widened the option set; direct production ownership covered architecture, implementation, pilot, and launch.',
+        `The ${DRAFTING_PLATFORM_NAME} began as a one-page plan, used the 2025 Amplify cohort for bounded problem exploration, entered pilot in April 2026, and launched across the full CFO Group in May. Amplify widened the option set; direct production ownership covered architecture, implementation, pilot, and launch.`,
       updated: '2026-08-30',
       status: 'published',
       projectId: 'project-approval-drafting',
@@ -220,7 +222,7 @@ export const POSTS: BlogPost[] = [
     furtherReading: [
       { title: 'AI/LLM Drafting: One Agent, Bounded Tools, Human Review', url: '/blog/enterprise-agentic-ai-architecture', description: 'Context, tools, retrieval, merge, coverage, and review boundaries.' },
       { title: 'AI/LLM Drafting: Four Decisions Behind a Reviewable Workflow', url: '/blog/enterprise-agentic-ai-framework', description: 'Chosen approaches, strongest alternatives, costs, and residual risks.' },
-      { title: 'AI/LLM Drafting Platform — Case Study', url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
+      { title: `${DRAFTING_PLATFORM_NAME} — Case Study`, url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
     ],
   },
   {
@@ -327,7 +329,7 @@ export const POSTS: BlogPost[] = [
         description: 'V1 operating knowledge, a shelved design, evaluation evidence, bounded scope, and production-team integration.',
       },
       {
-        title: 'Financial Peer Benchmarking Platform — Case Study',
+        title: `${FINANCIAL_BENCHMARKING_NAME} — Case Study`,
         url: '/projects/financial-peer-benchmarking',
         description: 'Product, contribution boundary, five-stage design, operating state, and limits.',
       },
@@ -343,7 +345,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Evaluation', 'Peer Benchmarking'],
       readingTime: '6 min read',
       abstract:
-        'The Financial Peer Benchmarking Platform’s v2 was a focused two-week concurrent refactor of its production v1 system, not a separate greenfield delivery. Its credibility came from v1 evidence, an earlier shelved design, later evaluation, bounded scope, and production-team integration.',
+        `The ${FINANCIAL_BENCHMARKING_NAME}’s v2 was a focused two-week concurrent refactor of its production v1 system, not a separate greenfield delivery. Its credibility came from v1 evidence, an earlier shelved design, later evaluation, bounded scope, and production-team integration.`,
       updated: '2026-08-30',
       status: 'published',
       projectId: 'financial-peer-benchmarking',
@@ -362,7 +364,7 @@ export const POSTS: BlogPost[] = [
         description: 'Decomposition, semantic candidates, reviewed templates, and accept-or-clarify behavior.',
       },
       {
-        title: 'Financial Peer Benchmarking Platform \u2014 Case Study',
+        title: `${FINANCIAL_BENCHMARKING_NAME} \u2014 Case Study`,
         url: '/projects/financial-peer-benchmarking',
         description: 'Product, contribution boundary, five-stage design, operating state, and limits.',
       },
@@ -392,7 +394,7 @@ export const POSTS: BlogPost[] = [
         description: 'The first production workflow and its analyst investigation loop.',
       },
       {
-        title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch',
+        title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`,
         url: '/blog/project-approval-drafting-platform-building',
         description: 'From a one-page vision through pilot and full CFO Group launch.',
       },

@@ -1,6 +1,8 @@
 import {
   COMMODITY_TAX_EFFICIENCY,
   DIGITAL_TWIN_SAVINGS,
+  DRAFTING_PLATFORM_NAME,
+  FINANCIAL_BENCHMARKING_NAME,
   HANDS_ON_PCT,
   HUMANA_ACCURACY,
   HUMANA_BASELINE_ACCURACY,
@@ -45,9 +47,9 @@ export const CAREER_SCOPE = {
   productionFinanceYears: '3.8',
   agenticLlmYears: '1.5',
   bankProductionSystems: [
-    'AI/LLM Drafting Platform',
+    `${DRAFTING_PLATFORM_NAME}`,
     WORKFORCE_ANALYTICS_NAME,
-    'Financial Peer Benchmarking Platform',
+    `${FINANCIAL_BENCHMARKING_NAME}`,
   ] as const,
 };
 
@@ -63,7 +65,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead · CFO Group',
     description:
-      `Conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME} from March through its ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch while guiding the 2025 Amplify cohort and leading a focused two-week v1-to-v2 refactor of the Financial Peer Benchmarking Platform. Later drove the AI/LLM Drafting Platform from concept to full CFO Group launch. Remain ${HANDS_ON_PCT} hands-on across architecture, implementation, evaluation, and production follow-through.`,
+      `Conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME} from March through its ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch while guiding the 2025 Amplify cohort and leading a focused two-week v1-to-v2 refactor of the ${FINANCIAL_BENCHMARKING_NAME}. Later drove the ${DRAFTING_PLATFORM_NAME} from concept to full CFO Group launch. Remain ${HANDS_ON_PCT} hands-on across architecture, implementation, evaluation, and production follow-through.`,
     skills: ['LangGraph', 'MCP', 'Semantic retrieval', 'Text-to-SQL', 'Python', 'React'],
     milestone: `${PROJECT_APPROVAL_DRAFTING_SCALE} launch`,
     accent: 'purple',
@@ -78,7 +80,7 @@ export const TIMELINE: TimelineNode[] = [
       'Current team: one Senior AI Scientist direct report and two interns who joined in May 2026. Contributing to AI/ML hiring since 2023.',
     projects: [
       {
-        name: 'AI/LLM Drafting Platform',
+        name: `${DRAFTING_PLATFORM_NAME}`,
         oneLiner:
           'Drove a reviewed, single-agent drafting workflow from a one-page concept to production. It was the first true agentic AI platform approved for production at the bank: pilot in April 2026, then full CFO Group launch across all geographies in May.',
         decisionRationale:
@@ -97,7 +99,7 @@ export const TIMELINE: TimelineNode[] = [
         caseStudyLink: '/projects/workforce-analytics',
       },
       {
-        name: 'Financial Peer Benchmarking Platform · v2',
+        name: `${FINANCIAL_BENCHMARKING_NAME} · v2`,
         oneLiner:
           'Led a focused two-week concurrent refactor of the existing v1 benchmarking product while building the AI/LLM Workforce Analytics Platform and guiding the 2025 Amplify cohort. The production team integrated and released the revised module.',
         decisionRationale:
@@ -140,7 +142,7 @@ export const TIMELINE: TimelineNode[] = [
         caseStudyLink: '/projects/commodity-tax',
       },
       {
-        name: 'Financial Peer Benchmarking Platform · v1',
+        name: `${FINANCIAL_BENCHMARKING_NAME} · v1`,
         oneLiner:
           'Built and launched the first version of the Canadian peer benchmarking product, including extraction and historical metric-matching logic for changing quarterly source packages.',
         decisionRationale:

@@ -113,6 +113,12 @@ export const COMMODITY_TAX_EFFICIENCY_COMPACT = '90 min';
 /** Duration of the concurrent peer benchmarking v1-to-v2 refactor. */
 export const FINANCIAL_BENCHMARKING_V2_BUILD_TIME = '2 weeks';
 
+/** Public functional name for the peer benchmarking product. */
+export const FINANCIAL_BENCHMARKING_NAME = 'Financial Peer Benchmarking Platform';
+
+/** Public functional name for the drafting platform. */
+export const DRAFTING_PLATFORM_NAME = 'AI/LLM Drafting Platform';
+
 /** Public functional name and reviewed delivery dates for workforce analytics. */
 export const WORKFORCE_ANALYTICS_NAME = 'AI/LLM Workforce Analytics Platform';
 export const WORKFORCE_ANALYTICS_BUILD_WINDOW = 'Mar → Nov 2025';

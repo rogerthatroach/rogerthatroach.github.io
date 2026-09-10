@@ -1,4 +1,6 @@
 import {
+  DRAFTING_PLATFORM_NAME,
+  FINANCIAL_BENCHMARKING_NAME,
   WORKFORCE_ANALYTICS_BUILD_WINDOW_LONG,
   WORKFORCE_ANALYTICS_NAME,
   WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH,
@@ -144,7 +146,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       mechanism:
         'The first two stages narrow a request to catalog candidates. The third either resolves one supported KPI or asks for clarification. The fourth selects a reviewed query pattern, validates identifiers, and binds values; the fifth formats the known result shape.',
       outcomeAndState:
-        'The Financial Peer Benchmarking Platform runs in production within the CFO Group as one product across v1 and v2. The 2025 CFO One RBC Team Award recognized the v1 production delivery; v2 is a refactor of that product rather than a separate delivery.',
+        `The ${FINANCIAL_BENCHMARKING_NAME} runs in production within the CFO Group as one product across v1 and v2. The 2025 CFO One RBC Team Award recognized the v1 production delivery; v2 is a refactor of that product rather than a separate delivery.`,
       limits:
         'A similarity or model score routes the next action; it is not a probability that the selected KPI is correct. Failed checks or unresolved ambiguity stop the registered path before execution.',
     },
@@ -160,7 +162,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       problem:
         'CFO Group questions across headcount, compensation costs, and open positions had to be answered across authorized combinations of roughly 40,000 cost centres. Precomputing every possible answer was not a suitable design boundary.',
       contribution:
-        `From March through the ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch, I conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME}, including the routing, entitlement, and deterministic calculation paths, while leading its cross-functional productionisation. This work ran alongside mentoring the 2025 Amplify cohort and a focused two-week refactor of the Financial Peer Benchmarking Platform. Engineering-services partners contributed to frontend and infrastructure delivery.`,
+        `From March through the ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch, I conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME}, including the routing, entitlement, and deterministic calculation paths, while leading its cross-functional productionisation. This work ran alongside mentoring the 2025 Amplify cohort and a focused two-week refactor of the ${FINANCIAL_BENCHMARKING_NAME}. Engineering-services partners contributed to frontend and infrastructure delivery.`,
       decision: {
         selectedApproach:
           'Keep model-mediated interpretation and answer shaping at the language edges while deterministic code resolves entitlement, accesses records, and performs the financial calculations.',
@@ -190,7 +192,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       problem:
         'project funding requests are structured governance documents assembled from templates, policies, historical examples, and author knowledge. Missing or conflicting inputs make drafting iterative, and unresolved coverage must remain visible to the author.',
       contribution:
-        'I conceived, architected, and built the AI/LLM Drafting Platform end to end, from ingestion and the LangGraph state graph through bounded MCP tool routines, field-scoped retrieval, merge and coverage handling, and frontend integration. Cross-functional partners supported deployment and operation.',
+        `I conceived, architected, and built the ${DRAFTING_PLATFORM_NAME} end to end, from ingestion and the LangGraph state graph through bounded MCP tool routines, field-scoped retrieval, merge and coverage handling, and frontend integration. Cross-functional partners supported deployment and operation.`,
       decision: {
         selectedApproach:
           'Give one LangGraph orchestration scope ownership of the reviewed v1 workflow, with bounded tool routines for template guidance, field-scoped evidence, extraction, merge checks, and coverage handling.',
@@ -202,7 +204,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       mechanism:
         'The graph carries a session from intake through template guidance, field-group retrieval, bounded extraction, ownership-aware merge, and coverage analysis. Passing checks produces a reviewable draft; missing coverage returns the session to clarification or human review.',
       outcomeAndState:
-        'The AI/LLM Drafting Platform became the first true agentic AI platform approved for production at the bank. Its pilot launched in April 2026, followed by a full CFO Group launch across all geographies in May 2026.',
+        `The ${DRAFTING_PLATFORM_NAME} became the first true agentic AI platform approved for production at the bank. Its pilot launched in April 2026, followed by a full CFO Group launch across all geographies in May 2026.`,
       limits:
         'Tool routines propose bounded work inside the graph; they are not independent agents. The author remains responsible for reviewing, revising, and accepting the draft, and unavailable evidence cannot be treated as covered.',
     },
