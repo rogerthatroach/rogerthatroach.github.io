@@ -62,3 +62,6 @@ public/images/logos/Tata_Consultancy_Services/
 # ciphertext (public/blue-rose/data.enc.json) is committed.
 data/themis/seed.json
 .themis-passphrase
+
+# Scratch renders and review artifacts (never publishable)
+tmp/
