@@ -101,7 +101,7 @@ export default async function ProjectCaseStudyPage(
         project={project}
         caseStudy={caseStudy}
         diagram={<ProjectDiagram slug={params.slug} />}
-        showFormalBlogCta={isPostSlugPublic(caseStudy.blogPostSlug)}
+        showTechnicalBlogCta={isPostSlugPublic(caseStudy.blogPostSlug)}
         showCompanionBlogCta={isPostSlugPublic(caseStudy.companionBlogPostSlug)}
       />
     </>

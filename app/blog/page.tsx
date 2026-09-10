@@ -10,7 +10,7 @@ import type { AccordionGroup } from '@/components/blog/ProjectAccordion';
 
 const META_TITLE = 'Writings';
 const META_DESCRIPTION =
-  'Technical writing on agentic AI, retrieval, text-to-SQL, and closed-loop optimization.';
+  'Technical notes, decision guides, and builder stories about production AI and machine-learning systems.';
 const META_PATH = '/blog';
 
 export const metadata: Metadata = {
@@ -39,12 +39,12 @@ export const metadata: Metadata = {
  *
  * Each post carries an optional `projectId` on its metadata (see
  * `BlogPostMeta` in `data/posts/index.ts`). The index groups posts by
- * project so multi-post projects (AI/LLM Drafting Platform has 3, Commodity Tax has
- * 2) read as a set, not as scattered cards. Cross-cutting pattern
+ * project so related technical notes, decision guides, and builder
+ * stories read as a set, not as scattered cards. Cross-cutting pattern
  * posts without a projectId fall into a final "Patterns" group.
  *
  * Group ordering mirrors the projects-chronological data with newest-
- * first (AI/LLM Drafting Platform → WorkforceAnalytics → FinancialBenchmarking → Commodity Tax → Document
+ * first (AI/LLM Drafting → Workforce Analytics → Peer Benchmarking → Commodity Tax → Document
  * Intelligence → Combustion Tuning → Patterns).
  */
 
@@ -54,22 +54,19 @@ type ProjectId = NonNullable<BlogPost['meta']['projectId']>;
 // accent bar + mono eyebrow. Matches the era palette used in the
 // Journey section so the two surfaces read the same vocabulary.
 const PROJECT_ERA: Record<ProjectId, { label: string; dark: string; light: string }> = {
-  'funding-request-drafting':           { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
-  workforceAnalytics:               { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
-  financialBenchmarking:                  { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
+  'project-approval-drafting':  { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
+  'workforce-analytics':        { label: 'Intelligent Systems',   dark: '#93c5fd', light: '#1e40af' },
+  'financial-peer-benchmarking': { label: 'Intelligent Systems', dark: '#93c5fd', light: '#1e40af' },
   'commodity-tax':        { label: 'Enterprise Analytics',  dark: '#fcd34d', light: '#92400e' },
   'document-intelligence':{ label: 'Cloud ML',              dark: '#67e8f9', light: '#155e75' },
   'combustion-tuning':    { label: 'Foundation',            dark: '#fca5a5', light: '#991b1b' },
 };
 
 export default function BlogIndexPage() {
-  // NB: wrap `isPostPublic` in an arrow; `.filter(isPostPublic)` would
-  // pass (element, index, array) and the array index would clobber the
-  // function's default `now` parameter (see data/posts/index.ts).
   const published = POSTS.filter((p) => isPostPublic(p));
 
-  // Group posts by projectId. PROJECTS is already newest-first (PAR
-  // Assist → Combustion Tuning); pattern posts fall into a final group.
+  // Group posts by projectId. PROJECTS is already newest-first (Project
+  // Approval Drafting → Combustion Tuning); pattern posts fall into a final group.
   // Pass only `meta` shapes through to the accordion (client component
   // boundary — keep the payload JSON-friendly and minimal).
   const groups: AccordionGroup[] = [];

@@ -9,7 +9,7 @@ import { CASE_STUDIES } from '@/data/projectCaseStudies';
 
 const META_TITLE = 'Projects';
 const META_DESCRIPTION =
-  'Case studies covering context, architecture, decisions, trade-offs, and impact across AI and ML systems.';
+  'Six case studies covering contribution, architecture, evidence, operating state, and limits across AI and ML systems.';
 const META_PATH = '/projects';
 
 export const metadata: Metadata = {
@@ -46,9 +46,6 @@ export default function ProjectsIndexPage() {
           Home
         </Link>
         <h1 className="font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">Projects</h1>
-        <p className="mt-2 text-base text-text-secondary">
-          The full story behind each project — context, decisions, trade-offs, and impact.
-        </p>
 
         {/* Mosaic: origin story (wide) → 4 middle projects (2×2) → vision (wide) */}
         <div className="mt-10 grid gap-6 sm:grid-cols-2">

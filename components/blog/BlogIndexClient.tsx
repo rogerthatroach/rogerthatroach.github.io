@@ -95,9 +95,7 @@ export default function BlogIndexClient({ groups }: { groups: AccordionGroup[] }
       <div className="sticky top-16 z-20 -mx-6 border-b border-border-subtle/40 bg-background/85 px-6 pb-5 pt-3 backdrop-blur-md md:-mx-16 md:px-16">
         <h1 className="font-display text-2xl font-bold text-text-primary sm:text-3xl">Writings</h1>
         <p className="mt-2 max-w-2xl text-base text-text-secondary">
-          Technical explorations — architecture patterns, control assumptions, and the systems
-          thinking behind the work. Grouped by project so posts about the same system read as a
-          set.
+          Architecture notes, decision guides, and build stories about production systems.
         </p>
 
         {/* Register chips — selecting filter. Default empty = show all
@@ -107,9 +105,9 @@ export default function BlogIndexClient({ groups }: { groups: AccordionGroup[] }
         <div
           role="group"
           aria-label="Filter posts by register"
-          className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-2 text-[11px] text-text-tertiary"
+          className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-2 text-xs text-text-tertiary"
         >
-          <span className="mr-1 font-mono text-[9px] uppercase tracking-[0.18em] text-text-tertiary/70">
+          <span className="mr-1 font-mono text-xs uppercase tracking-[0.18em] text-text-tertiary/70">
             filter
           </span>
           {REGISTERS.map((r) => {
@@ -120,7 +118,7 @@ export default function BlogIndexClient({ groups }: { groups: AccordionGroup[] }
                 type="button"
                 onClick={() => toggle(r)}
                 aria-pressed={isSelected}
-                className={`group flex items-baseline gap-1.5 rounded-md border px-2.5 py-1 transition-all ${
+                className={`group flex min-h-11 items-center gap-1.5 rounded-md border px-2.5 py-2 transition-all ${
                   isSelected
                     ? 'border-accent bg-accent-muted text-accent'
                     : 'border-border-subtle/40 bg-transparent text-text-tertiary hover:border-border-subtle hover:text-text-secondary'
@@ -144,7 +142,7 @@ export default function BlogIndexClient({ groups }: { groups: AccordionGroup[] }
             <button
               type="button"
               onClick={clear}
-              className="ml-1 font-mono text-[9px] uppercase tracking-[0.18em] text-text-tertiary transition-colors hover:text-accent"
+              className="ml-1 inline-flex min-h-11 items-center px-2 font-mono text-xs uppercase tracking-[0.18em] text-text-tertiary transition-colors hover:text-accent"
             >
               clear
             </button>

@@ -1,11 +1,5 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Calendar, Briefcase, CheckCircle2, XCircle, Lightbulb } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useHasNavigated } from '@/lib/useHasNavigated';
+import { ArrowRight, Calendar, Briefcase } from 'lucide-react';
 import type { Project } from '@/data/projects';
 import type { CaseStudy } from '@/data/projectCaseStudies';
 import PageTransition from '@/components/ui/PageTransition';
@@ -13,145 +7,57 @@ import ScrollProgressRail from '@/components/ui/ScrollProgressRail';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import { paletteStyle } from '@/lib/palette';
+import CaseStudyToc, { type TocSection } from './CaseStudyToc';
+import PreviousPathLink from '@/components/navigation/PreviousPathLink';
+import { DETAIL_RETURN_FALLBACKS } from '@/data/nav';
 
 interface CaseStudyLayoutProps {
   project: Project;
   caseStudy: CaseStudy;
   diagram: React.ReactNode;
-  showFormalBlogCta: boolean;
+  showTechnicalBlogCta: boolean;
   showCompanionBlogCta: boolean;
 }
 
-const FADE_UP = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: [0.4, 0, 0.2, 1] as const },
-  }),
-};
-
-const TOC_SECTIONS = [
-  { id: 'context', label: 'Context' },
-  { id: 'sequencing', label: 'Sequencing' },
-  { id: 'my-role', label: 'My Role' },
-  { id: 'stakeholders', label: 'Stakeholders' },
-  { id: 'challenge', label: 'The Challenge' },
-  { id: 'options', label: 'Options Considered' },
-  { id: 'decision', label: 'The Decision' },
-  { id: 'architecture', label: 'Architecture' },
-  { id: 'implementation', label: 'Implementation' },
-  { id: 'impact', label: 'Impact' },
-  { id: 'in-production', label: 'In Production' },
-  { id: 'lessons', label: 'Lessons Learned' },
-] as const;
-
-const TOC_SECTIONS_WITHOUT_SEQUENCING = TOC_SECTIONS.filter(
-  (section) => section.id !== 'sequencing'
-);
-
-function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+function Section({
+  id,
+  title,
+  aliases = [],
+  children,
+}: {
+  id: string;
+  title: string;
+  aliases?: string[];
+  children: React.ReactNode;
+}) {
   return (
-    <motion.div
+    <section
       id={id}
-      initial={false}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
-      transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] as const }}
-      // cv-auto: skip paint/layout while off-screen. The whileInView reveal
-      // (IntersectionObserver) still fires — cv:auto skips paint, not the DOM.
-      className="mt-16 scroll-mt-24 cv-auto"
+      className="mt-16 scroll-mt-24"
     >
+      {aliases.map((alias) => (
+        <span key={alias} id={alias} className="block scroll-mt-24" aria-hidden="true" />
+      ))}
       <h2 className="font-display text-xl font-bold tracking-tight text-text-primary">{title}</h2>
       <div className="mt-4 space-y-3 text-sm leading-relaxed text-text-secondary">
         {children}
       </div>
-    </motion.div>
+    </section>
   );
 }
 
-function CaseStudyTOC({ showSequencing }: { showSequencing: boolean }) {
-  const [activeId, setActiveId] = useState('');
-  const tocSections = showSequencing
-    ? TOC_SECTIONS
-    : TOC_SECTIONS_WITHOUT_SEQUENCING;
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible.length > 0) setActiveId(visible[0].target.id);
-      },
-      { rootMargin: '-100px 0px -65% 0px', threshold: 0 }
-    );
-
-    tocSections.forEach((s) => {
-      const el = document.getElementById(s.id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [tocSections]);
-
-  return (
-    <nav
-      // In-flow sticky sidebar from xl (≥1280px): lives in the left column of
-      // the content grid, so it never overlaps the article (the old fixed ToC
-      // could only appear ≥1536px). Below xl, CaseStudyTOCMobile renders the
-      // same links as a <details> disclosure at the top of the article.
-      aria-label="On this page"
-      className="hidden w-52 shrink-0 self-start xl:block xl:sticky xl:top-28"
-    >
-      <div className="max-h-[calc(100vh-8rem)] overflow-y-auto border-l border-border-subtle pl-4">
-        <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
-          Contents
-        </p>
-        <ul>
-          {tocSections.map((s) => (
-            <li key={s.id}>
-              <a
-                href={`#${s.id}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                className={cn(
-                  'block py-1.5 text-[11px] leading-snug transition-colors duration-150',
-                  activeId === s.id
-                    ? 'font-medium text-accent'
-                    : 'text-text-tertiary hover:text-text-secondary'
-                )}
-              >
-                {s.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </nav>
-  );
-}
-
-// Narrow-viewport ToC (< xl): a native <details> disclosure at the top of the
-// article. Same jump links as the sidebar; no JS, keyboard-accessible.
-function CaseStudyTOCMobile({ showSequencing }: { showSequencing: boolean }) {
-  const tocSections = showSequencing
-    ? TOC_SECTIONS
-    : TOC_SECTIONS_WITHOUT_SEQUENCING;
-
+function CaseStudyTOCMobile({ sections }: { sections: TocSection[] }) {
   return (
     <details className="mt-8 rounded-lg border border-border-subtle bg-surface/50 xl:hidden">
-      <summary className="cursor-pointer px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-widest text-text-tertiary">
+      <summary className="min-h-11 cursor-pointer px-4 py-3 font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
         On this page
       </summary>
       <ul className="border-t border-border-subtle px-2 py-2">
-        {tocSections.map((s) => (
+        {sections.map((s) => (
           <li key={s.id}>
             <a
               href={`#${s.id}`}
-              className="block rounded-sm px-2 py-1.5 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
+              className="flex min-h-11 items-center rounded-sm px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-surface-hover hover:text-accent"
             >
               {s.label}
             </a>
@@ -162,50 +68,39 @@ function CaseStudyTOCMobile({ showSequencing }: { showSequencing: boolean }) {
   );
 }
 
-export default function CaseStudyLayout({ project, caseStudy, diagram, showFormalBlogCta, showCompanionBlogCta }: CaseStudyLayoutProps) {
-  const { sections } = caseStudy;
-  const hasSequencing = Boolean(caseStudy.sequencing);
-  // Cold load → render the header (incl. the LCP title) at rest immediately for
-  // fast LCP; in-app nav → play the FADE_UP entrance. See useHasNavigated.
-  const hasNavigated = useHasNavigated();
-  const headerInitial = hasNavigated ? 'hidden' : false;
+export default function CaseStudyLayout({
+  project,
+  caseStudy,
+  diagram,
+  showTechnicalBlogCta,
+  showCompanionBlogCta,
+}: CaseStudyLayoutProps) {
+  const { narrative } = caseStudy;
+  const tocSections = [
+    narrative.problem ? { id: 'problem', label: 'Problem' } : undefined,
+    narrative.contribution ? { id: 'contribution', label: 'Contribution' } : undefined,
+    narrative.decision ? { id: 'decision', label: 'Decision' } : undefined,
+    { id: 'how-it-works', label: caseStudy.figureHeading ?? 'How it works' },
+    narrative.outcomeAndState ? { id: 'outcome', label: 'Outcome and state' } : undefined,
+    narrative.limits ? { id: 'limits', label: 'Limits' } : undefined,
+  ].filter((section): section is TocSection => Boolean(section));
 
   return (
     <PageTransition>
       <ScrollProgressRail />
       <Nav />
       <main id="main-content" className="px-6 pt-24 pb-12 md:px-16">
-        {/* Centered on all widths; from xl, a [sticky ToC | article] grid so
-            the ToC sits in its own column instead of overlapping the article. */}
         <div className="mx-auto max-w-content xl:flex xl:max-w-312 xl:gap-12">
-          <CaseStudyTOC showSequencing={hasSequencing} />
+          <CaseStudyToc sections={tocSections} />
           <div className="min-w-0 xl:max-w-content xl:flex-1">
-          {/* Breadcrumbs */}
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
-            >
-              <ArrowLeft size={16} />
-              Home
-            </Link>
-            <span className="text-text-tertiary/40">/</span>
-            <Link
-              href="/projects"
-              className="text-sm text-text-tertiary transition-colors hover:text-accent"
-            >
-              Projects
-            </Link>
-          </div>
+            <div>
+              <PreviousPathLink
+                fallbackHref={DETAIL_RETURN_FALLBACKS.projects.href}
+                fallbackLabel={DETAIL_RETURN_FALLBACKS.projects.label}
+              />
+            </div>
 
-          {/* Header */}
-          <motion.div
-            custom={0}
-            variants={FADE_UP}
-            initial={headerInitial}
-            animate="visible"
-            className="mt-8"
-          >
+            <div className="mt-8">
             <div className="flex flex-wrap items-center gap-3">
               <span
                 className="palette-pill rounded-full border px-3 py-1 font-mono text-xs font-medium"
@@ -214,11 +109,11 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
                 {caseStudy.era}
               </span>
               <span className="flex items-center gap-1.5 text-xs text-text-tertiary">
-                <Calendar size={12} />
+                <Calendar size={12} aria-hidden="true" />
                 {caseStudy.timeline}
               </span>
               {caseStudy.status === 'in-progress' && (
-                <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
                   {caseStudy.statusLabel ?? 'In Productionization'}
                 </span>
               )}
@@ -232,18 +127,11 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             <p className="mt-4 max-w-2xl text-lg text-text-secondary">
               {project.caption}
             </p>
-          </motion.div>
+          </div>
 
-          <CaseStudyTOCMobile showSequencing={hasSequencing} />
+          <CaseStudyTOCMobile sections={tocSections} />
 
-          {/* Key stats */}
-          <motion.div
-            custom={1}
-            variants={FADE_UP}
-            initial={headerInitial}
-            animate="visible"
-            className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4"
-          >
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
             <div className="rounded-lg border border-border-subtle bg-surface p-4">
               <span className="font-mono text-xl font-bold text-accent">
                 {project.heroMetric.value}
@@ -252,190 +140,68 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
             </div>
             <div className="rounded-lg border border-border-subtle bg-surface p-4">
               <span className="flex items-center gap-1.5 font-mono text-sm font-bold text-accent">
-                <Briefcase size={14} />
+                <Briefcase size={14} aria-hidden="true" />
                 Role
               </span>
               <p className="mt-1 text-xs text-text-tertiary">{project.role}</p>
             </div>
-            {project.stack.slice(0, 2).map((tech) => (
-              <div key={tech} className="rounded-lg border border-border-subtle bg-surface p-4">
-                <span className="font-mono text-sm font-bold text-accent">{tech}</span>
-                <p className="mt-1 text-xs text-text-tertiary">Core Technology</p>
-              </div>
-            ))}
-          </motion.div>
+          </div>
 
-          {/* TL;DR — 3-bullet summary for skimmers / exec audience.
-              Rendered only when caseStudy.tldr is populated. */}
-          {caseStudy.tldr && (
-            <motion.div
-              custom={2}
-              variants={FADE_UP}
-              initial={headerInitial}
-              animate="visible"
-              className="mt-10 rounded-xl border border-border-subtle bg-surface/50 p-6"
-            >
-              <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-text-tertiary">
-                TL;DR
-              </p>
-              <dl className="grid gap-5 sm:grid-cols-3 sm:gap-6">
-                <div>
-                  <dt className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">
-                    Problem
-                  </dt>
-                  <dd className="mt-2 text-sm leading-relaxed text-text-secondary">
-                    {caseStudy.tldr.problem}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">
-                    Decision
-                  </dt>
-                  <dd className="mt-2 text-sm leading-relaxed text-text-secondary">
-                    {caseStudy.tldr.decision}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-mono text-xs font-semibold uppercase tracking-wider text-accent">
-                    Impact
-                  </dt>
-                  <dd className="mt-2 text-sm leading-relaxed text-text-secondary">
-                    {caseStudy.tldr.impact}
-                  </dd>
-                </div>
-              </dl>
-            </motion.div>
-          )}
-
-          {/* Context */}
-          <Section id="context" title="Context">
-            <p>{sections.context}</p>
-          </Section>
-
-          {/* Sequencing — strategic-judgment paragraph contextualizing this
-              project within the broader portfolio arc. Optional. */}
-          {caseStudy.sequencing && (
-            <Section id="sequencing" title="Sequencing">
-              <p>{caseStudy.sequencing}</p>
+          {narrative.problem && (
+            <Section id="problem" title="Problem and context" aliases={['context', 'challenge']}>
+              <p>{narrative.problem}</p>
             </Section>
           )}
 
-          {/* My Role */}
-          <Section id="my-role" title="My Role">
-            <p>{sections.myRole}</p>
-          </Section>
+          {narrative.contribution && (
+            <Section id="contribution" title="Contribution and collaborators" aliases={['my-role', 'stakeholders']}>
+              <p>{narrative.contribution}</p>
+            </Section>
+          )}
 
-          {/* Stakeholders */}
-          <Section id="stakeholders" title="Stakeholders">
-            <p>{sections.stakeholders}</p>
-          </Section>
+          {narrative.decision && (
+            <Section id="decision" title="Decision and trade-off" aliases={['options']}>
+              <p>{narrative.decision.selectedApproach}</p>
+              {narrative.decision.strongestAlternative && (
+                <p>
+                  <span className="font-medium text-text-primary">Strongest alternative: </span>
+                  {narrative.decision.strongestAlternative}
+                </p>
+              )}
+              {narrative.decision.crux && (
+                <p>
+                  <span className="font-medium text-text-primary">Why this boundary: </span>
+                  {narrative.decision.crux}
+                </p>
+              )}
+              {narrative.decision.residualRisk && (
+                <p>
+                  <span className="font-medium text-text-primary">Residual risk: </span>
+                  {narrative.decision.residualRisk}
+                </p>
+              )}
+            </Section>
+          )}
 
-          {/* The Challenge */}
-          <Section id="challenge" title="The Challenge">
-            <p>{sections.challenge}</p>
-          </Section>
-
-          {/* Options Considered */}
-          <Section id="options" title="Options Considered">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {sections.optionsConsidered.map((opt, i) => (
-                <motion.div
-                  key={opt.option}
-                  initial={false}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
-                  transition={{ delay: i * 0.08, duration: 0.4 }}
-                  className={`rounded-lg border p-4 transition-colors ${
-                    opt.chosen
-                      ? 'border-accent/40 bg-accent-muted'
-                      : 'border-border-subtle bg-surface'
-                  }`}
-                >
-                  <div className="flex items-start gap-2">
-                    {opt.chosen ? (
-                      <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-accent" />
-                    ) : (
-                      <XCircle size={16} className="mt-0.5 shrink-0 text-text-tertiary" />
-                    )}
-                    <div>
-                      <p className="text-xs font-semibold text-text-primary">
-                        {opt.option}
-                        {opt.chosen && (
-                          <span className="ml-2 rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-medium text-accent">
-                            Chosen
-                          </span>
-                        )}
-                      </p>
-                      <p className="mt-2 text-[11px] leading-relaxed text-text-secondary">
-                        {opt.prosAndCons}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
-
-          {/* The Decision */}
-          <Section id="decision" title="The Decision">
-            <p>{sections.decision}</p>
-          </Section>
-
-          {/* Architecture Diagram */}
-          <Section id="architecture" title="Architecture">
+          <Section id="how-it-works" title={caseStudy.figureHeading ?? 'How it works'} aliases={['architecture', 'implementation']}>
+            {narrative.mechanism && <p>{narrative.mechanism}</p>}
             {diagram}
           </Section>
 
-          {/* Implementation */}
-          <Section id="implementation" title="Implementation">
-            <p>{sections.implementation}</p>
-          </Section>
-
-          {/* Impact */}
-          <Section id="impact" title="Impact">
-            <p>{sections.impact}</p>
-          </Section>
-
-          {/* In Production */}
-          <Section id="in-production" title="In Production">
-            <p>{sections.inProduction}</p>
-          </Section>
-
-          {/* Leadership Moment — only if present */}
-          {caseStudy.leadershipCallout && (
-            <motion.div
-              initial={false}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
-              transition={{ duration: 0.6 }}
-              className="mt-16 rounded-lg border border-amber-500/20 bg-amber-500/5 p-6"
-            >
-              <div className="flex items-start gap-3">
-                <Lightbulb size={18} className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
-                <div>
-                  <p className="text-sm font-medium text-text-primary">Leadership Moment</p>
-                  <p className="mt-2 text-sm leading-relaxed text-text-secondary">
-                    {caseStudy.leadershipCallout}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
+          {narrative.outcomeAndState && (
+            <Section id="outcome" title="Outcome and operating state" aliases={['impact', 'in-production']}>
+              <p>{narrative.outcomeAndState}</p>
+            </Section>
           )}
 
-          {/* Lessons Learned */}
-          <Section id="lessons" title="Lessons Learned">
-            <p>{sections.lessonsLearned}</p>
-          </Section>
+          {narrative.limits && (
+            <Section id="limits" title="What remains bounded" aliases={['lessons']}>
+              <p>{narrative.limits}</p>
+            </Section>
+          )}
 
-          {/* Tech Stack */}
-          <motion.div
-            initial={false}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mt-16"
-          >
-            <h2 className="text-xl font-bold text-text-primary">Tech Stack</h2>
+          <section className="mt-16">
+            <h2 className="text-xl font-bold text-text-primary">Selected tools</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {project.stack.map((tech) => (
                 <span
@@ -446,18 +212,11 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
                 </span>
               ))}
             </div>
-          </motion.div>
+          </section>
 
-          {/* Blog post CTAs: technical note plus an optional builder story. */}
-          {(showFormalBlogCta || showCompanionBlogCta) && (
-            <motion.div
-              initial={false}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true, amount: 0.1, margin: '200px 0px' }}
-              transition={{ duration: 0.6 }}
-              className="mt-16 mb-12 grid gap-4 sm:grid-cols-2"
-            >
-              {showFormalBlogCta && caseStudy.blogPostSlug && (
+          {(showTechnicalBlogCta || showCompanionBlogCta) && (
+            <div className="mt-16 mb-12 grid gap-4 sm:grid-cols-2">
+              {showTechnicalBlogCta && caseStudy.blogPostSlug && (
                 <div className="rounded-lg border border-accent/20 bg-accent-muted p-6">
                   <p className="text-sm font-medium text-text-primary">Mechanism and failure paths</p>
                   <p className="mt-2 text-sm text-text-secondary">
@@ -468,26 +227,26 @@ export default function CaseStudyLayout({ project, caseStudy, diagram, showForma
                     className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-text-primary"
                   >
                     Read the technical note
-                    <ArrowRight size={14} />
+                    <ArrowRight size={14} aria-hidden="true" />
                   </Link>
                 </div>
               )}
               {showCompanionBlogCta && caseStudy.companionBlogPostSlug && (
                 <div className="rounded-lg border border-border-subtle bg-surface/50 p-6">
-                  <p className="text-sm font-medium text-text-primary">Decisions and delivery</p>
+                  <p className="text-sm font-medium text-text-primary">Build story</p>
                   <p className="mt-2 text-sm text-text-secondary">
-                    Why the choices were made, what they cost, and how the work reached production.
+                    How the work took shape through its sequence, contributors, turning points, and route to production.
                   </p>
                   <Link
                     href={`/blog/${caseStudy.companionBlogPostSlug}`}
                     className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent transition-colors hover:text-text-primary"
                   >
-                    Read the delivery story
-                    <ArrowRight size={14} />
+                    Read the builder story
+                    <ArrowRight size={14} aria-hidden="true" />
                   </Link>
                 </div>
               )}
-            </motion.div>
+            </div>
           )}
           </div>
         </div>

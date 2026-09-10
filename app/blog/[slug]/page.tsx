@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { POSTS, isPostPublic } from '@/data/posts';
+import { PERSON_NAME, SITE_URL, SOCIAL_IMAGE_PATH } from '@/data/site';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import BlogPostShell from '@/components/blog/BlogPostShell';
 
-const SITE_URL = 'https://rogerthatroach.github.io';
 const MAX_META_DESCRIPTION_LENGTH = 160;
 
 function truncateDescription(text: string): string {
@@ -39,20 +39,20 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
       title: post.meta.title,
       description,
       url: `/blog/${params.slug}`,
-      siteName: 'Harmilap Singh Dhaliwal',
+      siteName: PERSON_NAME,
       locale: 'en_US',
       type: 'article',
       publishedTime: post.meta.date,
       modifiedTime: post.meta.updated ?? post.meta.date,
-      authors: ['Harmilap Singh Dhaliwal'],
+      authors: [PERSON_NAME],
       tags: post.meta.tags,
-      images: ['/og-image.png'],
+      images: [SOCIAL_IMAGE_PATH],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.meta.title,
       description,
-      images: ['/og-image.png'],
+      images: [SOCIAL_IMAGE_PATH],
     },
   };
 }
@@ -62,7 +62,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 // the single Person entity by @id (defined in app/layout.tsx).
 function blogPostingJsonLd(slug: string) {
   const post = POSTS.find((p) => p.meta.slug === slug);
-  if (!post) return null;
+  if (!post || !isPostPublic(post)) return null;
   const url = `${SITE_URL}/blog/${slug}`;
   return {
     '@context': 'https://schema.org',
@@ -71,11 +71,11 @@ function blogPostingJsonLd(slug: string) {
     description: post.meta.abstract,
     datePublished: post.meta.date,
     dateModified: post.meta.updated ?? post.meta.date,
-    author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: 'Harmilap Singh Dhaliwal' },
+    author: { '@type': 'Person', '@id': `${SITE_URL}/#person`, name: PERSON_NAME },
     keywords: post.meta.tags.join(', '),
     url,
     mainEntityOfPage: url,
-    image: `${SITE_URL}/og-image.png`,
+    image: `${SITE_URL}${SOCIAL_IMAGE_PATH}`,
     inLanguage: 'en',
   };
 }
@@ -83,7 +83,7 @@ function blogPostingJsonLd(slug: string) {
 export default async function BlogPostPage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params;
   const post = POSTS.find((p) => p.meta.slug === params.slug);
-  if (!post) notFound();
+  if (!post || !isPostPublic(post)) notFound();
 
   const jsonLd = blogPostingJsonLd(params.slug);
 

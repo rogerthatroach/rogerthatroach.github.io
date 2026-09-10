@@ -20,23 +20,23 @@ export default function ProjectsHybridTable({
   return (
     <>
       {/* Desktop — real HTML table */}
-      <div className="mt-8 hidden md:block">
+      <div className="mt-8 hidden lg:block">
         <table className="w-full border-collapse text-left">
           <thead>
             <tr className="border-b border-border-subtle">
-              <th scope="col" className="pb-3 pr-6 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
+              <th scope="col" className="pb-3 pr-6 font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
                 Year
               </th>
-              <th scope="col" className="pb-3 pr-6 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
+              <th scope="col" className="pb-3 pr-6 font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
                 Era
               </th>
-              <th scope="col" className="pb-3 pr-6 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
+              <th scope="col" className="pb-3 pr-6 font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
                 Project
               </th>
-              <th scope="col" className="pb-3 pr-6 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
+              <th scope="col" className="pb-3 pr-6 font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
                 Role
               </th>
-              <th scope="col" className="pb-3 text-right font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
+              <th scope="col" className="pb-3 text-right font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
                 Outcome
               </th>
             </tr>
@@ -52,7 +52,7 @@ export default function ProjectsHybridTable({
                 </td>
                 <td className="py-4 pr-6 align-top">
                   <span
-                    className="palette-pill inline-block whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[10px] font-medium"
+                    className="palette-pill inline-block whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium"
                     style={paletteStyle(project.palette)}
                   >
                     {caseStudy.era}
@@ -81,7 +81,7 @@ export default function ProjectsHybridTable({
                         {project.heroMetric.value}
                       </span>
                       <span className="sr-only"> — </span>
-                      <span className="block whitespace-nowrap text-[10px] text-text-tertiary">
+                      <span className="block whitespace-nowrap text-xs text-text-tertiary">
                         {project.heroMetric.label}
                       </span>
                     </div>
@@ -99,7 +99,7 @@ export default function ProjectsHybridTable({
       </div>
 
       {/* Mobile — stacked cards keep the palette colors prominent */}
-      <ul className="mt-8 space-y-3 md:hidden">
+      <ul className="mt-8 space-y-3 lg:hidden">
         {rows.map(({ project, caseStudy }) => (
           <li key={project.id}>
             <Link
@@ -108,12 +108,12 @@ export default function ProjectsHybridTable({
             >
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <span
-                  className="palette-pill inline-block rounded-full border px-2.5 py-0.5 text-[10px] font-medium"
+                  className="palette-pill inline-block rounded-full border px-2.5 py-0.5 text-xs font-medium"
                   style={paletteStyle(project.palette)}
                 >
                   {caseStudy.era}
                 </span>
-                <span className="font-mono text-[10px] text-text-tertiary">
+                <span className="font-mono text-xs text-text-tertiary">
                   {caseStudy.timeline}
                 </span>
               </div>
@@ -123,7 +123,7 @@ export default function ProjectsHybridTable({
               <p className="mt-0.5 text-xs text-text-tertiary">
                 {project.subtitle}
               </p>
-              <p className="mt-2 text-[11px] leading-relaxed text-text-secondary">
+              <p className="mt-2 text-xs leading-relaxed text-text-secondary">
                 {project.role}
               </p>
               <div className="mt-3 flex items-baseline gap-2 border-t border-border-subtle pt-3">
@@ -134,7 +134,7 @@ export default function ProjectsHybridTable({
                   {project.heroMetric.value}
                 </span>
                 <span className="sr-only"> — </span>
-                <span className="text-[11px] text-text-tertiary">
+                <span className="text-xs text-text-tertiary">
                   {project.heroMetric.label}
                 </span>
               </div>

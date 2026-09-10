@@ -45,7 +45,7 @@ export default function LayeredReveal({
   return (
     <figure className="my-10 not-prose">
       {label && (
-        <p className="mb-5 font-mono text-[10px] uppercase tracking-widest text-accent">
+        <p className="mb-5 font-mono text-xs uppercase tracking-widest text-accent">
           {label}
         </p>
       )}
@@ -100,7 +100,7 @@ function LayerPanel({
         </h3>
         <span
           aria-hidden="true"
-          className="font-mono text-[10px] text-text-tertiary"
+          className="font-mono text-xs text-text-tertiary"
           style={layer.accent ? { color: layer.accent } : undefined}
         >
           Layer {index + 1} / {total}

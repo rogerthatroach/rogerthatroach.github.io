@@ -94,7 +94,7 @@ function Section({ id, group, isOpen, onToggle }: SectionProps) {
         >
           {accent && (
             <p
-              className="font-mono text-[10px] font-semibold uppercase tracking-widest"
+              className="font-mono text-xs font-semibold uppercase tracking-widest"
               style={{ color: accent.dark }}
             >
               <span className="sr-only">{accent.label}</span>

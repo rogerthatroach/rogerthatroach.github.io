@@ -80,21 +80,16 @@ export default function TableOfContents() {
     return () => observerRef.current?.disconnect();
   }, [headings]);
 
-  const handleClick = (e: React.MouseEvent, id: string) => {
-    e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
   if (headings.length === 0) return null;
 
   return (
     <nav
+      aria-label="On this page"
       className="fixed top-28 hidden w-52 2xl:block"
       style={{ left: 'max(1rem, calc((100vw - 64rem) / 2 - 14rem))' }}
     >
       <div className="max-h-[calc(100vh-8rem)] overflow-y-auto border-l border-border-subtle pl-4">
-        <p className="mb-3 font-mono text-[10px] font-semibold uppercase tracking-widest text-text-tertiary">
+        <p className="mb-3 font-mono text-xs font-semibold uppercase tracking-widest text-text-tertiary">
           Contents
         </p>
         <ul>
@@ -102,9 +97,8 @@ export default function TableOfContents() {
             <li key={h.id}>
               <a
                 href={`#${h.id}`}
-                onClick={(e) => handleClick(e, h.id)}
                 className={cn(
-                  'block py-1.5 text-[11px] leading-snug transition-colors duration-150',
+                  'flex min-h-11 items-center py-2 text-xs leading-snug transition-colors duration-150',
                   h.level === 3 ? 'pl-3' : '',
                   activeId === h.id
                     ? 'font-medium text-accent'

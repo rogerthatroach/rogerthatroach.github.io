@@ -1,6 +1,5 @@
 import type { BlogPostMeta } from '@/data/posts';
 import { POSTS } from '@/data/posts';
-import { CASE_STUDIES } from '@/data/projectCaseStudies';
 import { PROJECTS } from '@/data/projects';
 import PostLayout from './PostLayout';
 
@@ -16,13 +15,13 @@ const POST_LOADERS: Record<string, () => Promise<PostModule>> = {
   'closed-loop': () => import('@/data/posts/closed-loop.mdx'),
   'enterprise-agentic-ai-architecture': () => import('@/data/posts/enterprise-agentic-ai.mdx'),
   'enterprise-agentic-ai-framework': () => import('@/data/posts/enterprise-agentic-ai-framework.mdx'),
-  'funding-request-drafting-platform-building': () => import('@/data/posts/funding-request-drafting-platform-building.mdx'),
+  'project-approval-drafting-platform-building': () => import('@/data/posts/project-approval-drafting-platform-building.mdx'),
   'commodity-tax-cfo-trust': () => import('@/data/posts/commodity-tax-cfo-trust.mdx'),
   'commodity-tax-cfo-trust-framework': () => import('@/data/posts/commodity-tax-cfo-trust-framework.mdx'),
-  'workforce-analytics-llm-as-router': () => import('@/data/posts/workforce-analytics-llm-as-router.mdx'),
-  'workforce-analytics-routing-framework': () => import('@/data/posts/workforce-analytics-routing-framework.mdx'),
-  'financial-benchmarking-refactor-velocity': () => import('@/data/posts/financial-benchmarking-refactor-velocity.mdx'),
-  'financial-benchmarking-decomposition-framework': () => import('@/data/posts/financial-benchmarking-decomposition-framework.mdx'),
+  'workforce-analytics-model-boundary': () => import('@/data/posts/workforce-analytics-llm-as-router.mdx'),
+  'workforce-analytics-boundary-decisions': () => import('@/data/posts/workforce-analytics-routing-framework.mdx'),
+  'financial-benchmarking-refactor': () => import('@/data/posts/financial-benchmarking-refactor-velocity.mdx'),
+  'financial-benchmarking-query-decisions': () => import('@/data/posts/financial-benchmarking-decomposition-framework.mdx'),
   'commodity-tax-provenance': () => import('@/data/posts/commodity-tax-provenance.mdx'),
 };
 
@@ -35,14 +34,13 @@ export default async function BlogPostShell({ slug, meta }: BlogPostShellProps) 
   const loadContent = POST_LOADERS[slug];
   const post = POSTS.find((p) => p.meta.slug === slug);
 
-  // Find the case study that links to this blog post via either the
-  // canonical technical post (blogPostSlug) or the practitioner companion
-  // (companionBlogPostSlug). Both reader paths link back to the same case study.
-  const caseStudy = CASE_STUDIES.find(
-    (cs) => cs.blogPostSlug === slug || cs.companionBlogPostSlug === slug,
-  );
-  const project = caseStudy ? PROJECTS.find((p) => p.id === caseStudy.projectId) : undefined;
-  const relatedProject = project && caseStudy
+  // Every register carries its canonical project id in post metadata. Use it
+  // directly so technical, practitioner, and builder routes all expose the
+  // same project relationship.
+  const project = meta.projectId
+    ? PROJECTS.find((candidate) => candidate.id === meta.projectId)
+    : undefined;
+  const relatedProject = project
     ? { title: project.title, path: `/projects/${project.id}` }
     : undefined;
 

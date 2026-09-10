@@ -33,16 +33,16 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
       >
         <div className="flex items-center gap-3">
           <span
-            className="palette-pill rounded-full border px-2.5 py-0.5 text-[10px] font-medium"
+            className="palette-pill rounded-full border px-2.5 py-0.5 text-xs font-medium"
             style={paletteStyle(project.palette)}
           >
             {caseStudy.era}
           </span>
-          <span className="font-mono text-[10px] text-text-tertiary">
+          <span className="font-mono text-xs text-text-tertiary">
             {caseStudy.timeline}
           </span>
           {caseStudy.status === 'in-progress' && (
-            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+            <span className="rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
               {caseStudy.statusLabel ?? 'In Productionization'}
             </span>
           )}
@@ -72,7 +72,7 @@ export default function ProjectCard({ project, caseStudy, index }: ProjectCardPr
           {project.stack.slice(0, 3).map((tech) => (
             <span
               key={tech}
-              className="palette-border rounded-full border px-2 py-0.5 text-[10px]"
+              className="palette-border rounded-full border px-2 py-0.5 text-xs"
               style={paletteStyle(project.palette)}
             >
               {tech}

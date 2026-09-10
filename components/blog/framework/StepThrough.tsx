@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
  * Usage:
  *
  *   <StepThrough
- *     label="Drafting a new PAR"
+ *     label="Drafting a new project funding request"
  *     steps={[
  *       { title: 'User intent', content: <>...</> },
  *       { title: 'Template match', content: <>...</> },
@@ -42,6 +42,7 @@ export default function StepThrough({
 }) {
   const [idx, setIdx] = useState(0);
   const panelId = useId();
+  const figureLabelId = useId();
   const reduceMotion = useReducedMotion();
   const current = steps[idx];
   const total = steps.length;
@@ -50,14 +51,15 @@ export default function StepThrough({
   const next = () => setIdx((i) => Math.min(total - 1, i + 1));
 
   return (
-    <figure className="my-8 not-prose">
-      {label && (
-        <p className="mb-3 font-mono text-xs uppercase tracking-widest text-accent">
-          {label}
-        </p>
-      )}
+    <figure className="my-8 not-prose" aria-labelledby={figureLabelId}>
+      <figcaption
+        id={figureLabelId}
+        className={label ? 'mb-3 font-mono text-xs uppercase tracking-widest text-accent' : 'sr-only'}
+      >
+        {label ?? 'Step-by-step explanation'}
+      </figcaption>
 
-      <div className="overflow-hidden rounded-xl border border-border-subtle bg-surface/40 p-5 md:p-6">
+      <div className="step-through-interactive overflow-hidden rounded-xl border border-border-subtle bg-surface/40 p-5 md:p-6 print:hidden">
         {/* Step header — title + progress */}
         <div className="mb-4 flex items-baseline justify-between gap-3">
           <div>
@@ -163,6 +165,28 @@ export default function StepThrough({
           </button>
         </div>
       </div>
+
+      {steps.length > 0 && (
+        <div className="step-through-print hidden rounded-xl border border-border-subtle bg-surface/40 p-5 print:block md:p-6">
+          <ol className="space-y-5">
+            {steps.map((step, stepIndex) => (
+              <li key={`${step.title}-print-${stepIndex}`}>
+                <h3 className="text-base font-semibold text-text-primary">
+                  Step {stepIndex + 1}: {step.title}
+                </h3>
+                {step.caption && (
+                  <p className="mt-0.5 text-xs text-text-tertiary">
+                    {step.caption}
+                  </p>
+                )}
+                <div className="mt-2 text-sm leading-relaxed text-text-secondary">
+                  {step.content}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
       {steps.length > 1 && (
         <noscript>

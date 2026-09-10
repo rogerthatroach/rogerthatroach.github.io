@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Clock, Calendar, FolderOpen } from 'lucide-react';
+import { ArrowRight, Clock, Calendar, FolderOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { BlogPostMeta, Reference, FurtherReadingItem } from '@/data/posts';
 import ReferenceList from './ReferenceList';
@@ -9,6 +9,8 @@ import FurtherReading from './FurtherReading';
 import TableOfContents from './TableOfContents';
 import ScrollProgressRail from '@/components/ui/ScrollProgressRail';
 import { useHasNavigated } from '@/lib/useHasNavigated';
+import PreviousPathLink from '@/components/navigation/PreviousPathLink';
+import { DETAIL_RETURN_FALLBACKS } from '@/data/nav';
 
 interface RelatedProject {
   title: string;
@@ -55,22 +57,11 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] as const }}
       className="mx-auto max-w-content px-6 pb-16 pt-28 md:px-16"
     >
-      {/* Back links */}
-      <div className="mb-8 flex items-center gap-4">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-sm text-text-tertiary transition-colors hover:text-accent"
-        >
-          <ArrowLeft size={16} />
-          Home
-        </Link>
-        <span className="text-text-tertiary/40">/</span>
-        <Link
-          href="/blog"
-          className="text-sm text-text-tertiary transition-colors hover:text-accent"
-        >
-          Writings
-        </Link>
+      <div className="mb-8">
+        <PreviousPathLink
+          fallbackHref={DETAIL_RETURN_FALLBACKS.blog.href}
+          fallbackLabel={DETAIL_RETURN_FALLBACKS.blog.label}
+        />
       </div>
 
       {/* Header */}
@@ -115,10 +106,9 @@ export default function PostLayout({ meta, references = [], furtherReading = [],
           </Link>
         )}
 
-        {/* Abstract */}
+        {/* Summary */}
         <div className="mt-8 rounded-lg border-l-2 border-accent bg-surface/50 px-5 py-4">
-          <p className="text-sm font-semibold text-text-secondary">Abstract</p>
-          <p className="mt-2 text-base leading-relaxed text-text-secondary">{meta.abstract}</p>
+          <p className="text-base leading-relaxed text-text-secondary">{meta.abstract}</p>
         </div>
       </header>
 

@@ -42,18 +42,18 @@ export default function PostCard({ post, index }: PostCardProps) {
         {post.register && (
           <div
             aria-label={`Register: ${REGISTER_MARK[post.register].label}`}
-            className="pointer-events-none absolute right-3 top-3 flex items-baseline gap-1 text-text-tertiary/70 transition-colors group-hover:text-text-tertiary"
+            className="pointer-events-none mb-2 flex items-baseline gap-1 self-end text-text-tertiary/70 transition-colors group-hover:text-text-tertiary"
           >
             <span className="font-display text-sm leading-none" aria-hidden="true">
               {REGISTER_MARK[post.register].glyph}
             </span>
-            <span className="font-mono text-[8px] uppercase tracking-[0.16em]">
+            <span className="font-mono text-xs uppercase tracking-[0.12em]">
               {REGISTER_MARK[post.register].label}
             </span>
           </div>
         )}
 
-        <h2 className="line-clamp-2 pr-16 text-sm font-semibold text-text-primary transition-colors group-hover:text-accent sm:text-base">
+        <h2 className="line-clamp-2 text-sm font-semibold text-text-primary transition-colors group-hover:text-accent sm:text-base">
           {post.title}
         </h2>
         <p className="mt-1 line-clamp-2 text-xs text-text-secondary">{post.subtitle}</p>
@@ -62,14 +62,14 @@ export default function PostCard({ post, index }: PostCardProps) {
           {post.tags.slice(0, 2).map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-accent-muted px-2 py-0.5 text-[10px] text-accent"
+              className="rounded-full bg-accent-muted px-2 py-0.5 text-xs text-accent"
             >
               {tag}
             </span>
           ))}
         </div>
 
-        <div className="mt-auto flex items-center justify-between pt-3 text-[11px] text-text-tertiary">
+        <div className="mt-auto flex items-center justify-between pt-3 text-xs text-text-tertiary">
           <div className="flex items-center gap-2.5">
             <span className="flex items-center gap-1">
               <Calendar size={11} />

@@ -32,7 +32,7 @@ export default function DecisionRationale({
       aria-label={`Decision rationale: ${option}`}
     >
       <div className="mb-3 flex items-center gap-2">
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-widest text-accent">
+        <span className="font-mono text-xs font-semibold uppercase tracking-widest text-accent">
           Decision
         </span>
         <ArrowRight size={12} className="text-accent" aria-hidden="true" />

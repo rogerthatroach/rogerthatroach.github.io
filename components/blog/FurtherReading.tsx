@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { FurtherReadingItem } from '@/data/posts';
 
 interface FurtherReadingProps {
@@ -13,14 +14,23 @@ export default function FurtherReading({ items }: FurtherReadingProps) {
       <ul className="space-y-3">
         {items.map((item) => (
           <li key={item.url}>
-            <a
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-accent underline-offset-2 hover:underline"
-            >
-              {item.title}
-            </a>
+            {item.url.startsWith('/') ? (
+              <Link
+                href={item.url}
+                className="text-sm font-medium text-accent underline-offset-2 hover:underline"
+              >
+                {item.title}
+              </Link>
+            ) : (
+              <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-accent underline-offset-2 hover:underline"
+              >
+                {item.title}
+              </a>
+            )}
             <p className="mt-0.5 text-sm text-text-tertiary">{item.description}</p>
           </li>
         ))}

@@ -6,9 +6,9 @@ const DIAGRAM_LOADERS: Record<string, () => Promise<DiagramModule>> = {
   'combustion-tuning': () => import('@/components/diagrams/CombustionDiagram'),
   'document-intelligence': () => import('@/components/diagrams/DocumentIntelligenceDiagram'),
   'commodity-tax': () => import('@/components/diagrams/CommodityTaxDiagram'),
-  'financialBenchmarking': () => import('@/components/diagrams/FinancialBenchmarkingDiagram'),
-  'workforceAnalytics': () => import('@/components/diagrams/WorkforceAnalyticsDiagram'),
-  'funding-request-drafting': () => import('@/components/diagrams/FundingRequestDiagram'),
+  'financial-peer-benchmarking': () => import('@/components/diagrams/FinancialBenchmarkingDiagram'),
+  'workforce-analytics': () => import('@/components/diagrams/WorkforceAnalyticsDiagram'),
+  'project-approval-drafting': () => import('@/components/diagrams/FundingRequestDraftingDiagram'),
 };
 
 export default async function ProjectDiagram({ slug }: { slug: string }) {
