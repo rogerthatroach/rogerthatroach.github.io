@@ -1,6 +1,9 @@
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
-import { WorkforceAnalyticsCaseOverviewFigure } from '@/components/visualizations/workforceAnalytics';
-import { WORKFORCE_ANALYTICS_CASE_INTRO, WORKFORCE_ANALYTICS_CASE_OVERVIEW } from '@/data/visualizations/workforceAnalytics';
+import { WorkforceAnalyticsCaseOverviewFigure } from '@/components/visualizations/workforce-analytics';
+import {
+  WORKFORCE_ANALYTICS_CASE_INTRO,
+  WORKFORCE_ANALYTICS_CASE_OVERVIEW,
+} from '@/data/visualizations/workforceAnalytics';
 
 export default function WorkforceAnalyticsDiagram() {
   return (

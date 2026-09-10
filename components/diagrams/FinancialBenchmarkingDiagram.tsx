@@ -1,5 +1,5 @@
 import VisualizationContainer from '@/components/blog/VisualizationContainer';
-import { FinancialBenchmarkingCaseSpineFigure } from '@/components/visualizations/financialBenchmarking';
+import { FinancialBenchmarkingCaseSpineFigure } from '@/components/visualizations/financial-benchmarking';
 import { FINANCIAL_BENCHMARKING_CASE_SPINE } from '@/data/visualizations/financialBenchmarking';
 
 export default function FinancialBenchmarkingDiagram() {
