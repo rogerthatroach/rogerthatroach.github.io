@@ -1,78 +1,61 @@
 import { CommodityTaxProcessContrastFigure, CommodityTaxTrustLoopFigure } from '@/components/visualizations/commodity-tax'
-import VisualizationContainer from '@/components/blog/VisualizationContainer';
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import { COMMODITY_TAX_BUILDER_CONTRAST, COMMODITY_TAX_BUILDER_LOOP } from '@/data/visualizations/commodityTax'
 
-In September 2022 I joined RBC&rsquo;s CFO Group as a Senior Data Scientist. Nobody had asked me to build AI. I was hired to help automate the Commodity Tax return process, a manual workflow that consumed finance analysts for months per cycle.
+My first delivery in RBC&rsquo;s CFO Group reduced a months-long Commodity Tax process to roughly 90 minutes. The work supported an allocation of roughly $600M and received a CFO Group RBC Quarterly Team Award in Q4 2023.
 
-By Q4 2023, the process took 90 minutes. The metric earned a CFO Group RBC Quarterly Team Award. More importantly, it earned the credibility to propose FinancialBenchmarking, WorkforceAnalytics, and eventually AI/LLM Drafting Platform, a cascade that shaped the next three years.
+The result mattered. The way the finance team could question it mattered just as much.
 
-This is the story of how automating a tax process became a stakeholder-trust project in disguise, and the architectural decision that made it land. The strategy compresses into one move: when an analyst questions a number, make the recorded path available for joint inspection instead of asking them to accept a final output on faith.
+Commodity Tax was a data and process-automation problem, not an AI project. Its central design decision was to build calculation and inspection together: PySpark performed the governed transformation, while configured Tableau views gave analysts a practical place to investigate a questioned value, reconcile a mapping, and review a rerun.
 
-## The problem
+## The first assignment
 
-Commodity tax returns at a major Canadian bank are not small paperwork. Finance teams pull transactions from General Ledger journals (~10&ndash;50 million rows per cycle), reconcile them against tax categories, and produce returns that reach CFO-level sign-off. The total tax allocation runs to roughly $600M per cycle. The process had accumulated years of institutional knowledge: undocumented edge cases, manual overrides, tribal understanding of which GL accounts mapped to which tax buckets.
+I joined the CFO Group in September 2022 as a Senior Data Scientist. The Commodity Tax workflow moved through General Ledger extraction, reconciliation, category mapping, aggregation, and return preparation. Much of the process depended on spreadsheets, manual handoffs, and mappings whose exceptions were understood by experienced finance partners.
 
-Automating it wasn&rsquo;t &ldquo;wrap a Python script around Excel.&rdquo; It meant codifying tribal knowledge without breaking anyone&rsquo;s trust in the numbers.
+Automating that workflow required more than translating formulas into code. A mapping could be mechanically consistent and still misrepresent the business rule. A clean aggregate could still inherit a missing source record. The system had to make the calculation repeatable while preserving a route for the people who owned the process to challenge it.
 
-## First project, first audition
+That made the collaboration model part of the architecture. I led development and stakeholder engagement, working with finance partners who supplied the meaning of categories and exceptions. The delivery team turned those decisions into reviewed mappings and transformations. Analysts remained responsible for investigating anomalies and approving corrections.
 
-When you join an organization as the AI person and your first assignment is process automation, there are two ways to read it. You can treat it as a detour: &ldquo;I&rsquo;ll do this so I can get to the real AI work.&rdquo; Or you can treat it as an audition.
+## Calculation and inspection were one design problem
 
-I treated it as an audition. Finance leaders were not going to green-light a machine-learning platform for CFO-level decisions on the strength of my CV. They were going to green-light it on the strength of my first delivery.
-
-That framing changed how I built.
-
-## The architecture decision that mattered
-
-The obvious technical stack was straightforward: PySpark on CDP for the extraction (GL journals are too big for pandas at this scale), orchestration around the tax category mappings, output artifacts the finance team could hand off.
-
-The decision that mattered wasn&rsquo;t technical. It was architectural-as-stakeholder-management.
-
-I built Tableau dashboards **not as the calculator, but as configured inspection surfaces beside the pipeline.**
-
-Relevant stages exposed recorded state through Tableau. When a number looked wrong, an authorized analyst could follow an available lineage path toward associated journal rows and see the recorded mapping outcome or version. The views exposed evidence for investigation; they did not validate the source population, mapping logic, joins, or resulting amount.
+The compute path used PySpark to move the process through five conceptual stages: Extract, Reconcile, Category Map, Aggregate, and Return. The inspection path sat beside the relevant stages rather than appearing only after the final artifact.
 
 <VisualizationContainer minHeight={0} caption={COMMODITY_TAX_BUILDER_CONTRAST.caption} className="md:-mx-12 lg:-mx-24" variant="open">
   <CommodityTaxProcessContrastFigure content={COMMODITY_TAX_BUILDER_CONTRAST} />
 </VisualizationContainer>
 
-## Where the approach proved useful
+Keeping calculation and inspection separate prevented the dashboard from becoming a second calculator. Tableau displayed configured views of recorded pipeline state. It could help an authorized analyst inspect an associated mapping or source record where the retained links supported that path. It did not prove that the source population was complete, the mapping rule was correct, or the returned amount deserved approval.
 
-The transparency layer gave analysts and the delivery team a shared review surface. A questioned aggregate could move through inspection, an available recorded path, reconciliation or an approved correction, and a reviewed rerun.
+The inspection surface helped the team ask a better question: where did this value come from, and what evidence is available to investigate it?
+
+## What happened when a number was questioned
+
+A questioned return value did not have to become a debate about the whole pipeline. The analyst could begin with the aggregate, follow the recorded associations that were available, inspect the relevant mapping and source records, and identify whether the issue was data, configuration, or interpretation.
 
 <VisualizationContainer minHeight={0} caption={COMMODITY_TAX_BUILDER_LOOP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
   <CommodityTaxTrustLoopFigure content={COMMODITY_TAX_BUILDER_LOOP} />
 </VisualizationContainer>
 
-The dashboards did not establish correctness on their own: source quality, rule quality, access controls, and complete lineage still mattered. They made an anomaly easier to localize and discuss than a final spreadsheet or PDF would have. By Q4 2023, the cycle took 90 minutes and the work received a CFO Group RBC Quarterly Team Award; the interface was one contributor to the review workflow, not the sole cause of that result.
+If the evidence supported a correction, the governed mapping or source issue could be addressed and the process rerun for review. If the recorded path was incomplete or inconsistent, the right outcome was further investigation rather than a confident explanation.
 
-## The result
+The loop gave finance and engineering a shared object to inspect. Instead of handing over an opaque final number, the delivery team could narrow the disagreement to a stage, mapping, or missing association. That made review more efficient without turning visibility into a correctness guarantee.
 
-- **Months → 90 minutes** per cycle
-- **CFO Group RBC Quarterly Team Award** (Q4 2023)
-- A production pipeline with Tableau dashboards supporting configured monitoring and inspection
-- A finance team that started bringing ideas to the AI team, not the other way around
+## The outcome and its limits
 
-## What I&rsquo;d do differently
+By Q4 2023, the process completed in roughly 90 minutes rather than months. The work received the team award, and the pipeline remained part of the operating process with analysts reviewing and correcting issues where needed.
 
-One scope call I&rsquo;d revisit: the first dashboard set deliberately did not surface the category-mapping rule book. Analysts could follow supported paths from a final number toward associated journal rows, but the *rules* that produced each mapping lived in Python code. Updating a governed rule therefore required a code change and redeploy.
+The outcome came from the full delivery: codified mappings, PySpark processing, configured inspection, finance partnership, testing, and operating review.
 
-In retrospect I&rsquo;d have built a *mapping-rules dashboard* earlier, letting analysts propose rule additions directly while retaining code-review approval before production. That would have turned the mapping layer into a shared, governed surface and reduced coordination and redeployment work. The transparency-as-architecture principle worked for *outputs*; I should have applied it to the *rules* too.
+The recorded path also remained conditional. A join without retained identifiers, a changed rule without the matching version, or an omitted source record could break the investigation trail. The system made supported questions easier to trace; it did not create perfect provenance.
 
-## What this opened
+## What I would change
 
-By the time Commodity Tax was running cleanly, the permission structure inside the CFO Group had shifted. I could propose FinancialBenchmarking v1 (a rules-based benchmarking engine for the Big 6 Canadian banks) and get the air cover to build it. When FinancialBenchmarking v1 shipped, I could propose FinancialBenchmarking v2, the AI-native refactor, and deliver it in two weeks while WorkforceAnalytics productionization was already underway. When WorkforceAnalytics reached production scale, I had the credibility to conceive AI/LLM Drafting Platform, hand the concept to the 2025 Amplify cohort for problem-space ideation, and then build the production platform end-to-end for a full CFO Group launch across all geographies.
+I would expose the governed mapping-rule surface earlier.
 
-Every one of those projects was technically ambitious. None of them would have been greenlit by a new hire with nothing to show for it. Commodity Tax was underwriting every subsequent bet.
+The initial design let analysts inspect supported paths from a returned value toward associated records, but mapping changes still moved through code and redeployment. A reviewed interface for proposing rule changes could have made that collaboration more direct while preserving approval and version control.
 
-## The pattern
+Business users should not edit production rules without controls. A reviewed interface would make the ownership boundary visible: finance proposes or explains the rule, engineering validates the implementation, and the released version remains traceable to both.
 
-Your first project at a new organization isn&rsquo;t just a deliverable. It&rsquo;s the audition that determines which doors open next.
+## What the delivery taught me
 
-The architectural decision (Tableau as a transparency layer, not an output) was the first time I applied a principle I&rsquo;d use in every subsequent system: **the hardest thing in production AI isn&rsquo;t getting the answer right; it&rsquo;s getting the humans who own the decision to trust the system that produced it.**
-
-WorkforceAnalytics&rsquo;s LLM-routes-intent / deterministic-code-handles-calculation separation is a descendant of this idea. FinancialBenchmarking v2&rsquo;s confidence-thresholded clarification is a descendant of this idea. It would rather ask than confidently mis-resolve. AI/LLM Drafting Platform&rsquo;s registered tool path writes structured records for successful field-assignment calls. In regulated production systems, the architecture has to support inspection, testing, and stakeholder review.
-
-Commodity Tax was where I learned that lesson.
-
-The technology changes. The pattern doesn&rsquo;t.
+Commodity Tax was my first substantial delivery in the group. In financial automation, an answer becomes useful when the people accountable for it can inspect the available evidence, challenge the rule, and correct the process without treating the software as an oracle.

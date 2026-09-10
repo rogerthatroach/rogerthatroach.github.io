@@ -1,336 +1,103 @@
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
-import { FinancialBenchmarkingDecisionSpineFigure } from '@/components/visualizations/financialBenchmarking'
-import { FINANCIAL_BENCHMARKING_PRACTITIONER_DECISIONS, FINANCIAL_BENCHMARKING_PRACTITIONER_WALKTHROUGH } from '@/data/visualizations/financialBenchmarking'
-import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
-import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
-import DecisionRationale from '@/components/blog/framework/DecisionRationale'
-import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
-import StepThrough from '@/components/blog/framework/StepThrough'
+import { FinancialBenchmarkingDecisionSpineFigure } from '@/components/visualizations/financial-benchmarking'
+import { FINANCIAL_BENCHMARKING_PRACTITIONER_DECISIONS } from '@/data/visualizations/financialBenchmarking'
 
-Finance analysts ask a question with subtle ambiguity baked in: *"how does our cost-to-income ratio compare against the peer average this quarter?"*, a sentence that can map to different reported KPI definitions across banks. The answer has to resolve to a specific KPI on a reproducible computation path, with the natural-language-to-KPI decision inspectable under audit.
+A natural-language benchmarking system has two different uncertainty problems.
 
-The industry pattern here is straightforward: prompt an LLM with a schema definition and the user&rsquo;s question; let the model emit SQL; run it. Fast to prototype. Easy to demo. Inadequate on its own inside regulated finance: chain-of-thought is not an audit trail; LLM-emitted SQL is not a safety property; *"the model usually gets it right"* is not a confidence interval.
+First, the user&rsquo;s phrase may map to several plausible financial KPIs. Second, even after the KPI is resolved, the system has to construct and execute a query without turning model output into an unrestricted database program.
 
-FinancialBenchmarking went the other way. Five sequential stages give interpretation, retrieval, ambiguity resolution, reviewed query construction, and formatting separate contracts. Model use is bounded to intent parsing and, when needed, candidate comparison. Templates produce SQL; parameters bind values; deterministic code formats the result. This post unpacks the four architectural decisions that separate decomposition-as-guardrail from the single-prompt pattern, with the alternatives that were seriously considered, the constraints each one answered, and the reasoning that produced the call. [Two Weeks, One Refactor](/blog/financial-benchmarking-refactor-velocity) tells the delivery chronology. [FinancialBenchmarking: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths](/blog/text-to-sql) examines the controls and failure paths.
+Collapsing both problems into one prompt makes the demo shorter and the operating decision harder to inspect. The Financial Peer Benchmarking Platform separates them. Semantic retrieval produces candidates; an accept-or-clarify policy handles ambiguity; reviewed templates and parameter binding constrain the executable query.
 
 <VisualizationContainer minHeight={0} caption={FINANCIAL_BENCHMARKING_PRACTITIONER_DECISIONS.caption} variant="open">
   <FinancialBenchmarkingDecisionSpineFigure content={FINANCIAL_BENCHMARKING_PRACTITIONER_DECISIONS} />
 </VisualizationContainer>
 
-## Constraints before choices
+## Two risks, two stop points
 
-Four constraints shaped every decision below. Two regulatory, one hard-technical, one soft-organizational. Every downstream choice satisfies these first; elegance second.
+Metric resolution and query execution fail differently.
 
-<ConstraintsBlock
-  constraints={[
-    {
-      kind: 'regulatory',
-      label: 'Constrained SQL generation surface',
-      detail: 'A natural-language query is a new attack surface. The control contract is narrower than "we use prepared statements": production queries must come from reviewed templates, values bind as parameters, identifiers come from allow-listed configuration, and validation rejects inputs outside that surface. Those controls reduce injection paths without treating any one layer as a proof.',
-    },
-    {
-      kind: 'regulatory',
-      label: 'Disambiguation safety under audit',
-      detail: 'A CFO-grade number tied to the wrong KPI is worse than no number. The system therefore applies an empirically evaluated acceptance-or-clarification policy: accept a proposed KPI only when its score clears the operating threshold; otherwise ask the user to clarify. Held-out selective-error and coverage measurements inform that threshold, but do not provide a pointwise correctness guarantee.',
-    },
-    {
-      kind: 'hard',
-      label: 'KPI catalog changes with each reporting cycle',
-      detail: 'Peer banks publish Supplementary Financial Packages on recurring schedules, and new releases can introduce renamed line items, new sub-categorizations, or near-duplicate KPIs that compute differently. v1 was rules-based, so catalog changes also expanded its rule-maintenance surface. v2 needs to move more existing-shape KPI additions into reviewed data while preserving code and template review for genuinely new query shapes.',
-    },
-    {
-      kind: 'soft',
-      label: 'Model readiness is empirical',
-      detail: 'Disambiguation performance is conditional on the model, catalog, and evaluation distribution. Over-confident misselection and excessive clarification are both operating risks. The architecture therefore needs an abstention path and a release process that depends on representative held-out evaluation rather than model reputation.',
-    },
-  ]}
-/>
+A wrong KPI selection can return a valid query against the wrong measure. A correct KPI selection can still feed an invalid or unsafe query path. One confidence score cannot stand in for both decisions, and a fluent final answer can conceal either failure.
 
-## The four architectural decisions
+The design therefore needs independent stop points:
 
-Four calls separate decomposition-as-guardrail from the single-prompt pattern. Each one mapped to an explicit options comparison before it landed.
+- the intent must conform to a typed request;
+- candidate retrieval must return a bounded, inspectable shortlist;
+- unresolved ambiguity must return to the user; and
+- executable queries must stay inside a reviewed surface.
 
-### Decision 1 · Orchestration shape
+## Decision 1: decompose the path
 
-Does the system give the LLM the natural-language question and ask for SQL? Or does it decompose the work into stages and bound the LLM&rsquo;s role?
+Five stages use separate contracts for intent, candidate retrieval, ambiguity handling, query construction, and formatting.
 
-<OptionsConsidered
-  decision="Who turns natural language into validated SQL: a single LLM call, or a decomposed pipeline?"
-  options={[
-    {
-      name: 'Decomposed five-stage pipeline with bounded model use',
-      summary: 'Intent parsing (LLM) → KPI detection (embeddings) → disambiguation gate (LLM if needed) → SQL generation (reviewed template + parameters) → formatting (deterministic). Typed stage contracts make controls and failures testable at their boundaries.',
-      chosen: true,
-      pros: [
-        'Each stage is testable against an explicit input/output contract; deterministic stages can be replayed with fixed inputs',
-        'The intended LLM surface is bounded: one wall separates intent handling from data access; another keeps executable SQL inside reviewed templates',
-        'Typed validation can stop a malformed intent before the SQL stage and makes boundary failures observable',
-        'For existing query shapes, many catalog additions become reviewed data and embedding updates rather than new matching rules',
-      ],
-      cons: [
-        'Five stages means five contracts to design, document, and maintain',
-        'Domain expertise required to author the SQL template library upfront',
-      ],
-    },
-    {
-      name: 'Single-prompt LLM (NL → SQL in one call)',
-      summary: 'One LLM call given the schema definition, the catalog, and the natural-language query; it emits SQL directly.',
-      pros: [
-        'Small initial implementation surface for a prototype',
-        'No explicit catalog-disambiguation step; the model handles everything implicitly',
-      ],
-      cons: [
-        'LLM-emitted SQL is not a safety property: injection prevention reduces to "the model usually gets it right"',
-        'Disambiguation happens implicitly inside the model, making it harder to evaluate and audit as a separate decision',
-        'Schema compliance is best-effort: model can hallucinate columns under load',
-        'Without intermediate contracts, several errors are observable only at the generated SQL or final-answer boundary',
-      ],
-    },
-    {
-      name: 'Two-stage NL→intent → intent→SQL',
-      summary: 'LLM parses intent; second LLM call generates SQL from the intent. No catalog disambiguation step; no template library.',
-      pros: [
-        'Marginal improvement over single-prompt: at least intent is structured',
-        'Familiar pattern from text-to-SQL benchmark literature (DIN-SQL, DAIL-SQL)',
-      ],
-      cons: [
-        'Still LLM-emitted SQL; same injection + schema-compliance arguments as the single-prompt option',
-        'Disambiguation is not a stage: KPI ambiguity gets baked into the intent or silently resolved by the SQL-gen call',
-      ],
-    },
-    {
-      name: 'Hand-tuned rules + small LLM-classifier sidecar',
-      summary: 'Extend FinancialBenchmarking v1’s rules engine with an LLM classifier for fuzzy matches; keep rule-based SQL templating.',
-      pros: [
-        'Lower-risk evolution from v1: the existing rule surface is preserved',
-        'No new architecture to learn for the team',
-      ],
-      cons: [
-        'The rule-maintenance surface remains: adding an LLM sidecar does not by itself reduce rule churn',
-        'Two cognitive models for "how the system answers a question": the rule path and the LLM path',
-        'Disambiguation safety remains a function of which path fired, not a property of the system',
-      ],
-    },
-  ]}
-/>
+A direct model-to-SQL path would instead give the model the user&rsquo;s question and schema, then ask it to emit the query.
 
-<DecisionRationale option="Decomposed five-stage pipeline with bounded model use">
-Three reasons, in order. First: **decomposition is a guardrail.** Each stage has a narrow contract, a testable interface, and clear failure modes. When the disambiguation gate fires, the SQL stage has not run yet. Before SQL generation runs, the resolved KPI and parameters must pass validation. That structure gives the system explicit stop points and makes the data flow easier to inspect; it does not remove the need for end-to-end tests and runtime monitoring.
+In the direct path, KPI selection and query construction happen inside one generation. A wrong metric, hallucinated identifier, or unsafe statement may become visible only after SQL exists. Decomposition places a validation or clarification boundary before each responsibility changes.
 
-Second: **the controls are testable per stage.** The SQL stage&rsquo;s reviewed-template and parameter-binding contract does not rely on the LLM emitting executable SQL. Schema checks belong to the template library and structural validator. Disambiguation behavior belongs to the confidence gate and its empirically chosen threshold. Local contracts make failures easier to test, trace, and audit, while their effectiveness still depends on configuration, validation coverage, and the evaluation distribution.
+The five-stage structure does not make the system safe by itself. It lets each control be evaluated against a narrower question: did intent parse correctly, did retrieval include the right KPI, did the gate handle ambiguity, and did query construction stay inside the registered surface?
 
-Third: **more catalog growth becomes data instead of code.** For an existing query shape, many KPI additions can be handled as reviewed catalog rows plus embedding updates. New query shapes still require a template and code review. The design reduces rule churn without eliminating engineering work.
+More stages create more schemas, configuration, and failure handling. The team has to maintain the interfaces rather than rely on one adaptable prompt.
 
-The cost is the upfront template library and per-stage contract design, followed by ongoing review as schemas and supported query shapes change. This post does not claim a standalone payback period for that work.
-</DecisionRationale>
+Individually passing stages can still compose into a wrong outcome. End-to-end tests, database permissions, timeouts, monitoring, and review remain necessary.
 
-### Decision 2 · KPI detection method
+## Decision 2: retrieve a shortlist, not an answer
 
-Once the intent is parsed, the system has the user&rsquo;s phrase for the KPI they want. The catalog contains overlapping names and related definitions. How does the system produce a useful candidate set?
+Dense semantic retrieval over reviewed KPI names, definitions, and metadata returns a bounded candidate set.
 
-<OptionsConsidered
-  decision="How does the system map a metric reference to a candidate set of KPIs in the catalog?"
-  options={[
-    {
-      name: 'Sentence embeddings + cosine similarity threshold',
-      summary: 'Each catalog KPI is embedded from its name, definition, and reviewed metadata. The metric phrase is embedded too. A configured retrieval policy returns a bounded candidate shortlist.',
-      chosen: true,
-      pros: [
-        'Can retrieve common abbreviation and full-name pairs such as "NIM" and "Net Interest Margin" even when their tokens differ',
-        'Can retrieve related phrasing such as "cost-to-income" and "operating efficiency ratio" for downstream disambiguation',
-        'For existing query shapes, a catalog addition can be handled through reviewed metadata and an embedding update',
-      ],
-      cons: [
-        'Near-duplicate KPIs cluster too tightly: disambiguation step is required for the cluster danger zone',
-        'Embedding model selection matters; off-the-shelf sentence transformers are good but not perfect on financial-domain text',
-      ],
-    },
-    {
-      name: 'Keyword matching + edit distance fallback',
-      summary: 'Tokenize the metric reference; match against catalog names; fall back to fuzzy matching for typos.',
-      pros: [
-        'Deterministic, fast, no model dependency',
-      ],
-      cons: [
-        'Fails on synonymy ("NIM" shares zero tokens with "Net Interest Margin")',
-        'Fails on phrasing variation ("cost-to-income" vs. "operating efficiency ratio")',
-        'Brittle on domain-specific abbreviations the SFPs use inconsistently',
-      ],
-    },
-    {
-      name: 'Pure LLM lookup (give the model the catalog, ask it to pick)',
-      summary: 'Skip embeddings; pass the full catalog into the LLM context and have it return the matched KPI.',
-      pros: [
-        'No embedding infrastructure',
-      ],
-      cons: [
-        'Catalog size grows; context window cost grows linearly',
-        'Disambiguation and detection collapse into one prompt: no calibration boundary, no testable intermediate',
-        'No independently evaluated detection score before the final selection',
-      ],
-    },
-  ]}
-/>
+Exact or fuzzy lexical matching would keep the machinery simple. Passing the entire catalog to a model would remove the separate retrieval step.
 
-<DecisionRationale option="Sentence embeddings + cosine similarity threshold">
-The catalog contains abbreviations and full names that exact keyword matching can miss. *NIM* is a common abbreviation for *Net Interest Margin*, so an embedding model can place the two names near one another even when their tokens differ. That proximity is only candidate-retrieval evidence: each bank&rsquo;s reported definition and catalog metadata still need to be checked during disambiguation.
+Financial catalogs contain abbreviations, related phrases, and near-duplicates. Lexical matching can miss equivalent wording; a full-catalog model prompt collapses retrieval and selection into one opaque decision. Semantic retrieval is useful when its job is limited to recall.
 
-The detection stage&rsquo;s job is *recall*, not precision. It returns a candidate shortlist, not a single answer. Precision is the next stage&rsquo;s job: the disambiguation gate decides whether one candidate is clearly supported or whether the model, and ultimately the user, needs to break the tie. Separating recall from precision keeps retrieval deterministic and bounds model use to the ambiguity decision.
-</DecisionRationale>
+The retrieval score therefore answers only: which candidates deserve comparison? It is not a probability that the first candidate is correct. The downstream policy decides whether the evidence supports one candidate or whether the user has to clarify.
 
-### Decision 3 · SQL generation safety model
+The catalog, embedding index, and retrieval configuration have to be versioned and refreshed. Domain metadata still needs human review.
 
-The pipeline now has a resolved KPI plus parameters (time window, entity, comparison shape). How does the system produce the actual SQL?
+The right KPI can be absent from the shortlist, and near-duplicates can cluster closely. Retrieval quality can drift as the catalog, model, or user language changes. The system must measure both candidate coverage and accepted-selection error on representative queries.
 
-<OptionsConsidered
-  decision="How is the SQL string produced, and what makes it safe?"
-  options={[
-    {
-      name: 'Template selection + parameterized binding',
-      summary: 'A pre-authored, schema-whitelisted SQL template library covers the query shapes (peer comparison, time series, single-point lookup, ranking). Parameters bind through the DB driver as prepared-statement values; templates are never modified at runtime.',
-      chosen: true,
-      pros: [
-        'Parameter binding keeps user-supplied values out of SQL syntax when every executable path stays inside the reviewed-template contract',
-        'Schema compliance is reviewable at the template-library boundary and re-checked as templates or schemas change',
-        'Templates are reviewable artefacts under regulatory inspection; LLM-generated SQL is not',
-        'Defense-in-depth checks (allow-list + AST + SELECT-only + parameter type + deny-list) can reject covered classes of anomalous input before execution',
-      ],
-      cons: [
-        'Template library has to be authored upfront; covers only pre-anticipated query shapes',
-        'New query shapes require a new template + review; not auto-emergent',
-      ],
-    },
-    {
-      name: 'LLM-generated SQL with post-hoc validation',
-      summary: 'Let the LLM emit SQL; sanitize / validate before executing. Reject if validation fails.',
-      pros: [
-        'Flexible: no upfront template authoring',
-        'Familiar from research benchmarks (Spider, WikiSQL evaluations)',
-      ],
-      cons: [
-        'Injection control is reactive: the system has to detect and reject unsafe or invalid generated SQL after generation',
-        'Sanitization is a denylist exercise: every new attack vector requires a rule update',
-        'Generated SQL can be logged and reviewed after the fact, but it is not a stable pre-reviewed artefact like a versioned template',
-        'Schema compliance is best-effort and probabilistic',
-      ],
-    },
-    {
-      name: 'AST-based SQL synthesis from intent',
-      summary: 'Build an AST from the parsed intent + resolved KPI; serialize to SQL.',
-      pros: [
-        'Makes the intended SQL structure explicit before serialization',
-        'No string concatenation anywhere',
-      ],
-      cons: [
-        'Materially the same as templates with extra steps: query shapes still have to be enumerated',
-        'AST builder becomes the new template library, with worse ergonomics for review',
-      ],
-    },
-  ]}
-/>
+## Decision 3: make templates the executable surface
 
-<DecisionRationale option="Template selection + parameterized binding">
-The mental shift required is recognizing that *the template library is the intended SQL surface*, not the LLM. Parameter binding separates values from SQL syntax; allow-listed templates constrain tables and columns; version control makes that surface reviewable. The claim remains conditional on every execution path respecting that contract and on validation keeping pace with template and schema changes.
+A reviewed query template is selected and user-supplied values are bound as parameters. Tables, columns, operations, and query shapes come from allow-listed configuration.
 
-The defense-in-depth validation layer is intentionally redundant. An allow-list defines what is permitted; a deny-list catches known hazards but is not treated as complete; a structural check verifies query shape; a SELECT-only operation check rules out DDL or mutation; parameter type checking adds another boundary. No single check is sufficient. Together they narrow the executable surface and create several places to reject or investigate anomalous input before execution.
-</DecisionRationale>
+Model-generated SQL followed by inspection or sanitization would offer a broader query surface.
 
-### Decision 4 · Disambiguation contract
+Generated SQL can be logged and checked after it exists, but each novel statement expands what the validators have to understand. Reviewed templates define the intended surface before a request arrives. Parameter binding keeps values separate from SQL syntax when every path respects that contract.
 
-Some KPI references are unambiguous. Some are not. What does the system do when it isn&rsquo;t sure?
+The capability is deliberately narrow. New query shapes require a template and review. The model cannot invent a join because a user phrased the question creatively.
 
-<OptionsConsidered
-  decision="When the KPI candidate set is ambiguous, does the system answer anyway, or does it ask?"
-  options={[
-    {
-      name: 'Evaluation-backed threshold with clarification',
-      summary: 'The LLM disambiguator produces a candidate selection plus a score. If the score clears an empirically chosen operating threshold, accept; otherwise return a clarification request listing the candidates with their definitions. The score is a routing signal, not a pointwise probability guarantee.',
-      chosen: true,
-      pros: [
-        'Accepted-case error and clarification coverage can be measured separately on held-out queries',
-        'The threshold exposes an explicit error-versus-coverage tradeoff for review',
-        'Clarification cases reveal ambiguous catalog regions that need domain review',
-        'Routing lower-scored cases to clarification can reduce accepted misselections on the evaluated distribution',
-      ],
-      cons: [
-        'Depends on evaluation coverage and can drift as the catalog, model, or query distribution changes',
-        'Clarification asks add a step in the user flow; some users find this friction',
-      ],
-    },
-    {
-      name: 'Always answer (highest-similarity wins)',
-      summary: 'Pick the top embedding match. Always emit SQL. Surface alternatives in the response if requested.',
-      pros: [
-        'Frictionless interaction',
-        'No LLM disambiguation cost',
-      ],
-      cons: [
-        'Confidently-wrong failure mode is the *default*: top match on near-duplicates can easily be the wrong KPI',
-        'CFO-grade analytics cannot tolerate silent misselection: once trust is broken, it does not return',
-      ],
-    },
-    {
-      name: 'Always clarify (return candidates; let the user pick)',
-      summary: 'Whenever more than one candidate remains, return the candidate list and have the user choose.',
-      pros: [
-        'Moves the final KPI choice to the user when several candidates remain',
-        'No LLM disambiguation cost',
-      ],
-      cons: [
-        'Heavy interaction friction for cases where the top match dominates by a wide margin',
-        'Ignores the LLM&rsquo;s genuine ability to disambiguate when the question + definitions make the answer obvious',
-        'Pushes domain-knowledge load onto users who came to the system to escape it',
-      ],
-    },
-  ]}
-/>
+The template library requires domain and database expertise. Schema changes and genuinely new query shapes still create engineering work.
 
-<DecisionRationale option="Evaluation-backed threshold with clarification">
-The disambiguation contract addresses the operational question: *how often are accepted selections wrong, and how often does the system abstain?* The gate reduces misselection risk rather than eliminating it. Scores below the operating threshold lead to clarification; scores above it are accepted only under a policy whose selective error and coverage have been measured on held-out queries. Those are empirical results to monitor, not pointwise guarantees.
+Templates and allow-lists can be wrong or incomplete. Parameter binding does not constrain identifiers chosen elsewhere. Database privileges, structural validation, resource limits, and review of every execution path remain part of the control set.
 
-Model readiness is evaluated rather than assumed. Over-confidence on near-duplicates can admit incorrect selections, while excessive caution can create too many clarification requests. Deployment and threshold decisions therefore depend on representative held-out evaluation, the accepted-error-versus-coverage tradeoff, and ongoing drift monitoring as models, catalogs, and query distributions change.
-</DecisionRationale>
+## Decision 4: accept or clarify
 
-## An illustrative query flow
+A KPI selection is accepted only under an empirically chosen policy; lower-support or competing cases return to the user with the plausible definitions.
 
-The synthetic example below shows how a cost-to-income peer-comparison question can move through the declared control path. It illustrates the architecture without reproducing deployed identifiers, scores, thresholds, results, or timings.
+At either extreme, the system could always choose the top candidate for a frictionless flow or always ask whenever more than one candidate appeared.
 
-<StepThrough
-  label="Follow one illustrative request"
-  steps={FINANCIAL_BENCHMARKING_PRACTITIONER_WALKTHROUGH}
-/>
+Always answering hides uncertainty. Always asking transfers avoidable work back to the user. A selective policy makes the trade-off explicit: fewer clarification steps usually mean more accepted errors, while a stricter policy reduces coverage.
 
-## Before and after
+The model&rsquo;s score is a routing signal under that policy, not a pointwise correctness guarantee. Evaluation separates accepted-case error from clarification rate and tracks how both change as the catalog and query distribution evolve.
 
-<BeforeAfterDiff
-  before={{
-    label: 'FinancialBenchmarking v1: rules-based, rigid query syntax',
-    content: (
-      <ul className="list-disc space-y-2 pl-5">
-        <li>Analysts translated questions into v1 syntax, or asked someone who knew it.</li>
-        <li>Static rules matched each query against the KPI catalog.</li>
-        <li>New and near-duplicate KPIs expanded the rule and disambiguation surface.</li>
-        <li>Syntax errors returned errors rather than a guided clarification path.</li>
-      </ul>
-    ),
-  }}
-  after={{
-    label: 'FinancialBenchmarking v2: decomposed, bounded query path',
-    content: (
-      <ul className="list-disc space-y-2 pl-5">
-        <li>Analysts ask in natural language; the first stage emits a typed intent.</li>
-        <li>Embeddings retrieve candidates, then the confidence gate accepts or asks for clarification.</li>
-        <li>For existing supported query shapes, many catalog additions become reviewed data and embedding updates rather than new query rules.</li>
-        <li>Validation and clarification make uncertainty visible before SQL execution.</li>
-      </ul>
-    ),
-  }}
-/>
+Clarification adds interaction, and threshold selection creates an operating decision that must be revisited rather than set once.
 
-## What transfers
+Held-out performance may not represent a new reporting cycle or a new phrasing pattern. Some high-scored selections will still be wrong. Analysts need to see the resolved KPI and retain a route to correct it.
 
-The *family* this architecture belongs to is the LLM-as-Router pattern. [LLM-as-Router in Practice — Four Decisions](/blog/workforce-analytics-routing-framework) examines the cross-domain analytics variant. The general shape: bound the LLM to *intent* and *judgment under uncertainty*; deterministic code performs calculation and produces the registered query and result. Declared application contracts separate model-mediated work from data access and executable SQL. Decomposition is one guardrail among validation, access control, testing, and monitoring.
+## Responsibilities at a glance
 
-What transfers across instances of the family is the *shape*: the bounded LLM surface area, confidence gates where uncertainty triggers clarification, and a deterministic compute or generation backbone. What does *not* transfer is the specific load-bearing piece: in WorkforceAnalytics it is hierarchy-aware allocation math across roughly 40,000 leaf-level cost centres; in FinancialBenchmarking it is the reviewed template library plus parameterized binding. Each system is built around the part that has to be most precise. The LLM is kept on the narrowest practical surface, while tests, validation, access controls, and monitoring enforce the boundaries in operation.
+- **Interpretation:** a model produces typed intent; malformed intent stops.
+- **Retrieval:** dense semantic search returns candidates; it does not decide correctness.
+- **Ambiguity:** the policy accepts or asks; uncertainty remains visible.
+- **Execution:** reviewed templates and bound values construct SQL; database controls remain in force.
+- **Presentation:** deterministic formatting presents the returned data; it does not repair an earlier selection error.
 
-The hardest engineering is not the LLM integration. It is figuring out which one piece is load-bearing, and refusing to let the LLM near it.
+This division keeps the model on language and comparison work while leaving executable structure in reviewed code and configuration.
+
+## What to test before adopting the pattern
+
+- Does the evaluation include real abbreviations and near-duplicate definitions?
+- How often is the correct KPI absent from the candidate set?
+- What are accepted-selection error and clarification coverage at the chosen policy?
+- Can any route construct SQL outside the reviewed templates?
+- Are identifiers, values, operations, row limits, and execution time constrained independently?
+- What evidence is retained when a user corrects a KPI selection?
+
+The design earns trust only when those questions have observable answers. Decomposition makes them askable; it does not answer them automatically.

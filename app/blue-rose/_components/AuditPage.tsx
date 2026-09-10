@@ -75,7 +75,7 @@ export default function AuditPage() {
             Audit log
           </h1>
           <p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-text-secondary">
-            Every action in Themis lands here as a typed event. AI-actor events
+            Every action in this workspace lands here as a typed event. AI-actor events
             (Diane) expose their MCP-tool-call rationale + field-group + cited
             policy clauses inline — the audit boundary is structural, not
             aspirational. Filter by actor or by event kind below.

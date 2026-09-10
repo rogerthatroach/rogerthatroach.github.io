@@ -1,6 +1,6 @@
 import { validateVisualizationSpec } from './validateVisualizationSpec';
 
-export interface ParFigureBase {
+export interface FundingRequestFigureBase {
   id: string;
   eyebrow: string;
   title: string;
@@ -9,38 +9,38 @@ export interface ParFigureBase {
   caveat?: string;
 }
 
-export interface ParFlowStage {
+export interface FundingRequestFlowStage {
   number: string;
   kind: string;
   title: string;
   detail: string;
 }
 
-export interface ParOutcome {
+export interface FundingRequestOutcome {
   condition: string;
   title: string;
   detail: string;
 }
 
-export interface ParOverviewContent extends ParFigureBase {
+export interface FundingRequestOverviewContent extends FundingRequestFigureBase {
   scopeLabel: string;
   scopeDetail: string;
-  stages: readonly ParFlowStage[];
+  stages: readonly FundingRequestFlowStage[];
   outcomePrompt: string;
-  outcomes: readonly ParOutcome[];
+  outcomes: readonly FundingRequestOutcome[];
   humanLabel: string;
 }
 
-export interface ParFieldGroupColumn {
+export interface FundingRequestFieldGroupColumn {
   label: string;
   title: string;
   items: readonly string[];
   note: string;
 }
 
-export interface ParFieldGroupContent extends ParFigureBase {
+export interface FundingRequestFieldGroupContent extends FundingRequestFigureBase {
   scopeLabel: string;
-  columns: readonly ParFieldGroupColumn[];
+  columns: readonly FundingRequestFieldGroupColumn[];
   mergeLabel: string;
   mergeRules: readonly string[];
   coverageLabel: string;
@@ -48,45 +48,45 @@ export interface ParFieldGroupContent extends ParFigureBase {
   coverageReturn: string;
 }
 
-export interface ParMilestone {
+export interface FundingRequestMilestone {
   marker: string;
   title: string;
   detail: string;
 }
 
-export interface ParMilestoneContent extends ParFigureBase {
-  milestones: readonly ParMilestone[];
+export interface FundingRequestMilestoneContent extends FundingRequestFigureBase {
+  milestones: readonly FundingRequestMilestone[];
   ownershipLabel: string;
   ownershipDetail: string;
 }
 
-export interface ParActorStep {
+export interface FundingRequestActorStep {
   actor: string;
   action: string;
   result: string;
 }
 
-export interface ParActorContent extends ParFigureBase {
+export interface FundingRequestActorContent extends FundingRequestFigureBase {
   openingLabel: string;
   closingLabel: string;
-  steps: readonly ParActorStep[];
+  steps: readonly FundingRequestActorStep[];
 }
 
-export interface ParDecision {
+export interface FundingRequestDecision {
   number: string;
   constraint: string;
   choice: string;
   tradeoff: string;
 }
 
-export interface ParDecisionContent extends ParFigureBase {
+export interface FundingRequestDecisionContent extends FundingRequestFigureBase {
   columnLabels: readonly [string, string, string];
-  decisions: readonly ParDecision[];
+  decisions: readonly FundingRequestDecision[];
   footerLabel: string;
   footerDetail: string;
 }
 
-export interface ParFormalNode {
+export interface FundingRequestFormalNode {
   id: string;
   category: string;
   title: string;
@@ -94,23 +94,23 @@ export interface ParFormalNode {
   tool?: string;
 }
 
-export interface ParFormalEnvelopeContent extends ParFigureBase {
+export interface FundingRequestFormalEnvelopeContent extends FundingRequestFigureBase {
   humanInput: string;
   humanInputDetail: string;
   humanOutput: string;
   envelopeLabel: string;
   envelopeDetail: string;
   graphLabel: string;
-  nodes: readonly ParFormalNode[];
+  nodes: readonly FundingRequestFormalNode[];
   branchLabel: string;
-  pass: ParOutcome;
-  return: ParOutcome;
+  pass: FundingRequestOutcome;
+  return: FundingRequestOutcome;
   stateLabel: string;
   stateItems: readonly string[];
   legend: readonly { label: string; detail: string }[];
 }
 
-export interface ParFormalFieldLane {
+export interface FundingRequestFormalFieldLane {
   id: string;
   label: string;
   ownedFields: string;
@@ -119,42 +119,42 @@ export interface ParFormalFieldLane {
   result: string;
 }
 
-export interface ParFormalFieldGroupContent extends ParFigureBase {
+export interface FundingRequestFormalFieldGroupContent extends FundingRequestFigureBase {
   overlapLabel: string;
   overlapDetail: string;
   evidenceLabel: string;
   routineLabel: string;
-  lanes: readonly ParFormalFieldLane[];
+  lanes: readonly FundingRequestFormalFieldLane[];
   mergeLabel: string;
   mergeDetail: string;
   resultLabel: string;
 }
 
-export interface ParTraceStep {
+export interface FundingRequestTraceStep {
   number: string;
   state: string;
   action: string;
   evidence: string;
 }
 
-export interface ParTraceContent extends ParFigureBase {
+export interface FundingRequestTraceContent extends FundingRequestFigureBase {
   columnLabels: readonly [string, string, string];
-  steps: readonly ParTraceStep[];
+  steps: readonly FundingRequestTraceStep[];
   branchLabel: string;
-  pass: ParOutcome;
-  return: ParOutcome;
+  pass: FundingRequestOutcome;
+  return: FundingRequestOutcome;
   assumptionsLabel: string;
   assumptions: readonly string[];
 }
 
-export const PAR_CASE_STUDY_INTRO = 'Read the architecture at two scales: follow the end-to-end drafting path first, then inspect the bounded work inside one selected field group.';
+export const PROJECT_APPROVAL_CASE_STUDY_INTRO = 'The architecture resolves at two scales: the end-to-end drafting path and the bounded work inside each field group.';
 
-export const PAR_CASE_OVERVIEW: ParOverviewContent = {
-  id: 'par-case-overview',
+export const PROJECT_APPROVAL_CASE_OVERVIEW: FundingRequestOverviewContent = {
+  id: 'project-approval-case-overview',
   eyebrow: 'Case study · system orientation',
   title: 'One agent carries the draft from intake to review',
   thesis: 'The graph owns the workflow. Tool routines perform bounded work. The author owns the decision.',
-  caption: 'AI/LLM Drafting Platform v1 as a reviewed drafting path: one orchestration scope, bounded tool work, explicit coverage checks, and a human-owned draft.',
+  caption: 'The production AI/LLM drafting platform as a reviewed path: one orchestration scope, bounded tool work, explicit coverage checks, and a human-owned draft.',
   caveat: 'The scope marker records a reviewed application boundary; it does not describe network or data isolation.',
   scopeLabel: 'Single-agent orchestration scope',
   scopeDetail: 'Chooses the next transition, dispatches registered actions, and retains declared state when checkpoints commit.',
@@ -200,8 +200,8 @@ export const PAR_CASE_OVERVIEW: ParOverviewContent = {
   humanLabel: 'Human review is the final gate in this drafting path',
 };
 
-export const PAR_FIELD_GROUP_LENS: ParFieldGroupContent = {
-  id: 'par-field-group-lens',
+export const PROJECT_APPROVAL_FIELD_GROUP_LENS: FundingRequestFieldGroupContent = {
+  id: 'project-approval-field-group-lens',
   eyebrow: 'Case study · one field-group lens',
   title: 'A field group is a scope, not a specialist agent',
   thesis: 'Evidence and target fields travel together through one bounded routine; workflow control stays with the graph.',
@@ -238,8 +238,8 @@ export const PAR_FIELD_GROUP_LENS: ParFieldGroupContent = {
   coverageReturn: 'Open input or collision remains → ask, review, and resume from a successfully retained checkpoint.',
 };
 
-export const PAR_BUILDER_MILESTONES: ParMilestoneContent = {
-  id: 'par-builder-milestones',
+export const PROJECT_APPROVAL_BUILDER_MILESTONES: FundingRequestMilestoneContent = {
+  id: 'project-approval-builder-milestones',
   eyebrow: 'Delivery arc',
   title: 'A one-page vision became a production platform in five distinct phases',
   thesis: 'Vision, exploration, production work, pilot use, and launch stay separate; ideation does not collapse into production authorship.',
@@ -275,8 +275,8 @@ export const PAR_BUILDER_MILESTONES: ParMilestoneContent = {
   ownershipDetail: 'Milap frames the concept, uses Amplify to widen the option set, then owns the distinct production build end to end.',
 };
 
-export const PAR_BUILDER_ACTORS: ParActorContent = {
-  id: 'par-builder-actors',
+export const PROJECT_APPROVAL_BUILDER_ACTORS: FundingRequestActorContent = {
+  id: 'project-approval-builder-actors',
   eyebrow: 'Author workflow',
   title: 'The author begins and ends the workflow',
   thesis: 'The system organizes the middle: it narrows context, proposes candidate fields, and surfaces gaps and conflicts found by configured checks.',
@@ -312,12 +312,12 @@ export const PAR_BUILDER_ACTORS: ParActorContent = {
   ],
 };
 
-export const PAR_PRACTITIONER_DECISIONS: ParDecisionContent = {
-  id: 'par-practitioner-decisions',
+export const PROJECT_APPROVAL_PRACTITIONER_DECISIONS: FundingRequestDecisionContent = {
+  id: 'project-approval-practitioner-decisions',
   eyebrow: 'Decision map',
   title: 'Four operating pressures shaped four architecture choices',
   thesis: 'Each choice solves a specific operating problem and carries a visible maintenance cost.',
-  caption: 'The practitioner map: constraint, selected architecture, and the trade-off that remains after the decision.',
+  caption: 'Each constraint leads to an architecture choice and a trade-off that remains.',
   columnLabels: ['Constraint', 'Choice', 'Trade-off retained'],
   decisions: [
     {
@@ -340,7 +340,7 @@ export const PAR_PRACTITIONER_DECISIONS: ParDecisionContent = {
     },
     {
       number: '04',
-      constraint: 'Specialized work must remain inside one reviewed agent-shaped scope.',
+      constraint: 'Specialized work must remain inside one reviewed single-agent scope.',
       choice: 'Bounded group calls plus schema validation and ownership-aware merge.',
       tradeoff: 'Concurrency where capacity permits, without sub-agents, plus explicit collision and ownership logic to maintain.',
     },
@@ -349,8 +349,8 @@ export const PAR_PRACTITIONER_DECISIONS: ParDecisionContent = {
   footerDetail: 'The graph owns control; tools return bounded results; detected gaps and conflicts return to a person.',
 };
 
-export const PAR_FORMAL_ENVELOPE: ParFormalEnvelopeContent = {
-  id: 'par-formal-envelope',
+export const PROJECT_APPROVAL_FORMAL_ENVELOPE: FundingRequestFormalEnvelopeContent = {
+  id: 'project-approval-formal-envelope',
   eyebrow: 'System boundary',
   title: 'One graph owns each transition in the reviewed v1 path',
   thesis: 'Concurrent extraction is bounded registered work inside the graph; no routine acquires independent workflow control.',
@@ -390,8 +390,8 @@ export const PAR_FORMAL_ENVELOPE: ParFormalEnvelopeContent = {
   ],
 };
 
-export const PAR_FORMAL_FIELD_GROUP: ParFormalFieldGroupContent = {
-  id: 'par-formal-field-group',
+export const PROJECT_APPROVAL_FORMAL_FIELD_GROUP: FundingRequestFormalFieldGroupContent = {
+  id: 'project-approval-formal-field-group',
   eyebrow: 'Retrieval and merge',
   title: 'Configured field ownership is disjoint; evidence may overlap',
   thesis: 'The configured owner map constrains which group may write each target field, while one source may support several groups.',
@@ -424,8 +424,8 @@ export const PAR_FORMAL_FIELD_GROUP: ParFormalFieldGroupContent = {
   resultLabel: 'Validated merged candidates',
 };
 
-export const PAR_FORMAL_TRACE: ParTraceContent = {
-  id: 'par-formal-trace',
+export const PROJECT_APPROVAL_FORMAL_TRACE: FundingRequestTraceContent = {
+  id: 'project-approval-formal-trace',
   eyebrow: 'Execution trace',
   title: 'Coverage decides whether the graph advances or asks',
   thesis: 'The normal path is inspectable only when the declared actions commit and the corresponding versions and records are retained.',
@@ -474,7 +474,7 @@ export const PAR_FORMAL_TRACE: ParTraceContent = {
     title: 'Clarify and resume',
     detail: 'Ask a prioritized question, retain the answer, and continue through the same graph.',
   },
-  assumptionsLabel: 'This trace remains conditional on',
+  assumptionsLabel: 'Conditions for a usable trace',
   assumptions: [
     'successful state and action-record writes',
     'complete registry coverage for the declared path',
@@ -484,12 +484,12 @@ export const PAR_FORMAL_TRACE: ParTraceContent = {
 };
 
 [
-  PAR_CASE_OVERVIEW,
-  PAR_FIELD_GROUP_LENS,
-  PAR_BUILDER_MILESTONES,
-  PAR_BUILDER_ACTORS,
-  PAR_PRACTITIONER_DECISIONS,
-  PAR_FORMAL_ENVELOPE,
-  PAR_FORMAL_FIELD_GROUP,
-  PAR_FORMAL_TRACE,
+  PROJECT_APPROVAL_CASE_OVERVIEW,
+  PROJECT_APPROVAL_FIELD_GROUP_LENS,
+  PROJECT_APPROVAL_BUILDER_MILESTONES,
+  PROJECT_APPROVAL_BUILDER_ACTORS,
+  PROJECT_APPROVAL_PRACTITIONER_DECISIONS,
+  PROJECT_APPROVAL_FORMAL_ENVELOPE,
+  PROJECT_APPROVAL_FORMAL_FIELD_GROUP,
+  PROJECT_APPROVAL_FORMAL_TRACE,
 ].forEach((spec) => validateVisualizationSpec(spec));

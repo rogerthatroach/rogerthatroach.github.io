@@ -70,18 +70,19 @@ export interface Submission {
   tags: string[];
   /**
    * Diane's analysis of this submission. Present only on submissions Diane
-   * has been invoked on (per the single-agent governance envelope from PAR
-   * Assist Phase 1: Diane runs only where she's invoked, not over everything).
+   * has been invoked on (per the single-agent governance envelope from the
+   * project funding request drafting platform: Diane runs only where she's invoked,
+   * not over everything).
    * Absence renders as the "Diane was not invoked" empty state.
    */
   diane?: DianeAnnotation;
 }
 
 /**
- * Diane's per-submission annotation. Vocabulary echoes public AI/LLM Drafting Platform
- * (AI/LLM Drafting Platform) Phase 1 architecture so stakeholders recognize the same
- * patterns: MCP tool boundary, two-stage field-group retrieval, coverage
- * analyzer, structural guarantees.
+ * Diane's per-submission annotation. Vocabulary echoes the public Project
+ * Approval drafting architecture so stakeholders recognize the same patterns:
+ * MCP tool boundary, two-stage field-group retrieval, coverage analyzer, and
+ * structural guarantees.
  */
 export interface DianeAnnotation {
   /** 1-paragraph plain-language framing rendered at top of WhyCard. */
@@ -102,7 +103,7 @@ export interface DianeAnnotation {
     }[];
     estimatedDays: number;
   };
-  /** 0..1 — % of expected field-groups populated (echoes PAR coverage analyzer). */
+  /** 0..1 — % of expected field-groups populated (echoes the drafting coverage analyzer). */
   coverage: number;
   confidence: Confidence;
   /** e.g. ['policy_lookup@v3', 'vendor_history@v2'] — visible in audit + WhyCard. */
@@ -177,8 +178,9 @@ export interface AuditEvent {
   after?: unknown;
   /**
    * For AI-actor events, the typed reasoning trace that surfaces in the
-   * "Why did Diane do this?" expandable. Vocabulary echoes AI/LLM Drafting Platform
-   * Phase 1 (MCP tool boundary, field-group taxonomy, coverage analyzer).
+   * "Why did Diane do this?" expandable. Vocabulary echoes the Project
+   * Approval drafting pattern (MCP tool boundary, field-group taxonomy,
+   * coverage analyzer).
    */
   dianeReasoning?: {
     /** e.g. "policy_lookup@v3 returned 7 clauses; coverage analyzer flagged 1 missing field-group → recommended jurisdiction_check@v2" */

@@ -1,14 +1,14 @@
-import type { ParTraceContent } from '@/data/visualizations/par';
-import ParFigureHeader from './ParFigureHeader';
+import type { FundingRequestTraceContent } from '@/data/visualizations/projectApproval';
+import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
-interface ParTraceFigureProps {
-  content: ParTraceContent;
+interface FundingRequestTraceFigureProps {
+  content: FundingRequestTraceContent;
 }
 
-export default function ParTraceFigure({ content }: ParTraceFigureProps) {
+export default function FundingRequestTraceFigure({ content }: FundingRequestTraceFigureProps) {
   return (
-    <section className="par-figure" aria-labelledby={`${content.id}-title`}>
-      <ParFigureHeader content={content} headingId={`${content.id}-title`} />
+    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+      <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">
         <section aria-labelledby={`${content.id}-branch`}>

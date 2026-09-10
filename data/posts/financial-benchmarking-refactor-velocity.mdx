@@ -1,81 +1,65 @@
-import VisualizationContainer from '@/components/blog/VisualizationContainer';
-import { FinancialBenchmarkingMilestoneFigure, FinancialBenchmarkingStructuralDiffFigure } from '@/components/visualizations/financialBenchmarking';
-import { FINANCIAL_BENCHMARKING_BUILDER_DIFF, FINANCIAL_BENCHMARKING_BUILDER_MILESTONES } from '@/data/visualizations/financialBenchmarking';
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
+import { FinancialBenchmarkingMilestoneFigure, FinancialBenchmarkingStructuralDiffFigure } from '@/components/visualizations/financial-benchmarking'
+import { FINANCIAL_BENCHMARKING_BUILDER_DIFF, FINANCIAL_BENCHMARKING_BUILDER_MILESTONES } from '@/data/visualizations/financialBenchmarking'
 
-FinancialBenchmarking v2 was a two-week concurrent refactor of the production v1 system, not a separate greenfield build. I was simultaneously running WorkforceAnalytics development and the 2025 summer intern program. The refactor landed while v1 continued serving analysts.
+The Financial Peer Benchmarking Platform&rsquo;s v2 was a focused concurrent refactor of the production v1 system in 2025. It was not a separate greenfield system, and the essential design work did not begin on the first day of the sprint. The short implementation window was possible because v1 had already exposed the operating problem, an earlier prototype had tested the architecture, and later evaluation results made that shelved direction worth revisiting.
 
-This isn&rsquo;t a post about working harder. It&rsquo;s a post about what velocity actually looks like when two preconditions land at the same time: an architecture you&rsquo;ve already rehearsed, and a model that finally clears the bar.
+Prior evidence, bounded scope, and decomposable interfaces turned a short window into a credible delivery period.
 
-## What v1 was, and what broke
+## V1 created the knowledge the refactor needed
 
-RBC&rsquo;s CFO Group benchmarks financial KPIs against the Big 6 Canadian banks using the Supplementary Financial Packages each bank publishes with its quarterly earnings. Publicly available, but complex: every bank names and nests its KPIs differently, CET1 ratios live in different tables, similar-sounding metrics mean subtly different things.
+The CFO Group benchmarks financial KPIs against public Supplementary Financial Packages from major Canadian banks. The source documents are public, but the language is inconsistent. Similar metrics can have different names, and similar names can refer to different definitions.
 
-FinancialBenchmarking v1 was a rules-based benchmarking engine I&rsquo;d already built and productionized. It worked. It earned the 2025 CFO One RBC Team Award. The trust that made the v2 sprint possible was the trust v1 had already earned.
+I built v1 as a rules-based benchmarking system. It established the catalog, supported query shapes, and operating relationships that v2 would later reuse. It also earned the 2025 CFO One RBC Team Award.
 
-The catalog exposed the limit. As the KPI catalog grew, the rules engine needed more maintenance to preserve coverage. Adding a new KPI meant a new rule; a near-duplicate KPI could also require disambiguation logic to keep v1 from confusing similar measures. The maintenance surface grew with both catalog size and ambiguity.
+As the catalog grew, the maintenance problem became clearer. New metrics and near-duplicates expanded the matching rules and the disambiguation logic around them. V1 remained useful, but it also showed exactly where natural-language interpretation could reduce friction and where the system could not afford to become less controlled.
 
-Natural-language input was the obvious cure. If analysts could just type the question they actually meant, the disambiguation problem moves into the model.
+That operating knowledge mattered more than a blank-sheet architecture exercise. By the time v2 was considered, the problem was no longer hypothetical: we knew where ambiguity appeared, which query shapes were supported, and what failure looked like to an analyst.
 
-## Why I waited
+## The first design stayed shelved
 
-I tried this earlier with a prior approved model generation. The architecture worked at demo scale. It didn&rsquo;t hold up under the catalog. Calibrated confidence wasn&rsquo;t reliable enough: the model was either over-confident on near-duplicates (silently picking the wrong KPI) or so cautious it refused to commit. Neither failure mode is acceptable in CFO-grade analytics, where a confidently wrong number is worse than no number.
+I explored a natural-language path before the refactor. The decomposition was sound, but the early evaluated implementation did not meet the ambiguity criteria. Near-duplicate KPIs produced the two failures that mattered most: choosing too confidently or asking for clarification too often.
 
-So I shelved the text-to-SQL rewrite and kept v1 in production. The catalog kept growing; the rule surface kept growing; the gap between v1&rsquo;s coverage and analyst demand kept widening. I lived with it.
+The responsible decision was to keep v1 in production and preserve the design work rather than force the model-assisted path into service.
 
-A later approved model generation closed enough of the gap in our evaluations. Its disambiguation performance made the confidence-thresholded decision function viable: accept above the threshold, request clarification below it. The architecture I&rsquo;d already designed and shelved could move forward with that fallback still in place.
+That pause was not wasted effort. It left behind a tested question: could a later implementation support an accept-or-clarify policy on the real catalog without making the score look like a guarantee of correctness?
 
-That&rsquo;s the unlock that made the two-week sprint possible. Not architecture clarity in isolation. Architecture clarity *plus* a model that crossed the reliability bar.
+When later evaluation results justified revisiting that question, the architecture did not have to be rediscovered. It still required implementation, integration, and testing, but the core trade-off was already understood.
 
 <VisualizationContainer minHeight={0} caption={FINANCIAL_BENCHMARKING_BUILDER_MILESTONES.caption} variant="open">
   <FinancialBenchmarkingMilestoneFigure content={FINANCIAL_BENCHMARKING_BUILDER_MILESTONES} />
 </VisualizationContainer>
 
-## The five-stage pipeline
+## Decomposition made the window believable
 
-The spine of v2 is a decomposed pipeline where each stage owns one concern:
+V2 separated the query path into five responsibilities: intent parsing, semantic candidate retrieval, ambiguity handling, reviewed query construction, and result formatting.
 
-1. **Intent parsing:** approved LLM with constrained generation against a JSON schema. Returns a typed intent tuple: which KPI, which time window, which comparison shape, which output format. Validation retries on schema violation; clarification request on persistent failure.
-2. **KPI detection:** deterministic embedding similarity search over the catalog. Returns a ranked candidate shortlist.
-3. **Disambiguation gate:** if one candidate meets the evaluated acceptance policy, it can proceed. If several candidates remain plausible, a model compares their names and definitions. A model score is a routing signal, not a correctness probability; unresolved cases return to the user.
-4. **SQL generation:** template-based with parameter binding. Templates are pre-authored, schema-allow-listed SQL with typed placeholders. Structural, read-operation, identifier, and parameter-type checks run before execution.
-5. **Result formatting:** deterministic. Output shape (table / chart / narrative / single value) was fixed in the intent tuple at Stage 1.
+Each stage could be built and tested without asking one model call to solve the entire problem. The catalog could be evaluated independently of SQL construction. The clarification policy could be evaluated independently of formatting. Reviewed templates and parameter binding could constrain executable queries without waiting for the language behavior to become perfect.
 
 <VisualizationContainer minHeight={0} caption={FINANCIAL_BENCHMARKING_BUILDER_DIFF.caption} variant="open">
   <FinancialBenchmarkingStructuralDiffFigure content={FINANCIAL_BENCHMARKING_BUILDER_DIFF} />
 </VisualizationContainer>
 
-[The technical note](/blog/text-to-sql) states the assumptions behind the controls: reviewed templates, parameter binding, schema validation, allow-lists, and confidence-gated disambiguation. These controls reduce the query surface but do not prove injection impossible; template review, validator coverage, access controls, and runtime monitoring remain necessary. Each stage is independently testable and has an explicit fallback. The LLM handles structured intent and ambiguous-candidate selection within schemas and confidence thresholds; database access and numerical computation remain in code.
+That decomposition reduced coordination inside the codebase. It also reduced scope. The refactor did not attempt to become a universal financial question-answering system, support free-form numerical reasoning, or redesign every user surface. It addressed one bounded path: turn an analyst&rsquo;s supported question into a resolved KPI, a reviewed query shape, and a result that could either proceed or return for clarification.
 
-## What the two-week refactor actually required
+The two-week window covers the focused v2 module refactor against a production-proven foundation. It does not include the time spent building v1, learning the catalog, evaluating the earlier design, or productionising the integrated product.
 
-The &ldquo;two weeks&rdquo; metric is real. What&rsquo;s misleading about it is the framing that implies the work happened in that window.
+## Contribution and integration
 
-The work happened in the months before. What happened during the sprint was crystallization, not improvisation.
+I led and implemented the focused refactor against the production-proven v1 boundary. Clear interfaces and deliberately narrow scope made the implementation window possible.
 
-1. **The architecture was already rehearsed.** I&rsquo;d been living with v1 in production and knew its failure modes: where the rules engine needed patches, which KPI categories were most ambiguous, and what analysts asked for versus what v1 could answer. I&rsquo;d also prototyped the text-to-SQL refactor with an earlier model generation; on the evaluated catalog, it did not clear the held-out acceptance bar. That operating knowledge and the shelved prototype became inputs to the v2 module. When the sprint started, I was implementing a design I&rsquo;d already evaluated and then rechecked against a model upgrade.
+After the module was built, my direct report worked with the broader production team to incorporate it into v2. V1 continued serving as the production path during the concurrent refactor. The implementation was concentrated; integration and production delivery remained collaborative.
 
-2. **The pipeline was decomposable.** Five stages with clear contracts meant I could build and test each one independently. Intent parsing on day one. KPI catalog + embedding load on day two. Disambiguation harness on day three. Template library + validation layer on days four-five. Formatting + integration testing on the second week. No single stage needed to be right before the next could start. At any given moment two or three stages were in flight in parallel in my head. That kind of decomposition is an architectural property; it&rsquo;s also an execution property. It makes speed possible because it makes work parallelizable.
+## What the sequence established
 
-3. **Scope was ruthlessly bounded.** v2 did not do a lot of things. It didn&rsquo;t try to be a universal financial QA system. It didn&rsquo;t support free-form numerical reasoning. It didn&rsquo;t rewrite the visualization layer. Every temptation to expand scope during the sprint got deferred to post-launch. &ldquo;We&rsquo;ll see if they ask for it once it&rsquo;s in production&rdquo; is a harder answer to give than &ldquo;sure, I&rsquo;ll add that,&rdquo; but it&rsquo;s the answer that keeps the ship date real.
+The refactor added a bounded natural-language path without discarding the controls v1 had earned. Ambiguous KPI requests could return to clarification. Executable SQL stayed inside reviewed templates with parameter binding. Retrieval scores informed routing but were not presented as probabilities of correctness.
 
-Underneath all three, there was capacity protection. WorkforceAnalytics was mid-flight. The 2025 summer intern cohort had interns I was mentoring. Two weeks of FinancialBenchmarking v2 work was possible only because the architecture&rsquo;s clarity meant I didn&rsquo;t need to be in the room for most implementation decisions. I could move between workstreams without each one losing momentum.
+The two-week window covered implementation; adoption, accuracy, and control completeness require separate evidence.
 
-## The result
+**A shelved design can preserve useful evidence.** Stopping the first attempt prevented an immature model path from becoming a production obligation. The prototype remained valuable because it captured decisions and failure cases that could be revisited.
 
-- Core v2 refactor completed in 2 weeks against the production-proven v1 foundation
-- Natural-language KPI benchmarking replacing manual Supplementary Financial Package lookups *and* v1&rsquo;s rigid query syntax
-- FinancialBenchmarking v1 remained the production path while the v2 refactor was underway
+**Velocity is downstream of prior operation.** V1 supplied a real catalog, real supported query shapes, and known failure modes. The sprint began with those constraints already visible.
 
-## The pattern
+**Decomposition creates options.** Separate contracts made it possible to improve one stage, reject an uncertain case, or integrate the refactor without replacing the whole product at once.
 
-Three ideas worth taking seriously:
-
-1. **Velocity is downstream of clarity *and* model readiness.** The work that makes a two-week sprint possible is the research, prototyping, and operational exposure that preceded it. But also: the model has to clear the reliability bar your architecture demands. The earlier-model prototype was a real cost (weeks of design work) that paid off when a later approved generation made the same architecture viable months later. If you&rsquo;re trying to compress novel architectural work into two weeks against an unreliable model, you&rsquo;re not doing it in two weeks.
-
-2. **A shelved prototype can preserve useful design evidence.** When the later model generation cleared our evaluation threshold, the earlier architecture gave the refactor a tested starting point. It reduced rediscovery; it did not make the later implementation or integration cost-free. Prototype before you can ship, and let measured model progress determine when the design is viable.
-
-3. **Decomposable pipelines beat monoliths.** Not only for testability, not only for maintainability, also for speed. Clear stage contracts let you parallelize work in a way monolithic agent architectures cannot.
-
-FinancialBenchmarking v2 is structurally a descendant of WorkforceAnalytics&rsquo;s LLM-as-Router: LLMs used surgically, deterministic code handling everything else, with the LLM&rsquo;s role bounded by schemas and confidence thresholds. The systems look different because they&rsquo;re in different domains. Architecturally they&rsquo;re the same family.
-
-The hardest part wasn&rsquo;t shipping fast. The hardest part was knowing what not to build, and knowing when to wait.
+The result was not a two-week invention. It was a two-week execution window created by earlier restraint, accumulated operating knowledge, and a design narrow enough to finish.

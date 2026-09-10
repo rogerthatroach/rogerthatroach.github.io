@@ -4,7 +4,7 @@ import {
   FinancialBenchmarkingExecutionTraceFigure,
   FinancialBenchmarkingFormalOverviewFigure,
   FinancialBenchmarkingValidatorFigure,
-} from '@/components/visualizations/financialBenchmarking';
+} from '@/components/visualizations/financial-benchmarking';
 import {
   FINANCIAL_BENCHMARKING_FORMAL_CANDIDATES,
   FINANCIAL_BENCHMARKING_FORMAL_OVERVIEW,
@@ -19,12 +19,13 @@ Text-to-SQL systems translate natural-language questions into executable databas
 queries. Reported Spider execution-accuracy results include 85.3% for DIN-SQL
 <CitationRef id={1} />, 86.6% for DAIL-SQL <CitationRef id={2} />, and 82.3% for
 C3 <CitationRef id={3} /> on the benchmark <CitationRef id={4} />. These are
-external benchmark results, not evidence about FinancialBenchmarking or its behavior under
-ambiguous language, catalog changes, and database controls.
+external benchmark results, not evidence about the Financial Peer Benchmarking
+Platform or its behavior under ambiguous language, catalog
+changes, and database controls.
 
-FinancialBenchmarking answers a narrower question: how can a benchmarking system interpret a
-user's KPI request without silently choosing the wrong metric, then execute only
-a supported database query? A phrase such as "efficiency" may refer to several
+The platform addresses a narrower question: how can it interpret a
+user's KPI request without silently choosing the wrong metric, then execute only a
+supported database query? A phrase such as "efficiency" may refer to several
 legitimate KPIs. Even after the metric is resolved, a natural-language request
 must not become unrestricted SQL.
 
@@ -207,17 +208,17 @@ application's data-handling rules. Logs are evidence for investigation, not
 proof that every call used the intended path. Runtime monitoring, permissions,
 and periodic regression tests remain part of the operating control set.
 
-## 9. What this design establishes
+## 9. Inspectable boundaries
 
-FinancialBenchmarking does not solve ambiguity by hiding it behind a single confidence score, and
-it does not treat generated SQL as an acceptable database interface. It narrows
-the problem in sequence: parse the request, retrieve possible KPIs, resolve or
+The benchmarking platform does not solve ambiguity by hiding it behind a single
+confidence score, and it does not treat generated SQL as an acceptable database
+interface. Instead, it narrows the problem in sequence: parse the request,
+retrieve possible KPIs, resolve or
 clarify, construct a supported query from reviewed parts, and format a known
 result.
 
 The result is an inspectable set of boundaries with specific failure responses.
 Its effectiveness still depends on the catalog, evaluation set, templates,
 validator configuration, database permissions, and deployed route coverage.
-That is the useful claim of the architecture: not that failure is impossible,
-but that ambiguity and execution risk have defined places to be measured,
-rejected, and improved.
+The architecture does not make failure impossible; it creates explicit points
+where ambiguity and execution risk can be measured, rejected, and reduced.

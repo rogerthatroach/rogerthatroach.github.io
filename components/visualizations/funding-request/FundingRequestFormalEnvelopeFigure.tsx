@@ -1,14 +1,14 @@
-import type { ParFormalEnvelopeContent } from '@/data/visualizations/par';
-import ParFigureHeader from './ParFigureHeader';
+import type { FundingRequestFormalEnvelopeContent } from '@/data/visualizations/projectApproval';
+import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
-interface ParFormalEnvelopeFigureProps {
-  content: ParFormalEnvelopeContent;
+interface FundingRequestFormalEnvelopeFigureProps {
+  content: FundingRequestFormalEnvelopeContent;
 }
 
-export default function ParFormalEnvelopeFigure({ content }: ParFormalEnvelopeFigureProps) {
+export default function FundingRequestFormalEnvelopeFigure({ content }: FundingRequestFormalEnvelopeFigureProps) {
   return (
-    <section className="par-figure" aria-labelledby={`${content.id}-title`}>
-      <ParFigureHeader content={content} headingId={`${content.id}-title`} />
+    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+      <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">
         <div className="grid gap-3 border-l-4 border-text-primary py-2 pl-4 sm:grid-cols-[auto_1fr] sm:items-baseline sm:gap-6">

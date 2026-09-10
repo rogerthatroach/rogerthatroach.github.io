@@ -11,7 +11,7 @@ The calculation path applies transformations in a fixed order. Each stage receiv
 
 The inspection path helps an authorized analyst examine selected intermediate results and the recorded relationships between them. Its job is to help answer questions such as: Which journal rows contributed to this value? Which category mapping was applied? At what point did the amount change? A configured Tableau view can make those questions easier to pursue, but viewing a number does not validate the source population, approve the rule that produced it, or sign off the return.
 
-This separation is the central design point. Inspection should be built from the same retained identifiers and derivation records as calculation, while remaining an independent read and review concern. If the dashboard reconstructs its own version of the pipeline, the displayed explanation can drift away from the calculation it is meant to explain.
+Inspection should be built from the same retained identifiers and derivation records as calculation while remaining an independent read and review concern. If the dashboard reconstructs its own version of the pipeline, the displayed explanation can drift away from the calculation it is meant to explain.
 
 ## 2. The five-stage calculation path
 
@@ -43,7 +43,7 @@ For that evidence to support an investigation, several conditions have to hold:
 
 These are implementation conditions to test, not properties conferred by calling the data “lineage.” A dropped join key can sever a path. A many-to-many join can duplicate contributions. An overwritten mapping can make a prior classification difficult to explain. A filter can remove a record without retaining why it left the population.
 
-The safest description is therefore **recorded lineage**. It says what the system retained without implying that unrecorded or incorrectly associated evidence can somehow be recovered later.
+**Recorded lineage** names only what the system retained; it cannot supply unrecorded evidence or repair an incorrect association on its own.
 
 ## 4. Investigating one questioned value
 
@@ -88,7 +88,7 @@ The dashboards therefore support investigation, not automated approval. They pro
 
 The human workflow continues after drill-down. An analyst raises a question, inspects the configured evidence, and reconciles the recorded derivation against the applicable source and rule. If the issue is a source record, mapping, or transformation defect, the correction follows the governed path for that artifact. The affected calculation is then rerun, and the resulting value and evidence are reviewed again.
 
-This loop matters because changing a dashboard annotation does not change the calculation, and changing a source or rule does not update an already-produced return until the relevant stages run again. The review surface and the compute path must stay connected without being confused for one another.
+Changing a dashboard annotation does not change the calculation, and changing a source or rule does not update an already-produced return until the relevant stages run again. The review surface and the compute path must stay connected without being confused for one another.
 
 The configured views exposed selected outputs and recorded paths, but not the full rulebook. Category mappings remained in transformation code, and changes continued through the data team's review and release controls. That boundary limited what an analyst could inspect directly and kept a dashboard annotation from becoming an ungoverned rule change.
 
@@ -98,4 +98,4 @@ Recorded lineage can make a question more focused. It can show which records and
 
 It cannot establish that the original source population was complete, that every retained association is accurate, that a business rule was approved, that an analyst saw every relevant record, or that the resulting return should be accepted. It also cannot recover evidence that was never recorded.
 
-The bounded lesson is practical: calculation should retain enough derivation evidence for authorized inspection, inspection should expose gaps and inconsistencies rather than conceal them, and accountable analysts should decide what those findings mean. Visibility improves the quality of the investigation only when the records beneath it deserve confidence.
+Calculation should retain enough derivation evidence for authorized inspection, inspection should expose gaps and inconsistencies rather than conceal them, and accountable analysts should decide what those findings mean. Visibility improves the quality of the investigation only when the records beneath it deserve confidence.

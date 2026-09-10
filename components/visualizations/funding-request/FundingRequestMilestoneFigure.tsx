@@ -1,14 +1,14 @@
-import type { ParMilestoneContent } from '@/data/visualizations/par';
-import ParFigureHeader from './ParFigureHeader';
+import type { FundingRequestMilestoneContent } from '@/data/visualizations/projectApproval';
+import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
-interface ParMilestoneFigureProps {
-  content: ParMilestoneContent;
+interface FundingRequestMilestoneFigureProps {
+  content: FundingRequestMilestoneContent;
 }
 
-export default function ParMilestoneFigure({ content }: ParMilestoneFigureProps) {
+export default function FundingRequestMilestoneFigure({ content }: FundingRequestMilestoneFigureProps) {
   return (
-    <section className="par-figure" aria-labelledby={`${content.id}-title`}>
-      <ParFigureHeader content={content} headingId={`${content.id}-title`} />
+    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+      <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">
         <ol className="ml-2 border-l-2 border-text-primary lg:ml-0 lg:grid lg:grid-cols-5 lg:border-l-0 lg:border-t-2">

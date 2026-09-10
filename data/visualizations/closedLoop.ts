@@ -393,7 +393,7 @@ export const CLOSED_LOOP_ABSTRACTION = validateVisualizationSpec<AbstractionComp
           { questionId: 'act', detail: 'The analyst corrects, reruns, and reviews the return candidate.' },
           { questionId: 'return', detail: 'Recorded corrections support the next governed rerun.' },
         ],
-        limit: 'This is a deterministic calculation and correction cycle, not a learning optimizer or physical feedback controller.',
+        limit: 'Deterministic calculation and correction, not a learning optimizer or physical feedback controller.',
       },
       {
         id: 'model-assisted',

@@ -193,13 +193,13 @@ export interface FinancialBenchmarkingExecutionTraceContent extends FinancialBen
 }
 
 export const FINANCIAL_BENCHMARKING_CASE_SPINE: FinancialBenchmarkingCaseSpineContent = {
-  id: 'financialBenchmarking-case-spine',
+  id: 'financial-benchmarking-case-spine',
   title: 'One pipeline, two legitimate outcomes',
   thesis:
     'A clear request can continue through reviewed query construction. An unresolved request returns for clarification before any database call.',
   headingLevel: 3,
   caption:
-    'The FinancialBenchmarking v2 request path. Candidate retrieval proposes catalog entries; an evaluated policy either accepts one or keeps the uncertainty visible.',
+    'The v2 benchmarking request path. Candidate retrieval proposes catalog entries; an evaluated policy either accepts one or keeps the uncertainty visible.',
   caveat:
     'The scenarios explain control flow, not production telemetry. Model scores are routing signals rather than correctness probabilities.',
   scenarioLabel: 'Illustrative request',
@@ -267,15 +267,15 @@ export const FINANCIAL_BENCHMARKING_CASE_SPINE: FinancialBenchmarkingCaseSpineCo
 };
 
 export const FINANCIAL_BENCHMARKING_BUILDER_MILESTONES: FinancialBenchmarkingMilestoneContent = {
-  id: 'financialBenchmarking-builder-milestones',
+  id: 'financial-benchmarking-builder-milestones',
   title: 'The two-week refactor began long before the sprint',
   thesis:
     'Production experience exposed the limit, an earlier design was shelved on evidence, and a later readiness gate made focused execution possible.',
   headingLevel: 3,
   caption:
-    'The delivery sequence behind FinancialBenchmarking v2: production foundation, evaluated pause, model readiness, focused refactor, and team productionisation.',
+    'The delivery sequence behind the v2 benchmarking refactor: production foundation, evaluated pause, model readiness, focused implementation, and team productionisation.',
   caveat:
-    'FinancialBenchmarking v2 is a concurrent refactor of v1, not a separate greenfield product.',
+    'v2 is a concurrent refactor of v1, not a separate greenfield product.',
   milestones: [
     {
       marker: 'Production foundation',
@@ -295,12 +295,12 @@ export const FINANCIAL_BENCHMARKING_BUILDER_MILESTONES: FinancialBenchmarkingMil
     {
       marker: 'Focused refactor',
       title: 'The v2 module is built in two weeks',
-      detail: 'The concurrent sprint runs while WorkforceAnalytics productionisation and the summer intern program are also active.',
+      detail: 'The bounded module refactor is implemented against the product boundary and operating knowledge established by v1.',
     },
     {
       marker: 'Team delivery',
       title: 'The module joins the production product',
-      detail: 'A direct report and the broader team integrate and productionalize the refactored module as FinancialBenchmarking v2.',
+      detail: 'A direct report and the broader team integrate and productionalize the refactored module as v2.',
     },
   ],
   continuityLabel: 'One product, two revisions',
@@ -309,7 +309,7 @@ export const FINANCIAL_BENCHMARKING_BUILDER_MILESTONES: FinancialBenchmarkingMil
 };
 
 export const FINANCIAL_BENCHMARKING_BUILDER_DIFF: FinancialBenchmarkingStructuralDiffContent = {
-  id: 'financialBenchmarking-builder-diff',
+  id: 'financial-benchmarking-builder-diff',
   title: 'The refactor changed the query interface, not the product identity',
   thesis:
     'v2 replaces a growing rule surface with explicit interpretation and clarification stages while keeping query execution bounded to supported patterns.',
@@ -346,7 +346,7 @@ export const FINANCIAL_BENCHMARKING_BUILDER_DIFF: FinancialBenchmarkingStructura
 };
 
 export const FINANCIAL_BENCHMARKING_PRACTITIONER_DECISIONS: FinancialBenchmarkingDecisionSpineContent = {
-  id: 'financialBenchmarking-practitioner-decisions',
+  id: 'financial-benchmarking-practitioner-decisions',
   title: 'Four decisions sit at four different control points',
   thesis:
     'The architecture follows from the pressure at each boundary: expose intermediate failure, retrieve broadly, preserve abstention, and constrain execution.',
@@ -436,7 +436,7 @@ export const FINANCIAL_BENCHMARKING_PRACTITIONER_WALKTHROUGH: FinancialBenchmark
 ];
 
 export const FINANCIAL_BENCHMARKING_FORMAL_OVERVIEW: FinancialBenchmarkingFormalOverviewContent = {
-  id: 'financialBenchmarking-formal-overview',
+  id: 'financial-benchmarking-formal-overview',
   title: 'Every handoff narrows what the next stage can receive',
   thesis:
     'The pipeline separates interpretation, candidate retrieval, ambiguity handling, reviewed query construction, and deterministic formatting.',
@@ -518,7 +518,7 @@ export const FINANCIAL_BENCHMARKING_FORMAL_OVERVIEW: FinancialBenchmarkingFormal
 };
 
 export const FINANCIAL_BENCHMARKING_FORMAL_CANDIDATES: FinancialBenchmarkingCandidateAmbiguityContent = {
-  id: 'financialBenchmarking-formal-candidates',
+  id: 'financial-benchmarking-formal-candidates',
   title: 'Candidate count changes the next action, not the meaning of a score',
   thesis:
     'Retrieval produces possibilities. The resolution policy decides whether the system can continue or must return to the analyst.',
@@ -573,7 +573,7 @@ export const FINANCIAL_BENCHMARKING_FORMAL_CANDIDATES: FinancialBenchmarkingCand
 };
 
 export const FINANCIAL_BENCHMARKING_FORMAL_VALIDATOR: FinancialBenchmarkingValidatorContent = {
-  id: 'financialBenchmarking-formal-validator',
+  id: 'financial-benchmarking-formal-validator',
   title: 'Five positive checks stand between intent and execution',
   thesis:
     'The registered path starts from reviewed application objects and bound values, then rejects the request if a required condition is absent.',
@@ -643,7 +643,7 @@ export const FINANCIAL_BENCHMARKING_FORMAL_VALIDATOR: FinancialBenchmarkingValid
 };
 
 export const FINANCIAL_BENCHMARKING_FORMAL_TRACES: FinancialBenchmarkingExecutionTraceContent = {
-  id: 'financialBenchmarking-formal-traces',
+  id: 'financial-benchmarking-formal-traces',
   title: 'The ambiguous path ends before the database path begins',
   thesis:
     'A normal request and an unresolved request share the first stages, then diverge at the catalog decision.',

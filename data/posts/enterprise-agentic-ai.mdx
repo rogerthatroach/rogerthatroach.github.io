@@ -1,7 +1,15 @@
-import { ParFormalEnvelopeFigure, ParFormalFieldGroupFigure, ParTraceFigure } from '@/components/visualizations/par'
+import {
+  FundingRequestFormalEnvelopeFigure,
+  FundingRequestFormalFieldGroupFigure,
+  FundingRequestTraceFigure,
+} from '@/components/visualizations/project-approval'
 import CitationRef from '@/components/blog/CitationRef'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
-import { PAR_FORMAL_ENVELOPE, PAR_FORMAL_FIELD_GROUP, PAR_FORMAL_TRACE } from '@/data/visualizations/par'
+import {
+  PROJECT_APPROVAL_FORMAL_ENVELOPE,
+  PROJECT_APPROVAL_FORMAL_FIELD_GROUP,
+  PROJECT_APPROVAL_FORMAL_TRACE,
+} from '@/data/visualizations/projectApproval'
 
 ## 1. The architecture problem
 
@@ -9,25 +17,25 @@ Document-heavy enterprise workflows ask more of an AI system than a chatbot can 
 
 Retrieval-augmented generation can supply relevant source material <CitationRef id={7} />, but retrieval alone does not decide who owns the workflow, how retrieved evidence is scoped, what happens when sources disagree, or when a draft is ready for review. Those are orchestration and control questions.
 
-AI/LLM Drafting Platform addresses them with one reviewed agent-shaped workflow. A LangGraph graph owns the session path; registered tool routines perform bounded work; field groups constrain which references and target fields travel together; merge and coverage checks surface collisions and omissions; and an author reviews the resulting draft. This is the production v1 architecture used inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
+The AI/LLM Drafting Platform addresses them with one reviewed single-agent workflow. A LangGraph graph owns the session path; registered tool routines perform bounded work; field groups constrain which references and target fields travel together; merge and coverage checks surface collisions and omissions; and an author reviews the resulting project funding request draft. This is the production v1 architecture used inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
 
-The important claim is narrow: the architecture makes responsibilities and failure paths explicit. It does not make model output deterministic, prove that every source is complete, or remove the need for human judgment.
+The architecture makes responsibilities and failure paths explicit. It does not make model output deterministic, prove that every source is complete, or remove the need for human judgment.
 
 ## 2. One agent owns the workflow
 
-The reviewed v1 control surface contains one agent-shaped graph. LangGraph supplies graph routing, retained workflow state, and checkpoint concepts <CitationRef id={6} />. Application code uses those primitives to decide which registered step runs next: intake, template selection, evidence retrieval, scoped extraction, merge, coverage review, clarification, or response.
+The reviewed v1 control surface contains one single-agent graph. LangGraph supplies graph routing, retained workflow state, and checkpoint concepts <CitationRef id={6} />. Application code uses those primitives to decide which registered step runs next: intake, template selection, evidence retrieval, scoped extraction, merge, coverage review, clarification, or response.
 
 That ownership boundary matters because some work can run concurrently without becoming a collection of agents. When several field groups are ready, graph code may dispatch multiple extraction calls. Those calls do not choose their own goals, exchange messages, or take control of the session. They receive bounded inputs, return typed candidate values, and hand control back to the graph. Concurrency changes execution timing; it does not change who owns orchestration.
 
 The graph also provides the explicit return paths that a linear happy-path flow would hide. Missing information can lead to clarification. Conflicting candidate values can lead to review. Incomplete coverage can stop draft assembly. A tool or state-write failure can stop progression rather than being treated as a completed step.
 
-<VisualizationContainer minHeight={0} caption={PAR_FORMAL_ENVELOPE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<ParFormalEnvelopeFigure content={PAR_FORMAL_ENVELOPE} />
+<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_FORMAL_ENVELOPE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<FundingRequestFormalEnvelopeFigure content={PROJECT_APPROVAL_FORMAL_ENVELOPE} />
 </VisualizationContainer>
 
 ## 3. Retained state is an operating contract
 
-A multi-turn workflow is useful only if the next turn receives the information required to continue the same reviewed path. AI/LLM Drafting Platform therefore retains declared workflow fields such as the chosen template, field-group status, candidate values, coverage results, pending follow-ups, and references to registered tool work.
+A multi-turn workflow is useful only if the next turn receives the information required to continue the same reviewed path. The drafting platform therefore retains declared workflow fields such as the chosen template, field-group status, candidate values, coverage results, pending follow-ups, and references to registered tool work.
 
 That list is a state contract, not a persistence guarantee. Resuming correctly depends on several conditions:
 
@@ -39,11 +47,11 @@ That list is a state contract, not a persistence guarantee. Resuming correctly d
 
 If any of those conditions fail, a checkpoint can exist and still be misleading. A stale template identifier could send later work through the wrong fields. A missing follow-up could make coverage appear clearer than it is. A partial write could preserve a candidate value without the record needed to explain where it came from.
 
-The appropriate response is not to describe state as inherently durable or replayable. It is to test interrupted transitions, resume from known checkpoints, validate the stored schema, and monitor incomplete or contradictory state. Retained state makes continuity inspectable when those controls work as intended.
+Interrupted transitions need testing, resumption needs known checkpoints, and stored state needs schema validation and monitoring for incomplete or contradictory records. Retained state makes continuity inspectable when those controls work as intended; it is not inherently durable or replayable.
 
 ## 4. Tools perform bounded work
 
-Model Context Protocol defines a standard way to expose tools with declared inputs and outputs <CitationRef id={5} />. In AI/LLM Drafting Platform, registered tools form the action surface for work such as template selection, retrieval, extraction, merge, and coverage checks.
+Model Context Protocol defines a standard way to expose tools with declared inputs and outputs <CitationRef id={5} />. In the drafting platform, registered tools form the action surface for work such as template selection, retrieval, extraction, merge, and coverage checks.
 
 A typed interface narrows what each routine is expected to receive and return. It does not prove that the values inside a valid payload are safe, relevant, or correct. The application still has to validate allowed fields, reject malformed outputs, enforce authorization at the appropriate handoffs, and handle timeouts or downstream failures.
 
@@ -57,13 +65,13 @@ Retrieval then works in two bounded steps. First, the workflow identifies the fi
 
 This improves scope control, but it does not prove relevance or completeness. A stale field owner, a missing reference-to-group mapping, an indexing defect, or an overly broad group selection can still produce the wrong evidence set. The system therefore needs taxonomy review, retrieval evaluation on representative cases, mapping-version checks, and tests that verify the group filter is actually applied.
 
-<VisualizationContainer minHeight={0} caption={PAR_FORMAL_FIELD_GROUP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<ParFormalFieldGroupFigure content={PAR_FORMAL_FIELD_GROUP} />
+<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_FORMAL_FIELD_GROUP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<FundingRequestFormalFieldGroupFigure content={PROJECT_APPROVAL_FORMAL_FIELD_GROUP} />
 </VisualizationContainer>
 
 ## 6. Merge, coverage, and clarification
 
-Each scoped extraction routine returns candidate values only for the fields owned by its group. Merge code accepts those owned keys and treats duplicate or out-of-scope contributions as collisions to investigate, not as values to resolve silently. Overlapping evidence is normal; conflicting ownership or competing field values is not.
+Each scoped extraction routine returns candidate values only for the fields owned by its group. Merge code accepts those owned keys and treats duplicate or out-of-scope contributions as collisions to investigate, not as values to resolve silently. Overlapping evidence is normal; conflicting ownership or competing field values are not.
 
 The merged draft then passes through a coverage check. Coverage asks whether required fields contain candidate values that satisfy configured checks and whether unresolved follow-ups remain. It is not a probability that the draft is correct. A field can be populated with an incorrect value, a source can be incomplete, and a configured check can miss a material issue.
 
@@ -71,20 +79,20 @@ When coverage is missing or uncertain, the workflow returns to clarification or 
 
 This review boundary is part of the operating model. The system assists with evidence gathering and structured drafting; it does not become the accountable author. References and trace records help the reviewer inspect how a candidate value was formed, but they do not replace judgment about whether the value and its supporting source are appropriate.
 
-<VisualizationContainer minHeight={0} caption={PAR_FORMAL_TRACE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<ParTraceFigure content={PAR_FORMAL_TRACE} />
+<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_FORMAL_TRACE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+<FundingRequestTraceFigure content={PROJECT_APPROVAL_FORMAL_TRACE} />
 </VisualizationContainer>
 
 ## 7. Context limits and residual risk
 
-The model receives user-provided material and selected reference passages during intake and extraction. The design therefore does not imply zero data exposure. Its narrower objective is to keep application-managed context within material classified and authorized for model processing.
+The model receives user-provided material and selected reference passages during intake and extraction. The design therefore does not imply zero data exposure. It aims to keep application-managed context within material classified and authorized for model processing.
 
 That objective depends on ingestion classification, scoped retrieval, payload construction, and output filtering working as configured. A user can paste sensitive text into a request. A document can be misclassified. Retrieval can be broader than intended. A filter can omit a sensitive field. Provider terms, encryption, retention controls, incident handling, and controlled payload inspection remain relevant outside the graph itself.
 
-The same restraint applies to traceability. A retained record can show what the registered path recorded; it cannot show an action that bypassed that path or evidence that was never captured. Reviewers should read a trace as bounded evidence, not as proof of completeness.
+Traceability has the same limit. A retained record can show what the registered path recorded; it cannot show an action that bypassed that path or evidence that was never captured. A trace is bounded evidence, not proof of completeness.
 
-## 8. What the deployment establishes
+## 8. Production scope and transferability
 
-AI/LLM Drafting Platform entered pilot in April 2026 and launched across the full CFO Group in all geographies in May. That establishes that this architecture passed the applicable production path and is operating at the stated scope. It does not, by itself, establish a universal architecture for regulated workflows or a quantified improvement in drafting time.
+The drafting platform entered pilot in April 2026 and launched across the full CFO Group in all geographies in May. This production architecture now operates at that scope. Deployment alone does not make it a universal architecture for regulated workflows or demonstrate a quantified improvement in drafting time.
 
 The reusable part is a set of questions: Who owns control? Which work is bounded as a tool routine? What state is required to resume? How is evidence scoped? Where do collisions surface? What stops progression when coverage is missing? Who reviews the result? Those questions transfer to other structured workflows. The answers, controls, and evidence still have to be designed and evaluated for each domain.

@@ -1,86 +1,70 @@
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
-import { WorkforceAnalyticsBuilderContrastFigure } from '@/components/visualizations/workforceAnalytics'
+import { WorkforceAnalyticsBuilderContrastFigure } from '@/components/visualizations/workforce-analytics'
 import { WORKFORCE_ANALYTICS_BUILDER_CONTRAST } from '@/data/visualizations/workforceAnalytics'
 
-> **This is the story behind the architecture call.** [WorkforceAnalytics: Bounded LLM Roles for Financial Analytics](/blog/agentic-ai) explains the mechanism, evidence, and failure paths. [LLM-as-Router in Practice — Four Decisions](/blog/workforce-analytics-routing-framework) compares the alternatives and trade-offs. Here, the focus is the pressure to make the opposite call and what productionising the chosen boundary taught me about regulated AI.
+The AI/LLM Workforce Analytics Platform began with a tempting shortcut: the fastest route to an impressive demo was also the wrong production boundary.
 
----
+A broad-access agent could have accepted a financial question, called data tools, and worked toward an answer. That shape was easy to explain. It was much harder to explain who owned entitlement, which records could reach the model, and whether the calculation would remain stable for the same authorized inputs.
 
-A common enterprise-agent prototype gives the LLM broad tool and data access and lets it iterate toward an answer. That shape did not fit this system&rsquo;s constraints.
+The platform took a narrower route. Model-assisted stages handle language interpretation and answer shaping. Deterministic code owns entitlement resolution and financial calculation. The design is less theatrical than a general agent, but it gives each part of the system a responsibility that can be reviewed.
 
-When I was designing WorkforceAnalytics, a production analytics platform for RBC&rsquo;s CFO Group, the fastest demo path was a single LLM connected to financial-data tools, answering natural-language questions by reasoning over retrieved data. It was straightforward to prototype, but it expanded the data, entitlement, and audit surface that would need governance.
+## The shortcut we did not take
 
-I pushed back. WorkforceAnalytics ships today on a pattern I call LLM-as-Router: bounded LLM stages classify intent, extract scoped metadata, and shape answers, while a deterministic path owns entitlement resolution, data access, and calculation. Typed interfaces, access controls, validation, logging, and monitoring constrain what crosses each boundary; their effectiveness still depends on correct configuration and complete enforcement across every integration path.
+The problem began with cross-domain questions that moved through email and spreadsheets. A finance leader might ask for headcount by division, crossed with open positions and compensation cost. Analysts could assemble the answer, but a new slice or follow-up often restarted part of the work.
 
-This is the story of why, and what it took to build.
+The data model made a generic assistant especially risky. Roughly 40,000 cost centres sit at the leaves of business-segment and geographic hierarchies. A request has to resolve to the caller&rsquo;s authorized subset before calculation. The model also has to distinguish questions about compensation cost, headcount, and open positions without becoming the authority for either permission or arithmetic.
 
-## The problem
+The obvious prototype was one model with broad data tools. It offered a short path to a conversational demo, but it combined four different responsibilities:
 
-RBC&rsquo;s CFO Group ran on email. Finance leadership would ask analysts questions (&ldquo;headcount by division, crossed with open positions, crossed with tenure&rdquo;) and the answers would bounce through days of spreadsheet work, then days of back-and-forth about whether the numbers were right. The underlying data existed in EPM (Enterprise Performance Management): ~40,000 cost centres as leaves shared by an 18-level business-segment hierarchy with ~9,000 rollups and a geographic hierarchy, with entitlement controls applied across the structure.
+- interpreting the question;
+- resolving what the caller may access;
+- calculating the requested result; and
+- explaining that result.
 
-The existing workflow did not answer those questions interactively, and generic tools did not encode the CFO Group&rsquo;s permission model. A monolithic AI design would also have expanded the data placed in model context and the number of paths that needed governance.
+That concentration was the problem. A strong language model did not make permission logic more reliable, and a fluent answer did not establish that the underlying calculation was correct.
 
-## The seductive option
+## The boundary the problem demanded
 
-The prototype you can build in a week is this: one LLM, function-calling against EPM API, answering natural-language queries by iteratively querying the data store. ReAct-style agent loop. Fast to demo. Looks magical.
+I separated language work from controlled execution.
 
-Those prototyping advantages did not outweigh the production constraints.
-
-1. **Non-determinism on CFO-level numbers.** The same query, asked twice, can produce different answers from an LLM doing the computation. Finance needs the calculation to return the same result for the same authorized inputs, data snapshot, code, and configuration, with the number coming from the governed source rather than the model&rsquo;s interpretation of it.
-
-2. **Data exposure risk.** Putting sensitive employee records in the model context expands the exposure surface to inference infrastructure, telemetry, and logging controls. The stronger design objective was to minimize model-visible data, define the allowed boundary explicitly, and test and monitor that boundary.
-
-3. **Insufficiently structured trace records.** Model-directed queries and free-form reasoning logs do not by themselves provide the typed actions and schemas finance review needs. The system needed explicit records of resolved scope, calculation inputs, and controlled handoffs.
-
-4. **Non-determinism on permissions.** Permission entitlements (who&rsquo;s allowed to see which organizational rollup, at what grain) should not depend on an LLM interpreting a prompt. Permission enforcement has to be a first-class, tested part of the data-access path, with failures visible through logs and monitoring.
-
-The monolithic option did not meet those four constraints.
-
-## The architectural call
-
-The pattern I landed on is straightforward to describe and fiddly to build:
-
-- A foundation model is used for intent work and answer-shaping across four bounded stages: a Gate call (relevance / injection / scope), three parallel domain-specific metadata extractions, one Answer call on the simple path (or three parallel Answer calls on the cross-domain path), and a final Synthesis call on the cross-domain path. That is 5 to 8 LLM calls per query.
-- Between two declared application contracts, a deterministic Cython-compiled Python layer owns the controlled data path: permission cascade (domain → access → entities → cost centres → SQL), then employee-event-level ins/outs calculations over the entitled cost-centre set. The deterministic layer also handles dispatch, parallelization, re-gating between stages, and typed JSON validation contracts at every stage boundary.
-- Aggregates cross back up; the Answer-stage and Synthesis-stage calls shape them into the user-facing response.
-- The declared interface sends parsed metadata down and structured aggregates up. Keeping underlying records outside model context depends on the implementation, configuration, tests, and monitoring continuing to match that interface.
-- Transactional storage supports the state, entitlement, hierarchy, and trace records used by the controlled path.
-
-This is LLM-as-Router. The LLM handles language-shaped work (classifying intent, disambiguating phrasing, handling synonyms). The deterministic layer owns entitlement resolution, data access, calculation, and boundary validation. [LLM-as-Router in Practice — Four Decisions](/blog/workforce-analytics-routing-framework) compares the alternatives behind orchestration, computation, entitlement, and answer shaping.
+Model-assisted stages classify the request, extract scoped intent, and shape the response. A deterministic Python path resolves entitlement, retrieves the authorized data, and performs the calculation. On the declared path, the interfaces are designed to pass structured inputs and aggregates across those application boundaries.
 
 <VisualizationContainer minHeight={0} caption={WORKFORCE_ANALYTICS_BUILDER_CONTRAST.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<WorkforceAnalyticsBuilderContrastFigure content={WORKFORCE_ANALYTICS_BUILDER_CONTRAST} />
+  <WorkforceAnalyticsBuilderContrastFigure content={WORKFORCE_ANALYTICS_BUILDER_CONTRAST} />
 </VisualizationContainer>
 
-The permission-to-SQL entitlement modeling alone took weeks of domain immersion: domain permissions map to access groups, which map to employees, which map to cost centres (the atomic unit of the data model), which map to SQL WHERE clauses. That mapping had to be explicit, reviewable, and testable rather than delegated to a prompt.
+The router handled intent and response shaping; governed code remained responsible for entitlement and calculation. The model had no declared authority to broaden the caller&rsquo;s scope or replace the governed computation.
 
-## What it took to build
+That boundary also made failure more legible. A request can be rejected as out of scope. Entitlement resolution can fail closed. A calculation can return a structured error. Answer shaping can be checked against the aggregates it received. None of those controls proves the whole system safe, but each gives the production team a specific condition to test and monitor.
 
-Three things, in the order they mattered:
+## Building the part the demo hides
 
-1. **Refusing the monolithic-agent default.** Broad-access agent demos were a visible industry pattern through 2024. Sticking to LLM-as-Router meant explaining why that pattern did not fit this system&rsquo;s data, entitlement, and calculation constraints across multiple stakeholder audiences.
+The visible conversational layer was not the difficult part. The load-bearing work was translating the existing entitlement model into an executable scope and making the calculation path responsive enough for interactive use.
 
-2. **Building the permission-to-SQL translation layer before writing a line of agent code.** Most of the interesting engineering in WorkforceAnalytics isn&rsquo;t the LLM integration. It&rsquo;s the entitlement model. Permissions are enforced outside the LLM and tested at the data-access boundary. That translation layer is the load-bearing piece; everything else is scaffolding around it.
+I built the permission-to-query translation and the employee-movement calculations that sit behind the model-facing stages. Cython was used in the compute-intensive path while the surrounding orchestration stayed in Python. Typed handoffs made the boundary between intent, authorized computation, and response shaping explicit.
 
-3. **Cross-functional delivery with engineering services partner while staying hands-on.** I led this at ~70% hands-on (architecture, code, review) while coordinating with front-end and infrastructure peers at the engineering services partner. The temptation when you&rsquo;re the AI lead is to hand the implementation off and move to the next project. I didn&rsquo;t, and WorkforceAnalytics is better for it.
+The implementation deliberately encoded what was specific to the operating problem: supported domains, hierarchy resolution, entitlement checks, and calculation rules. A more generic agent abstraction would have weakened that control.
 
-## The result
+The production work also extended beyond the core algorithm. Interfaces had to agree on schemas. Failure states had to be observable. Entitlement and data changes had to be handled as operating conditions rather than one-time setup. Reviewers needed enough retained evidence to investigate a request without treating logs as proof of completeness.
 
-- ~40,000 cost centres as leaves shared by an 18-level business-segment hierarchy with ~9,000 rollups and a geographic hierarchy, supporting low-latency slices across approved query shapes
-- Three delivery channels from a single architecture: dashboard, chatbot, and HTML reports generated for executive consumption
-- Days of email replaced by an interactive query path
-- A scoped-context design intended to keep underlying employee records outside model context, backed by typed boundaries, access controls, validation, logging, and monitoring
-- The architectural pattern became a technical note documenting the separation of concerns, its assumptions, and the controls used to reduce context and entitlement risk
+## Building it and bringing it to production
 
-## The pattern
+From March through the November 2025 launch, I conceived, architected, and built the AI/LLM workforce analytics platform while leading its cross-functional productionisation. The same period included mentoring the 2025 Amplify cohort and a focused two-week refactor of the Financial Peer Benchmarking Platform. I remained hands-on across the application and model boundaries while front-end, data, infrastructure, and governance partners owned the surrounding delivery surfaces and controls.
 
-LLM-as-Router is a strong candidate when:
+The architecture helped the collaboration. Because responsibilities were explicit, each group could review a concrete boundary rather than debate a general promise about what the model would or would not do. The same separation shaped testing: language behavior, entitlement resolution, calculation, and response assembly could fail independently and therefore needed independent evidence.
 
-- The calculation path needs repeatable results for the same authorized inputs and data snapshot
-- Model context should be minimized and limited to explicitly approved fields
-- Permission enforcement should sit outside the model and be tested, logged, and monitored
-- The cost of a wrong answer is larger than the cost of a slightly less elegant architecture
+## What changed
 
-The same separation of language work from controlled execution influenced later systems. FinancialBenchmarking v2&rsquo;s guardrailed text-to-SQL uses tighter intent classification; AI/LLM Drafting Platform&rsquo;s typed MCP tool contracts apply the boundary to a richer action vocabulary.
+The workforce analytics platform entered production in November 2025. It supports approved questions across compensation cost, headcount, and open positions through dashboard, conversational, and report-oriented experiences.
 
-The hardest part of enterprise AI isn&rsquo;t building the language-model-powered feature. It&rsquo;s knowing when *not* to let the language model touch the thing.
+The practical change was not that every finance question became automatic. It was that supported cross-domain questions gained an interactive path with entitlement applied before calculation. Users could ask a follow-up without restarting a multi-day email chain, while analysts and operators retained responsibility for the source data, supported query shapes, and interpretation of the result.
+
+The architecture still carries operating dependencies. Entitlement catalogs have to be current. Every integration path has to preserve the declared boundary. Structured aggregates can still be sensitive. Generated phrasing can still be wrong. Tests, monitoring, access controls, and review are what keep the design honest in operation.
+
+## What carries forward
+
+Many enterprise systems do not need an LLM router.
+
+Language interpretation benefited from model flexibility. Permission and arithmetic did not. Drawing that line early prevented the prototype&rsquo;s most impressive feature from becoming the production system&rsquo;s weakest control.
+
+Each component should own the narrowest responsibility it can perform well. The handoffs should be observable, and the controlled path should carry the facts the model is only allowed to explain.

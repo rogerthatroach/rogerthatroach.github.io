@@ -1,459 +1,102 @@
-import CitationRef from '@/components/blog/CitationRef'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
-import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
-import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
-import DecisionRationale from '@/components/blog/framework/DecisionRationale'
-import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
-import StepThrough from '@/components/blog/framework/StepThrough'
-import { WorkforceAnalyticsDecisionMapFigure } from '@/components/visualizations/workforceAnalytics'
+import { WorkforceAnalyticsDecisionMapFigure } from '@/components/visualizations/workforce-analytics'
 import { WORKFORCE_ANALYTICS_PRACTITIONER_DECISIONS } from '@/data/visualizations/workforceAnalytics'
 
-Finance leadership asks questions that cross three domains in one sentence: *"headcount by division, crossed with open positions, crossed with tenure."* The calculation needs to be repeatable for the same authorized inputs, data snapshot, and configuration; the request must be scoped by entitlement; and the path needs to return within an interactive latency target. The equivalent workflow previously took days and produced line-of-business-level results only.
+The AI/LLM Workforce Analytics Platform was shaped by boundary decisions: where model flexibility helped, where it created unnecessary risk, and which responsibilities had to stay in controlled code. The question was never a binary choice between &ldquo;use an LLM&rdquo; and &ldquo;do everything deterministically.&rdquo;
 
-A common prototype pattern is to give the LLM broad tool access and let it iterate toward an answer: one model, function-calling into a financial data store through a ReAct-style loop. It is fast to prototype and easy to demo, but it expands the data, entitlement, and audit surface that must be governed in regulated finance.
-
-WorkforceAnalytics went the other way: five to eight foundation-model calls per query across four bounded stages, with a deterministic Cython-compiled Python layer between two declared application contracts. A permission-to-SQL entitlement cascade is applied *before* compute, not after. The declared interfaces limit the LLM stages to scoped metadata and structured aggregates; typed contracts, access controls, tests, logs, and monitoring are needed to verify that the deployed paths preserve those limits. This post unpacks the four architectural decisions, the alternatives that were considered, and the residual risks. [Why I Chose LLM-as-Router Over a Monolithic Agent](/blog/workforce-analytics-llm-as-router) tells the delivery story. [WorkforceAnalytics: Bounded LLM Roles for Financial Analytics](/blog/agentic-ai) examines the mechanism, evidence, and failure paths.
+The design serves financial questions that may cross compensation cost, headcount, and open positions. It has to interpret natural language, resolve the caller&rsquo;s authorized scope, calculate over that scope, and return an understandable answer. Treating those as one model task would make a convenient prototype. Treating them as four different responsibilities produced a system that could be reviewed and operated.
 
 <VisualizationContainer minHeight={0} caption={WORKFORCE_ANALYTICS_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
   <WorkforceAnalyticsDecisionMapFigure content={WORKFORCE_ANALYTICS_PRACTITIONER_DECISIONS} />
 </VisualizationContainer>
 
-## Constraints before choices
+## Four operating constraints
 
-Four constraints shaped the decisions below: two regulatory, one hard-technical, and one soft-organizational. They served as the evaluation frame; elegance came second.
+1. **The calculation needed a stable owner.** For the same authorized inputs, source snapshot, code, and configuration, the numerical path should produce the same result. Model routing and prose could still vary, so they needed separate validation and review.
+2. **Entitlement had to be enforced before calculation.** The model could not decide which records a caller was allowed to see. That scope had to come from the governed entitlement path and be applied to the calculation input.
+3. **Supported subsets had to remain interactive.** The system could not precompute every possible combination of organizational leaves. It had to resolve the requested authorized subset at runtime and calculate only the supported shape.
+4. **Natural language still mattered.** Users needed to ask questions in the language of finance rather than learn a query interface. The design therefore had to preserve model flexibility without making the model the data or calculation authority.
 
-<ConstraintsBlock
-  constraints={[
-    {
-      kind: 'regulatory',
-      label: 'Repeatable compute and reviewable trace records',
-      detail: 'For the same authorized inputs, data snapshot, code, and configuration, the calculation path should return the same result. Typed, structured records support review of the configured request path when the relevant records and versions are retained; model prose remains probabilistic.',
-    },
-    {
-      kind: 'regulatory',
-      label: 'Entitlement outside the model',
-      detail: 'Who may see which organizational slice, at what grain and time window, is enforced in the data-access path rather than delegated to an LLM prompt. The control still depends on complete route coverage, current entitlement data, tests, and monitoring.',
-    },
-    {
-      kind: 'hard',
-      label: 'Interactive response over authorized hierarchy slices',
-      detail: 'The interactive experience needs a low-latency compute path across roughly 40,000 cost-centre leaves and roughly 9,000 rollups in the business-segment hierarchy, with a parallel geographical hierarchy over the same leaves. Precomputing the combinatorial subset-selection space is infeasible. Profiling and load tests must define which data volumes and query shapes meet the target.',
-    },
-    {
-      kind: 'soft',
-      label: 'Entitlement catalogs already live in EPM',
-      detail: 'The bank already runs an Enterprise Performance Management system where domain permissions, access groups, employee assignments, and cost centres are maintained. Rebuilding that model outside EPM would fork the source of truth. The solution has to enforce entitlement by reusing the catalog, not by re-implementing it.',
-    },
-  ]}
-/>
+These constraints did not point to a universal architecture. They demanded local choices about responsibility.
 
-## The four architectural decisions
+## Decision 1: put the model at the edges
 
-Four calls separate LLM-as-Router from the monolithic pattern. Each one mapped to an explicit options comparison before it landed.
+Bounded model-assisted stages handle intent and response shaping, with deterministic orchestration and computation between them.
 
-### Decision 1 · Orchestration shape
+A broader model could instead receive tool access and iteratively query the data store until it could answer.
 
-Where does the LLM sit in the control flow? Is it driving, or is it advising?
+That broad-agent design combined language interpretation, permission, retrieval, calculation, and explanation inside one adaptive loop. The system needed model flexibility for the first and last of those responsibilities, not for the middle three.
 
-<OptionsConsidered
-  decision="Who orchestrates a cross-domain CFO query: the LLM, or deterministic code?"
-  options={[
-    {
-      name: 'LLM-as-Router + deterministic compute',
-      summary: 'The LLM classifies intent and extracts metadata; deterministic Python executes the computation. Declared application contracts separate intent, compute, and synthesis.',
-      chosen: true,
-      pros: [
-        'Scoped interfaces minimize model-visible data; tests and monitoring check that the deployed boundary matches the design',
-        'Deterministic calculation path for the same authorized inputs, data snapshot, code, and configuration',
-        'Typed, structured records support review of the controlled path when the related records and versions are retained',
-        'Entitlement enforcement happens in the deterministic layer, before any computation runs',
-      ],
-      cons: [
-        'Two layers means two things to design and maintain, not one',
-        'The deterministic compute layer has to be built; there is no one-library solution',
-      ],
-    },
-    {
-      name: 'Monolithic LLM with function-calling',
-      summary: 'One LLM with ReAct-style tool use; iteratively queries the data store and reasons over results directly.',
-      pros: [
-        'Fast to prototype: a small team can demo this in a week',
-        'Richer interaction surface: the model can ask follow-up questions mid-reasoning',
-      ],
-      cons: [
-        'Underlying records in model context expand the inference, telemetry, and logging controls that must be governed',
-        'Non-deterministic computation: the same query can produce different aggregates',
-        'Chain-of-thought as audit trail: does not survive regulated review',
-        'Permissions become prompt-engineering rather than structural',
-      ],
-    },
-    {
-      name: 'LangGraph chain with data nodes',
-      summary: 'LangGraph directed graph, but LLM steps read data as input to feed the next node.',
-      pros: [
-        'Graph topology fits branching CFO queries naturally',
-        'LangGraph checkpointer gives durable state for free',
-      ],
-      cons: [
-        'If an LLM node reads underlying records, the graph shape alone does not reduce the resulting exposure surface',
-        'Needs the same two-wall discipline on top anyway; adds a framework cost without solving the core problem',
-      ],
-    },
-    {
-      name: 'Multiple model-backed specialists',
-      summary: 'Multiple LLM-backed agents negotiate work, each specialized for a subdomain.',
-      pros: [
-        'Clean conceptual split of domain concerns',
-        'Rich academic literature on coordination patterns',
-      ],
-      cons: [
-        'Adds model-mediated actors and handoffs that this problem does not require',
-        'Expands the context and coordination surface rather than narrowing it',
-        'Adds orchestration complexity without resolving entitlement or calculation ownership',
-      ],
-    },
-  ]}
-/>
+Keeping the model at the edges narrowed what each call could receive and return. It also let the application reject an out-of-scope request before controlled data access and validate structured handoffs before moving to the next stage.
 
-<DecisionRationale option="LLM-as-Router + deterministic compute">
-Three reasons, in order. First: **a narrower data boundary**. Alternatives where the LLM reads underlying employee records expand the model-context, telemetry, and logging surface. LLM-as-Router defines narrow typed inputs for the model-facing stages and keeps data access in a separate controlled path. That reduces exposure, but it is not self-proving: interface coverage, configuration, tests, access controls, and monitoring remain part of the claim.
+The trade-off was more application-owned orchestration, schemas, and explicit failure states. A framework could not supply the domain boundary on its own.
 
-Second: **repeatable calculation as a pre-condition for use.** Finance needs a numerical result that can be reproduced from the same authorized inputs, data snapshot, code, and configuration. The LLM can route requests into the deterministic compute path and phrase its structured outputs, but its routing and prose remain probabilistic. Validation, confidence gates, and visible failure handling are therefore required around both sides of the calculation.
+A narrow interface is only a design claim until every deployed path, serializer, and configuration is checked against it. Model stages can still misclassify intent or misstate a result. Tests, monitoring, and visible failure handling remain necessary.
 
-Third: **entitlement is enforced before compute runs.** Because deterministic code owns the data path, the permission-to-SQL entitlement cascade runs *before* the compute step rather than being woven into an LLM prompt. Retained records can show the user, catalog lookup, access group, resolved entities, cost-centre set, and SQL predicate for the configured path. That supports review; it does not eliminate the need to test route coverage, catalog freshness, and failure modes.
+## Decision 2: keep financial calculation in code
 
-The cost of this shape is that the deterministic compute layer has to be built and maintained. That cost was obviously the right trade, but it was the part that took real engineering.
-</DecisionRationale>
+Python owns the controlled calculation path, with Cython in the compute-intensive portions.
 
-### Decision 2 · Computation layer
+Letting the model calculate directly from retrieved records would sacrifice a stable numerical path. Precomputing a large catalogue of possible answers would avoid runtime calculation but could not cover the supported subset space.
 
-Once the LLM is out of the compute path, *what* does compute? Supported cross-domain query shapes over roughly 40,000 leaf-level cost centres need employee-event-level netting semantics applied over movement events, not aggregates over snapshots. The compute layer is where the interactive latency target lives or dies.
+Financial arithmetic needed to be inspectable as code and repeatable for controlled inputs. At the same time, the supported subset space was too large to turn every possible question into a precomputed result.
 
-<OptionsConsidered
-  decision="What technology implements employee-event-level ins-outs math at interactive latency?"
-  options={[
-    {
-      name: 'Cython-compiled Python',
-      summary: 'Python code paths compiled to C via Cython for the hot inner loops; everything else stays in idiomatic Python.',
-      chosen: true,
-      pros: [
-        'Team muscle memory is Python: authorship, review, debugging, and on-call all land in the same language',
-        'Cython gives C-level speed on the hot paths (event enumeration, netting, aggregation) without rewriting the system',
-        'Interop is trivial: the Cython modules drop into the same Python process that does routing, ORM, serialization',
-        'Profiling is a first-class workflow: cProfile + line_profiler + Cython annotation show exactly where the time goes',
-      ],
-      cons: [
-        'Build toolchain is more involved than pure Python: compilation step in CI, C extension artifacts',
-        'Edge of expertise inside the team is narrower than pure Python',
-      ],
-    },
-    {
-      name: 'Pure Python with pandas / Polars',
-      summary: 'Vectorized DataFrame operations for aggregation; rely on NumPy / Arrow backends for speed.',
-      pros: [
-        'Fast to write; easy to review',
-        'Battle-tested for analytical workloads',
-      ],
-      cons: [
-        'Event-level netting does not vectorize cleanly: the dependency between sequential events breaks DataFrame primitives',
-        'Profiling showed pure Python / pandas missed the interactive target on the tested cross-domain workload',
-      ],
-    },
-    {
-      name: 'SQL-only aggregation',
-      summary: 'Push all computation into Postgres via window functions and CTEs; the application layer just shapes the query.',
-      pros: [
-        'Data stays close to storage; no serialization hop',
-        'Postgres planner handles optimization',
-      ],
-      cons: [
-        'Event-level netting expressed in SQL becomes a multi-hundred-line query that is hard to test and harder to evolve',
-        'Cross-domain subset combinations generate query plans that the planner cannot always collapse efficiently',
-        'Business-logic-as-SQL is a debugging liability: the reviewer population is smaller than for Python',
-      ],
-    },
-    {
-      name: 'Rust microservice',
-      summary: 'Extract the compute layer into a Rust service; the Python application calls it over the wire.',
-      pros: [
-        'Peak performance; compile-time correctness on ownership',
-        'No GIL concerns for concurrency',
-      ],
-      cons: [
-        'Team expertise would have to be rebuilt; hiring in-bank Rust engineers is not a solved problem',
-        'Adds a network hop and a serialization boundary to the hot path',
-        'The speed delta over well-written Cython was not worth the team and ops cost at this scale',
-      ],
-    },
-  ]}
-/>
+The chosen path resolves the requested subset at runtime and applies the approved calculation rules in code. Cython was a targeted implementation choice for the heavier calculation path; the surrounding application remained ordinary Python so it could be reviewed and operated by the team.
 
-<DecisionRationale option="Cython-compiled Python">
-Two reasons. First: **match the team shape.** Python was already the language for everything else in the stack: routing logic, ORM, serialization, audit-log writes. Cython gave the compute layer C-level speed for the hot paths without forking the codebase into two languages. The reviewer pool stayed the same. The hiring pipeline stayed the same. The on-call runbook stayed the same.
+Domain-specific calculation code has to be maintained as source rules and data structures change. It is less immediately impressive than asking a model to reason over the records.
 
-Second: **profile first, then compile.** Cython's annotation mode shows which Python lines are still Python-level (with a visible interpreter cost) and which have been lowered to C. That made optimization a surgical activity: find the lines that matter, annotate with type declarations, recompile, re-measure. Only the profiled hot paths had to meet the interactive latency target; the rest could stay readable Python. Pure-Rust or pure-SQL alternatives would have forced an all-or-nothing rewrite.
+Deterministic code can still be wrong. Source-data defects, stale rules, incorrect joins, and configuration errors remain possible. Reproducibility narrows an investigation; it does not establish correctness by itself.
 
-The SQL-only path was genuinely considered and ruled out during implementation: event-level netting across cross-domain subset combinations produces query plans that the Postgres planner handles inconsistently at this scale. The computation is more readable as imperative Python over a well-indexed event log than as a multi-hundred-line window-function SQL query.
-</DecisionRationale>
+## Decision 3: resolve entitlement before compute
 
-### Decision 3 · Entitlement enforcement shape
+The caller&rsquo;s governed entitlement is translated into the data scope before calculation begins.
 
-Who is allowed to see which slice? The answer was already encoded, across years, in EPM: domain permissions → access groups → entities → cost centres → SQL. The question was *where* to apply it.
+Two apparent shortcuts were to calculate over a broader dataset and filter the result afterward, or to ask the model to interpret permission instructions.
 
-<OptionsConsidered
-  decision="Where in the pipeline does the entitlement check run?"
-  options={[
-    {
-      name: 'EPM passthrough, pre-compute',
-      summary: 'The full EPM-derived permission cascade runs as a deterministic Python pipeline before the controlled compute step. The user id maps through domain → access → entities → cost centres → SQL WHERE clause. The declared compute path receives the filtered cost-centre set.',
-      chosen: true,
-      pros: [
-        'Pre-compute filtering reduces exposure by limiting the declared compute path to the resolved entitled set',
-        'Reuses the EPM catalog as the source of truth; no parallel permission model to drift',
-        'Structured logs capture permission-resolution inputs and outputs for review when the related records are retained',
-        'The cascade is testable in isolation: each of the five steps gets its own unit tests and integration tests',
-      ],
-      cons: [
-        'The cascade has to be built and kept in sync with EPM changes: active maintenance, not set-and-forget',
-        'Some queries resolve into large SQL WHERE clauses; indexes and query plans need attention',
-      ],
-    },
-    {
-      name: 'Post-filter on compute results',
-      summary: 'Compute over the full dataset, then filter the result set by entitlement before returning.',
-      pros: [
-        'Simpler pipeline shape',
-        'One entitlement implementation at the output boundary',
-      ],
-      cons: [
-        'Violates least-privilege: data the user cannot see is loaded into memory before being stripped out',
-        'Aggregates computed over unauthorized data can leak information through differentials (counts, min/max)',
-        'Audit has to reason about what was *temporarily* seen, not what was definitively accessible',
-      ],
-    },
-    {
-      name: 'LLM-enforced policy via prompt',
-      summary: 'Include entitlement rules in the LLM prompt and trust the model to respect them.',
-      pros: [
-        'Easy to describe; fits the monolithic agent pattern',
-      ],
-      cons: [
-        'A prompt is an unreliable enforcement boundary for permission policy',
-        'Unreviewable: the "policy" is natural-language text interpreted probabilistically',
-        'Does not clear regulated review at any grain',
-      ],
-    },
-    {
-      name: 'Row-level security (Postgres RLS)',
-      summary: 'Express entitlement as Postgres row-level security policies; the database enforces.',
-      pros: [
-        'Database-layer enforcement narrows the number of application paths that must implement policy correctly',
-        'Can cover database queries subject to the configured policy',
-      ],
-      cons: [
-        'Enterprise permission logic is a five-step cascade with business-rule layers that do not map cleanly to RLS policies',
-        'Would force duplicating EPM model into database policies, drifting from the catalog',
-        'Debugging a denied query becomes a database-administration task, not a development task',
-      ],
-    },
-  ]}
-/>
+Post-filtering means the computation has already touched data outside the caller&rsquo;s resolved scope. Prompt-based permission makes a probabilistic component responsible for an access-control decision. Neither matched the intended boundary.
 
-<DecisionRationale option="EPM passthrough, pre-compute">
-The deciding property was **reuse of the source of truth**. The bank had spent years curating the EPM catalog (domain permissions, security groups, employee assignments, cost centres) under an established review and change-management process. Any entitlement model that did not reuse that catalog would fork the source of truth and introduce additional drift and control-review risk.
+Pre-compute entitlement gives the calculation one explicit input: the authorized subset for this caller and request. The model can propose intent, but code resolves the scope from the current entitlement view and applies it to data access.
 
-Pre-compute placement came from a narrower argument: *least privilege.* A query result that was post-filtered from a larger computation means the computation ran over data outside the user's resolved scope, and the review has to account for differential leakage and transient access. Pre-compute filtering narrows the calculation input to the entitled set and makes that review more direct. The control still depends on the cascade being current and applied on every relevant path.
+The application has to integrate with the governed entitlement source and handle its hierarchy, update cadence, and failure modes. That integration is substantial product engineering, not a prompt detail.
 
-The five-step cascade (domain → access → entities → cost centres → SQL) was the real engineering. Each step has typed inputs and outputs, tests, and a structured trace record. When the related records are retained, they support review of the resolved scope for the configured path; answering a broader exposure question also requires checking catalog freshness, alternate paths, configuration, and telemetry.
-</DecisionRationale>
+The control depends on current entitlement data and complete route coverage. A stale catalog, mapping defect, bypass path, or logging gap can weaken it. Its strength depends on every relevant path preserving and testing the boundary; the architecture does not make exposure impossible.
 
-### Decision 4 · Answer and synthesis strategy
+## Decision 4: vary answer shaping by question scope
 
-Aggregates cross back up from the deterministic layer. The LLM picks them up for the answer-shaping stages: phrasing the answer, combining cross-domain results, generating the right output format. The question is *how many* LLM calls participate, and in what shape.
+Supported single-domain questions use a simpler answer path; supported cross-domain questions use bounded parallel answer work plus synthesis. Across the full path, the workforce analytics platform uses five to eight model calls over four stages, depending on the query shape.
 
-<OptionsConsidered
-  decision="After the deterministic layer produces aggregates, how does the LLM shape the user-facing answer?"
-  options={[
-    {
-      name: 'Gate-decides hybrid (simple Answer path or cross-domain Answer + Synthesis path)',
-      summary: 'The Gate stage classifies the query. Single-domain queries take the simple path: one Answer-stage LLM call composes the response directly and becomes the final output. Cross-domain queries take the cross-domain path: three parallel Answer-stage calls (one per domain: EPM, Headcount, Open Positions), then a single Synthesis-stage call that combines them under a typed validation contract.',
-      chosen: true,
-      pros: [
-        'Latency is proportional to query complexity: simple queries do not pay the cost of parallel answer-shaping or synthesis',
-        'Cross-domain path keeps each Answer-stage context small and focused, which improves quality on the cross-domain cases that matter most',
-        'The Synthesis stage receives typed, validated aggregate inputs, making the allowed numerical fields inspectable before answer shaping',
-        'Gate already has to classify intent; picking the answer-shape path is a small extension of that decision',
-      ],
-      cons: [
-        'Two answer-shaping code paths instead of one: more to test and maintain',
-        'The Gate has to be calibrated correctly for the path-choice to add value',
-      ],
-    },
-    {
-      name: 'Single Answer call always',
-      summary: 'One Answer-stage LLM call composes the response, regardless of query complexity. No Synthesis stage.',
-      pros: [
-        'Simplest possible answer-shaping code path',
-        'Consistent latency profile',
-      ],
-      cons: [
-        'One large context window on complex multi-domain queries: quality regression on the cross-domain cases that matter most',
-        "Doesn't exploit the fact that simple queries are already simple at the aggregate layer",
-      ],
-    },
-    {
-      name: 'Always three parallel Answer-stage calls + Synthesis call',
-      summary: 'Always fan out to three domain Answer-stage calls in parallel, then run the Synthesis-stage call regardless of query shape.',
-      pros: [
-        'Uniform answer-shape; simpler to reason about',
-      ],
-      cons: [
-        'Pays the parallel cost on simple single-domain queries that do not need it',
-        'Pure waste at p50: the majority of queries are not complex enough to benefit',
-      ],
-    },
-    {
-      name: 'No Answer LLM; render templates from aggregates',
-      summary: 'The deterministic layer formats the aggregates directly into a templated response. No Answer or Synthesis stage.',
-      pros: [
-        'No LLM surface in the answer-shaping step at all: strictest determinism',
-        'Lowest possible latency and cost',
-      ],
-      cons: [
-        'Answers are templated, not conversational: loses the natural-language comfort that is the point of an LLM frontend',
-        'Every shape of answer requires a template; the surface area is large',
-      ],
-    },
-  ]}
-/>
+One large answer call would flatten the distinction between query shapes; always using the cross-domain path would add its cost even when one domain was enough.
 
-<DecisionRationale option="Gate-decides hybrid (simple Answer path or cross-domain Answer + Synthesis path)">
-The answer-shaping workload is bimodal. Most queries are single-domain and respond cleanly to a single Answer-stage call: a user asking "what is headcount for the Technology division this quarter" does not benefit from three parallel Answer-stage calls or a downstream Synthesis stage. A minority of queries are multi-domain and benefit significantly from scoped Answer-stage calls that keep each context small and focused: "headcount crossed with open positions, crossed with tenure" is the shape where the cross-domain path pays off.
+A single-domain question does not need the context and coordination required by a cross-domain one. Conversely, one large context can make the model responsible for reconciling distinctions that the application can preserve explicitly.
 
-The Gate stage already classifies intent to decide whether the query is in scope at all. Extending that classification to pick the answer-shape path is cheap: the information the Gate needs (how many domains the query touches, whether cross-domain reconciliation is needed) is already on its plate. That makes the hybrid architecturally clean rather than being bolted on.
+The hybrid path keeps simple work simple while allowing scoped cross-domain results to be combined after deterministic calculation. The synthesis stage receives structured results rather than underlying records.
 
-The audit anchor is the typed validation contracts at each stage boundary. The Synthesis-stage call takes structured aggregate inputs and produces a structured response; numerical reconciliation rules (how rollups interact and which base number anchors a cross-domain join) are applied before the free-form phrasing step. Deterministic Python between stages handles dispatch, parallelization, privilege checks, and contract validation. These controls constrain the model's inputs and outputs, but they do not make generated prose deterministic or eliminate semantic errors; output validation, monitoring, and user-visible uncertainty handling remain necessary.
-</DecisionRationale>
+Two answer shapes create more branches to test, and the initial routing decision must distinguish them well enough to be useful.
 
-## A production query, end to end
+Parallel calls are bounded work, not independent authorities. Their outputs can disagree or omit context, and synthesis can introduce semantic error. Typed contracts, reconciliation rules, validation, and user-visible uncertainty constrain that behavior without making it deterministic.
 
-A concrete CFO query (*"show me headcount by division, crossed with open positions, crossed with average tenure, filtered to the Technology business line, for Q2"*) walking through the Cascade.
+## Responsibilities at a glance
 
-<StepThrough
-  label="Cross-domain query · 8 LLM calls (4 stages) · profiled compute path"
-  steps={[
-    {
-      title: 'Step 1 · Stage 1 Gate (LLM 1)',
-      caption: 'relevance / injection / scope + path selection',
-      content: 'A single Gate call screens the utterance for relevance, prompt-injection indicators, and domain scope, then proposes an answer-shape path. For this example it classifies a cross-domain three-way query (headcount, open_positions, tenure) with reconciliation. A rejection stops this declared path before downstream data access. The Gate is a probabilistic control, so false accepts and false rejects must be measured; its typed output is validated before routing.',
-    },
-    {
-      title: 'Step 2 · Stage 2 Parallel metadata extraction (LLM 2, 3, 4 in parallel)',
-      caption: 'three domain-scoped extraction calls',
-      content: 'Three LLM calls fire in parallel, one per domain. Headcount extracts the time-window (Q2, resolved against fiscal calendar) and filter parameters (business_line = Technology) scoped to headcount semantics. HR Costs / EPM extracts its own metadata or returns an empty contract if not needed for this query shape. Open Positions extracts its time-window and filter shape. Each call is intended to return only the fields allowed by its domain contract; deterministic validation rejects malformed outputs.',
-    },
-    {
-      title: 'Step 3 · Entitlement cascade (deterministic, no LLM)',
-      caption: 'domain to access to entities to cost centres to SQL',
-      content: "The user's identity flows through the five-step permission cascade. Domain permissions: which WorkforceAnalytics domains can this user touch? Access groups: which of those domains is the Technology business line inside? Employee assignments: which employee records are visible at this grain? Cost centres: which subset of the roughly 40,000 leaves does this resolve to? SQL: the WHERE clause is materialized and passed to compute. Structured logs record each step. A privilege check at this handoff confirms the resolved scope against the current entitlement view.",
-    },
-    {
-      title: 'Step 4 · Compute (Cython, no LLM)',
-      caption: 'employee-event-level ins/outs over the filtered set',
-      content: 'Cython-compiled netting calculations run over the entitled record set. Headcount movements resolve to point-in-time counts at each requested grain; open-position status changes resolve similarly; date fields produce tenure averages. The three calculations land as structured outputs. Profiling verifies the latency target for the tested data and query shapes.',
-    },
-    {
-      title: 'Step 5 · Stage 3 Answer (LLM 5, 6, 7 in parallel)',
-      caption: 'three parallel Answer-stage calls, one per domain',
-      content: 'Three Answer-stage LLM calls fire in parallel, one per domain. Each takes its own structured aggregate (validated against the domain contract on the way in) and phrases its slice of the answer. The Headcount Answer call phrases the headcount slice; the Open Positions Answer call phrases its slice; the Tenure-scoped Answer call phrases its slice. Each output is structured and contract-validated on the way out.',
-    },
-    {
-      title: 'Step 6 · Stage 4 Synthesis (LLM 8)',
-      caption: 'one Synthesis-stage call combines the three Answer outputs',
-      content: 'A single Synthesis-stage LLM call takes the three structured Answer-stage outputs as typed aggregate inputs and combines them into a cross-domain response. Numerical reconciliation rules (how the rollups interact and which base number anchors the cross-domain join) are applied before answer shaping. Output validation checks the structured response, while monitoring and user-visible failure handling address residual semantic risk. The delivery path targets an interactive response on the tested workload.',
-    },
-  ]}
-/>
+- **Language interpretation:** model-assisted, because user phrasing varies.
+- **Entitlement:** deterministic and pre-compute, because access is not a language judgment.
+- **Calculation:** deterministic code, because the numerical path needs a stable, reviewable owner.
+- **Response shaping:** model-assisted over structured results, because explanation benefits from flexible language.
 
-## The permission cascade in detail
+The handoffs are as important as the components. Each boundary needs a declared schema, a failure response, and evidence that the deployed route actually uses it.
 
-The five-step cascade is the engineering that made this architecture shippable inside governance. Each step is implemented through typed inputs and outputs with a structured trace record. Those records support review of the resolved path when the relevant inputs, snapshots, code, configuration, and records are retained.
+## Where this pattern does not transfer
 
-1. **Domain permissions.** The EPM organizes data into domains; the user identity resolves to a set of domain permissions. This is a direct lookup against the entitlement catalog.
-2. **Access groups.** Domain permissions map to access groups with finer-grained scope: business line, geography, grain. The mapping is maintained in EPM and pulled via a periodic catalog sync.
-3. **Entities.** Access groups map to the employee records the user is entitled to see: visible headcount, visible organizational rollups.
-4. **Cost centres.** The atomic routing unit: roughly 40,000 leaves shared by an 18-level business-segment hierarchy with roughly 9,000 rollups and a geographic hierarchy. Queries resolve to the entitled subset that the calculation operates over.
-5. **SQL WHERE clause.** The cost-centre set materializes into a SQL predicate that Postgres applies at query time. The declared compute path requires this predicate; tests and monitoring are responsible for detecting an alternate or misconfigured path.
+LLM-as-Router is not a default for every analytics product. If a system operates on public data, has a small fixed query set, or can answer directly from a conventional interface, the additional model and orchestration surface may add cost without useful capability.
 
-The decision to reuse EPM rather than build a parallel model reduced the control surface. The bank already had review and change-management processes around the EPM catalog. Forking the permission model outside EPM would have created another model to review and synchronize, with drift risk whenever the source catalog changed.
+The pattern becomes more compelling when language is genuinely variable but permission and calculation need narrow ownership. Even then, the exact design should follow the local constraint. The Financial Peer Benchmarking Platform relies on a reviewed query-construction surface; the AI/LLM Drafting Platform relies on one agent with bounded drafting tools. Copying the AI/LLM Workforce Analytics Platform&rsquo;s topology into either system would obscure the responsibility each one must control.
 
-## Why subset selection changes the compute shape
+## Residual-risk review
 
-The system supports subset-selection queries over roughly 40,000 leaf-level cost centres, constrained by the caller&rsquo;s entitlements and supported query shapes. Precomputing every possible answer set is infeasible. Instead, the runtime resolves the authorized cost-centre subset, filters the employee-event log, and applies netting semantics to the selected rows. Previously the finance organization could not ask those questions interactively at all; the analyst time to produce one supported slice was measured in days of spreadsheet work.
+- Can the model-facing inputs be enumerated and tested?
+- Is entitlement applied on every data-access path, using a current source?
+- Can the calculation be reproduced from retained inputs, code, configuration, and source state?
+- Are aggregates themselves sensitive at the returned grain?
+- What happens when intent routing, validation, or synthesis fails?
+- Can a reviewer distinguish a logged event from evidence that the complete path was followed?
 
-Cython's role in this is blunt: the event-level netting math inside the hot loop runs in C. The rest of the layer (IO, entitlement resolution, serialization) stays in idiomatic Python. Profiling showed the hot loop was responsible for the majority of runtime on cross-domain queries, so that's where the Cython annotations concentrate.
-
-The *previously impossible* framing is not marketing. Before WorkforceAnalytics, finance-leadership questions of the form "how does headcount cross with open positions by division, at Q2" either got answered with a multi-day analyst turnaround or did not get answered at all. The combinatorial size of the question space made interactive slicing infeasible. LLM-as-Router plus Cython-compiled compute turns the question space into an interactive one.
-
-## Before and after
-
-<BeforeAfterDiff
-  heading="Finance leadership asks a cross-domain question"
-  before={{
-    label: 'Before WorkforceAnalytics',
-    hint: 'days',
-    content: (
-      <>
-        Email to the analytics team. Analyst pulls three extracts from EPM, one per domain. Joins them in Excel. Checks entitlement manually against the employee directory. Reconciles rollup differences between cubes. Emails back a spreadsheet. The CFO asks a follow-up; cycle repeats. The question exchanges take days, and new cross-domain slices routinely require bespoke work.
-      </>
-    ),
-  }}
-  after={{
-    label: 'With WorkforceAnalytics',
-    hint: 'seconds',
-    content: (
-      <>
-        Ask the question in natural language. Five to eight foundation-model calls across four bounded stages surround one Cython-compiled compute step. The entitlement filter is applied before the controlled calculation path, and the numerical result comes from that deterministic calculation. Retained structured logs support review of the configured path; generated phrasing remains probabilistic, and latency is measured for approved query shapes rather than assumed for every combination.
-      </>
-    ),
-  }}
-/>
-
-## Coverage, guardrails, and boundary enforcement
-
-Three properties the architecture has to maintain under real queries, including the ones that fail.
-
-**What happens when the Gate fails.** The Stage 1 Gate call returns a structured intent object or a rejection. If the intent is malformed or flagged, the declared path returns a clarification or refusal and does not invoke Stage 2 or downstream data access. Because the Gate is probabilistic, false accepts and false rejects are residual risks that need test sets, monitoring, and a safe fallback.
-
-**What happens when the Gate says out-of-scope.** The Gate call classifies whether the query is inside the WorkforceAnalytics domain set. Questions about payroll processing, HR performance reviews, and benefits administration are out of scope. On an out-of-scope decision, the declared path terminates before metadata extraction, compute, and answer shaping, and the user receives a scoped reply directing them to the governed source system or its support owner. Classifier errors remain possible, so deterministic domain allow-lists and downstream validation provide additional checks.
-
-**How the walls constrain exposure.** Wall 1 separates LLM intent work from deterministic data access through narrow function signatures and typed contracts. Wall 2 limits answer-shaping inputs to structured aggregates rather than underlying records. Reviewers can inspect the signatures, call sites, serializers, and logs, while tests and runtime validation check the allowed schemas. These controls reduce exposure but do not prove its absence: aggregates can themselves be sensitive, alternate integrations can bypass an intended interface, and misconfiguration can weaken a boundary. Access control, aggregation thresholds where needed, integration tests, telemetry review, and monitoring are part of the operating control set.
-
-Configured model calls, compute steps, and entitlement resolutions write structured trace records. Those records support review of a request path when the related inputs and versions are retained. Exact replay also depends on retaining the source-data snapshot, entitlement state, code and prompt versions, model version, and sampling settings; generated text can still vary.
-
-## Timeline + velocity
-
-WorkforceAnalytics went from the first design outline to production in ~5 months, with v2 cycles continuing after. The architecture stabilized early; most of the engineering time after month two went into the permission cascade, the Cython-compiled compute layer, and the employee-event-level ins/outs calculations. Stakeholder conversations (explaining, repeatedly, why LLM-as-Router was the right shape rather than the seductive monolithic pattern) ran in parallel through the first three months. [Why I Chose LLM-as-Router Over a Monolithic Agent](/blog/workforce-analytics-llm-as-router) tells the story of that stretch.
-
-## What's next: WorkforceAnalytics v2
-
-The next evolution extends the pattern without changing its shape. Three directions on the table:
-
-- **Skill composition.** Cross-domain-path Answer-stage calls become named skills with declared input/output contracts. A new domain is added by registering a skill, not by forking the answer-shaping code.
-- **Richer Gate.** The Stage 1 Gate gains access to a small set of deterministic classifiers (question-shape, temporal-shape, cross-domain-shape) that inform path selection more precisely.
-- **Expanded scope.** Additional domains come online behind the same pattern (forecasting, variance analysis) each as a new deterministic compute module plus a new Stage 3 Answer-stage call for that domain. The envelope does not change.
-
-The constraints that shaped v1 still hold. Each v2 capability needs evidence against the same four gates: repeatable calculation for controlled inputs, entitlement enforced outside the model, measured latency at scale, and reuse of the governed source of truth.
-
-## What transfers
-
-The LLM-as-Router pattern is not specific to CFO analytics. It applies anywhere:
-
-- The calculation must be repeatable for the same authorized inputs and retained snapshot
-- Model context should be minimized to explicitly approved fields
-- Permission enforcement should be implemented outside the model and verified with tests, logs, and monitoring
-- The cost of a wrong answer exceeds the cost of a slightly less elegant architecture
-
-WorkforceAnalytics was the first production shape this pattern took inside RBC; it now underlies other systems. AI/LLM Drafting Platform applies the separation with a richer action vocabulary; [AI/LLM Drafting Platform: Four Decisions Behind a Reviewable Drafting Workflow](/blog/enterprise-agentic-ai-framework) explains that variant. FinancialBenchmarking v2 applies a related boundary to intent classification and a constrained SQL surface.
-
-The pattern transfers across system types because the constraints are shared. Giving an LLM broad data and tool access raises the same governance questions in many regulated-enterprise settings. LLM-as-Router is one compact response, provided its declared boundaries are verified in the deployed system.
+A production boundary is credible only when responsibility, failure, and evidence remain legible after the prototype becomes a production system.

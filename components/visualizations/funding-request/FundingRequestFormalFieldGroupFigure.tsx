@@ -1,14 +1,14 @@
-import type { ParFormalFieldGroupContent } from '@/data/visualizations/par';
-import ParFigureHeader from './ParFigureHeader';
+import type { FundingRequestFormalFieldGroupContent } from '@/data/visualizations/projectApproval';
+import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
-interface ParFormalFieldGroupFigureProps {
-  content: ParFormalFieldGroupContent;
+interface FundingRequestFormalFieldGroupFigureProps {
+  content: FundingRequestFormalFieldGroupContent;
 }
 
-export default function ParFormalFieldGroupFigure({ content }: ParFormalFieldGroupFigureProps) {
+export default function FundingRequestFormalFieldGroupFigure({ content }: FundingRequestFormalFieldGroupFigureProps) {
   return (
-    <section className="par-figure" aria-labelledby={`${content.id}-title`}>
-      <ParFigureHeader content={content} headingId={`${content.id}-title`} />
+    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+      <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">
         <div className="border-y border-dotted border-text-primary py-4 text-center">

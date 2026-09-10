@@ -151,7 +151,7 @@ export interface CommodityTaxFormalTraceContent extends CommodityTaxFigureBase {
 }
 
 export const COMMODITY_TAX_CASE_INTRO =
-  'Read the architecture in two moves: separate deterministic computation from configured inspection, then follow one questioned value toward the records associated with it.';
+  'The architecture separates deterministic computation from configured inspection, then preserves a path from a questioned value toward its associated records.';
 
 export const COMMODITY_TAX_CASE_OVERVIEW: CommodityTaxOverviewContent = {
   id: 'commodity-tax-case-overview',
@@ -325,35 +325,23 @@ export const COMMODITY_TAX_BUILDER_LOOP: CommodityTaxTrustLoopContent = {
 
 export const COMMODITY_TAX_PRACTITIONER_DECISIONS: CommodityTaxDecisionMapContent = {
   id: 'commodity-tax-practitioner-decisions',
-  title: 'Four operating pressures shaped the delivery architecture',
+  title: 'Two operating pressures shaped the delivery architecture',
   headingLevel: 2,
   caption:
-    'The practitioner view connects each pressure to a design choice and the operating responsibility that remained after the choice.',
+    'Each operating pressure leads to a design choice and a responsibility that remains.',
   columnLabels: ['Operating pressure', 'Architecture choice', 'Responsibility retained'],
   decisions: [
     {
       number: '01',
-      pressure: 'The workflow required repeatable General Ledger extraction and transformation on the sanctioned data platform.',
-      choice: 'PySpark stages on the sanctioned CDP platform.',
-      operatingConsequence: 'Distributed execution fit the scale, while development, scheduling, and platform operation still required discipline.',
+      pressure: 'The calculation had to be repeatable across the five governed stages and the full source population.',
+      choice: 'Use PySpark for the governed transformation path.',
+      operatingConsequence: 'Distributed calculation fit the workload, while mappings, schedules, data quality, and code still required review and operation.',
     },
     {
       number: '02',
       pressure: 'A final output alone would not support efficient investigation of reviewer questions.',
       choice: 'Configured Tableau inspection surfaces beside the calculation path.',
       operatingConsequence: 'Review became more direct, but dashboard joins, semantics, permissions, and performance needed their own testing.',
-    },
-    {
-      number: '03',
-      pressure: 'Account-to-category knowledge had to become explicit and changeable under review.',
-      choice: 'Versioned mapping rules in the governed pipeline.',
-      operatingConsequence: 'Changes gained a review trail, while code-owned rules remained a coordination bottleneck.',
-    },
-    {
-      number: '04',
-      pressure: 'Finance users already had established review tools and a low tolerance for unfamiliar black boxes.',
-      choice: 'Use the familiar Tableau surface and introduce automation incrementally.',
-      operatingConsequence: 'The design reused a familiar review surface, while analyst reconciliation and accountable sign-off stayed in the operating model.',
     },
   ],
   operatingRuleLabel: 'Operating rule',
@@ -470,7 +458,7 @@ export const COMMODITY_TAX_FORMAL_TRACE: CommodityTaxFormalTraceContent = {
   caption:
     'Figure 2. A selected return value is traced backward through the recorded links that connect it to aggregates, mappings, reconciliations, and source records.',
   caveat:
-    'The trace explains the available recorded path. It does not prove that the path is complete or correct; the conditions below still require testing.',
+    'Recorded links expose the available path, not proof that it is complete or correct. Source, mapping, join, retention, and authorization conditions still require testing.',
   selectionLabel: 'Starting point',
   selectionDetail: 'One questioned return value',
   levels: [

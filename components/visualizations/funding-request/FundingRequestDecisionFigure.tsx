@@ -1,14 +1,14 @@
-import type { ParDecisionContent } from '@/data/visualizations/par';
-import ParFigureHeader from './ParFigureHeader';
+import type { FundingRequestDecisionContent } from '@/data/visualizations/projectApproval';
+import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
-interface ParDecisionFigureProps {
-  content: ParDecisionContent;
+interface FundingRequestDecisionFigureProps {
+  content: FundingRequestDecisionContent;
 }
 
-export default function ParDecisionFigure({ content }: ParDecisionFigureProps) {
+export default function FundingRequestDecisionFigure({ content }: FundingRequestDecisionFigureProps) {
   return (
-    <section className="par-figure" aria-labelledby={`${content.id}-title`}>
-      <ParFigureHeader content={content} headingId={`${content.id}-title`} />
+    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+      <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">
         <div className="hidden grid-cols-[3rem_1fr_1fr_1fr] gap-5 border-b-2 border-text-primary pb-3 md:grid">

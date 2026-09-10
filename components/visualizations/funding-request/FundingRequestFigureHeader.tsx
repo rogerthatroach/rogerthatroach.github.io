@@ -1,11 +1,11 @@
-import type { ParFigureBase } from '@/data/visualizations/par';
+import type { FundingRequestFigureBase } from '@/data/visualizations/projectApproval';
 
-interface ParFigureHeaderProps {
-  content: ParFigureBase;
+interface FundingRequestFigureHeaderProps {
+  content: FundingRequestFigureBase;
   headingId: string;
 }
 
-export default function ParFigureHeader({ content, headingId }: ParFigureHeaderProps) {
+export default function FundingRequestFigureHeader({ content, headingId }: FundingRequestFigureHeaderProps) {
   return (
     <header className="flex items-start gap-3 border-l-2 border-text-primary pl-4">
       <span aria-hidden="true" className="mt-2 h-2 w-2 shrink-0 bg-text-primary" />

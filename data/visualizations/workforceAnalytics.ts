@@ -127,19 +127,19 @@ export interface WorkforceAnalyticsMovementModelContent extends WorkforceAnalyti
 }
 
 export const WORKFORCE_ANALYTICS_CASE_INTRO =
-  'Read this as a responsibility map, not a deployment topology. It shows where language work ends, where entitlement and calculation begin, and what changes when a question crosses supported domains.';
+  'Language work ends where entitlement and calculation begin. Cross-domain questions change the branch, not the responsibility boundary. Application responsibilities, not deployment topology.';
 
 export const WORKFORCE_ANALYTICS_CASE_OVERVIEW: WorkforceAnalyticsCaseOverviewContent = {
-  id: 'workforceAnalytics-case-overview',
+  id: 'workforce-analytics-case-overview',
   title: 'Language stays at the edges; permissions and calculation stay in code',
   thesis:
     'The request and answer may be model-mediated. The authorized scope and the numerical result come from a separate controlled path.',
   caption:
-    'WorkforceAnalytics keeps the same responsibility split for a single-domain request and a cross-domain request. The branch changes; the entitlement and calculation boundary does not.',
+    'The AI/LLM workforce analytics platform keeps the same responsibility split for a single-domain request and a cross-domain request. The branch changes; the entitlement and calculation boundary does not.',
   caveat:
     'The two rules mark declared application contracts. They are not network-security boundaries, and their effectiveness depends on complete route coverage, current configuration, tests, access controls, logging, and monitoring.',
   headingLevel: 3,
-  scenarioControlLabel: 'Choose an WorkforceAnalytics query shape',
+  scenarioControlLabel: 'Choose a workforce analytics query shape',
   noScriptComparisonLabel: 'Cross-domain comparison',
   openingLabel: 'Responsible user',
   openingDetail: 'Asks a supported question within an authorized working context.',
@@ -202,7 +202,7 @@ export const WORKFORCE_ANALYTICS_CASE_OVERVIEW: WorkforceAnalyticsCaseOverviewCo
 };
 
 export const WORKFORCE_ANALYTICS_BUILDER_CONTRAST: WorkforceAnalyticsBuilderContrastContent = {
-  id: 'workforceAnalytics-builder-contrast',
+  id: 'workforce-analytics-builder-contrast',
   title: 'The faster prototype widened the wrong boundaries',
   thesis:
     'The consequential choice was not whether to use a language model. It was whether the model would direct permission, data access, and calculation.',
@@ -273,7 +273,7 @@ const ENTITLEMENT_DETAIL: readonly WorkforceAnalyticsEntitlementStep[] = [
 ];
 
 export const WORKFORCE_ANALYTICS_PRACTITIONER_DECISIONS: WorkforceAnalyticsDecisionMapContent = {
-  id: 'workforceAnalytics-practitioner-decisions',
+  id: 'workforce-analytics-practitioner-decisions',
   title: 'Four operating pressures produced four architecture choices',
   thesis:
     'Each choice narrows one risk, but none removes the need for tests, current configuration, monitoring, and accountable use.',
@@ -316,7 +316,7 @@ export const WORKFORCE_ANALYTICS_PRACTITIONER_DECISIONS: WorkforceAnalyticsDecis
 };
 
 export const WORKFORCE_ANALYTICS_TECHNICAL_OVERVIEW: WorkforceAnalyticsTechnicalOverviewContent = {
-  id: 'workforceAnalytics-technical-overview',
+  id: 'workforce-analytics-technical-overview',
   title: 'Each boundary has a different input, control, and failure',
   thesis:
     'A routing error, an entitlement error, a calculation error, and a misleading explanation are different failures and need different evidence.',
@@ -358,7 +358,7 @@ export const WORKFORCE_ANALYTICS_TECHNICAL_OVERVIEW: WorkforceAnalyticsTechnical
 };
 
 export const WORKFORCE_ANALYTICS_PERMISSION_CASCADE: WorkforceAnalyticsPermissionCascadeContent = {
-  id: 'workforceAnalytics-permission-cascade',
+  id: 'workforce-analytics-permission-cascade',
   title: 'Authorization becomes a query filter through five inspectable handoffs',
   thesis:
     'Each handoff translates and bounds the resolved scope for the next representation. A missing, stale, or invalid relation must stop or flag the path rather than widen it.',
@@ -410,15 +410,15 @@ export const WORKFORCE_ANALYTICS_PERMISSION_CASCADE: WorkforceAnalyticsPermissio
     'Do not infer a broader scope. Stop, surface the failed relation, and resolve the catalog or hierarchy evidence before calculation.',
 };
 
-export const WORKFORCE_ANALYTICS_EVENT_MODEL: WorkforceAnalyticsMovementModelContent = {
-  id: 'workforceAnalytics-event-model',
+export const WORKFORCE_ANALYTICS_MOVEMENT_MODEL: WorkforceAnalyticsMovementModelContent = {
+  id: 'workforce-analytics-movement-model',
   title: 'Events explain movement that two snapshots can hide',
   thesis:
     'Snapshots answer where headcount stood. Paired movement records explain how it changed and whether a transfer nets within or moves across rollups.',
   caption:
     'Three conceptual movement states show what snapshots reveal, what event evidence adds, and when incomplete evidence must return to reconciliation.',
   caveat:
-    'Netting depends on correctly paired, de-duplicated movement records and the hierarchy version in effect. The figure illustrates the rule; it is not evidence that source data is complete.',
+    'Netting depends on correctly paired, de-duplicated movement records and the hierarchy version in effect. The rule shown here does not establish source-data completeness.',
   headingLevel: 3,
   scenarioControlLabel: 'Choose a movement-evidence state',
   columnLabels: ['Snapshot view', 'Movement evidence', 'Rollup result', 'Review action'],
@@ -459,5 +459,5 @@ export const WORKFORCE_ANALYTICS_EVENT_MODEL: WorkforceAnalyticsMovementModelCon
   WORKFORCE_ANALYTICS_PRACTITIONER_DECISIONS,
   WORKFORCE_ANALYTICS_TECHNICAL_OVERVIEW,
   WORKFORCE_ANALYTICS_PERMISSION_CASCADE,
-  WORKFORCE_ANALYTICS_EVENT_MODEL,
+  WORKFORCE_ANALYTICS_MOVEMENT_MODEL,
 ].forEach((spec) => validateVisualizationSpec(spec));

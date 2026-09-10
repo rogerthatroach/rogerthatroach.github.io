@@ -73,7 +73,7 @@ export const DOCUMENT_INTELLIGENCE_SPECIMEN: DocumentIntelligenceSpecimenContent
   caption:
     'An illustrative, non-client form showing the component boundary: Document AI provides text and layout context, OpenCV and Random Forest handle checkbox regions, and the classified states return to the document structure.',
   caveat:
-    'This is a responsibility map, not a deployment topology. The synthetic form and sequence omit storage, platform, and client-specific implementation detail.',
+    'Responsibilities, not deployment topology. The synthetic form and sequence omit storage, platform, and client-specific implementation detail.',
   headingLevel: 3,
   specimen: {
     id: 'synthetic-form',

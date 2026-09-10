@@ -18,9 +18,9 @@ export interface BlogPostMeta {
    * Must match an id in data/projects.ts.
    */
   projectId?:
-    | 'funding-request-drafting'
-    | 'workforceAnalytics'
-    | 'financialBenchmarking'
+    | 'project-approval-drafting'
+    | 'workforce-analytics'
+    | 'financial-peer-benchmarking'
     | 'commodity-tax'
     | 'document-intelligence'
     | 'combustion-tuning';
@@ -60,30 +60,30 @@ export interface BlogPost {
   furtherReading: FurtherReadingItem[];
 }
 
-export function isPostPublic(post: BlogPost, now: number = Date.now()): boolean {
-  return post.meta.status === 'published' && new Date(post.meta.date).getTime() <= now;
+export function isPostPublic(post: BlogPost): boolean {
+  return post.meta.status === 'published';
 }
 
-export function isPostSlugPublic(slug: string | undefined, now: number = Date.now()): boolean {
+export function isPostSlugPublic(slug: string | undefined): boolean {
   if (!slug) return false;
   const post = POSTS.find((p) => p.meta.slug === slug);
-  return post ? isPostPublic(post, now) : false;
+  return post ? isPostPublic(post) : false;
 }
 
 export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'agentic-ai',
-      title: 'WorkforceAnalytics: Bounded LLM Roles for Financial Analytics',
+      title: 'AI/LLM Workforce Analytics: Bounded Model Roles and Deterministic Controls',
       subtitle: 'How intent routing, entitlement filtering, deterministic calculation, and output checks divide responsibility in a production CFO analytics system.',
       date: '2026-03-01',
       tags: ['LLM Routing', 'Entitlements', 'Deterministic Computation', 'Financial Analytics', 'Failure Modes'],
       readingTime: '10 min read',
       abstract:
-        'WorkforceAnalytics places model-mediated intent and answer shaping around a conventional entitlement and calculation path. This note traces the inputs, outputs, controls, and failure modes at each boundary; explains permission-to-SQL translation and the event-versus-snapshot distinction; and states what the production evidence does and does not establish.',
+        'The AI/LLM Workforce Analytics Platform places model-mediated intent and answer shaping around a conventional entitlement and calculation path. Each boundary has distinct inputs, outputs, controls, and failure modes; entitlement-to-query translation and event-versus-snapshot behavior expose what the production evidence can and cannot establish.',
       updated: '2026-08-09',
       status: 'published',
-      projectId: 'workforceAnalytics',
+      projectId: 'workforce-analytics',
       register: 'technical',
     },
     references: [
@@ -91,24 +91,24 @@ export const POSTS: BlogPost[] = [
       { id: 4, authors: 'Li, H. et al.', title: 'Privacy in Large Language Models: Attacks, Defenses and Future Directions', venue: 'arXiv preprint arXiv:2310.10383', year: 2023, url: 'https://arxiv.org/abs/2310.10383' },
     ],
     furtherReading: [
-      { title: 'Why I Chose LLM-as-Router Over a Monolithic Agent', url: '/blog/workforce-analytics-llm-as-router', description: 'The builder story about the consequential architecture call and the work required to productionise it.' },
-      { title: 'LLM-as-Router in Practice — Four Decisions', url: '/blog/workforce-analytics-routing-framework', description: 'A decision guide to the alternatives, trade-offs, and residual risks behind the same system.' },
-      { title: 'WorkforceAnalytics — Case Study', url: '/projects/workforceAnalytics', description: 'A concise account of the problem, contribution, architecture, operating state, and limits.' },
+      { title: 'Building AI/LLM Workforce Analytics Around a Deliberate Model Boundary', url: '/blog/workforce-analytics-model-boundary', description: 'The consequential architecture call and the work required to productionise it.' },
+      { title: 'AI/LLM Workforce Analytics: Four Decisions About Model and Deterministic Work', url: '/blog/workforce-analytics-boundary-decisions', description: 'Alternatives, trade-offs, and residual risks behind the same system.' },
+      { title: 'AI/LLM Workforce Analytics Platform — Case Study', url: '/projects/workforce-analytics', description: 'Problem, contribution, architecture, operating state, and limits.' },
     ],
   },
   {
     meta: {
       slug: 'text-to-sql',
-      title: 'FinancialBenchmarking: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
+      title: 'Financial Peer Benchmarking: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
       subtitle: 'How semantic candidate retrieval, evaluated clarification, reviewed SQL templates, parameter binding, and database controls constrain financial benchmarking queries.',
       date: '2026-02-08',
       tags: ['Text-to-SQL', 'Semantic Retrieval', 'Ambiguity', 'SQL Safety Controls', 'Failure Paths'],
       readingTime: '9 min read',
       abstract:
-        'FinancialBenchmarking separates intent parsing, catalog candidate retrieval, ambiguity handling, reviewed query construction, and deterministic formatting. This note explains the input, output, primary control, and failure response at each stage; treats clarification as a normal outcome; and keeps free-form model output away from database execution.',
+        'The Financial Peer Benchmarking Platform separates intent parsing, catalog candidate retrieval, ambiguity handling, reviewed query construction, and deterministic formatting. Each stage has a declared input, output, primary control, and failure response; clarification is a normal outcome, and free-form model output never reaches database execution.',
       updated: '2026-08-09',
       status: 'published',
-      projectId: 'financialBenchmarking',
+      projectId: 'financial-peer-benchmarking',
       register: 'technical',
     },
     references: [
@@ -120,9 +120,9 @@ export const POSTS: BlogPost[] = [
       { id: 7, authors: 'OWASP Foundation', title: 'SQL Injection Prevention Cheat Sheet', venue: 'owasp.org', year: 2023, url: 'https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html' },
     ],
     furtherReading: [
-      { title: 'Two Weeks, One Refactor: Velocity, Clarity, and Model Readiness', url: '/blog/financial-benchmarking-refactor-velocity', description: 'The builder story about why the focused two-week refactor was possible and how the production team integrated it.' },
-      { title: 'Decomposition as Guardrail — Four Decisions', url: '/blog/financial-benchmarking-decomposition-framework', description: 'The decision guide to decomposition, candidate retrieval, reviewed templates, and clarification trade-offs.' },
-      { title: 'FinancialBenchmarking — Case Study', url: '/projects/financialBenchmarking', description: 'A concise account of the product, contribution boundary, five-stage design, and operating state.' },
+      { title: 'Financial Peer Benchmarking: What Made a Two-Week Refactor Possible', url: '/blog/financial-benchmarking-refactor', description: 'Why the focused two-week refactor was possible and how the production team integrated it.' },
+      { title: 'Financial Peer Benchmarking: Four Decisions for Bounded Text-to-SQL', url: '/blog/financial-benchmarking-query-decisions', description: 'Decomposition, candidate retrieval, reviewed templates, and clarification trade-offs.' },
+      { title: 'Financial Peer Benchmarking Platform — Case Study', url: '/projects/financial-peer-benchmarking', description: 'Product, contribution boundary, five-stage design, and operating state.' },
     ],
   },
   {
@@ -134,7 +134,7 @@ export const POSTS: BlogPost[] = [
       tags: ['PSO', 'Human-in-the-Loop', 'Industrial ML', 'Systems Design', 'Feedback Loops'],
       readingTime: '10 min read',
       abstract:
-        'A model output is not yet a useful system. This note starts with 84 regression models, Particle Swarm Optimization, and operator-reviewed combustion settings at Maizuru, then tests four recurring questions—observe, estimate, choose, act—plus a return-path check against later document, finance, and model-assisted workflows. The questions transfer; the mechanisms and guarantees do not.',
+        'A model output is not yet a useful system. At Maizuru, 84 regression models, Particle Swarm Optimization, and operator-reviewed combustion settings ground four recurring questions—observe, estimate, choose, act—plus a return-path check across later document, finance, and model-assisted workflows. The questions transfer; the mechanisms and guarantees do not.',
       updated: '2026-08-09',
       status: 'published',
       register: 'technical',
@@ -152,16 +152,16 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'enterprise-agentic-ai-architecture',
-      title: 'AI/LLM Drafting Platform: One Agent, Bounded Tools, Reviewable Drafting',
+      title: 'AI/LLM Drafting: One Agent, Bounded Tools, Human Review',
       subtitle: 'How retained state, field-scoped evidence, ownership-aware merge, coverage checks, and human review shape a production drafting workflow.',
       date: '2026-03-22',
       tags: ['LangGraph', 'MCP', 'Field-Scoped Retrieval', 'Single-Agent Systems', 'Human Review'],
       readingTime: '7 min read',
       abstract:
-        'AI/LLM Drafting Platform uses one LangGraph orchestrator to guide drafting across retained sessions. Typed MCP tools handle bounded workflow actions; field-scoped retrieval supplies evidence to extraction tasks; ownership-aware merge and coverage checks surface collisions and gaps for author review. The post explains where these controls help, what evidence they preserve, and which failures still require human judgment.',
+        'The AI/LLM Drafting Platform uses one LangGraph orchestrator to guide drafting across retained sessions. Typed MCP tools handle bounded workflow actions; field-scoped retrieval supplies evidence to extraction tasks; ownership-aware merge and coverage checks surface collisions and gaps for author review. These controls preserve evidence and expose failure paths without removing the need for human judgment.',
       updated: '2026-08-09',
       status: 'published',
-      projectId: 'funding-request-drafting',
+      projectId: 'project-approval-drafting',
       register: 'technical',
     },
     references: [
@@ -170,6 +170,9 @@ export const POSTS: BlogPost[] = [
       { id: 7, authors: 'Lewis, P. et al.', title: 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks', venue: 'NeurIPS', year: 2020 },
     ],
     furtherReading: [
+      { title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch', url: '/blog/project-approval-drafting-platform-building', description: 'From initial product thesis through pilot and full CFO Group launch.' },
+      { title: 'AI/LLM Drafting: Four Decisions Behind a Reviewable Workflow', url: '/blog/enterprise-agentic-ai-framework', description: 'Chosen approaches, strongest alternatives, costs, and residual risks.' },
+      { title: 'AI/LLM Drafting Platform — Case Study', url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
       { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Graph-based workflow orchestration with state, conditional routing, and checkpoints.' },
       { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Typed interfaces for tools and model-accessible capabilities.' },
       { title: 'Retrieval-Augmented Generation', url: 'https://arxiv.org/abs/2005.11401', description: 'The original RAG paper; useful background for retrieval as one component of the workflow.' },
@@ -178,135 +181,110 @@ export const POSTS: BlogPost[] = [
   {
     meta: {
       slug: 'enterprise-agentic-ai-framework',
-      title: 'AI/LLM Drafting Platform: Four Decisions Behind a Reviewable Drafting Workflow',
+      title: 'AI/LLM Drafting: Four Decisions Behind a Reviewable Workflow',
       subtitle:
-        'Why one graph owns orchestration, tools stay bounded, evidence is scoped by field group, and missing coverage returns to clarification.',
+        'One-graph control, registered tools, field-scoped evidence, bounded concurrency, and author review divide responsibility in the workflow.',
       date: '2026-04-22',
       tags: ['LangGraph', 'MCP', 'RAG', 'Agentic AI', 'Single-Agent Envelope'],
-      readingTime: '10 min read',
-      abstract:
-        'A decision guide to AI/LLM Drafting Platform’s production v1 architecture: single-agent orchestration, typed tool boundaries, field-scoped retrieval, and bounded extraction with ownership-aware merge. It compares the main alternatives, explains the trade-offs, and keeps coverage gaps and human review explicit.',
-      updated: '2026-08-09',
-      status: 'published',
-      projectId: 'funding-request-drafting',
-      register: 'practitioner',
-    },
-    references: [
-      { id: 1, authors: 'Yao, S. et al.', title: 'ReAct: Synergizing Reasoning and Acting in Language Models', venue: 'ICLR', year: 2023 },
-      { id: 2, authors: 'Schick, T. et al.', title: 'Toolformer: Language Models Can Teach Themselves to Use Tools', venue: 'NeurIPS', year: 2023 },
-      { id: 3, authors: 'Wang, L. et al.', title: 'A Survey on Large Language Model based Autonomous Agents', venue: 'arXiv preprint arXiv:2308.11432', year: 2023, url: 'https://arxiv.org/abs/2308.11432' },
-      { id: 5, authors: 'Anthropic', title: 'Model Context Protocol Specification', venue: 'modelcontextprotocol.io', year: 2024, url: 'https://modelcontextprotocol.io/' },
-      { id: 6, authors: 'LangChain, Inc.', title: 'LangGraph: Multi-Actor Applications with LLMs', venue: 'LangChain, Inc.', year: 2024, url: 'https://langchain-ai.github.io/langgraph/' },
-      { id: 7, authors: 'Lewis, P. et al.', title: 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks', venue: 'NeurIPS', year: 2020 },
-      { id: 10, authors: 'Li, H. et al.', title: 'Privacy in Large Language Models: Attacks, Defenses and Future Directions', venue: 'arXiv preprint arXiv:2310.10383', year: 2023, url: 'https://arxiv.org/abs/2310.10383' },
-      { id: 13, authors: 'Mialon, G. et al.', title: 'Augmented Language Models: A Survey', venue: 'Transactions on Machine Learning Research', year: 2023 },
-    ],
-    furtherReading: [
-      { title: 'AI/LLM Drafting Platform: One Agent, Bounded Tools, Reviewable Drafting', url: '/blog/enterprise-agentic-ai-architecture', description: 'The technical note on mechanism, evidence boundaries, failure paths, and residual risk.' },
-      { title: 'How We Built AI/LLM Drafting Platform: From One-Page Vision to Production Platform', url: '/blog/funding-request-drafting-platform-building', description: 'The production journey from one-page vision through pilot and full CFO Group launch.' },
-    ],
-  },
-  {
-    meta: {
-      slug: 'funding-request-drafting-platform-building',
-      title: 'How We Built AI/LLM Drafting Platform: From One-Page Vision to Production Platform',
-      subtitle: 'How a one-page vision became a launched drafting platform, and what the journey taught about scope, parallel work, and review boundaries.',
-      date: '2026-04-17',
-      tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
-      readingTime: '9 min read',
-      abstract:
-        'The story of how a one-page vision became AI/LLM Drafting Platform: an Amplify ideation exercise, a production build, an April 2026 pilot, and full CFO Group launch across all geographies in May. The focus is the product journey, the consequential architecture calls, and three leadership lessons about scoping, parallel execution, and turning vision into a production system.',
-      updated: '2026-08-09',
-      status: 'published',
-      projectId: 'funding-request-drafting',
-      register: 'builder',
-    },
-    references: [],
-    furtherReading: [
-      { title: 'AI/LLM Drafting Platform: One Agent, Bounded Tools, Reviewable Drafting', url: '/blog/enterprise-agentic-ai-architecture', description: 'The technical note on context, tool, retrieval, merge, coverage, and review boundaries.' },
-      { title: 'What Happens After a Model Predicts?', url: '/blog/closed-loop', description: 'A bounded comparison between industrial PSO and enterprise AI, including what does not transfer across domains.' },
-      { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Official docs for directed-graph workflow orchestration with persistent state.' },
-      { title: 'Model Context Protocol (MCP)', url: 'https://modelcontextprotocol.io/', description: 'Open standard for typed tool contracts between AI assistants and external systems.' },
-      { title: 'pgvector', url: 'https://github.com/pgvector/pgvector', description: 'Vector similarity search for PostgreSQL, used here as part of a bounded field-group retrieval pattern.' },
-    ],
-  },
-  {
-    meta: {
-      slug: 'workforce-analytics-llm-as-router',
-      title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
-      subtitle:
-        'The architecture choice that kept entitlement and financial calculation outside the model, and the production work needed to make that boundary real.',
-      date: '2026-04-18',
-      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'WorkforceAnalytics'],
       readingTime: '7 min read',
       abstract:
-        'This is the story of rejecting a monolithic, broad-access agent while building WorkforceAnalytics, a production analytics platform for the CFO Group. It explains why LLM-as-Router keeps entitlement and calculation outside the model, what the permission-to-SQL work required, and where typed boundaries, tests, logging, and monitoring are still needed because the architecture does not prove its own enforcement.',
-      updated: '2026-08-09',
+        'Four operating constraints lead to four production decisions: one graph owns the session, registered tools perform bounded actions, retrieval follows the document’s field structure, and concurrent extraction remains inside the single-agent envelope. Each choice is paired with its strongest alternative, cost, and residual risk.',
+      updated: '2026-08-30',
       status: 'published',
-      projectId: 'workforceAnalytics',
+      projectId: 'project-approval-drafting',
+      register: 'practitioner',
+    },
+    references: [],
+    furtherReading: [
+      { title: 'AI/LLM Drafting: One Agent, Bounded Tools, Human Review', url: '/blog/enterprise-agentic-ai-architecture', description: 'Mechanism, evidence boundaries, failure paths, and residual risk.' },
+      { title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch', url: '/blog/project-approval-drafting-platform-building', description: 'The production journey from one-page plan through pilot and full CFO Group launch.' },
+      { title: 'AI/LLM Drafting Platform — Case Study', url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
+    ],
+  },
+  {
+    meta: {
+      slug: 'project-approval-drafting-platform-building',
+      title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch',
+      subtitle: 'How bounded exploration, one accountable workflow, and explicit review points turned an initial product thesis into a production drafting platform.',
+      date: '2026-04-17',
+      tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
+      readingTime: '5 min read',
+      abstract:
+        'The AI/LLM Drafting Platform began as a one-page plan, used the 2025 Amplify cohort for bounded problem exploration, entered pilot in April 2026, and launched across the full CFO Group in May. Amplify widened the option set; direct production ownership covered architecture, implementation, pilot, and launch.',
+      updated: '2026-08-30',
+      status: 'published',
+      projectId: 'project-approval-drafting',
+      register: 'builder',
+    },
+    references: [],
+    furtherReading: [
+      { title: 'AI/LLM Drafting: One Agent, Bounded Tools, Human Review', url: '/blog/enterprise-agentic-ai-architecture', description: 'Context, tools, retrieval, merge, coverage, and review boundaries.' },
+      { title: 'AI/LLM Drafting: Four Decisions Behind a Reviewable Workflow', url: '/blog/enterprise-agentic-ai-framework', description: 'Chosen approaches, strongest alternatives, costs, and residual risks.' },
+      { title: 'AI/LLM Drafting Platform — Case Study', url: '/projects/project-approval-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
+    ],
+  },
+  {
+    meta: {
+      slug: 'workforce-analytics-model-boundary',
+      title: 'Building AI/LLM Workforce Analytics Around a Deliberate Model Boundary',
+      subtitle:
+        'Why language work stayed at the edges, entitlement and calculation stayed in code, and cross-functional production delivery depended on that separation.',
+      date: '2026-04-18',
+      tags: ['Leadership', 'Agentic AI', 'Enterprise Architecture', 'Regulated AI', 'Workforce Analytics'],
+      readingTime: '6 min read',
+      abstract:
+        'From March through the November 2025 launch, the work ran alongside mentoring the Amplify cohort and a focused two-week peer-benchmarking refactor. The production platform kept intent and answer shaping at the model boundary while entitlement and calculation remained in code.',
+      updated: '2026-08-30',
+      status: 'published',
+      projectId: 'workforce-analytics',
       register: 'builder',
     },
     references: [],
     furtherReading: [
       {
-        title: 'WorkforceAnalytics: Bounded LLM Roles for Financial Analytics',
+        title: 'AI/LLM Workforce Analytics: Bounded Model Roles and Deterministic Controls',
         url: '/blog/agentic-ai',
-        description: 'The technical note on the LLM-as-Router boundary, its controls, evidence, failure paths, and residual risks.',
+        description: 'The LLM-as-Router boundary, its controls, evidence, failure paths, and residual risks.',
       },
       {
-        title: 'LLM-as-Router in Practice \u2014 Four Decisions',
-        url: '/blog/workforce-analytics-routing-framework',
-        description: 'A decision guide to the alternatives, trade-offs, and residual risks behind the same system.',
+        title: 'AI/LLM Workforce Analytics: Four Decisions About Model and Deterministic Work',
+        url: '/blog/workforce-analytics-boundary-decisions',
+        description: 'Alternatives, trade-offs, and residual risks behind the same system.',
       },
       {
-        title: 'How We Built AI/LLM Drafting Platform: From One-Page Vision to Production Platform',
-        url: '/blog/funding-request-drafting-platform-building',
-        description: 'A different system that uses typed MCP tool contracts and registered workflow records rather than WorkforceAnalytics\u2019s deterministic compute wall.',
-      },
-      {
-        title: 'WorkforceAnalytics \u2014 Case Study',
-        url: '/projects/workforceAnalytics',
-        description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
+        title: 'AI/LLM Workforce Analytics Platform \u2014 Case Study',
+        url: '/projects/workforce-analytics',
+        description: 'Problem, contribution, boundary decision, operating state, and limits.',
       },
     ],
   },
   {
     meta: {
-      slug: 'workforce-analytics-routing-framework',
-      title: 'LLM-as-Router in Practice \u2014 Four Decisions',
+      slug: 'workforce-analytics-boundary-decisions',
+      title: 'AI/LLM Workforce Analytics: Four Decisions About Model and Deterministic Work',
       subtitle:
-        'Four architecture decisions that separate model-assisted intent and answer shaping from entitlement-aware deterministic calculation.',
+        'Model placement, financial computation, pre-compute entitlement, and question-scoped answer shaping remain separate responsibilities.',
       date: '2026-04-23',
-      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'Entitlement', 'WorkforceAnalytics'],
-      readingTime: '14 min read',
+      tags: ['Agentic AI', 'LLM-as-Router', 'Cython', 'Entitlement', 'Workforce Analytics'],
+      readingTime: '7 min read',
       abstract:
-        'WorkforceAnalytics separates model-assisted intent and answer shaping from a deterministic Cython compute path. This guide compares four decisions: orchestration shape, computation layer, pre-compute entitlement enforcement, and answer strategy. It keeps the alternatives, trade-offs, access-control dependencies, validation, monitoring, and residual risks explicit.',
-      updated: '2026-08-09',
+        'The AI/LLM Workforce Analytics Platform treats interpretation, entitlement, calculation, and explanation as different responsibilities. Each boundary carries a chosen approach, strongest alternative, deciding crux, cost, and residual risk, plus clear limits on where the pattern transfers.',
+      updated: '2026-08-30',
       status: 'published',
-      projectId: 'workforceAnalytics',
+      projectId: 'workforce-analytics',
       register: 'practitioner',
     },
     references: [],
     furtherReading: [
       {
-        title: 'WorkforceAnalytics: Bounded LLM Roles for Financial Analytics',
+        title: 'AI/LLM Workforce Analytics: Bounded Model Roles and Deterministic Controls',
         url: '/blog/agentic-ai',
-        description: 'The technical note on system responsibilities, entitlement boundaries, production evidence, and failure paths.',
+        description: 'System responsibilities, entitlement boundaries, production evidence, and failure paths.',
       },
       {
-        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
-        url: '/blog/workforce-analytics-llm-as-router',
-        description: 'The delivery story behind the architecture call, including the pressure, scope, and productionisation work.',
-      },
-      {
-        title: 'AI/LLM Drafting Platform: Four Decisions Behind a Reviewable Drafting Workflow',
-        url: '/blog/enterprise-agentic-ai-framework',
-        description: 'A decision guide to single-agent orchestration, bounded tools, field-scoped retrieval, and coverage handling.',
-      },
-      {
-        title: 'LangGraph Documentation',
-        url: 'https://langchain-ai.github.io/langgraph/',
-        description: 'Directed-graph workflow orchestration with persistent state \u2014 the framework precedent for routing-style orchestration.',
+        title: 'Building AI/LLM Workforce Analytics Around a Deliberate Model Boundary',
+        url: '/blog/workforce-analytics-model-boundary',
+        description: 'The pressure, scope, and productionisation work behind the architecture call.',
       },
       {
         title: 'Cython: Python with C Performance',
@@ -314,84 +292,79 @@ export const POSTS: BlogPost[] = [
         description: 'The compiled-Python toolchain used by the deterministic event-level calculation path.',
       },
       {
-        title: 'WorkforceAnalytics \u2014 Case Study',
-        url: '/projects/workforceAnalytics',
-        description: 'The case study page: context, stakeholders, options considered, the decision rationale, and the production narrative.',
+        title: 'AI/LLM Workforce Analytics Platform \u2014 Case Study',
+        url: '/projects/workforce-analytics',
+        description: 'Problem, contribution, boundary decision, operating state, and limits.',
       },
     ],
   },
   {
     meta: {
-      slug: 'financial-benchmarking-decomposition-framework',
-      title: 'Decomposition as Guardrail — Four Decisions',
+      slug: 'financial-benchmarking-query-decisions',
+      title: 'Financial Peer Benchmarking: Four Decisions for Bounded Text-to-SQL',
       subtitle:
-        'Four decisions that constrain intent parsing, candidate retrieval, ambiguity handling, and reviewed SQL construction.',
+        'How a decomposed path separates KPI ambiguity from executable-query safety, and where clarification remains part of the product.',
       date: '2026-04-26',
-      tags: ['Text-to-SQL', 'Decomposition', 'SQL Safety', 'Embeddings', 'Calibration', 'FinancialBenchmarking'],
-      readingTime: '13 min read',
+      tags: ['Text-to-SQL', 'Decomposition', 'SQL Safety', 'Embeddings', 'Calibration', 'Peer Benchmarking'],
+      readingTime: '6 min read',
       abstract:
-        'This guide compares four decisions: decomposed orchestration, semantic KPI candidate retrieval, reviewed SQL templates with parameter binding, and confidence-gated clarification. A six-step query walkthrough and v1-to-v2 comparison show how the boundaries work in practice. The thesis: bound the LLM to intent and judgment under uncertainty; use decomposition as one layer of the guardrail.',
-      updated: '2026-08-09',
+        'Metric resolution and SQL execution are different risks. Four decisions keep them separate: decomposition instead of direct generation, semantic candidate retrieval, reviewed templates with parameter binding, and an accept-or-clarify policy whose scores route action rather than guarantee correctness.',
+      updated: '2026-08-30',
       status: 'published',
-      projectId: 'financialBenchmarking',
+      projectId: 'financial-peer-benchmarking',
       register: 'practitioner',
     },
     references: [],
     furtherReading: [
       {
-        title: 'FinancialBenchmarking: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
+        title: 'Financial Peer Benchmarking: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
         url: '/blog/text-to-sql',
-        description: 'The technical note on the five-stage pipeline, its controls, evidence, and explicit clarification and failure paths.',
+        description: 'The five-stage pipeline, its controls, evidence, and explicit clarification and failure paths.',
       },
       {
-        title: 'Two Weeks, One Refactor: Velocity, Clarity, and Model Readiness',
-        url: '/blog/financial-benchmarking-refactor-velocity',
-        description: 'The narrative of when those calls landed and how a later model cleared the held-out calibration bar for a shelved design.',
+        title: 'Financial Peer Benchmarking: What Made a Two-Week Refactor Possible',
+        url: '/blog/financial-benchmarking-refactor',
+        description: 'V1 operating knowledge, a shelved design, evaluation evidence, bounded scope, and production-team integration.',
       },
       {
-        title: 'LLM-as-Router in Practice — Four Decisions',
-        url: '/blog/workforce-analytics-routing-framework',
-        description: 'The same family of architectural decisions applied to cross-domain analytics. FinancialBenchmarking and WorkforceAnalytics share the family resemblance; the load-bearing piece differs.',
-      },
-      {
-        title: 'FinancialBenchmarking — Case Study',
-        url: '/projects/financialBenchmarking',
-        description: 'Project case study: context, the cascade architecture, the production narrative.',
+        title: 'Financial Peer Benchmarking Platform — Case Study',
+        url: '/projects/financial-peer-benchmarking',
+        description: 'Product, contribution boundary, five-stage design, operating state, and limits.',
       },
     ],
   },
   {
     meta: {
-      slug: 'financial-benchmarking-refactor-velocity',
-      title: 'Two Weeks, One Refactor: Velocity, Clarity, and Model Readiness',
+      slug: 'financial-benchmarking-refactor',
+      title: 'Financial Peer Benchmarking: What Made a Two-Week Refactor Possible',
       subtitle:
-        'A focused FinancialBenchmarking v1-to-v2 refactor ran for two weeks while WorkforceAnalytics was mid-flight and the summer intern program was running; the architecture had been on the shelf for months.',
+        'Why v1 operating knowledge, a shelved design, later evaluation evidence, bounded scope, and production-team integration made the focused window credible.',
       date: '2026-04-26',
-      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Model Readiness', 'FinancialBenchmarking'],
-      readingTime: '7 min read',
+      tags: ['Leadership', 'Velocity', 'Text-to-SQL', 'Architecture', 'Evaluation', 'Peer Benchmarking'],
+      readingTime: '6 min read',
       abstract:
-        'The v1 benchmarking module was refactored into the v2 architecture in a focused two-week sprint while WorkforceAnalytics and the 2025 summer intern cohort were also active. Months of prior design and prototyping preceded that window. An earlier model had failed the held-out calibration bar; a later model cleared it, allowing the shelved design to resume. My direct report and the broader team then integrated and productionalized it as FinancialBenchmarking v2. The 2025 CFO One RBC Team Award recognized v1.',
-      updated: '2026-08-01',
+        'The Financial Peer Benchmarking Platform’s v2 was a focused two-week concurrent refactor of its production v1 system, not a separate greenfield delivery. Its credibility came from v1 evidence, an earlier shelved design, later evaluation, bounded scope, and production-team integration.',
+      updated: '2026-08-30',
       status: 'published',
-      projectId: 'financialBenchmarking',
+      projectId: 'financial-peer-benchmarking',
       register: 'builder',
     },
     references: [],
     furtherReading: [
       {
-        title: 'FinancialBenchmarking: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
+        title: 'Financial Peer Benchmarking: A Five-Stage Text-to-SQL Pipeline with Explicit Failure Paths',
         url: '/blog/text-to-sql',
-        description: 'The technical note on semantic candidate retrieval, clarification, reviewed templates, parameter binding, and database controls.',
+        description: 'Semantic candidate retrieval, clarification, reviewed templates, parameter binding, and database controls.',
       },
       {
-        title: 'Why I Chose LLM-as-Router Over a Monolithic Agent',
-        url: '/blog/workforce-analytics-llm-as-router',
-        description: 'A related router-and-code separation, with different data, query, and disambiguation controls.',
+        title: 'Financial Peer Benchmarking: Four Decisions for Bounded Text-to-SQL',
+        url: '/blog/financial-benchmarking-query-decisions',
+        description: 'Decomposition, semantic candidates, reviewed templates, and accept-or-clarify behavior.',
       },
       {
-        title: 'FinancialBenchmarking v2 \u2014 Case Study',
-        url: '/projects/financialBenchmarking',
-        description: 'The case study page: context, the five-stage architecture, and the production narrative.',
+        title: 'Financial Peer Benchmarking Platform \u2014 Case Study',
+        url: '/projects/financial-peer-benchmarking',
+        description: 'Product, contribution boundary, five-stage design, operating state, and limits.',
       },
     ],
   },
@@ -403,10 +376,10 @@ export const POSTS: BlogPost[] = [
         'Why the pipeline ran on the sanctioned data platform and exposed configured inspection views to the analysts reviewing its output.',
       date: '2026-04-21',
       tags: ['Leadership', 'Decision Making', 'Stakeholder Review', 'PySpark', 'Tableau'],
-      readingTime: '9 min read',
+      readingTime: '5 min read',
       abstract:
-        'A decision guide to two choices in the Commodity Tax automation: use PySpark on the sanctioned data platform for repeatable calculation, and provide configured Tableau views for investigation. It compares the alternatives, trade-offs, and residual costs without treating visibility as proof of correctness.',
-      updated: '2026-08-09',
+        'Two choices shaped the Commodity Tax automation: use PySpark on the sanctioned data platform for repeatable calculation, and provide configured Tableau views for investigation. Both carry alternatives, trade-offs, and residual costs; neither turns visibility into proof of correctness.',
+      updated: '2026-08-30',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'practitioner',
@@ -414,19 +387,19 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'How Commodity Tax Built CFO Trust',
+        title: 'Commodity Tax: Designing Calculation and Inspection Together',
         url: '/blog/commodity-tax-cfo-trust',
-        description: 'The delivery story behind the first production workflow and its analyst investigation loop.',
+        description: 'The first production workflow and its analyst investigation loop.',
       },
       {
-        title: 'How We Built AI/LLM Drafting Platform: From One-Page Vision to Production Platform',
-        url: '/blog/funding-request-drafting-platform-building',
-        description: 'A later builder story about moving from a one-page vision through pilot and full CFO Group launch.',
+        title: 'Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch',
+        url: '/blog/project-approval-drafting-platform-building',
+        description: 'From a one-page vision through pilot and full CFO Group launch.',
       },
       {
         title: 'Commodity Tax — Case Study',
         url: '/projects/commodity-tax',
-        description: 'The case study page: context, stakeholders, options considered, decision rationale, production narrative, and lessons learned.',
+        description: 'Problem, contribution, decision, mechanism, operating outcome, and limits.',
       },
     ],
   },
@@ -440,7 +413,7 @@ export const POSTS: BlogPost[] = [
       tags: ['Data Lineage', 'Process Automation', 'Tableau', 'Analyst Review', 'Financial Controls'],
       readingTime: '8 min read',
       abstract:
-        'The Commodity Tax workflow separates a five-stage calculation path from configured inspection views. This note explains what recorded lineage must retain, how an analyst traces one questioned value, what happens when evidence is missing or inconsistent, and why visibility supports investigation without validating sources, rules, joins, or the return.',
+        'The Commodity Tax workflow separates a five-stage calculation path from configured inspection views. Recorded lineage must support one questioned value through the calculation path; missing or inconsistent evidence returns to investigation, and visibility does not validate sources, rules, joins, or the return.',
       updated: '2026-08-09',
       status: 'published',
       projectId: 'commodity-tax',
@@ -452,9 +425,9 @@ export const POSTS: BlogPost[] = [
     ],
     furtherReading: [
       {
-        title: 'How Commodity Tax Built CFO Trust',
+        title: 'Commodity Tax: Designing Calculation and Inspection Together',
         url: '/blog/commodity-tax-cfo-trust',
-        description: 'The builder story about the first delivery, the analyst investigation loop, and the credibility earned through production work.',
+        description: 'The first delivery, its finance-engineering collaboration, and the analyst investigation loop.',
       },
       {
         title: 'What Happens After a Model Predicts?',
@@ -464,22 +437,22 @@ export const POSTS: BlogPost[] = [
       {
         title: 'Commodity Tax — Case Study',
         url: '/projects/commodity-tax',
-        description: 'Project case study: context, the five-stage calculation path, configured inspection surfaces, and the analyst-review pattern.',
+        description: 'Context, the five-stage calculation path, configured inspection surfaces, and the analyst-review pattern.',
       },
     ],
   },
   {
     meta: {
       slug: 'commodity-tax-cfo-trust',
-      title: 'How Commodity Tax Built CFO Trust',
+      title: 'Commodity Tax: Designing Calculation and Inspection Together',
       subtitle:
-        'First project at RBC, first audition — and the architectural decision that turned a months-long manual process into a 90-minute automated one, and a skeptical finance team into the AI team\u2019s strongest sponsors.',
+        'How a governed PySpark calculation path and configured Tableau inspection views supported a roughly $600M allocation and reduced a months-long process to roughly 90 minutes.',
       date: '2026-04-26',
       tags: ['Leadership', 'Stakeholder Management', 'PySpark', 'Tableau', 'Process Automation'],
-      readingTime: '7 min read',
+      readingTime: '5 min read',
       abstract:
-        'The story of automating RBC\u2019s Commodity Tax return process from months to 90 minutes across a roughly $600M allocation, and why stakeholder review shaped the architecture. Covers the decision to treat Tableau as a transparency layer rather than only an output, the bounded review pattern it supported, and the cascade of AI initiatives this first project underwrote: FinancialBenchmarking v1, FinancialBenchmarking v2, WorkforceAnalytics, AI/LLM Drafting Platform.',
-      updated: '2026-08-01',
+        'My first substantial CFO Group delivery paired five-stage PySpark automation with configured Tableau inspection. It reduced a months-long process to roughly 90 minutes while keeping finance-engineering review, the limits of recorded lineage, and accountable investigation explicit.',
+      updated: '2026-08-30',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'builder',
@@ -487,29 +460,14 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       {
-        title: 'How We Built AI/LLM Drafting Platform: From One-Page Vision to Production Platform',
-        url: '/blog/funding-request-drafting-platform-building',
-        description: 'A later builder story about moving from a one-page vision through pilot and full CFO Group launch.',
-      },
-      {
-        title: 'What Happens After a Model Predicts?',
-        url: '/blog/closed-loop',
-        description: 'A bounded comparison of observation, estimation, decision, action, and feedback across unlike systems.',
+        title: 'Commodity Tax: Making a Financial Pipeline Inspectable',
+        url: '/blog/commodity-tax-provenance',
+        description: 'Calculation, recorded lineage, configured inspection, evidence gaps, and analyst review.',
       },
       {
         title: 'Commodity Tax — Case Study',
         url: '/projects/commodity-tax',
-        description: 'The case study page: context, stakeholders, options considered, decision rationale, production narrative, and lessons learned.',
-      },
-      {
-        title: 'PySpark Documentation',
-        url: 'https://spark.apache.org/docs/latest/api/python/',
-        description: 'The pipeline backbone used for large-scale General Ledger extraction.',
-      },
-      {
-        title: 'Tableau',
-        url: 'https://www.tableau.com/',
-        description: 'Used here for configured inspection views that support analyst investigation and review.',
+        description: 'Operating problem, contribution, calculation/inspection decision, outcome, and limits.',
       },
     ],
   },

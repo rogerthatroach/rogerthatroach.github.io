@@ -1,438 +1,96 @@
-import { ParDecisionFigure } from '@/components/visualizations/par'
-import CitationRef from '@/components/blog/CitationRef'
+import { FundingRequestDecisionFigure } from '@/components/visualizations/project-approval'
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
-import OptionsConsidered from '@/components/blog/framework/OptionsConsidered'
-import ConstraintsBlock from '@/components/blog/framework/ConstraintsBlock'
-import DecisionRationale from '@/components/blog/framework/DecisionRationale'
-import BeforeAfterDiff from '@/components/blog/framework/BeforeAfterDiff'
 import StepThrough from '@/components/blog/framework/StepThrough'
-import Glossed from '@/components/resume/story/Glossed'
-import { PAR_PRACTITIONER_DECISIONS } from '@/data/visualizations/par'
+import { PROJECT_APPROVAL_PRACTITIONER_DECISIONS } from '@/data/visualizations/projectApproval'
 
-Enterprise organizations run on structured processes. Project approvals, budget requests, compliance reviews: high-stakes, document-heavy workflows riddled with institutional knowledge that lives in people's heads rather than systems.
+The AI/LLM Drafting Platform had to guide an author through a branching, multi-turn project funding request workflow without turning every useful piece of work into another agent. Production v1 therefore uses one LangGraph graph to own the workflow and registered MCP tool routines to perform bounded work inside it.
 
-A chatbot alone does not cover that workflow. The user needs something that understands where they are in a multi-step process, holds context across the session, pulls relevant reference material at the right moment, and surfaces contradictions between policy sources so the author can resolve them.
+## Four operating constraints
 
-Retrieval-augmented generation is one component of the design <CitationRef id={7} />. The system-level problem is orchestration over a structured form. This post walks through the architecture at <Glossed>AI/LLM Drafting Platform</Glossed> inside <Glossed>RBC CFO Group</Glossed>, the first true agentic AI platform approved for production at the bank.
+1. **One reviewed single-agent scope.** Production v1 could branch, use tools, and retain state, but it could not delegate control to independent sub-agents.
+2. **A session spans turns.** Template choice, candidate fields, open questions, and review state have to remain coherent when a session pauses and resumes.
+3. **Evidence serves known targets.** The workflow drafts a structured document, so retrieval should support fields in scope rather than return one undifferentiated set of plausible passages.
+4. **The author remains accountable.** Missing coverage, conflicting candidates, and uncertain interpretation need a route back to clarification or review.
 
-## Constraints before choices
-
-Four constraints shaped every decision below. One is governance, two are regulatory/technical requirements, one is the shape of the source material. Every downstream choice was evaluated against these first; aesthetics second.
-
-<ConstraintsBlock
-  constraints={[
-    {
-      kind: 'regulatory',
-      label: 'Single-agent envelope',
-      detail: 'The governance bar for the first true agentic AI platform approved for production at the bank was one agent, one approved scope. No multi-agent orchestration in v1. The architecture had to get agent-like behavior (branching, conditional reasoning, tool use) without crossing that line.',
-    },
-    {
-      kind: 'hard',
-      label: 'Registered-action evidence',
-      detail: 'Every registered workflow action has to be a typed tool invocation with a committed audit record. Reconstruction depends on registry coverage, successful writes, retention, and controls for bypass paths.',
-    },
-    {
-      kind: 'hard',
-      label: 'Stateful orchestration',
-      detail: 'A PAR drafting session can span many turns. The state schema persists template choice, extracted field values, conflicts, open questions, and tool-record references so a successfully checkpointed session can resume within its retention window.',
-    },
-    {
-      kind: 'soft',
-      label: 'Heterogeneous inputs',
-      detail: 'Authors upload pptx, docx, txt, pdf, and images (OCR via an approved vision-capable model). Templates, guidelines, policies, and historical examples are all differently shaped. Retrieval has to cope with that without forcing everything through the same lens.',
-    },
-  ]}
-/>
-
-## The four architectural decisions
-
-Four calls separate AI/LLM Drafting Platform from a clever chatbot. Each one mapped to an explicit options comparison before it landed.
-
-<VisualizationContainer minHeight={0} caption={PAR_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-<ParDecisionFigure content={PAR_PRACTITIONER_DECISIONS} />
+<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_PRACTITIONER_DECISIONS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <FundingRequestDecisionFigure content={PROJECT_APPROVAL_PRACTITIONER_DECISIONS} />
 </VisualizationContainer>
 
-### Decision 1 · Orchestration framework
+## Decision 1: put one graph in charge
 
-<OptionsConsidered
-  decision="What orchestrates an extended, branching drafting session?"
-  options={[
-    {
-      name: 'LangGraph',
-      summary: 'Directed graph with conditional edges, shared state, and durable checkpoint support.',
-      chosen: true,
-      pros: [
-        'Its graph, routing, checkpoint, and tool abstractions matched the evaluated workflow',
-        'Conditional edges for branching workflows (template selection, clarification loops, conflict resolution)',
-        'Shared state and checkpointing are first-class concepts for session durability',
-        'Tool-call boundary treated as a first-class primitive, not bolted on',
-      ],
-      cons: [
-        'More upfront setup than a sequential chain',
-        'Debugging routing logic is harder than linear pipeline tracing when a branch misfires',
-      ],
-    },
-    {
-      name: 'CrewAI / AutoGen',
-      summary: 'Considered at the framework-survey step, not deeply evaluated.',
-      pros: ['Richer multi-agent primitives out of the box.'],
-      cons: [
-        'Multi-agent primitives would not have cleared the single-agent governance bar in v1',
-        'Not deeply evaluated, so no comparative performance or maturity conclusion was reached',
-      ],
-    },
-    {
-      name: 'LangChain sequential chains',
-      pros: ['Simple composition; most tutorials assume this shape.'],
-      cons: [
-        'The linear primitive needs added routing, loop, and persistence logic for this workflow',
-        'Session state has to be bolted on via memory abstractions, not modeled natively',
-      ],
-    },
-    {
-      name: 'Hand-rolled finite state machine',
-      pros: ['Zero framework dependency; total control.'],
-      cons: [
-        'Rewrites what LangGraph already solves: shared state, checkpointing, tool dispatch, tracing',
-        'No ecosystem: every diagnostic has to be built',
-      ],
-    },
-  ]}
-/>
+A LangGraph graph owns each workflow transition. Application code uses explicit nodes and edges for intake, template confirmation, field-group work, merge, coverage review, clarification, and response. Successfully retained checkpoints allow the supported session path to continue across turns.
 
-<DecisionRationale option="LangGraph">
-Two reasons drove the choice. First, LangGraph's graph, routing, tool, and checkpoint abstractions matched the workflow evaluated for AI/LLM Drafting Platform. This was a fit decision within the reviewed options, not a market-wide ranking.
+A hand-rolled state machine could provide the same conceptual control without an orchestration-framework dependency. It was a credible alternative because the production design needed one controller, not multi-agent coordination.
 
-Second, the drafting session is shaped like a graph. A user picks a template, the agent retrieves relevant field groups, extracts candidate values, sometimes a field is ambiguous (loop to clarify), sometimes two guideline clauses conflict (loop to resolve), sometimes the project classification changes mid-session (loop back to template selection). LangGraph represented that control flow directly and supported durable checkpoints without a separate orchestration-state abstraction.
-</DecisionRationale>
+The workflow already had branching and return paths. Representing those transitions directly fit better than rebuilding routing, checkpoint integration, and tool dispatch around a linear chain. That choice reflected the reviewed workflow, not a belief that LangGraph is universally superior.
 
-### Decision 2 · Action boundary
+The trade-off is more setup and harder debugging than a short sequence. A checkpoint is useful only when the state schema is complete, the write succeeds, and recovery distinguishes finished work from an interrupted transition. Tests and monitoring still have to establish those properties.
 
-Every registered workflow action (pick a template, retrieve a group, extract fields, run a coverage check) passes through a typed contract and writes an audit record on successful commit. That makes the normal path inspectable; registry coverage and log-completeness checks still matter.
+## Decision 2: make registered tools the action boundary
 
-<OptionsConsidered
-  decision="What's the action-boundary abstraction for tool calls?"
-  options={[
-    {
-      name: 'MCP tools',
-      summary: 'Typed function contracts dispatched by the graph engine. Multiple MCP tools, each with a declared input/output schema.',
-      chosen: true,
-      pros: [
-        'Every tool call is a typed function with declared schemas on both sides',
-        'Registered dispatch goes through the engine, pairing successful tool calls with typed audit records',
-        'Portable: the same tool definitions move with the workflow if the graph topology evolves',
-      ],
-      cons: [
-        'More upfront contract-design work than free-form tool use',
-        'MCP spec is still young; tooling ecosystem is evolving',
-      ],
-    },
-    {
-      name: 'Free-form / function-calling',
-      pros: ['Maximum flexibility; the LLM picks arguments dynamically.'],
-      cons: [
-        'Action space is less explicit, so complete logging requires additional wrappers and coverage tests',
-        'Auditability depends on implementation discipline across more call paths',
-      ],
-    },
-    {
-      name: 'Custom Python functions with manual logging',
-      pros: ['No framework dependency.'],
-      cons: [
-        'Every tool needs its own audit-log invocation: easy to forget one',
-        'No typed contract means input validation is ad-hoc',
-      ],
-    },
-  ]}
-/>
+Bounded workflow actions use registered MCP tools with declared inputs and outputs. The application pairs successfully committed actions on that registered path with structured records that support later review.
 
-<DecisionRationale option="MCP tools">
-The property we care about is: *every registered workflow action that commits has a corresponding audit record.* MCP gives those actions one typed registry and dispatch path, which makes the property testable. It does not prove that no bypass, failed write, or unregistered administrative path exists; those cases require access controls, integration tests, and log-completeness monitoring. Free-form function calling can also be logged, but it requires more wrappers and coverage work.
+Plain application functions with custom validation and logging could implement the same business work. That alternative offers direct control, but each function needs its own wrappers and evidence checks, expanding the surface where coverage can drift.
 
-In regulated finance, the control has to be evidenced. MCP narrowed the surface that needs that evidence.
+One declared dispatch surface makes a specific question testable: did every supported action that committed produce the expected record? MCP supplies typed tool contracts; the application remains responsible for registry coverage, authorization, validation, persistence, and failure handling.
 
-A concrete example: template selection is itself an MCP tool. It takes the user's uploaded material and their responses to decision-tree questions (project type, spend tier, business line, regulatory exposure) and returns a typed template-id with a confidence score. Successful calls retain structured inputs, outputs, and timestamps, giving reviewers evidence for how a selection was made. Completeness still depends on the logging and retention controls above.
-</DecisionRationale>
+Those contracts take time to design and version. A registered interface does not prove that values are correct or that every possible action used the interface. Failed writes, bypass paths, incomplete retention, and configuration errors remain operating risks.
 
-### Decision 3 · Retrieval shape
+## Decision 3: retrieve for a field, not for the whole document
 
-PAR templates are large. Across the supported PAR types there are many fields, and some recur across templates. In our evaluations, flat chunk retrieval against policy and guideline documents produced noisy results for a drafting session: too much relevant-looking text, not enough that mapped cleanly to a target field.
+The target document is organized into groups of related fields. The workflow first identifies which groups matter for the current session, then searches the approved references associated with each selected group. Each extraction task receives the fields and evidence for one bounded scope.
 
-The shape we needed is **field-group retrieval**: organize the knowledge base by the *target* the LLM is extracting toward, not by source document.
+A flat dense-retrieval pass over all approved chunks is simpler to build and remains useful for open-ended question answering. In the evaluated drafting workflow, however, it mixed passages that looked relevant to the subject while serving different target fields.
 
-<OptionsConsidered
-  decision="How do we structure retrieval over many fields and policy sources?"
-  options={[
-    {
-      name: 'Two-stage retrieval: groups → chunks → compression',
-      summary: 'Group = a logically related set of target fields. Stage 1 selects relevant groups; Stage 2 retrieves a bounded set of associated chunks per group, followed by compression.',
-      chosen: true,
-      pros: [
-        'Fields map to a taxonomy the LLM can reason over, not a flat sea of chunks',
-        'Each relevant group becomes a scoped retrieval task: short-context, focused',
-        'Compression is applied per group so the final prompt carries signal, not noise',
-      ],
-      cons: [
-        'Taxonomy has to be defined and maintained: not zero-effort',
-        'Two retrieval hops means two places latency can creep in',
-      ],
-    },
-    {
-      name: 'Flat RAG: one embedding index over all chunks',
-      pros: ['Simplest to build; one index, one query.'],
-      cons: [
-        'Top-k against a flat index surfaces chunks from unrelated fields and templates',
-        'A flat index does not preserve the configured field-group association without extra metadata and filtering',
-        'Our evaluated top-k results mixed evidence for unrelated target fields',
-      ],
-    },
-    {
-      name: 'Graph RAG over policy citation structure',
-      pros: ['Would preserve inter-document references in policy documents.'],
-      cons: [
-        'The LLM still needs to go from a graph neighborhood to *which field this helps fill*',
-        'For this workflow, graph construction and maintenance added overhead without improving the field-targeting result enough to justify it',
-      ],
-    },
-  ]}
-/>
+A project funding request has a known output shape. Using that structure before retrieval narrows the question from "what text resembles this document?" to "what evidence can support these fields?" References may still overlap across groups even though each target field has one configured owner.
 
-<DecisionRationale option="Two-stage retrieval with group taxonomy">
-The insight is that a PAR has a known target shape. We know which fields we're trying to fill before we retrieve anything. If we organize knowledge by those fields (group related fields together across templates, attach the relevant policy/guideline/example chunks to each group) retrieval becomes a lookup into a structure the LLM already understands.
+The field taxonomy and its reference mappings become maintained product assets. A stale owner, missing mapping, broad group, or weak retrieval result can still supply the wrong evidence. Representative retrieval evaluation, mapping review, and visible gaps remain necessary.
 
-**Stage 1** picks relevant groups for the current session using uploaded-document similarity and template-selection context. **Stage 2** runs a bounded similarity search over the references associated with each group. A compression pass reduces each result set to a payload that fits alongside a scoped batch of target-field metadata in the approved extraction model's prompt.
+## Decision 4: run bounded calls, not independent agents
 
-Flat retrieval remained useful for Q&A, but our evaluations found it too noisy for structured extraction across categorically different template fields.
-</DecisionRationale>
+Selected field groups become units of bounded work. Where capacity permits, extraction calls can run concurrently. Each receives one scoped task, returns typed candidate values, and hands control back to the graph. Ownership-aware merge code accepts configured fields and surfaces collisions or out-of-scope contributions.
 
-### Decision 4 · Extraction within the single-agent envelope
+One large extraction call would stay inside the single-agent boundary and simplify dispatch, at the cost of a wider context containing unrelated fields, instructions, and evidence. A sub-agent per group mapped neatly to the problem, but it did not fit the reviewed v1 scope.
 
-This is where the governance constraint (single-agent envelope) met the problem shape (parallel work across field groups). The natural answer would have been multi-agent orchestration: one sub-agent per group, each a specialist. Governance said no.
+Concurrency did not need to change orchestration ownership. Bounded calls preserved one controller while giving specialized work smaller inputs and independent validation boundaries.
 
-<OptionsConsidered
-  decision="How do we get parallel, specialized extraction inside a single-agent design?"
-  options={[
-    {
-      name: 'Up to N parallel LLM calls, one per relevant group',
-      summary: 'N = number of groups surfaced in stage 1. Each call receives one group\'s scoped target fields and associated reference chunks, then returns structured JSON. The workflow dispatches these as tool invocations, not independent agents.',
-      chosen: true,
-      pros: [
-        'Each call is bounded to a configured batch of target fields and associated context',
-        'Independent group calls can run concurrently instead of serially',
-        'Schema-valid JSON can be merged by ownership-aware code without an additional synthesis-model call',
-        'Guardrails, guidelines, and few-shot good/bad examples can be tuned per group',
-      ],
-      cons: [
-        'Group taxonomy has to be maintained: a badly drawn boundary can produce an overstuffed call or a missing field',
-        'The ownership map and merge logic must detect duplicate or out-of-scope field contributions',
-      ],
-    },
-    {
-      name: 'One call with all retrieved context',
-      pros: ['Simple to implement; one prompt, one model call.'],
-      cons: [
-        'Context window bloats with every active group\'s chunks',
-        'Model attention dilutes across fields: precision drops on the long tail',
-        'One prompt has to carry guardrails and few-shot examples for every group simultaneously',
-      ],
-    },
-    {
-      name: 'True multi-agent with sub-agents per group',
-      pros: ['Architecturally cleanest mapping of the problem.'],
-      cons: [
-        'Would not have cleared the single-agent governance envelope in v1',
-      ],
-    },
-  ]}
-/>
+The design adds concurrency limits, schemas, an ownership map, and merge logic. A poor group boundary can overload a call or omit a field. A configuration defect can create a collision. Coverage checks can miss a weak candidate. Detected issues therefore return to review rather than being resolved silently.
 
-<DecisionRationale option="Parallel LLM calls, one per relevant group">
-The relevant groups picked by stage-1 retrieval become the units of concurrency. A bounded number of calls can run at once, each carrying one group's compressed references, a scoped batch of target-field metadata, and the instructions and few-shot examples specific to that task. Each returns a JSON dictionary of candidate field values.
-
-Each target field has one expected owner group, while the underlying reference subsets may overlap because the same source can inform several fields. Merge code accepts values only for the owner's configured keys. Duplicate or out-of-scope contributions are treated as collisions and surfaced for review rather than resolved by last-writer-wins.
-
-The result is scoped extraction that can run concurrently and then pass through schema validation and ownership-aware merge code, all inside a single-agent envelope. Coordination lives in graph logic rather than in independent agent processes; each model call receives a bounded extraction task and returns structured data for validation.
-</DecisionRationale>
-
-## A PAR draft, end to end
+## A drafting trace
 
 <StepThrough
-  label="One drafting session: the path a PAR takes through the system"
+  label="One supported drafting path"
   steps={[
     {
-      title: '1 · Intake',
-      caption: 'pptx · docx · txt · pdf · images',
-      content: (
-        <>
-          User uploads the source material: a deck, a memo, a pre-existing draft, screenshots of requirements. pptx, docx, and pdf parse natively; txt passes through; images route to an approved vision-capable model for OCR. The normalized text carries source references where the parser and OCR path provide them.
-        </>
-      ),
+      title: '1 · Establish the session',
+      caption: 'Author intent and source material',
+      content: 'The author supplies relevant material and confirms the applicable template. The graph records the session state and decides which supported step runs next.',
     },
     {
-      title: '2 · Template selection (MCP tool with decision tree)',
-      caption: 'classification, not classification-by-ML',
-      content: (
-        <>
-          The template-selection MCP tool takes the uploaded material plus the user's answers to a short decision-tree dialog (project type, spend tier, business line, regulatory exposure) and returns a typed template-id with a confidence score and rationale. The interface exposes that rationale and an override path for the author.
-        </>
-      ),
+      title: '2 · Select field groups',
+      caption: 'Known targets narrow the search',
+      content: 'The workflow identifies the field groups relevant to the current draft. The selection defines the target fields and approved reference scope for the next work.',
     },
     {
-      title: '3 · Stage-1 retrieval: which groups?',
-      caption: 'similarity search over the field-group taxonomy',
-      content: (
-        <>
-          With a template in hand, the relevant field-group set becomes a bounded problem. Stage-1 retrieval uses the uploaded material and the template-id to score which groups are in play for this session, typically a subset, not all of them.
-        </>
-      ),
+      title: '3 · Retrieve and extract',
+      caption: 'Bounded registered work',
+      content: 'Registered routines retrieve group-scoped references and return typed candidate values. Several groups may run concurrently, but none owns the session.',
     },
     {
-      title: '4 · Stage-2 retrieval: bounded chunks per group',
-      caption: 'scoped similarity within each group',
-      content: (
-        <>
-          Per relevant group, similarity search returns a bounded set of chunks from associated policies, guidelines, templates, and few-shot examples. Compression reduces that set to a payload sized for the approved extraction model's prompt.
-        </>
-      ),
+      title: '4 · Merge and check coverage',
+      caption: 'Configured ownership and visible gaps',
+      content: 'The application validates candidate shapes, applies the field-owner map, and checks for collisions, missing coverage, and unresolved follow-ups.',
     },
     {
-      title: '5 · N parallel extraction calls',
-      caption: 'one LLM call per group, each returns JSON',
-      content: (
-        <>
-          A bounded number of calls can run concurrently, one per relevant group. Each carries compressed reference chunks, a scoped batch of target-field metadata, and the instructions and few-shot examples for that task. Each returns a JSON dictionary of candidate field values with available source references.
-        </>
-      ),
-    },
-    {
-      title: '6 · Validate, merge, and persist',
-      caption: 'ownership-aware merge · audit record on commit',
-      content: (
-        <>
-          Validated JSON dictionaries merge into one session-state object using the target-field ownership map. Duplicate or out-of-scope contributions and schema violations are flagged for review. Declared workflow state and registered action records commit to the transactional store; approved references remain available through the vector-backed retrieval layer.
-        </>
-      ),
-    },
-    {
-      title: '7 · Coverage analyzer + follow-ups',
-      caption: 'analysis pass vs guidelines and few-shot examples',
-      content: (
-        <>
-          A coverage analyzer checks the merged state against configured template guidelines and the few-shot example library. It produces a coverage report (which required fields contain candidate values that pass configured checks?) and a prioritized follow-up list for the author. Unanswered follow-ups loop the session into a clarification node.
-        </>
-      ),
-    },
-    {
-      title: '8 · Draft assembly',
-      caption: 'structured state → rendered template',
-      content: (
-        <>
-          Once coverage clears, the merged state renders into the target PAR template. The author sees populated fields, available source references, and coverage flags inline. Revisions made through the registered workflow are typed tool invocations and extend the audit record; out-of-band changes require separate controls.
-        </>
-      ),
+      title: '5 · Return judgment to the author',
+      caption: 'Clarify, revise, or review',
+      content: 'Open questions return to the author. When the configured checks clear, the workflow assembles a candidate draft with available references for human review.',
     },
   ]}
 />
 
-## Transactional workflow state
+## Responsibility by design
 
-The public architectural point is the separation of responsibilities: a transactional workflow store retains declared checkpoints, validated session state, and registered action records, while a vector-backed retrieval layer indexes approved reference material.
+The goal is not maximum autonomy. It is explicit responsibility: one component owns control, bounded routines perform declared work, configured checks expose known gaps, and an author decides what moves forward.
 
-Committing a state transition with its corresponding registered action record reduces inconsistency between the workflow's declared state and its audit evidence. It does not prove complete reconstruction: successful writes, registry and schema coverage, reference-version capture, access controls, and retention still have to be tested and monitored.
-
-That level of detail is enough to explain the control pattern without publishing deployment topology. Storage products and boundaries can change independently as long as the workflow preserves those tested properties.
-
-## Coverage, guardrails, and few-shot examples
-
-Three quality layers run through the system, each at a different node in the graph:
-
-1. **Per-group instructions and validation:** each extraction prompt carries field constraints and phrasing guidance. Prompts and few-shot examples influence behavior but do not enforce it, so responses are schema-checked and violations follow a review or retry path.
-
-2. **Per-group few-shot good/bad examples:** small, curated libraries of example values and review notes. They give the model concrete examples of acceptable and unacceptable output for a field, but validation and author review remain separate controls.
-
-3. **Session-level coverage analyzer:** runs after the merge. Checks the full merged state against the guideline set. Produces a coverage report + a prioritized list of intelligent follow-ups. The follow-ups are what turn AI/LLM Drafting Platform from a field extractor into a collaborator: "You haven't addressed regulatory exposure for this spend tier. Here are three questions."
-
-## Timeline and velocity
-
-<StepThrough
-  label="AI/LLM Drafting Platform: from one-page plan to enterprise pilot"
-  steps={[
-    {
-      title: 'Nov 2025: the one-page plan',
-      caption: 'thesis: process guidance generalizes across PAR templates',
-      content: (
-        <>
-          One page, written to frame the opportunity. The vision was process guidance for PAR drafting; the following months were spent translating it into a production system. What was missing was a production shape and a testable thesis for how the pattern could extend across supported PAR types.
-        </>
-      ),
-    },
-    {
-      title: 'Feb 2026: development begins',
-      caption: 'alongside WorkforceAnalytics productionization and other active delivery',
-      content: (
-        <>
-          Real development started after holidays and team restructuring. AI/LLM Drafting Platform ran alongside WorkforceAnalytics productionization and other active delivery: multiple workstreams, one team, and distinct engineering demands.
-        </>
-      ),
-    },
-    {
-      title: 'April 2026: pilot launch',
-      caption: 'first wave of PAR authors; full launch followed in May',
-      content: (
-        <>
-          Pilot with the first wave of PAR authors. The full launch followed in May 2026.
-        </>
-      ),
-    },
-  ]}
-/>
-
-## Before and after
-
-<BeforeAfterDiff
-  label="Drafting a PAR: before and after"
-  before={{
-    label: 'Before',
-    content: (
-      <>
-        A PAR draft was the product of multi-meeting, multi-revision cycles. Authors spent most of their time hunting for the right template, reading policy to figure out which fields applied to which project type, and resolving contradictions between guideline documents by hand. Drafts that reached first review often had fields populated with best-guess values because the author could not be sure which policy source was authoritative.
-      </>
-    ),
-  }}
-  after={{
-    label: 'After',
-    content: (
-      <>
-        A guided interactive session. The system proposes a template, extracts candidate field values from uploaded source material, surfaces policy conflicts with citations, and flags ambiguity for the author to decide. The author can inspect source references and correct the draft rather than treating the model as authoritative. No duration or adoption measurement is published here.
-      </>
-    ),
-  }}
-/>
-
-## War story: living inside a single-agent envelope
-
-The problem decomposes into specialist scopes such as risk, financial structure, regulatory impact, and implementation planning. Each target field has one configured owner group, while the policy and guideline evidence available to those groups can overlap. One candidate design was a sub-agent per scope, coordinated by an orchestrator.
-
-Governance set a different boundary. The first true agentic AI platform approved for production at the bank had a single-agent envelope: one agent, one approved scope, no multi-agent orchestration in v1. That removed the sub-agent design from the v1 option set.
-
-The v1 design uses concurrent scoped extraction without sub-agents. The graph selects groups, dispatches registered calls, validates their schemas, and merges results according to the target-field ownership map. Cross-call coordination is not assigned to an autonomous model process; each call receives a bounded extraction task.
-
-The workflow still provides branching dialog, multi-step state, tool use, and concurrent specialized work. Its reviewed control surface remains one agent calling tools. That operational distinction is more useful here than claiming a universal definition of an agent.
-
-The cost was design discipline. Every time we reached for a multi-agent pattern (persistent cross-agent memory, inter-agent negotiation, agent-on-agent reasoning) we had to ask whether that could be expressed as deterministic graph logic plus MCP tools, or whether it fundamentally required multi-agent primitives. Capabilities that required the latter stayed outside the approved production design.
-
-**The lesson that generalizes:** an early agentic deployment in a regulated environment is not about maximum capability. It is about making the reviewed boundary explicit and preserving reusable contracts. AI/LLM Drafting Platform v1 is single-agent: its group taxonomy, scoped calls, validation, coverage analysis, state model, and MCP tool surface remain inside that reviewed boundary.
-
-## Current status
-
-A multi-agent successor is in pilot. Further details will follow in a coordinated publication.
-
-## What transfers
-
-The pattern (**governance-shaped orchestration + typed action boundary + field-group retrieval + concurrent scoped extraction + retained workflow state**) is a candidate for enterprise workflows that combine (a) multi-turn state, (b) structured-form target outputs, and (c) regulatory audit requirements. PAR drafting is one instance. Applying it elsewhere still requires domain-specific controls, evaluation, and evidence.
-
-The implementation can change while those control questions remain useful: what context reaches the model, which actions have typed contracts, what state is retained, where collisions surface, and how each boundary is tested.
-
----
-
-*This post describes architectural patterns and engineering decisions without proprietary code, data, or internal screenshots. Quantitative drafting-time and revision-cycle claims are omitted because verified, publishable measurements are not included here. Compression and prompt details remain intentionally abstracted.*
+That structure does not make model output deterministic or evidence complete. It makes the remaining questions easier to ask: what state was retained, what context reached each task, which fields a routine could write, where uncertainty surfaced, and what stopped the workflow before review. Those are the properties to evaluate when applying the pattern to another structured drafting process.

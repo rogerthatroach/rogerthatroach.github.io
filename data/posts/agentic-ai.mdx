@@ -4,22 +4,20 @@ import {
   WorkforceAnalyticsMovementModelFigure,
   WorkforceAnalyticsPermissionCascadeFigure,
   WorkforceAnalyticsTechnicalOverviewFigure,
-} from '@/components/visualizations/workforceAnalytics'
+} from '@/components/visualizations/workforce-analytics'
 import {
-  WORKFORCE_ANALYTICS_EVENT_MODEL,
+  WORKFORCE_ANALYTICS_MOVEMENT_MODEL,
   WORKFORCE_ANALYTICS_PERMISSION_CASCADE,
   WORKFORCE_ANALYTICS_TECHNICAL_OVERVIEW,
 } from '@/data/visualizations/workforceAnalytics'
 
-WorkforceAnalytics answers a deceptively simple kind of question: a finance leader asks for headcount, compensation cost, or open positions across an authorized part of the organization and expects an answer they can use. The language is flexible. The calculation and access rules cannot be.
+The AI/LLM Workforce Analytics Platform answers a deceptively simple kind of question: a finance leader asks for headcount, compensation cost, or open positions across an authorized part of the organization and expects an answer they can use. The language is flexible. The calculation and access rules cannot be.
 
 The architecture therefore separates responsibilities rather than treating one model call as the system. Foundation-model stages interpret the request and shape the response. Conventional code resolves entitlement, reads governed data, performs the calculation, and validates the handoffs. The numerical path is repeatable for fixed inputs, data, code, and configuration; model routing and prose remain probabilistic.
 
-This note is about that boundary: what crosses it, what evidence can test it, and where the design can still fail.
-
 ## The responsibility split
 
-The useful question is not whether an LLM can call tools or produce a plausible financial answer. It is which responsibilities may remain probabilistic without weakening access control or moving calculation into generated prose.
+LLMs can call tools and produce plausible financial answers. The design problem is deciding which responsibilities may remain probabilistic without weakening access control or moving calculation into generated prose.
 
 That separation makes failures easier to locate. A routing error is not the same failure as a stale entitlement mapping. A correct aggregate with misleading prose is not the same failure as incorrect arithmetic. Each needs different evidence and a different fallback.
 
@@ -27,11 +25,11 @@ That separation makes failures easier to locate. A routing error is not the same
   <WorkforceAnalyticsTechnicalOverviewFigure content={WORKFORCE_ANALYTICS_TECHNICAL_OVERVIEW} />
 </VisualizationContainer>
 
-The figure describes the intended application path. It does not prove that every integration follows it. Queries can contain sensitive information, aggregates can themselves be sensitive, and logs or telemetry can create a second exposure surface. A privacy boundary therefore requires call-site inventory, payload inspection, access control, retention rules, and incident handling in addition to typed interfaces <CitationRef id={4} />.
+Every integration still needs verification. Queries can contain sensitive information, aggregates can themselves be sensitive, and logs or telemetry can create a second exposure surface. A privacy boundary therefore requires call-site inventory, payload inspection, access control, retention rules, and incident handling in addition to typed interfaces <CitationRef id={4} />.
 
 ## Four bounded model stages
 
-WorkforceAnalytics uses five to eight foundation-model calls across four stages. The count varies with the query shape, but the responsibility split does not.
+The workforce analytics platform uses five to eight foundation-model calls across four stages. The count varies with the query shape, but the responsibility split does not.
 
 **1. Gate.** The first stage checks whether the request belongs to a supported domain and screens for out-of-scope or suspicious input. It returns a typed routing decision. Because this is a model decision, false accepts and false rejects remain possible; validation and a safe refusal path are part of the operating design.
 
@@ -43,11 +41,11 @@ WorkforceAnalytics uses five to eight foundation-model calls across four stages.
 
 The model-facing stages use approved foundation-model endpoints through an internal multi-provider model gateway. Provider choice is not the architectural control. The controls are the payload contract, the deterministic work between model stages, the validation at each handoff, and the fallback when a stage does not clear its checks.
 
-Repeated-prompt studies in code generation illustrate that model output can vary under similar settings <CitationRef id={3} />. WorkforceAnalytics therefore treats its own model-shaped stages as probabilistic and evaluates them accordingly. The narrower claim is that the calculation path is repeatable for fixed authorized inputs and a retained data/configuration state, not that the complete natural-language response is deterministic.
+Repeated-prompt studies in code generation illustrate that model output can vary under similar settings <CitationRef id={3} />. The platform therefore treats its model-mediated stages as probabilistic and evaluates them accordingly. For fixed authorized inputs and a retained data/configuration state, the calculation path is repeatable; the complete natural-language response is not deterministic.
 
 ## Entitlement translation belongs in code
 
-The entitlement problem starts in Enterprise Performance Management, where permissions reflect organizational domains, access groups, people, cost centres, and hierarchy position. The calculation store needs an executable filter. The figure follows the five handoffs that translate one into the other and shows the stop condition at each boundary.
+The entitlement problem starts in Enterprise Performance Management, where permissions reflect organizational domains, access groups, people, cost centres, and hierarchy position. The calculation store needs an executable filter. Five handoffs translate one into the other, with a stop condition at each boundary.
 
 Roughly 40,000 cost centres form the leaf level shared by the business-segment and geographic hierarchies. The business-segment hierarchy has 18 levels and roughly 9,000 rollups. A request may target one approved slice or cross several supported domains, but the same entitlement translation determines the rows available to the calculation.
 
@@ -55,7 +53,7 @@ Roughly 40,000 cost centres form the leaf level shared by the business-segment a
   <WorkforceAnalyticsPermissionCascadeFigure content={WORKFORCE_ANALYTICS_PERMISSION_CASCADE} />
 </VisualizationContainer>
 
-The figure is a map of responsibilities, not evidence that authorization is correct. Four operating tests add evidence beyond the handoff checks shown above:
+Four operating tests add evidence:
 
 - **Narrower users remain narrower.** Differential tests compare users with deliberately nested scopes and verify that the resolved row sets preserve that relationship.
 - **Every delivery path uses the same check.** Dashboard, conversational, and report flows are tested for alternate routes around entitlement resolution.
@@ -74,17 +72,17 @@ That does not make an answer automatically correct. A valid calculation can stil
 
 Workforce movement is a useful counterexample to the idea that one representation is sufficient. Snapshots show the stock at two reporting points; paired movement records can explain whether a change occurred within one rollup, across two rollups, or cannot yet be reconciled from the available evidence.
 
-<VisualizationContainer minHeight={0} caption={WORKFORCE_ANALYTICS_EVENT_MODEL.caption} className="md:-mx-12 lg:-mx-24" variant="open">
-  <WorkforceAnalyticsMovementModelFigure content={WORKFORCE_ANALYTICS_EVENT_MODEL} />
+<VisualizationContainer minHeight={0} caption={WORKFORCE_ANALYTICS_MOVEMENT_MODEL.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <WorkforceAnalyticsMovementModelFigure content={WORKFORCE_ANALYTICS_MOVEMENT_MODEL} />
 </VisualizationContainer>
 
-This is not an argument that snapshots are defective. They remain useful for point-in-time reporting and independent reconciliation. Events are useful when the question is about joins, departures, or transfers between two selected scopes. Their advantage also depends on correctly paired, de-duplicated records and the hierarchy version in effect at the time. Missing or late events require explicit reconciliation rather than a mathematical assumption that the data must balance.
+Snapshots remain useful for point-in-time reporting and independent reconciliation. Events are useful when the question is about joins, departures, or transfers between two selected scopes. Their advantage also depends on correctly paired, de-duplicated records and the hierarchy version in effect at the time. Missing or late events require explicit reconciliation rather than a mathematical assumption that the data must balance.
 
 ## Production evidence
 
-I conceived, architected, and built WorkforceAnalytics, then led its cross-functional productionisation with frontend and infrastructure peers. It has operated in the CFO Group since November 2025 across a dashboard, a conversational interface, and inbox-ready HTML reports.
+From March through the November 2025 launch, I conceived, architected, and built the AI/LLM workforce analytics platform while leading its cross-functional productionisation with frontend and infrastructure peers. It has operated in the CFO Group since that launch across a dashboard, a conversational interface, and inbox-ready HTML reports.
 
-The published production shape is deliberately specific:
+The production system uses:
 
 - five to eight model calls across four bounded stages;
 - Cython-compiled Python for the deterministic calculation path;
@@ -108,6 +106,6 @@ The responsibility split reduces the number of things any one probabilistic comp
 - Logs are useful only when coverage, retention, minimization, and access controls are maintained.
 - A generated answer remains an aid to a responsible user, not a substitute for ownership of the decision.
 
-The design should therefore be judged by a concrete question: can a reviewer trace each responsibility to the component that owns it, the evidence that tests it, and the fallback used when it fails? If the answer is yes, the architecture is governable. If responsibilities blur across the boundary, a polished response can hide which control actually broke.
+A governable architecture ties each responsibility to an owning component, the evidence that tests it, and the fallback used when it fails. When those boundaries blur, a polished response can hide which control actually broke.
 
 {/* References and Further Reading rendered by PostLayout from data/posts/index.ts */}

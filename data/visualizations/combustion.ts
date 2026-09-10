@@ -64,7 +64,7 @@ export const COMBUSTION_CASE_FLOW: CombustionCaseFlowContent = {
   caption:
     'The combustion-tuning recommendation path for one Maizuru generating unit. Observed plant state and controllable settings remain distinct, and later readings support review rather than autonomous control or model updating.',
   caveat:
-    'This is a system-responsibility schematic, not live plant telemetry. It shows no automatic actuation, guaranteed optimum, or automatic model update.',
+    'System responsibilities, not live plant telemetry. No automatic actuation, guaranteed optimum, or automatic model update is implied.',
   scopeLabel: 'Plant scope',
   scopeDetail:
     'One 900 MW generating unit at Kansai Electric’s 1,800 MW Maizuru coal-fired power station in Japan.',

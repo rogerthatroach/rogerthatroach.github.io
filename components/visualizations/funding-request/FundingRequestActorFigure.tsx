@@ -1,14 +1,14 @@
-import type { ParActorContent } from '@/data/visualizations/par';
-import ParFigureHeader from './ParFigureHeader';
+import type { FundingRequestActorContent } from '@/data/visualizations/projectApproval';
+import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
-interface ParActorFigureProps {
-  content: ParActorContent;
+interface FundingRequestActorFigureProps {
+  content: FundingRequestActorContent;
 }
 
-export default function ParActorFigure({ content }: ParActorFigureProps) {
+export default function FundingRequestActorFigure({ content }: FundingRequestActorFigureProps) {
   return (
-    <section className="par-figure" aria-labelledby={`${content.id}-title`}>
-      <ParFigureHeader content={content} headingId={`${content.id}-title`} />
+    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+      <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">
         <p className="border-y-2 border-text-primary py-3 text-sm font-semibold text-text-primary">

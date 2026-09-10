@@ -75,7 +75,7 @@ const CONFIDENCE_COLOR: Record<Confidence, string> = {
  *
  *  • `submission.diane` present → full render: summary, reasons-for/against,
  *    citation chips, MCP-tool footer caption, "Why did Diane do this?"
- *    disclosure. Vocabulary echoes AI/LLM Drafting Platform Phase 1 (field-group retrieval,
+ *    disclosure. Vocabulary echoes Project Approval Request drafting (field-group retrieval,
  *    coverage analyzer, MCP tool boundary, structural guarantees).
  *  • `submission.diane` absent → modeling-the-governance-envelope empty state:
  *    "Diane was not invoked on this submission." Diane only runs where

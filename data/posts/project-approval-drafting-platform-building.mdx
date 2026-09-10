@@ -1,0 +1,65 @@
+import {
+  FundingRequestActorFigure,
+  FundingRequestMilestoneFigure,
+} from '@/components/visualizations/project-approval'
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
+import {
+  PROJECT_APPROVAL_BUILDER_ACTORS,
+  PROJECT_APPROVAL_BUILDER_MILESTONES,
+} from '@/data/visualizations/projectApproval'
+
+The AI/LLM Drafting Platform began with a one-page plan: guide an author through a project funding request instead of making them search for the right template, policy passage, or precedent on their own. The pilot launched in April 2026. A full CFO Group launch across all geographies followed in May.
+
+I wrote the initial plan, then gave the 2025 Amplify cohort a bounded ideation exercise around the problem. Their exploration widened the option set. I led the separate production work from architecture through full-stack implementation.
+
+<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_BUILDER_MILESTONES.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <FundingRequestMilestoneFigure content={PROJECT_APPROVAL_BUILDER_MILESTONES} />
+</VisualizationContainer>
+
+## The job was guidance, not chat
+
+project funding requests govern significant initiatives. An author has to choose an applicable template, interpret guidance, gather supporting material, complete the fields that apply to the project, and resolve questions before review. The work is iterative because new information can change an earlier answer.
+
+That made a generic chatbot the wrong product shape. Search could find relevant passages, but it could not own the sequence of the drafting process. Free-form conversation could feel helpful while leaving the author unsure about what remained incomplete. The product needed to retain where the session stood, narrow evidence to the fields in scope, and return detected gaps to the author rather than quietly filling them.
+
+The promise stayed deliberately narrow: help an author build a reviewable first draft, step by step, while keeping the author responsible for what moves forward.
+
+## Exploration before commitment
+
+The Amplify exercise tested several possible shapes before production architecture was fixed. It clarified that the real problem was process guidance rather than another question-answering layer. It also made the product boundary easier to defend: support drafting across the configured project funding request types, but do not turn the first release into a general-purpose assistant.
+
+Because the exploration happened before the production commitment, ideas could be compared without treating every promising feature as launch scope. By the time I moved into the build, the central question was no longer "what could an assistant do?" It was "what is the smallest reviewed system that can carry an author from intake to a draft with visible follow-ups?"
+
+## The production call
+
+The system became the first true agentic AI platform approved for production at the bank. Its reviewed v1 scope contained one single-agent workflow, not a collection of agents. One LangGraph graph retained control of the session. Registered MCP tool routines performed bounded work such as template selection, scoped retrieval, extraction, merge, and coverage checks. Some extraction work could run concurrently, but those calls did not acquire goals or control of the workflow.
+
+That boundary was more than a governance accommodation. It forced each responsibility to have a clear owner. The graph decided which step came next. Tool routines returned typed results. Configured ownership and coverage checks surfaced known collisions or omissions. The author answered follow-up questions, reviewed available references, revised the candidate fields, and decided what was ready to submit.
+
+The result still depended on state writes, mappings, validation, and review working as designed. The architecture made those dependencies visible; it did not turn generated content into a guaranteed answer.
+
+<VisualizationContainer minHeight={0} caption={PROJECT_APPROVAL_BUILDER_ACTORS.caption} className="md:-mx-12 lg:-mx-24" variant="open">
+  <FundingRequestActorFigure content={PROJECT_APPROVAL_BUILDER_ACTORS} />
+</VisualizationContainer>
+
+## What delivery demanded
+
+**Hold the scope.** Early exploration produced many plausible features. The filter was simple: does this help an author move through the configured drafting process, or does it create another product inside the product? Deferring attractive additions protected the pilot from becoming a collection of demonstrations.
+
+**Make interfaces carry the coordination load.** The drafting platform was one of several active workstreams. I remained hands-on across architecture and full-stack implementation while coordinating the product, engineering, and review work needed to reach production. Narrow interfaces made that possible. When one component declared exactly what it accepted, returned, and recorded, work could progress without every decision becoming a meeting.
+
+**Design for disagreement.** A draft is not useful merely because every field contains text. Sources can conflict, a field can remain unsupported, and a model can produce a plausible value that still needs correction. Treating clarification and author review as normal routes produced a more honest workflow than optimizing only for a complete-looking first response.
+
+## What shipped
+
+The April pilot put the workflow in front of its first authors. The May launch extended it across the full CFO Group in all geographies. The released product turned a manual search-and-draft process into a guided session that can retain available references, surface configured gaps, and return unresolved questions to the author.
+
+The product and launch scope are established; drafting-time and adoption measurements are not yet public.
+
+## What I would change
+
+I would write the detailed architecture note earlier. The key decisions were already forming during exploration, and recording them sooner would have made the handoff into production work cleaner.
+
+I would also bring project funding request authors into the design loop earlier. The initial problem framing was useful, but first-wave users exposed edge cases that architecture discussion alone could not. Earlier contact would have sharpened both the workflow and the launch scope.
+
+A credible production build does not need an agent at every step. It begins by naming one job, one accountable workflow owner, and the points where the system must return judgment to a person.

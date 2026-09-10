@@ -19,7 +19,7 @@ A model output is not yet a useful system. Someone still has to decide what the 
 
 That boundary was tangible in my first production machine-learning work. Regression models estimated how a large generating unit might respond to candidate combustion settings. Particle Swarm Optimization searched for promising settings. Plant operators decided whether to apply them. The models did not operate the plant, and the optimizer did not possess the operating context held by the people in the control room.
 
-That experience left me with four questions that have remained useful across later systems:
+Four questions from that experience have remained useful across later systems:
 
 1. **Observe:** What can the system actually see?
 2. **Estimate:** What is inferred rather than directly measured?
@@ -32,7 +32,7 @@ These questions are a design heuristic, not a claim that every data pipeline or 
 
 A real feedback loop has more than four boxes arranged in a circle. An action changes the environment; the changed environment is observed again; the observed outcome can be compared with the expected one; and that evidence reaches the people or processes responsible for the next decision.
 
-Three qualifications keep the term honest:
+Three conditions distinguish feedback from a circular diagram:
 
 - **Feedback is captured evidence, not automatic learning.** A system does not improve merely because new data exists. Outcomes have to be associated with the action that preceded them, reviewed, and deliberately incorporated into monitoring, rules, or model updates.
 - **Choice is constrained.** An optimizer searches within a permitted operating region. A workflow router chooses among registered paths. A reviewer can decline both. Those are different choice mechanisms with different evidence requirements.
@@ -51,7 +51,7 @@ Three qualifications keep the term honest:
 
 ### 3.1 Context and responsibility
 
-Kansai Electric owns and operates the 1,800MW Maizuru coal-fired power station in Japan. The work focused on one 900MW generating unit. MHPS participated as an engineering and equipment partner; it was not the plant operator.
+Kansai Electric owns and operates the 1,800 MW Maizuru coal-fired power station in Japan. The work focused on one 900 MW generating unit. MHPS participated as an engineering and equipment partner; it was not the plant operator.
 
 Combustion performance depends on a mixture of measured conditions and controllable settings. Sensor readings describe temperatures, pressures, flows, load, and emissions. Candidate settings include variables such as fuel mix, airflow, and damper positions. Keeping those categories separate is fundamental: an optimizer may search a controllable setting, but it cannot choose the weather, equipment condition, or every transient state represented by the sensors.
 
@@ -59,7 +59,7 @@ Combustion performance depends on a mixture of measured conditions and controlla
 
 The system used 84 regression models to estimate relevant plant outputs under the observed state and a candidate set of controllable settings. Different outputs can depend on different subsets of the available measurements, so feature selection and validation were performed per model rather than assuming one universal input set.
 
-Model evaluation considered both predictive error and stability across held-out folds. The purpose was not to crown one algorithm with a single headline score. A model that performs well on average but varies sharply across folds can be a poor basis for recommendations. The engineering question is whether its behavior is stable enough, over the tested operating region, to contribute to a bounded search whose result will still be reviewed by an operator.
+Model evaluation considered both predictive error and stability across held-out folds. Strong average performance with sharp variation across folds can still be a poor basis for recommendations. Selection depends on demonstrated stability over the tested operating region, within a bounded search whose result remains subject to operator review.
 
 <VisualizationContainer
   minHeight={0}
@@ -105,13 +105,11 @@ But several links have to remain intact for that comparison to be useful:
 
 Without those associations, new sensor data is merely later data. It cannot explain which action produced which outcome. And even with them, a single before-and-after observation does not isolate causality in a complex industrial process.
 
-This is why the human gate and the evidence loop belong in the same architecture. The operator contributes context before action. The recorded outcome contributes evidence after action. Neither is replaced by the regression models or the optimizer.
+The human gate and the evidence loop belong in the same architecture. The operator contributes context before action. The recorded outcome contributes evidence after action. Neither is replaced by the regression models or the optimizer.
 
-## 5. Testing the heuristic in later systems
+## 5. What the heuristic reveals in later systems
 
-The four questions still help outside industrial control, but the answers reveal why the later systems are not all closed loops.
-
-The comparison prevents a common category error. Commodity Tax has an explicit correction and rerun path, but its core calculation is not a model estimate. AI/LLM Drafting Platform can return missing coverage to clarification, but the human-reviewed draft does not actuate a physical environment. FinancialBenchmarking can abstain on ambiguous KPI candidates, but an abstention policy is not numerical optimization. WorkforceAnalytics can constrain entitlements and calculation in code, but its answer phrasing remains model-mediated.
+Outside industrial control, the same questions reveal why later systems are not all closed loops. Commodity Tax has an explicit correction and rerun path, but its core calculation is not a model estimate. The AI/LLM Drafting Platform can route coverage gaps to clarification, but the human-reviewed draft does not actuate a physical environment. The Financial Peer Benchmarking Platform can abstain on ambiguous KPI candidates, but an abstention policy is not numerical optimization. The AI/LLM Workforce Analytics Platform can constrain entitlements and calculation in code, but its answer phrasing remains model-mediated.
 
 <VisualizationContainer
   minHeight={0}
@@ -136,11 +134,11 @@ The heuristic becomes misleading when it turns every processing stage into a con
 
 **Not every correction closes a learning loop.** Feedback has to be captured, attributed, reviewed, and used. Otherwise it remains an interaction outcome rather than evidence that changes future system behavior.
 
-Those distinctions are not pedantry. They determine which tests are meaningful, which failures can be detected, and who remains responsible when the system is uncertain.
+Those distinctions determine which tests are meaningful, which failures can be detected, and who remains responsible when the system is uncertain.
 
 ## 7. A practical design review
 
-When evaluating a new applied-ML or AI workflow, I now use the four questions with a second layer of challenge:
+An applied-ML or AI design review can test the loop with five questions:
 
 1. **Observe:** What is directly recorded, what is selected or transformed, and what relevant context remains invisible?
 2. **Estimate:** Which outputs are probabilistic, which are deterministic, and what evidence supports each boundary?
@@ -148,9 +146,9 @@ When evaluating a new applied-ML or AI workflow, I now use the four questions wi
 4. **Act:** Who is accountable for changing the physical or business state, and can they inspect the evidence they need?
 5. **Return:** Is the outcome associated with the action strongly enough to support monitoring or learning, or does the loop end at delivery?
 
-The fifth question is the safeguard. It stops a visually circular diagram from being mistaken for an operating feedback system.
+The fifth question distinguishes an operating feedback system from a visually circular workflow.
 
-## 8. Conclusion
+## 8. Prediction is not the end of the system
 
 The most important design question often begins after the model predicts. A useful system has to connect an estimate or transformation to a bounded decision, an accountable actor, and evidence about what happened next.
 

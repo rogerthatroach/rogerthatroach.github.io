@@ -1,25 +1,19 @@
 import {
-  PAR_ASSIST_SCALE,
   COMMODITY_TAX_EFFICIENCY,
   DIGITAL_TWIN_SAVINGS,
+  HANDS_ON_PCT,
   HUMANA_ACCURACY,
+  HUMANA_BASELINE_ACCURACY,
+  PROJECT_APPROVAL_DRAFTING_SCALE,
+  WORKFORCE_ANALYTICS_BUILD_WINDOW,
+  WORKFORCE_ANALYTICS_COST_CENTRES,
+  WORKFORCE_ANALYTICS_NAME,
+  WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH,
 } from './canonical';
 
-/**
- * A single project highlight within a role. Surfaced in the expanded
- * /resume view; each project gets a one-liner, an optional decision
- * rationale (the "why X over Y" that makes engineering judgment visible
- * to a director-level reader), an optional headline metric, and
- * optional cross-links to a case study and/or blog post.
- */
 export interface ProjectHighlight {
   name: string;
   oneLiner: string;
-  /**
-   * Decision visibility — one line capturing the key architectural call
-   * and why. Directors read these as system-level judgment signals.
-   * Example: "LangGraph over chains because PAR workflows branch conditionally."
-   */
   decisionRationale?: string;
   metric?: { value: string; label: string };
   caseStudyLink?: string;
@@ -32,277 +26,207 @@ export interface TimelineNode {
   period: string;
   org: string;
   role: string;
-  /** Short summary — rendered in both compact (homepage) and expanded (/resume) views. */
   description: string;
   skills: string[];
   milestone?: string;
   accent: 'blue' | 'emerald' | 'amber' | 'purple' | 'cyan' | 'rose';
-  /**
-   * Optional path to the company's logo SVG, relative to /public.
-   * When set, SkillTimeline renders the logo next to the org name.
-   *
-   * To add a logo:
-   *   1. Source from the company's official brand asset page
-   *      (e.g., RBC: https://www.rbc.com/about-us/brand-guidelines)
-   *   2. Drop the SVG at public/images/logos/{slug}.svg
-   *   3. Set logoPath below. Keep SVGs under ~5KB.
-   */
   logoPath?: string;
-  /**
-   * Optional Tailwind size class override for the logo. Default:
-   * `h-11 w-auto max-w-[160px] md:h-12`. Square-aspect logos (TCS)
-   * need a bigger height to match the visual weight of horizontal
-   * wordmarks (RBC, Quantiphi) rendered at the default.
-   */
   logoClass?: string;
-  /**
-   * When true, the group header renders the logo + date range only,
-   * skipping the org-name text. Useful for companies whose logo IS
-   * the wordmark (TCS) — the text next to the logo becomes redundant.
-   */
   hideOrgNameInHeader?: boolean;
-
-  // ───────────────────────────────────────────────────────────────
-  // Fields below surface ONLY in the expanded /resume view (SkillTimeline
-  // with `expanded={true}`). Homepage's compact view ignores them.
-  // All optional — a node without these fields degrades gracefully.
-  // ───────────────────────────────────────────────────────────────
-
-  /** The single number or claim that captures the role's scope/impact. */
   headlineMetric?: { value: string; label: string };
-  /**
-   * Why this career move happened, in Milap's voice — 1–3 sentences on
-   * the transition and what new scope it unlocked. Director-level readers
-   * use these to map trajectory, not just chronology.
-   */
   transitionStory?: string;
-  /**
-   * Team / stakeholder shape — not "managed N people" but the leadership
-   * shape: direct reports, mentees, cross-functional peers, hiring
-   * involvement. Honest tense (current vs peak).
-   */
   teamContext?: string;
-  /** Key projects from this role — each a ProjectHighlight with decision rationale. */
   projects?: ProjectHighlight[];
-  /** Optional canonical case-study link for this role. */
   caseStudyLink?: string;
-  /** Optional canonical blog-post link for this role. */
   blogLink?: string;
 }
 
+export const CAREER_SCOPE = {
+  productionFinanceYears: '3.8',
+  agenticLlmYears: '1.5',
+  bankProductionSystems: [
+    'AI/LLM Drafting Platform',
+    WORKFORCE_ANALYTICS_NAME,
+    'Financial Peer Benchmarking Platform',
+  ] as const,
+};
+
+/**
+ * The authoritative public career chronology. Keep this concise enough to
+ * scan on the homepage and detailed enough to stand alone on /resume.
+ */
 export const TIMELINE: TimelineNode[] = [
   {
     id: 'rbc-lead',
     era: 'Intelligent Systems',
-    period: '2025 – Present',
+    period: 'Apr 2025 – Present',
     org: 'Royal Bank of Canada',
-    role: 'AI & Data Science Lead — CFO Group',
+    role: 'AI & Data Science Lead · CFO Group',
     description:
-      'Architecting enterprise agentic AI. Conceived, architected, and built AI/LLM Drafting Platform end-to-end (pilot April 2026; full CFO Group launch across all geographies May 2026). Conceived, architected, and built WorkforceAnalytics, then led its cross-functional productionisation (production since Nov 2025). Refactored FinancialBenchmarking v1 into the v2 architecture in a 2-week concurrent sprint while leading WorkforceAnalytics productionisation and mentoring the Amplify intern cohort. ~70% hands-on.',
-    skills: ['LangGraph', 'MCP', 'RAG', 'Text-to-SQL', 'Embeddings', 'React', 'Multi-Agent Orchestration'],
-    milestone: `${PAR_ASSIST_SCALE} AI platform`,
+      `Conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME} from March through its ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch while guiding the 2025 Amplify cohort and leading a focused two-week v1-to-v2 refactor of the Financial Peer Benchmarking Platform. Later drove the AI/LLM Drafting Platform from concept to full CFO Group launch. Remain ${HANDS_ON_PCT} hands-on across architecture, implementation, evaluation, and production follow-through.`,
+    skills: ['LangGraph', 'MCP', 'Semantic retrieval', 'Text-to-SQL', 'Python', 'React'],
+    milestone: `${PROJECT_APPROVAL_DRAFTING_SCALE} launch`,
     accent: 'purple',
     logoPath: '/images/logos/rbc.svg',
     headlineMetric: {
-      value: '2 enterprise platforms',
-      label: 'Conceived · architected · built',
+      value: HANDS_ON_PCT,
+      label: 'hands-on across architecture and implementation',
     },
     transitionStory:
-      'Promoted internally from Senior Data Scientist after 2.5 years built on Commodity Tax (months → 90 min) and FinancialBenchmarking v1 solo end-to-end productionization. The Lead role added product vision (not just execution), cross-functional leadership of engineering services partners, expanded hiring involvement, and responsibility for net-new enterprise platforms: WorkforceAnalytics development began April 2025 coincident with the promotion, and AI/LLM Drafting Platform was conceived as my own vision, handed to Amplify interns for problem-space ideation, then built end-to-end as the first true agentic AI platform approved for production at the bank.',
+      'Promoted after delivering Commodity Tax automation and the first version of the financial peer benchmarking product as a Senior Data Scientist. The Lead role added product direction, cross-functional production delivery, mentoring, and hiring involvement while preserving direct build ownership.',
     teamContext:
-      'Current team: 1 Senior AI Scientist direct report + 2 interns who joined in May 2026 (3 total). Cumulative intern scope: 9 managed end-to-end (the 2025 Amplify cohort explored the AI/LLM Drafting Platform problem space via an ideation exercise before I built the production platform end-to-end). Cross-functional leadership of engineering services partners (senior + junior) on WorkforceAnalytics. Contributing to hiring decisions since 2023 (university recruiting, screening, performance reviews). Peak simultaneous management: 5.',
+      'Current team: one Senior AI Scientist direct report and two interns who joined in May 2026. Contributing to AI/ML hiring since 2023.',
     projects: [
       {
         name: 'AI/LLM Drafting Platform',
         oneLiner:
-          'Conceived, architected, and built end-to-end: the first true agentic AI platform approved for production at the bank. Pilot launched April 2026; full CFO Group launch across all geographies followed in May.',
+          'Drove a reviewed, single-agent drafting workflow from a one-page concept to production. It was the first true agentic AI platform approved for production at the bank: pilot in April 2026, then full CFO Group launch across all geographies in May.',
         decisionRationale:
-          'LangGraph over plain LangChain chains because PAR workflows branch conditionally (template selection, field assignment, conflict resolution looping back). Transactional workflow state and vector-backed retrieval support retained session data and trace records. Concept handed to Amplify interns as an ideation exercise; production system built end-to-end after the exploration. Production deployment runs through GFT on OpenShift via CI/CD.',
-        metric: { value: 'Pilot April 2026', label: 'Full CFO Group · May 2026' },
-        caseStudyLink: '/projects/funding-request-drafting',
-        blogLink: '/blog/funding-request-drafting-platform-building',
+          'A single LangGraph orchestrator owns workflow state and review. Bounded MCP tool routines handle scoped work without being presented as additional agents; missing coverage returns to clarification or human review.',
+        metric: { value: 'April → May 2026', label: 'pilot to full CFO Group launch' },
+        caseStudyLink: '/projects/project-approval-drafting',
+        blogLink: '/blog/project-approval-drafting-platform-building',
       },
       {
-        name: 'WorkforceAnalytics',
+        name: WORKFORCE_ANALYTICS_NAME,
         oneLiner:
-          'Conceived, architected, and built the production analytics platform for CFO Group, then led its cross-functional productionisation with engineering services partners. It delivers interactive headcount, compensation-cost, and open-position analysis at bank scale. Production since Nov 2025.',
+          `Conceived, architected, and built the platform from March through its ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch while leading cross-functional production delivery. It supports authorized questions over ${WORKFORCE_ANALYTICS_COST_CENTRES} cost centres.`,
         decisionRationale:
-          'Two-wall architecture. LLM calls handle gate, metadata extraction, answer shaping, and synthesis using scoped metadata or structured aggregates. Cython-compiled Python handles entitlement and compute, with the permission-to-SQL cascade applied before event-level ins-outs math. Bounded, parallel domain extraction spans Compensation Costs, Headcount, and Open Positions; typed contracts, validation, privilege checks, logs, and monitoring constrain the handoffs. Transactional storage supports the event, entitlement, hierarchy, and trace records needed by the controlled path. Production deployment runs through GFT on OpenShift via CI/CD.',
-        metric: { value: '~40K leaf-level cost centres', label: 'production since Nov 2025' },
-        caseStudyLink: '/projects/workforceAnalytics',
+          'Approved model endpoints interpret intent and shape language. Entitlement-aware deterministic Python performs retrieval and calculation so governed data access and financial arithmetic do not depend on model output.',
+        metric: { value: WORKFORCE_ANALYTICS_BUILD_WINDOW, label: 'build to production launch' },
+        caseStudyLink: '/projects/workforce-analytics',
       },
       {
-        name: 'FinancialBenchmarking v2',
+        name: 'Financial Peer Benchmarking Platform · v2',
         oneLiner:
-          '2-week concurrent refactor of the v1 benchmarking module, completed in parallel with WorkforceAnalytics delivery and mentoring the Amplify intern cohort. The v2 architecture adds multi-stage RAG with multi-gate query parsing across bank, parameter, platform, and time-period, plus a text-to-SQL layer over rich KPI metadata and embeddings. Integrated and productionalized by my direct report with the broader team.',
+          'Led a focused two-week concurrent refactor of the existing v1 benchmarking product while building the AI/LLM Workforce Analytics Platform and guiding the 2025 Amplify cohort. The production team integrated and released the revised module.',
         decisionRationale:
-          'Guarded LLM disambiguation over pure semantic search for near-duplicate KPI names. Text-to-SQL with whitelisting and parameterization over free-form generation, because schema safety is non-negotiable in regulated finance.',
-        metric: { value: '2 weeks', label: 'v1 → v2 refactor' },
-        caseStudyLink: '/projects/financialBenchmarking',
+          'Dense semantic retrieval surfaces candidate metrics; controlled disambiguation resolves near-duplicate names; reviewed SQL templates and parameter binding constrain execution. Ambiguous requests return for clarification.',
+        metric: { value: '2 weeks', label: 'concurrent v1-to-v2 refactor' },
+        caseStudyLink: '/projects/financial-peer-benchmarking',
       },
     ],
-    caseStudyLink: '/projects/funding-request-drafting',
-    blogLink: '/blog/funding-request-drafting-platform-building',
+    caseStudyLink: '/projects/project-approval-drafting',
+    blogLink: '/blog/project-approval-drafting-platform-building',
   },
   {
     id: 'rbc-senior',
     era: 'Enterprise Analytics',
-    period: '2022 – 2025',
+    period: 'Sep 2022 – Apr 2025',
     org: 'Royal Bank of Canada',
-    role: 'Senior Data Scientist — CFO Group',
+    role: 'Senior Data Scientist · CFO Group',
     description:
-      'Overhauled the Commodity Tax process (months → 90 min). Built and productionized FinancialBenchmarking v1 end-to-end (solo): the Big 6 bank peer-benchmarking engine whose SFP extraction automation broke the long-standing peer-analysis bottleneck. Earned trust with CFO stakeholders.',
-    skills: ['PySpark', 'SQL', 'Tableau', 'Financial Modeling', 'FinancialBenchmarking v1'],
+      'Built production finance analytics and automation. Reduced Commodity Tax processing from months to 90 minutes and built the first version of the financial peer benchmarking product end to end before promotion to Lead.',
+    skills: ['PySpark', 'Python', 'SQL', 'Tableau', 'Financial analytics'],
     milestone: COMMODITY_TAX_EFFICIENCY,
     accent: 'amber',
     logoPath: '/images/logos/rbc.svg',
     headlineMetric: {
-      value: '$600M',
-      label: 'Tax allocation automated (months → 90 min)',
+      value: '~$600M',
+      label: 'allocation supported by Commodity Tax automation',
     },
     transitionStory:
-      'Joined RBC after Quantiphi seeking financial services depth and a bigger platform than consulting. The Senior DS role at CFO Group delivered C-suite stakeholder access, bank-scale data (Big 6 peer benchmarking, enterprise GL), and the chance to evolve from ML engineering into product-oriented data science. Promotion to Lead came from accumulated trust: Commodity Tax built credibility, FinancialBenchmarking v1 proved end-to-end product ownership, and WorkforceAnalytics scoping in early 2025 set the stage for the cross-functional production delivery I would lead in the Lead role.',
+      'Moved from consulting into financial services to work directly with finance stakeholders and own production systems over time. Commodity Tax established delivery credibility; the first version of the peer benchmarking product extended that ownership into applied AI.',
     teamContext:
-      'Individual contributor progressing toward leadership. Partnered with CFO Group leadership, Commodity Tax team, and finance teams across the bank. Mentored junior data scientists. Built the stakeholder relationships that made WorkforceAnalytics possible.',
+      'Worked directly with CFO Group leaders, finance subject-matter experts, data partners, and technology teams. Mentored junior contributors and began participating in AI/ML hiring in 2023.',
     projects: [
       {
         name: 'Commodity Tax Automation',
         oneLiner:
-          '~$600M tax allocation per cycle; processing time slashed from months to 90 minutes.',
+          'Rebuilt a manual allocation process as a governed PySpark calculation pipeline with Tableau inspection surfaces, supporting an allocation of ~$600M in 90 minutes instead of months.',
         decisionRationale:
-          'PySpark over pandas/plain SQL — General Ledger data is bank-scale (~10–50M rows per cycle, full-period scans needed). Tableau over custom dashboards — CFO Group muscle memory is Tableau; adoption friction matters more than framework novelty.',
-        metric: { value: COMMODITY_TAX_EFFICIENCY, label: 'Processing time' },
+          'PySpark handled the bank-scale calculation path; Tableau gave finance users familiar inspection and correction surfaces. This was deterministic automation, not an LLM or retrieval system.',
+        metric: { value: COMMODITY_TAX_EFFICIENCY, label: 'processing time' },
         caseStudyLink: '/projects/commodity-tax',
       },
       {
-        name: 'FinancialBenchmarking v1',
+        name: 'Financial Peer Benchmarking Platform · v1',
         oneLiner:
-          'Solo end-to-end build of the Canadian Supplementary Benchmarking engine, deriving and comparing peer KPIs from Big 6 Canadian banks\' Supplementary Financial Package data.',
+          'Built and launched the first version of the Canadian peer benchmarking product, including extraction and historical metric-matching logic for changing quarterly source packages.',
         decisionRationale:
-          'Automated SFP extraction and matching despite quarterly schema shifts (the long-standing bottleneck that had blocked timely peer analysis). Historical matching logic baked into v1 to prevent v2 from inheriting a messy dataset.',
-        metric: { value: 'CFO One RBC Team Award', label: '2025 LLM/AI recognition' },
-        caseStudyLink: '/projects/financialBenchmarking',
-      },
-      {
-        name: 'EDS Automation (PAR actual vs. planned)',
-        oneLiner:
-          'Automated actual-vs-planned comparison across financial accounts, benefits, expenses, capital expenditure, revenue, and depreciation. Custom Python pipeline scheduled in Dataiku; Tableau dashboards for business consumption. Widely adopted across the finance team.',
-        decisionRationale:
-          'Dataiku used as a scheduler only — pipeline logic is custom Python, not low-code components. Tableau over a custom dashboard for the same adoption-friction reason as Commodity Tax: meet finance users in the tool their muscle memory is already in.',
-      },
-      {
-        name: 'Journal Entry Automation',
-        oneLiner:
-          'Automated a manual journal-entry workflow with PySpark + CDP and dynamic monitoring dashboards.',
-        decisionRationale:
-          'PySpark + CDP over Dataiku/other — CDP was the enterprise-sanctioned platform for PII-adjacent workloads. Staying inside the sanctioned boundary avoided a governance fight.',
+          'The first version established a clean, reviewable history before later retrieval and text-to-SQL improvements were introduced through the v2 refactor.',
+        metric: { value: '2025', label: 'production product recognised by a team award' },
+        caseStudyLink: '/projects/financial-peer-benchmarking',
       },
     ],
   },
   {
     id: 'quantiphi',
     era: 'Cloud ML',
-    period: '2021 – 2022',
+    period: 'Oct 2021 – Sep 2022',
     org: 'Quantiphi Inc.',
     role: 'Machine Learning Engineer',
-    logoPath: '/images/logos/quantiphi.svg',
     description:
-      'Deployed ML models on Google Cloud for insurance and financial clients. Document verification pipelines, Vertex AI, entity extraction at scale.',
-    skills: ['GCP', 'Vertex AI', 'AutoML', 'Document AI', 'SQL', 'Tableau'],
+      'Built and deployed cloud document-intelligence systems, combining OCR, computer vision, and classical machine learning for high-volume business workflows.',
+    skills: ['GCP', 'Vertex AI', 'OCR', 'OpenCV', 'Random Forest', 'Document intelligence'],
     accent: 'cyan',
+    logoPath: '/images/logos/quantiphi.svg',
     headlineMetric: {
       value: HUMANA_ACCURACY,
-      label: 'Humana checkbox detection (up from ~70%)',
+      label: `checkbox detection accuracy, up from ${HUMANA_BASELINE_ACCURACY}`,
     },
     transitionStory:
-      'After Georgian College (Jan–Aug 2021) I needed a Canadian ML role with cloud depth. Quantiphi was a Google Cloud partner — the fastest on-ramp to production GCP / Vertex AI work, which the bank market was starting to demand. The one-year tenure was intentional: a bridge from pure data science into a major Canadian bank.',
+      'Moved into a Canadian machine-learning engineering role to deepen production cloud experience and apply earlier computer-vision work to client systems.',
     teamContext:
-      'ML engineer on client-facing teams. Deployed production pipelines to Humana (healthcare) and Chick-fil-A (US-wide retail).',
+      'Worked in client-facing engineering teams across healthcare and retail, translating operational document and inventory problems into deployed ML workflows.',
     projects: [
       {
-        name: 'Humana Document Understanding',
+        name: 'Healthcare Document Intelligence',
         oneLiner:
-          'Hybrid document pipeline (Document AI + OpenCV + Random Forest) on Google Cloud — detection of checkboxes, handwritten text, and form fields to reduce manual review.',
+          `Improved checkbox detection from ${HUMANA_BASELINE_ACCURACY} to ${HUMANA_ACCURACY} within a broader document classification and extraction workflow.`,
         decisionRationale:
-          'Document AI alone hit ~70% on checkbox detection. Hybrid composition: Document AI for OCR + OpenCV for pixel-level checkbox detection + Random Forest for the checkbox classification. BigTable (hot lookups) + BigQuery (analytics) over Cloud Storage + CSVs — match storage to access pattern.',
-        metric: { value: HUMANA_ACCURACY, label: 'Checkbox-detection accuracy' },
+          'OCR located text and page context, OpenCV localised checkbox regions, and a Random Forest classified checkbox state. The 99.95% result applies only to checkbox detection, not the entire pipeline.',
+        metric: { value: HUMANA_ACCURACY, label: 'checkbox detection only' },
+        caseStudyLink: '/projects/document-intelligence',
       },
       {
-        name: 'Chick-fil-A Inventory Analytics',
+        name: 'Retail Inventory Analytics',
         oneLiner:
-          'Multi-million-row inventory analysis across US-wide locations with SQL and Tableau.',
-        decisionRationale:
-          'Tableau + SQL over a custom data app — operators needed self-serve intelligence; meet them in the tool they already know.',
+          'Developed cloud data and analytics workflows for a large US restaurant network, supporting inventory visibility across locations.',
       },
     ],
   },
   {
     id: 'tcs',
     era: 'Foundation',
-    period: '2016 – 2019',
+    period: 'Aug 2016 – Nov 2019',
     org: 'Tata Consultancy Services',
     role: 'Data Scientist',
     description:
-      'Built a Digital Twin for one 900MW generating unit at the 1,800MW Maizuru coal-fired power station in Japan — $3M annual savings. Won 2nd/600 in a computer vision hackathon. Where the ML journey began.',
-    skills: ['R', 'Python', 'ggplot2', 'Regression', 'Classification', 'Clustering', 'CNNs', 'TensorFlow'],
+      'Built industrial machine-learning systems for power generation, including a digital twin for one 900 MW generating unit at Kansai Electric\'s 1,800 MW Maizuru coal-fired power station in Japan. Earlier computer-vision work included internal research and hackathons.',
+    skills: ['Python', 'Regression', 'PSO', 'Time series', 'Computer vision', 'Industrial ML'],
     milestone: `${DIGITAL_TWIN_SAVINGS}/year savings`,
     accent: 'emerald',
     logoPath: '/images/logos/tcs.svg',
-    // TCS wordmark is ~3.75:1 wide. Even cropped, the rendered width
-    // dominated the timeline card on mobile. Shrunk to ~75% of the
-    // default (h-8 / md:h-9 vs default h-11 / md:h-12) and capped at
-    // max-w-[120px] so it sits visibly smaller than the org name +
-    // role-title block alongside it.
     logoClass: 'h-8 w-auto max-w-[120px] md:h-9 md:max-w-[132px]',
-    // Logo already carries the "Tata Consultancy Services" wordmark — no
-    // need to restate it in text next to it.
     hideOrgNameInHeader: true,
     headlineMetric: {
-      value: DIGITAL_TWIN_SAVINGS,
-      label: 'Annual savings — Maizuru 900MW unit Digital Twin',
+      value: `${DIGITAL_TWIN_SAVINGS}/year`,
+      label: 'savings attributed to the combustion-tuning system',
     },
     transitionStory:
-      'Joined TCS out of B.Eng (Electronics & Communications Engineering, Thapar, 2016). TCS offered the fastest path from engineering generalist to applied ML — specifically the MHPS / Maizuru digital twin opportunity, which was leading-edge industrial AI in 2017. It gave me end-to-end ML ownership (ETL to production recommendations), cross-border client delivery (India ↔ Japan), and a set of observe → estimate → choose → act questions that I later reused as a design heuristic.',
+      'Began in industrial analytics, where recommendations had to respect physical constraints, operator judgment, and plant safety. That foundation shaped later work on bounded, reviewable AI systems.',
     teamContext:
-      'Sole Data Scientist on a 3-person R&D team (mechanical engineer + technical manager + me). Owned the entire pipeline from raw sensor data to optimized control recommendations. Stakeholders: MHPS (Mitsubishi Hitachi Power Systems) engineering and equipment SMEs, and Kansai Electric operators working on the project at one 900MW unit of the 1,800MW Maizuru station.',
+      'Worked with TCS researchers, Mitsubishi Hitachi Power Systems as the engineering and equipment partner, and Kansai Electric as station owner and operator. Plant operators retained the final action decision.',
     projects: [
       {
-        name: 'Combustion Tuning (Digital Twin)',
+        name: 'Combustion Tuning Digital Twin',
         oneLiner:
-          '84 independent regression models across 90+ industrial sensors; Particle Swarm Optimization for closed-loop boiler control recommendations on one 900MW generating unit at the 1,800MW Maizuru station.',
+          'Built 84 regression models for plant behaviour and used particle swarm optimisation to propose candidate settings for operator review at one 900 MW Maizuru generating unit.',
         decisionRationale:
-          'PSO over gradient-based optimization because the objective landscape (coupled boiler dynamics, non-convex, high-dimensional, no analytical gradient) is the metaheuristic fit. 84 independent regression models rather than one shared model because plant operators and engineering reviewers needed per-variable explainability.',
-        metric: { value: DIGITAL_TWIN_SAVINGS, label: '/year savings' },
+          'Separate models represented interacting plant responses; optimisation searched for settings within declared limits. Measurements remained distinct from controllable settings, and operators decided whether to act.',
+        metric: { value: `${DIGITAL_TWIN_SAVINGS}/year`, label: 'reported savings' },
         caseStudyLink: '/projects/combustion-tuning',
-      },
-      {
-        name: 'LSTM — Ammonium Bisulphate Deposition',
-        oneLiner:
-          'Time-series forecasting model predicting air-preheater deposition, critical for plant maintenance planning.',
-        decisionRationale:
-          'LSTM over classical ARIMA because deposition dynamics have regime-shift memory (upstream chemistry → downstream deposit). ARIMA captures autocorrelation; LSTM captures regime transitions.',
-      },
-      {
-        name: 'Coal Classification (5-algorithm comparison)',
-        oneLiner:
-          'kMeans, Logistic Regression, Random Forest, SVM, XGBoost — evaluated in parallel to classify coal physicochemical features.',
-        decisionRationale:
-          'Multi-algorithm comparison surfaced XGBoost as the winner and gave the team defensible reasoning for MHPS. Running 5 in parallel is cheaper than prematurely committing.',
       },
       {
         name: 'Transformer Life Prediction',
         oneLiner:
-          'Electrical transformer life prediction using XGBoost on tabular physicochemical data.',
-        decisionRationale:
-          'XGBoost over deep learning — small tabular data is XGBoost\'s dominant regime.',
+          'Modelled transformer health and remaining-life signals from operational time-series data to support maintenance planning.',
       },
       {
-        name: 'Math Notation Detection (CV Hackathon, 2019)',
+        name: 'Mathematical Notation Detection Hackathon',
         oneLiner:
-          'Deep CNN model to identify mathematical symbols from written text. 2nd out of 600 in TCS Computer Vision Hackathon.',
-        decisionRationale:
-          'CNN as the standard playbook for visual symbol classification. Project differentiator was training augmentation to handle handwritten symbol variance.',
-        metric: { value: '2nd / 600', label: 'TCS CV Hackathon' },
+          'Built a computer-vision prototype for mathematical-notation detection that placed second among ~600 participants in an internal hackathon.',
       },
     ],
   },

@@ -16,15 +16,16 @@ export const AWARDS_COUNT = AWARDS.length;
  * RBC production AI systems (3).
  *
  *   1. AI/LLM Drafting Platform — pilot launched April 2026; full CFO Group launch across all geographies May 2026
- *   2. WorkforceAnalytics   — production since Nov 2025
- *   3. FinancialBenchmarking      — v1 shipped, v2 is a concurrent 2-week refactor of v1 (one product, two revisions)
+ *   2. AI/LLM Workforce Analytics Platform — built Mar–Nov 2025; production since Nov 2025
+ *   3. Financial Peer Benchmarking Platform — v1 shipped, v2 is a concurrent 2-week refactor of v1 (one product, two revisions)
  *
- * FinancialBenchmarking v1 and its two-week v2 refactor count as one product, not two.
+ * The peer benchmarking v1 and its two-week v2 refactor count as one product,
+ * not two.
  */
 export const PRODUCTION_SYSTEMS_COUNT = 3;
 
 // ═══════════════════════════════════════════════════════════════════
-// CAREER SPAN — DERIVED from stint dates (auto-updates per build)
+// CAREER SPAN — DERIVED from stint dates at an explicit publication date
 // ═══════════════════════════════════════════════════════════════════
 
 interface CareerStint {
@@ -51,12 +52,21 @@ const CAREER_STINTS: CareerStint[] = [
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
 
 /**
+ * Date through which the public career facts have been reviewed. Keeping this
+ * explicit makes identical source produce identical exports; advance it only
+ * as part of a factual review.
+ */
+export const PUBLIC_AS_OF_DATE = '2026-08-30';
+const PUBLIC_AS_OF = new Date(`${PUBLIC_AS_OF_DATE}T00:00:00.000Z`);
+
+/**
  * Total professional years of experience as a float, summed across all
- * stints. Ongoing stints (no `end`) use `asOf` (default: now).
+ * stints. Ongoing stints (no `end`) use `asOf` (default: the reviewed public
+ * as-of date above).
  *
  * Pure function — exported so tests can pass arbitrary `asOf` dates.
  */
-export function computeYearsExperience(asOf: Date = new Date()): number {
+export function computeYearsExperience(asOf: Date = PUBLIC_AS_OF): number {
   return CAREER_STINTS.reduce((total, stint) => {
     const end = stint.end ?? asOf;
     return total + (end.getTime() - stint.start.getTime()) / MS_PER_YEAR;
@@ -67,14 +77,14 @@ export function computeYearsExperience(asOf: Date = new Date()): number {
  * Format raw years as a display string. Uses "N+" with N = floor(value) — the
  * at-least-N convention (e.g. "8+ years"), which also mirrors the "8+ years"
  * bar common in job descriptions. Past an integer the value reads as that
- * integer "+", and advances to "9+" only once a full ninth year completes.
- * Honest because the count is genuinely past N; re-evaluated per build.
+ * integer "+". The public display advances only after the as-of date is
+ * deliberately reviewed and updated.
  */
 export function formatYearsExperience(years: number = computeYearsExperience()): string {
   return `${Math.floor(years)}+`;
 }
 
-/** Display string. Re-evaluated at module load (build time for static export). */
+/** Display string derived deterministically from the reviewed public date. */
 export const YEARS_EXPERIENCE = formatYearsExperience();
 
 /**
@@ -100,30 +110,35 @@ export const COMMODITY_TAX_EFFICIENCY = 'Months → 90 min';
 /** Compact form for 3-slot displays (Hero NUMBER_SEQUENCE) */
 export const COMMODITY_TAX_EFFICIENCY_COMPACT = '90 min';
 
-/** Duration of the concurrent FinancialBenchmarking v1-to-v2 refactor. */
+/** Duration of the concurrent peer benchmarking v1-to-v2 refactor. */
 export const FINANCIAL_BENCHMARKING_V2_BUILD_TIME = '2 weeks';
 
+/** Public functional name and reviewed delivery dates for workforce analytics. */
+export const WORKFORCE_ANALYTICS_NAME = 'AI/LLM Workforce Analytics Platform';
+export const WORKFORCE_ANALYTICS_BUILD_WINDOW = 'Mar → Nov 2025';
+export const WORKFORCE_ANALYTICS_BUILD_WINDOW_LONG = 'March–November 2025';
+export const WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH = 'November 2025';
+
 /**
- * WorkforceAnalytics domain model.
+ * AI/LLM workforce analytics domain model.
  *
  * The CFO Group's workforce is modelled as ~40,000 COST CENTRES: the most
  * granular org unit (one cost centre = one or more teams). Cost centres are
  * the shared leaves of TWO hierarchies that roll the same leaves up two ways:
  *   - business-segment hierarchy: 18 levels, ~9,000 rollup nodes
  *   - geographical hierarchy
- * A query names one node in each (e.g. Wealth Management × US); WorkforceAnalytics
+ * A query names one node in each (e.g. Wealth Management × US); the platform
  * intersects them down to the cost-centre leaves, retrieves from Postgres,
- * and aggregates. It answers HR compensation costs (actual vs planned),
- * headcount over time, and employee events (hires, departures, promotions,
- * demotions, lateral moves) across supported, authorized hierarchy scopes.
+ * and aggregates. It answers compensation cost, headcount, and open position
+ * questions across supported, authorized hierarchy scopes.
  */
 export const WORKFORCE_ANALYTICS_COST_CENTRES = '~40,000';
 
 /** Rollup nodes in the 18-level business-segment hierarchy, above the leaf cost centres. */
 export const WORKFORCE_ANALYTICS_ROLLUPS = '~9,000';
 
-/** AI/LLM Drafting Platform pilot launched April 2026; full CFO Group launch across all geographies May 2026. */
-export const PAR_ASSIST_SCALE = 'Full CFO Group';
+/** Drafting-platform pilot launched April 2026; full CFO Group launch across all geographies May 2026. */
+export const PROJECT_APPROVAL_DRAFTING_SCALE = 'Full CFO Group';
 
 // ═══════════════════════════════════════════════════════════════════
 // TEAM

@@ -1,16 +1,16 @@
-import type { ParOverviewContent } from '@/data/visualizations/par';
-import ParFigureHeader from './ParFigureHeader';
+import type { FundingRequestOverviewContent } from '@/data/visualizations/projectApproval';
+import FundingRequestFigureHeader from './FundingRequestFigureHeader';
 
-interface ParOverviewFigureProps {
-  content: ParOverviewContent;
+interface FundingRequestOverviewFigureProps {
+  content: FundingRequestOverviewContent;
 }
 
-export default function ParOverviewFigure({ content }: ParOverviewFigureProps) {
+export default function FundingRequestOverviewFigure({ content }: FundingRequestOverviewFigureProps) {
   const [humanInput, ...agentStages] = content.stages;
 
   return (
-    <section className="par-figure" aria-labelledby={`${content.id}-title`}>
-      <ParFigureHeader content={content} headingId={`${content.id}-title`} />
+    <section className="project-approval-figure" aria-labelledby={`${content.id}-title`}>
+      <FundingRequestFigureHeader content={content} headingId={`${content.id}-title`} />
 
       <div className="mt-6">
         <div className="grid gap-3 border-y-2 border-text-primary py-4 sm:grid-cols-[auto_1fr] sm:items-baseline sm:gap-6">
