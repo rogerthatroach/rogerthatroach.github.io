@@ -106,21 +106,21 @@ export const CASE_STUDIES: CaseStudy[] = [
       problem:
         'The CFO Group\'s Commodity Tax return process took finance teams months per cycle to extract General Ledger records, reconcile differences, apply category mappings, and prepare the return.',
       contribution:
-        'As lead developer and stakeholder liaison, I translated the finance team\'s process into a PySpark pipeline and configured Tableau inspection views. Finance analysts and managers remained responsible for reviewing exceptions and accepting the result.',
+        'As lead developer and stakeholder liaison, I translated the finance team\'s process into a Dataiku scenario combining Python and Spark, with saved run data, Excel reports, and dynamic Tableau dashboards. Finance partners remained responsible for reviewing exceptions and accepting the result.',
       decision: {
         selectedApproach:
-          'Pair a deterministic five-stage calculation path with configured inspection views that let analysts investigate recorded state at the relevant stage.',
+          'Retain every run input and intermediate output, with multiple Excel reports and dynamic dashboards at each stage for audit and debugging.',
         crux:
           'Faster calculation was useful only if finance users could locate a questioned value, inspect the available evidence, correct the underlying issue, and rerun the affected path.',
         residualRisk:
-          'A visible inspection path depends on retained records, stable associations, access, and tested joins; it does not prove that sources, rules, or amounts are correct.',
+          'Reports, dashboards, and retrieved datasets must represent the run being reviewed. Retention makes the work available to inspect; it does not establish source completeness or correct rules.',
       },
       mechanism:
-        'The calculation moves through Extract, Reconcile, Category Map, Aggregate, and Return. Configured Tableau views sit beside relevant stages so analysts can inspect recorded evidence and investigate exceptions without treating the presentation layer as a correctness check.',
+        'Extract, Reconcile, Category Map, Aggregate, and Return summarize a larger Dataiku scenario. Python and Spark perform the processing. Inputs and intermediates are saved in run-date/time folders and corresponding data partitions; Excel reports and dynamic Tableau dashboards support inspection at each stage.',
       outcomeAndState:
         'The production workflow reduced the process from months to 90 minutes for a return involving roughly $600M in tax allocation. The work received the CFO Group RBC Quarterly Team Award in Q4 2023.',
       limits:
-        'Analyst review and correction remain part of the operating model. Recorded lineage is available only where identifiers, mappings, joins, and source records preserve the required associations.',
+        'Analysts and engineers investigate discrepancies and review corrections. Explaining a value can require comparing saved datasets, querying the relevant records, and examining transformation code.',
     },
     blogPostSlug: 'commodity-tax-provenance',
     companionBlogPostSlug: 'commodity-tax-cfo-trust',

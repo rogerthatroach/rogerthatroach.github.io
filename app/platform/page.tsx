@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import { COMMODITY_TAX_REVIEW_SUMMARY } from '@/data/canonical';
 
 const META_TITLE = 'Platform';
 const META_DESCRIPTION =
@@ -80,8 +81,7 @@ const CAPABILITIES: { surface: string; evidence: React.ReactNode }[] = [
     surface: 'Lineage and inspection',
     evidence: (
       <>
-        Record lineage where joins and mappings preserve it, configured
-        inspection views, and analyst correction in{' '}
+        {COMMODITY_TAX_REVIEW_SUMMARY} in{' '}
         <Link
           href="/projects/commodity-tax"
           className="text-accent underline underline-offset-4 hover:text-text-primary"

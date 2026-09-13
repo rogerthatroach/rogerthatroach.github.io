@@ -372,64 +372,26 @@ export const POSTS: BlogPost[] = [
   },
   {
     meta: {
-      slug: 'commodity-tax-cfo-trust-framework',
-      title: 'Commodity Tax: Two Decisions Behind a Reviewable Workflow',
+      slug: 'commodity-tax-provenance',
+      title: 'Commodity Tax: Making a Financial Pipeline Inspectable',
       subtitle:
-        'Why the pipeline ran on the sanctioned data platform and exposed configured inspection views to the analysts reviewing its output.',
-      date: '2026-04-21',
-      tags: ['Leadership', 'Decision Making', 'Stakeholder Review', 'PySpark', 'Tableau'],
-      readingTime: '5 min read',
+        'How run-date/time folders and partitions, retained inputs and intermediates, Excel reports, and dynamic dashboards support investigation across a complex Dataiku scenario.',
+      date: '2026-04-26',
+      tags: ['Data Lineage', 'Process Automation', 'Tableau', 'Analyst Review', 'Financial Controls'],
+      readingTime: '8 min read',
       abstract:
-        'Two choices shaped the Commodity Tax automation: use PySpark on the sanctioned data platform for repeatable calculation, and provide configured Tableau views for investigation. Both carry alternatives, trade-offs, and residual costs; neither turns visibility into proof of correctness.',
-      updated: '2026-08-30',
+        'The Commodity Tax scenario preserves every input and intermediate by run date and time. Python and Spark perform the processing, while multiple Excel reports and dynamic dashboards at each stage support audit, debugging, and comparison of saved stage data.',
+      updated: '2026-09-12',
       status: 'published',
       projectId: 'commodity-tax',
-      register: 'practitioner',
+      register: 'technical',
     },
     references: [],
     furtherReading: [
       {
         title: 'Commodity Tax: Designing Calculation and Inspection Together',
         url: '/blog/commodity-tax-cfo-trust',
-        description: 'The first production workflow and its analyst investigation loop.',
-      },
-      {
-        title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`,
-        url: '/blog/funding-request-drafting-platform-building',
-        description: 'From a one-page vision through pilot and full CFO Group launch.',
-      },
-      {
-        title: 'Commodity Tax — Case Study',
-        url: '/projects/commodity-tax',
-        description: 'Problem, contribution, decision, mechanism, operating outcome, and limits.',
-      },
-    ],
-  },
-  {
-    meta: {
-      slug: 'commodity-tax-provenance',
-      title: 'Commodity Tax: Making a Financial Pipeline Inspectable',
-      subtitle:
-        'How a five-stage calculation path, recorded lineage, configured Tableau views, and analyst review help investigate a questioned value without treating visibility as proof of correctness.',
-      date: '2026-04-26',
-      tags: ['Data Lineage', 'Process Automation', 'Tableau', 'Analyst Review', 'Financial Controls'],
-      readingTime: '8 min read',
-      abstract:
-        'The Commodity Tax workflow separates a five-stage calculation path from configured inspection views. Recorded lineage must support one questioned value through the calculation path; missing or inconsistent evidence returns to investigation, and visibility does not validate sources, rules, joins, or the return.',
-      updated: '2026-08-09',
-      status: 'published',
-      projectId: 'commodity-tax',
-      register: 'technical',
-    },
-    references: [
-      { id: 4, authors: 'Cui, Y., Widom, J. & Wiener, J. L.', title: 'Tracing the Lineage of View Data in a Warehousing Environment', venue: 'ACM Transactions on Database Systems', year: 2000 },
-      { id: 5, authors: 'Cheney, J., Chiticariu, L. & Tan, W. C.', title: 'Provenance in Databases: Why, How, and Where', venue: 'Foundations and Trends in Databases', year: 2009 },
-    ],
-    furtherReading: [
-      {
-        title: 'Commodity Tax: Designing Calculation and Inspection Together',
-        url: '/blog/commodity-tax-cfo-trust',
-        description: 'The first delivery, its finance-engineering collaboration, and the analyst investigation loop.',
+        description: 'The delivery, its finance-engineering collaboration, and the analyst investigation loop.',
       },
       {
         title: 'What Happens After a Model Predicts?',
@@ -439,7 +401,7 @@ export const POSTS: BlogPost[] = [
       {
         title: 'Commodity Tax — Case Study',
         url: '/projects/commodity-tax',
-        description: 'Context, the five-stage calculation path, configured inspection surfaces, and the analyst-review pattern.',
+        description: 'Context, contribution, Dataiku processing, retained run data, and stage reporting.',
       },
     ],
   },
@@ -448,13 +410,13 @@ export const POSTS: BlogPost[] = [
       slug: 'commodity-tax-cfo-trust',
       title: 'Commodity Tax: Designing Calculation and Inspection Together',
       subtitle:
-        'How a governed PySpark calculation path and configured Tableau inspection views supported a roughly $600M allocation and reduced a months-long process to roughly 90 minutes.',
+        'How a Dataiku workflow combining Python, Spark, saved run data, Excel reports, and dynamic dashboards reduced a months-long process to roughly 90 minutes.',
       date: '2026-04-26',
       tags: ['Leadership', 'Stakeholder Management', 'PySpark', 'Tableau', 'Process Automation'],
       readingTime: '5 min read',
       abstract:
-        'My first substantial CFO Group delivery paired five-stage PySpark automation with configured Tableau inspection. It reduced a months-long process to roughly 90 minutes while keeping finance-engineering review, the limits of recorded lineage, and accountable investigation explicit.',
-      updated: '2026-08-30',
+        'The Commodity Tax delivery combined Python and Spark processing with retained run data, multiple Excel reports, and dynamic dashboards at every stage. It supported a roughly $600M allocation and reduced a months-long process to roughly 90 minutes.',
+      updated: '2026-09-12',
       status: 'published',
       projectId: 'commodity-tax',
       register: 'builder',
@@ -464,7 +426,7 @@ export const POSTS: BlogPost[] = [
       {
         title: 'Commodity Tax: Making a Financial Pipeline Inspectable',
         url: '/blog/commodity-tax-provenance',
-        description: 'Calculation, recorded lineage, configured inspection, evidence gaps, and analyst review.',
+        description: 'Run-organized storage, retained stage data, Excel reports, dashboards, and investigation.',
       },
       {
         title: 'Commodity Tax — Case Study',
@@ -474,3 +436,9 @@ export const POSTS: BlogPost[] = [
     ],
   },
 ];
+
+export const COMMODITY_TAX_CONSOLIDATION = {
+  destinationSlug: 'commodity-tax-cfo-trust',
+  heading: 'Article moved',
+  description: 'The two design decisions are now included in the Commodity Tax delivery article.',
+} as const;

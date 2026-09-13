@@ -1,101 +1,71 @@
 import { CommodityTaxFormalPipelineFigure, CommodityTaxFormalTraceFigure } from '@/components/visualizations/commodity-tax'
-import VisualizationContainer from '@/components/blog/VisualizationContainer';
-import CitationRef from '@/components/blog/CitationRef';
+import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import { COMMODITY_TAX_FORMAL_PIPELINE, COMMODITY_TAX_FORMAL_TRACE } from '@/data/visualizations/commodityTax'
 
-## 1. Calculation and inspection are different jobs
+## 1. The run is the starting point
 
-The Commodity Tax workflow produces a financial return from General Ledger journal rows. That calculation path and the surfaces used to inspect it are related, but they are not the same system responsibility.
+The Commodity Tax workflow ran as a large Dataiku scenario containing Python and Spark code. It processed General Ledger data through extraction, reconciliation, category mapping, aggregation, and return preparation. These five conceptual stages summarize the workflow; they do not imply that the scenario contained only five steps.
 
-The calculation path applies transformations in a fixed order. Each stage receives a defined input, produces a defined output, and passes that output to the next stage. Its job is to compute the return consistently under the rules and data supplied for that run.
+Every run saved each input and resulting intermediate file. Shared-storage folders were organized by run date and time, with corresponding partitions on the enterprise data platform. PySpark supported retrieval and navigation of the partitioned datasets; the saved files provided another access path to the run data.
 
-The inspection path helps an authorized analyst examine selected intermediate results and the recorded relationships between them. Its job is to help answer questions such as: Which journal rows contributed to this value? Which category mapping was applied? At what point did the amount change? A configured Tableau view can make those questions easier to pursue, but viewing a number does not validate the source population, approve the rule that produced it, or sign off the return.
+This organization matters when a result is questioned. The investigation starts with the data used and produced by that run, instead of whichever dataset happens to be current.
 
-Inspection should be built from the same retained identifiers and derivation records as calculation while remaining an independent read and review concern. If the dashboard reconstructs its own version of the pipeline, the displayed explanation can drift away from the calculation it is meant to explain.
+## 2. Stage outputs remain available
 
-## 2. The five-stage calculation path
+The five-stage view gives reviewers a map of the calculation:
 
-The public architecture has five fixed conceptual stages:
+1. **Extract.** Retrieve the General Ledger data in scope for the workflow.
+2. **Reconcile.** Compare and reconcile the contributing data.
+3. **Category Map.** Apply the tax-category mappings.
+4. **Aggregate.** Combine the mapped values into the required totals.
+5. **Return.** Prepare the reporting output.
 
-1. **Extract.** Select the journal rows in scope for the reporting period and carry forward the identifiers needed to locate them again.
-2. **Reconcile.** Normalize and compare records across contributing sources, retaining the relationship between reconciled rows and their recorded inputs.
-3. **Category Map.** Apply the configured tax-category mappings and retain which mapping and version contributed to each classified record.
-4. **Aggregate.** Combine classified records into the values required by the return while retaining their recorded contributing population.
-5. **Return.** Assemble the reporting output and the metadata needed to identify the run, period, and rule versions behind it.
-
-The stages are sequential, but inspection does not have to mimic a left-to-right walkthrough. An analyst usually begins with a questioned output and moves backward. The architecture therefore needs both a forward calculation path and a backward route through the evidence that was retained.
+Inputs and resulting intermediate files are saved throughout the scenario. Multiple Excel reports and dynamic Tableau dashboards accompany each stage, supporting audit and debugging while the underlying stage data remains available for closer examination.
 
 <VisualizationContainer minHeight={0} caption={COMMODITY_TAX_FORMAL_PIPELINE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
   <CommodityTaxFormalPipelineFigure content={COMMODITY_TAX_FORMAL_PIPELINE} />
 </VisualizationContainer>
 
-## 3. What recorded lineage must retain
+The calculation moves forward, but an investigation may move backward. An unexpected aggregate can lead to an examination of mapped records, the preceding reconciliation, and the original input from the same run.
 
-Database-lineage research distinguishes the records that contributed to an output from the operations that transformed them <CitationRef id={4} /><CitationRef id={5} />. This pipeline uses a coarser operational version of that idea: stable identifiers and derivation records connect retained stage outputs to the inputs recorded for them.
+## 3. Three ways to examine the work
 
-For that evidence to support an investigation, several conditions have to hold:
+**Saved datasets** preserve the inputs and intermediate results for a particular run. The folder and partition organization helps the team retrieve the stage data it needs.
 
-- **Contributing inputs are retained.** When a row affects a derived value, its identifier remains associated with that derivation.
-- **Associations point to the right records.** A retained identifier is useful only if joins and mappings connect it to the input that actually contributed.
-- **Rules are identifiable.** Category mappings and other material transformations carry the version needed to understand which rule was applied.
-- **Identifiers remain resolvable.** Keys survive the relevant joins, filters, and intermediate datasets for the supported review period.
-- **Aggregations preserve their contributing population.** A total can be investigated only when the records included in that total remain associated with it.
+**Excel reports** expose results at each stage for direct examination. They are part of the automated delivery, rather than merely a remnant of the earlier manual process.
 
-These are implementation conditions to test, not properties conferred by calling the data “lineage.” A dropped join key can sever a path. A many-to-many join can duplicate contributions. An overwritten mapping can make a prior classification difficult to explain. A filter can remove a record without retaining why it left the population.
+**Dynamic Tableau dashboards** provide interactive inspection of the stage results. The dashboards therefore support investigation, not automated approval.
 
-**Recorded lineage** names only what the system retained; it cannot supply unrecorded evidence or repair an incorrect association on its own.
+These surfaces complement one another. A report can identify an unexpected amount, a dashboard can help narrow the question, and the saved data can support a closer comparison of the relevant transformation's input and output.
 
-## 4. Investigating one questioned value
+## 4. Investigating a questioned return value
 
-Suppose an analyst questions a value in the return. The investigation begins at that value and works backward through the recorded path:
+A practical investigation follows the saved work of the run:
 
-1. Identify the aggregate and reporting period associated with the questioned value.
-2. Expand the aggregate to the category-level records retained as contributors.
-3. Inspect the mappings recorded for those records, including the applicable rule versions.
-4. Follow the reconciled records back toward the extracted journal rows associated with them.
-5. Compare the displayed evidence with the source material and the analyst's understanding of the rule.
-
-That investigation can end in three different ways. The recorded path may explain the value. It may reveal an inconsistent mapping, join, or source record that needs correction. Or it may stop because the required evidence was not retained or cannot be resolved. The third outcome is not a weaker version of the first two; it is a distinct evidence gap that should remain visible.
+1. Identify the run date and time associated with the questioned result.
+2. Open the relevant stage report or dashboard and check that it represents the same run.
+3. Retrieve the saved input and output for that stage through the file or partitioned-data path.
+4. Compare the records and calculation. If the issue originated earlier, examine the preceding stage's saved output.
+5. Review the source data, mapping, or implementation with the people responsible for it.
 
 <VisualizationContainer minHeight={0} caption={COMMODITY_TAX_FORMAL_TRACE.caption} className="md:-mx-12 lg:-mx-24" variant="open">
   <CommodityTaxFormalTraceFigure content={COMMODITY_TAX_FORMAL_TRACE} />
 </VisualizationContainer>
 
-## 5. Missing or inconsistent evidence
+The figure describes an investigation sequence through saved stage data. It does not imply that every output has an automatically generated row-level ancestry graph. Finding which records explain a value can still require queries, comparisons, and examination of the code.
 
-A usable investigation path has to represent failure rather than route around it. When a contributing identifier is missing, a dashboard should stop at the last supported stage instead of presenting an inferred source path. When the calculation and inspection joins disagree, the discrepancy should become a defect to reconcile rather than a cosmetic dashboard issue.
+## 5. Keep the investigation aligned with the run
 
-Common failure cases include:
+Run-organized storage helps separate one execution from another, but the reviewer must still select the appropriate data. Comparing outputs from different runs, or a dashboard using different filters from the report under review, can obscure the original question.
 
-- A source row contributes to an aggregate but its identifier is dropped during an intermediate transformation.
-- A many-to-many join inflates a value while the inspection view displays only distinct records.
-- A category mapping changes without retaining the version used by an earlier run.
-- The dashboard applies a filter or join that differs from the calculation path.
-- An analyst has access to the derived value but not to one of the recorded source datasets.
-- A corrected source record exists, but the affected calculation has not yet been rerun and reviewed.
+Useful checks include whether the input and intermediate files belong to the intended run, whether the report and dashboard represent that run, and whether their filters and aggregations match the comparison being made.
 
-The operating response depends on the failure. A missing association may require lineage repair. A source defect may require a governed correction. A mapping issue may require rule review. An authorization limit may require a different reviewer. In every case, the evidence state should remain separate from the disposition: “unresolved” is more accurate than an explanation assembled from incomplete records.
+Saving all inputs also cannot establish that an upstream source supplied everything it should have. Data retention preserves the material received by the workflow; source completeness remains a separate review concern.
 
-## 6. Configured Tableau inspection views
+## 6. Corrections and the next run
 
-Tableau provided configured inspection surfaces associated with relevant pipeline stages. It was familiar to the finance users involved, and it could present filtered stage outputs and drill-down paths without introducing a separate custom interface.
+If the investigation identifies a source, mapping, or implementation problem, the responsible team reviews the correction. The subsequent calculation and its reports then need to be checked again. Earlier saved runs remain useful comparison points.
 
-Those views are useful only to the extent that their joins, filters, rule labels, and authorization behavior match the retained pipeline records. They require their own semantic checks and maintenance. A dashboard can be available while its query is stale; it can display the right total while omitting a contributing row; or it can show a complete recorded path built from an incomplete source population.
+Mapping logic remained in code, with changes passing through the data team's review and release process. Reports and dashboards supported examination of results; changing their presentation did not itself correct a transformation.
 
-The dashboards therefore support investigation, not automated approval. They provide a shared surface on which an analyst and the delivery team can examine the same questioned value and locate where their interpretations diverge.
-
-## 7. Reconcile, correct, rerun, review
-
-The human workflow continues after drill-down. An analyst raises a question, inspects the configured evidence, and reconciles the recorded derivation against the applicable source and rule. If the issue is a source record, mapping, or transformation defect, the correction follows the governed path for that artifact. The affected calculation is then rerun, and the resulting value and evidence are reviewed again.
-
-Changing a dashboard annotation does not change the calculation, and changing a source or rule does not update an already-produced return until the relevant stages run again. The review surface and the compute path must stay connected without being confused for one another.
-
-The configured views exposed selected outputs and recorded paths, but not the full rulebook. Category mappings remained in transformation code, and changes continued through the data team's review and release controls. That boundary limited what an analyst could inspect directly and kept a dashboard annotation from becoming an ungoverned rule change.
-
-## 8. What visibility cannot prove
-
-Recorded lineage can make a question more focused. It can show which records and rule versions the supported path associated with a value. It can help distinguish a mapping issue from a source issue and give the team a common place to investigate.
-
-It cannot establish that the original source population was complete, that every retained association is accurate, that a business rule was approved, that an analyst saw every relevant record, or that the resulting return should be accepted. It also cannot recover evidence that was never recorded.
-
-Calculation should retain enough derivation evidence for authorized inspection, inspection should expose gaps and inconsistencies rather than conceal them, and accountable analysts should decide what those findings mean. Visibility improves the quality of the investigation only when the records beneath it deserve confidence.
+The architecture made a complex scenario easier to inspect by retaining its inputs and intermediate work and providing multiple review surfaces at each stage. It supported audit and debugging without making retention a guarantee of correct rules, complete sources, or identical replay.

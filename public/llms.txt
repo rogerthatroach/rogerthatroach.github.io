@@ -18,7 +18,7 @@
 - [AI/LLM Drafting Platform](https://rogerthatroach.github.io/projects/funding-request-drafting): The first true agentic AI platform approved for production at the bank; launched across the full CFO Group in all geographies in May 2026.
 - [AI/LLM Workforce Analytics Platform](https://rogerthatroach.github.io/projects/workforce-analytics): Built March–November 2025; production financial analytics with model-mediated language work around code-owned entitlement and calculation.
 - [Financial Peer Benchmarking Platform](https://rogerthatroach.github.io/projects/financial-peer-benchmarking): One production product across v1 and its two-week v2 text-to-SQL refactor.
-- [Commodity Tax](https://rogerthatroach.github.io/projects/commodity-tax): PySpark and Tableau process automation that reduced a months-long workflow to 90 minutes for a roughly $600M allocation.
+- [Commodity Tax](https://rogerthatroach.github.io/projects/commodity-tax): Python and Spark automation in Dataiku, with saved run data, Excel reports, and dynamic dashboards; months to 90 minutes for a roughly $600M allocation.
 - [Document Intelligence](https://rogerthatroach.github.io/projects/document-intelligence): A hybrid component that improved checkbox-detection accuracy from roughly 70% to 99.95%; this is not an end-to-end pipeline score.
 - [Combustion Tuning](https://rogerthatroach.github.io/projects/combustion-tuning): 84 regression models and bounded PSO for operator-reviewed settings on one 900 MW Maizuru unit; $3M in annual savings.
 

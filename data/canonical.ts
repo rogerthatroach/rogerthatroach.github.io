@@ -110,6 +110,9 @@ export const COMMODITY_TAX_EFFICIENCY = 'Months → 90 min';
 /** Compact form for 3-slot displays (Hero NUMBER_SEQUENCE) */
 export const COMMODITY_TAX_EFFICIENCY_COMPACT = '90 min';
 
+export const COMMODITY_TAX_REVIEW_SUMMARY =
+  'Run-organized inputs and intermediates, Excel stage reports, dynamic dashboards, and analyst investigation';
+
 /** Duration of the concurrent peer benchmarking v1-to-v2 refactor. */
 export const FINANCIAL_BENCHMARKING_V2_BUILD_TIME = '2 weeks';
 

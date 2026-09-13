@@ -2,60 +2,50 @@ import { CommodityTaxProcessContrastFigure, CommodityTaxTrustLoopFigure } from '
 import VisualizationContainer from '@/components/blog/VisualizationContainer'
 import { COMMODITY_TAX_BUILDER_CONTRAST, COMMODITY_TAX_BUILDER_LOOP } from '@/data/visualizations/commodityTax'
 
-My first delivery in RBC&rsquo;s CFO Group reduced a months-long Commodity Tax process to roughly 90 minutes. The work supported an allocation of roughly $600M and received a CFO Group RBC Quarterly Team Award in Q4 2023.
+The Commodity Tax automation in RBC&rsquo;s CFO Group reduced a months-long process to roughly 90 minutes. The work supported an allocation of roughly $600M and received a CFO Group RBC Quarterly Team Award in Q4 2023.
 
-The result mattered. The way the finance team could question it mattered just as much.
+The delivery combined calculation with the practical work of auditing and debugging a complex financial workflow. Every run saved its inputs and intermediate outputs. Multiple Excel reports and dynamic Tableau dashboards at each stage let the team inspect what the process had produced before looking only at the final return.
 
-Commodity Tax was a data and process-automation problem, not an AI project. Its central design decision was to build calculation and inspection together: PySpark performed the governed transformation, while configured Tableau views gave analysts a practical place to investigate a questioned value, reconcile a mapping, and review a rerun.
+## The workflow
 
-## The first assignment
+The Commodity Tax process involved General Ledger extraction, reconciliation, category mapping, aggregation, and return preparation. These five stages summarize a much larger Dataiku scenario containing Python and Spark code.
 
-I joined the CFO Group in September 2022 as a Senior Data Scientist. The Commodity Tax workflow moved through General Ledger extraction, reconciliation, category mapping, aggregation, and return preparation. Much of the process depended on spreadsheets, manual handoffs, and mappings whose exceptions were understood by experienced finance partners.
+I led development and stakeholder engagement, working with finance partners who supplied the meaning of categories and exceptions. Automating the transformations did not remove that collaboration: a calculation could execute successfully while applying a rule incorrectly or receiving incomplete source data.
 
-Automating that workflow required more than translating formulas into code. A mapping could be mechanically consistent and still misrepresent the business rule. A clean aggregate could still inherit a missing source record. The system had to make the calculation repeatable while preserving a route for the people who owned the process to challenge it.
+The reporting and saved-data paths made those questions easier to investigate during delivery and operation.
 
-That made the collaboration model part of the architecture. I led development and stakeholder engagement, working with finance partners who supplied the meaning of categories and exceptions. The delivery team turned those decisions into reviewed mappings and transformations. Analysts remained responsible for investigating anomalies and approving corrections.
+## Preserve the work of each run
 
-## Calculation and inspection were one design problem
+The scenario saved every input and resulting intermediate file. Shared-storage folders were organized by run date and time, with corresponding partitions on the enterprise data platform. PySpark made the partitioned data easier to retrieve and navigate, alongside the saved files.
 
-The compute path used PySpark to move the process through five conceptual stages: Extract, Reconcile, Category Map, Aggregate, and Return. The inspection path sat beside the relevant stages rather than appearing only after the final artifact.
+That organization gave an investigation a concrete starting point: identify the run, open the relevant stage data, and compare its input and output. An earlier run remained available to inspect after later processing had taken place.
 
 <VisualizationContainer minHeight={0} caption={COMMODITY_TAX_BUILDER_CONTRAST.caption} className="md:-mx-12 lg:-mx-24" variant="open">
   <CommodityTaxProcessContrastFigure content={COMMODITY_TAX_BUILDER_CONTRAST} />
 </VisualizationContainer>
 
-Keeping calculation and inspection separate prevented the dashboard from becoming a second calculator. Tableau displayed configured views of recorded pipeline state. It could help an authorized analyst inspect an associated mapping or source record where the retained links supported that path. It did not prove that the source population was complete, the mapping rule was correct, or the returned amount deserved approval.
+## Reports and dashboards at every stage
 
-The inspection surface helped the team ask a better question: where did this value come from, and what evidence is available to investigate it?
+Excel remained part of the delivered system. Each stage produced multiple reports alongside dynamic Tableau dashboards for audit and debugging. The reports exposed stage results for examination; the dashboards provided interactive ways to explore the data.
 
-## What happened when a number was questioned
+The underlying inputs and intermediates were also saved, so investigation could extend beyond a report or dashboard. If an amount looked wrong, finance and engineering could examine the relevant run, compare stage outputs, and inspect the transformation or mapping involved.
 
-A questioned return value did not have to become a debate about the whole pipeline. The analyst could begin with the aggregate, follow the recorded associations that were available, inspect the relevant mapping and source records, and identify whether the issue was data, configuration, or interpretation.
+The comparison needed to stay within the same run. A report from one execution and a dashboard or dataset from another could create an apparent discrepancy. Maintaining the stage outputs and checking the selected run, filters, and aggregations remained part of operating the workflow.
 
 <VisualizationContainer minHeight={0} caption={COMMODITY_TAX_BUILDER_LOOP.caption} className="md:-mx-12 lg:-mx-24" variant="open">
   <CommodityTaxTrustLoopFigure content={COMMODITY_TAX_BUILDER_LOOP} />
 </VisualizationContainer>
 
-If the evidence supported a correction, the governed mapping or source issue could be addressed and the process rerun for review. If the recorded path was incomplete or inconsistent, the right outcome was further investigation rather than a confident explanation.
-
-The loop gave finance and engineering a shared object to inspect. Instead of handing over an opaque final number, the delivery team could narrow the disagreement to a stage, mapping, or missing association. That made review more efficient without turning visibility into a correctness guarantee.
+Reports, dashboards, and saved datasets served different parts of the same review. A disagreement still required interpretation: whether it came from source data, a business rule, its implementation, or the presentation of a result.
 
 ## The outcome and its limits
 
-By Q4 2023, the process completed in roughly 90 minutes rather than months. The work received the team award, and the pipeline remained part of the operating process with analysts reviewing and correcting issues where needed.
+By Q4 2023, the process completed in roughly 90 minutes rather than months. The result came from the whole delivery: Python and Spark transformations, run-organized data retention, stage reports, dashboards, testing, and finance collaboration.
 
-The outcome came from the full delivery: codified mappings, PySpark processing, configured inspection, finance partnership, testing, and operating review.
-
-The recorded path also remained conditional. A join without retained identifiers, a changed rule without the matching version, or an omitted source record could break the investigation trail. The system made supported questions easier to trace; it did not create perfect provenance.
+Saving the inputs and intermediates made the calculation inspectable. It did not prove that every input was complete or every rule was correct. Analysts and the delivery team still had to investigate discrepancies, review corrections, and check the resulting output.
 
 ## What I would change
 
-I would expose the governed mapping-rule surface earlier.
+I would expose the mapping-rule surface earlier. Reports and dashboards supported inspection, but mapping changes still moved through code and redeployment. A reviewed interface for proposing changes could have made that collaboration more direct while preserving approval and version control.
 
-The initial design let analysts inspect supported paths from a returned value toward associated records, but mapping changes still moved through code and redeployment. A reviewed interface for proposing rule changes could have made that collaboration more direct while preserving approval and version control.
-
-Business users should not edit production rules without controls. A reviewed interface would make the ownership boundary visible: finance proposes or explains the rule, engineering validates the implementation, and the released version remains traceable to both.
-
-## What the delivery taught me
-
-Commodity Tax was my first substantial delivery in the group. In financial automation, an answer becomes useful when the people accountable for it can inspect the available evidence, challenge the rule, and correct the process without treating the software as an oracle.
+The useful lesson was to make the work of a run available for examination: retain its data, expose stage results in forms people can use, and keep a practical route from a questioned number back to the calculation.

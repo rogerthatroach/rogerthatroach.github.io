@@ -24,7 +24,7 @@ export const GLOSSARY: Record<string, string> = {
   'cost centre':
     'A lowest-level organizational and accounting unit used in finance reporting. Hierarchy and entitlement rules determine which units may contribute to a calculation.',
   PySpark:
-    'The Python interface to Apache Spark. Commodity Tax used it for a deterministic data-transformation pipeline, not an AI or LLM workflow.',
+    'The Python interface to Apache Spark. The Commodity Tax Dataiku scenario combined Python and Spark processing, with partitioned data for retrieval and inspection.',
   OCR:
     'Optical character recognition, which turns document images into text and layout information. Small visual controls such as checkboxes may need a separate image path.',
   OpenCV:

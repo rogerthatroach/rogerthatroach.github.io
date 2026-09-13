@@ -70,10 +70,10 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
     title: 'Commodity Tax',
     subtitle: 'Process Automation — RBC CFO Group',
     role: 'Lead developer + stakeholder engagement',
-    stack: ['PySpark', 'Tableau', 'General Ledger Extraction'],
+    stack: ['Dataiku', 'Python', 'PySpark', 'Excel', 'Tableau'],
     heroMetric: { value: COMMODITY_TAX_EFFICIENCY, label: 'Processing Time' },
     caption:
-      'Automated a months-long Commodity Tax return workflow to 90 minutes with PySpark and configured Tableau views for finance review.',
+      'Reduced a months-long Commodity Tax workflow to 90 minutes with Python and Spark in Dataiku, saved run data, Excel reports, and dynamic dashboards.',
     palette: { primary: '#fcd34d', primaryLight: '#92400e' },
     deepDivePath: '/projects/commodity-tax',
   },

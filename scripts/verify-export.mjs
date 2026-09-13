@@ -6,6 +6,9 @@ import { extname, join, relative, resolve, sep } from 'node:path'
 const ROOT = resolve(import.meta.dirname, '..')
 const OUT = join(ROOT, 'out')
 const SITE_ORIGIN = 'https://rogerthatroach.github.io'
+const articleRedirects = new Map([
+  ['/blog/commodity-tax-cfo-trust-framework', '/blog/commodity-tax-cfo-trust'],
+])
 
 const failures = []
 
@@ -59,7 +62,7 @@ function localTarget(pathname) {
     candidates.push(`${direct}.html`, join(direct, 'index.html'))
   }
 
-  return candidates.find((candidate) => existsSync(candidate))
+  return candidates.find((candidate) => existsSync(candidate) && statSync(candidate).isFile())
 }
 
 if (!existsSync(OUT)) {
@@ -68,10 +71,11 @@ if (!existsSync(OUT)) {
 }
 
 const htmlFiles = walk(OUT).filter((path) => path.endsWith('.html'))
-const contentPages = htmlFiles.filter((path) => {
+const nonErrorPages = htmlFiles.filter((path) => {
   const route = routeForHtml(path)
   return route !== '/404' && !route.startsWith('/_not-found')
 })
+const contentPages = nonErrorPages.filter((path) => !articleRedirects.has(routeForHtml(path)))
 
 const renderedOutputGuards = [
   ['client-only placeholder', /Loading (?:diagram|post)/i],
@@ -104,10 +108,9 @@ const requiredVisibleTextByRoute = new Map([
   ['/blog/financial-benchmarking-refactor', ['Financial Peer Benchmarking: What Made a Two-Week Refactor Possible']],
   ['/blog/financial-benchmarking-query-decisions', ['Financial Peer Benchmarking: Four Decisions for Bounded Text-to-SQL']],
   ['/blog/commodity-tax-cfo-trust', ['Commodity Tax: Designing Calculation and Inspection Together']],
-  ['/blog/commodity-tax-cfo-trust-framework', ['Commodity Tax: Two Decisions Behind a Reviewable Workflow']],
 ])
 
-for (const path of contentPages) {
+for (const path of nonErrorPages) {
   const route = routeForHtml(path)
   const html = readFileSync(path, 'utf8')
   const visibleText = renderedText(html)
@@ -154,7 +157,7 @@ for (const path of contentPages) {
 
     let url
     try {
-      url = new URL(href, `${SITE_ORIGIN}${route === '/' ? '/' : `${route}/`}`)
+      url = new URL(href, `${SITE_ORIGIN}${route}`)
     } catch {
       fail(`${route}: invalid href ${href}`)
       continue
@@ -168,12 +171,42 @@ for (const path of contentPages) {
       continue
     }
 
-    if (url.hash && target.endsWith('.html')) {
+    // The prototype's global skip link follows the same separately scoped
+    // landmark exception as its page shell above.
+    const prototypeSkipLink = route.startsWith('/blue-rose')
+      && url.pathname === route && url.hash === '#main-content'
+    if (url.hash && target.endsWith('.html') && !prototypeSkipLink) {
       const id = decodeURIComponent(url.hash.slice(1))
       const targetHtml = readFileSync(target, 'utf8')
       if (!targetHtml.includes(`id="${id}"`) && !targetHtml.includes(`name="${id}"`)) {
         fail(`${route}: missing fragment target ${href}`)
       }
+    }
+  }
+}
+
+for (const [source, destination] of articleRedirects) {
+  const redirectFile = localTarget(source)
+  if (!redirectFile) {
+    fail(`${source}: missing static redirect page`)
+    continue
+  }
+  const html = readFileSync(redirectFile, 'utf8')
+  const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1]
+  const refresh = html.match(/<meta\s+http-equiv="refresh"\s+content="([^"]+)"/i)?.[1]
+  const robots = html.match(/<meta\s+name="robots"\s+content="([^"]+)"/i)?.[1]
+  if (canonical !== `${SITE_ORIGIN}${destination}`) fail(`${source}: incorrect redirect canonical`)
+  if (refresh !== `0;url=${destination}`) fail(`${source}: missing immediate no-JavaScript redirect`)
+  if (!robots?.split(/,\s*/).includes('noindex')) fail(`${source}: redirect must be noindex`)
+  if (!html.includes(`<a href="${destination}"`)) fail(`${source}: missing fallback article link`)
+  if (html.includes('"@type":"BlogPosting"')) fail(`${source}: redirect must not carry article schema`)
+  if (!localTarget(destination)) fail(`${source}: redirect destination is missing`)
+  if (readFileSync(join(OUT, 'sitemap.xml'), 'utf8').includes(`${SITE_ORIGIN}${source}<`)) {
+    fail(`${source}: retired article remains in sitemap`)
+  }
+  for (const path of contentPages) {
+    if (readFileSync(path, 'utf8').includes(`href="${source}"`)) {
+      fail(`${routeForHtml(path)}: links to the retired article instead of its destination`)
     }
   }
 }
@@ -186,6 +219,9 @@ for (const path of walk(OUT).filter((candidate) => /\.(?:html|js|xml|txt|json)$/
   const contents = readFileSync(path, 'utf8')
   for (const [label, pattern] of paperExposurePatterns) {
     if (pattern.test(contents)) fail(`${relative(OUT, path)}: contains ${label}`)
+  }
+  if (contents.includes('Commodity Tax: Two Decisions Behind a Reviewable Workflow')) {
+    fail(`${relative(OUT, path)}: contains the retired article title`)
   }
 }
 
@@ -207,7 +243,7 @@ if (!existsSync(join(OUT, 'og-image.png'))) fail('/og-image.png: social preview 
 // the publication audit. Source-level constants cover the TypeScript data
 // layer, but MDX prose is literal text, so this is the only check that covers
 // every surface a reader actually sees.
-const RETIRED_PUBLIC_TERMS = ['FinancialBenchmarking', 'WorkforceAnalytics', 'AI/LLM Drafting Platform', 'ModelGateway', 'project funding request']
+const RETIRED_PUBLIC_TERMS = ['Aegis', 'Astraeus', 'PAR Assist', 'Lumina', 'Project Approval Request']
 
 for (const path of contentPages) {
   const route = routeForHtml(path)
@@ -225,4 +261,4 @@ if (failures.length > 0) {
   process.exit(1)
 }
 
-console.log(`Export verification passed: ${contentPages.length} HTML pages, internal links, metadata, claims, and machine outputs.`)
+console.log(`Export verification passed: ${contentPages.length} content pages, ${articleRedirects.size} article redirect, internal links, metadata, claims, and machine outputs.`)

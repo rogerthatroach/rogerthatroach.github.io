@@ -17,7 +17,6 @@ const POST_LOADERS: Record<string, () => Promise<PostModule>> = {
   'enterprise-agentic-ai-framework': () => import('@/data/posts/enterprise-agentic-ai-framework.mdx'),
   'funding-request-drafting-platform-building': () => import('@/data/posts/funding-request-drafting-platform-building.mdx'),
   'commodity-tax-cfo-trust': () => import('@/data/posts/commodity-tax-cfo-trust.mdx'),
-  'commodity-tax-cfo-trust-framework': () => import('@/data/posts/commodity-tax-cfo-trust-framework.mdx'),
   'workforce-analytics-model-boundary': () => import('@/data/posts/workforce-analytics-llm-as-router.mdx'),
   'workforce-analytics-boundary-decisions': () => import('@/data/posts/workforce-analytics-routing-framework.mdx'),
   'financial-benchmarking-refactor': () => import('@/data/posts/financial-benchmarking-refactor-velocity.mdx'),

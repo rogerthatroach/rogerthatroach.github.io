@@ -135,9 +135,9 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: 'Commodity Tax Automation',
         oneLiner:
-          'Rebuilt a manual allocation process as a governed PySpark calculation pipeline with Tableau inspection surfaces, supporting an allocation of ~$600M in 90 minutes instead of months.',
+          'Automated a manual allocation process with Python and Spark in Dataiku, saved run data, Excel reports, and dynamic dashboards, supporting an allocation of ~$600M in 90 minutes instead of months.',
         decisionRationale:
-          'PySpark handled the bank-scale calculation path; Tableau gave finance users familiar inspection and correction surfaces. This was deterministic automation, not an LLM or retrieval system.',
+          'Run-date/time folders and partitions retained every input and intermediate output. Multiple Excel reports and dynamic dashboards at each stage supported audit and debugging.',
         metric: { value: COMMODITY_TAX_EFFICIENCY, label: 'processing time' },
         caseStudyLink: '/projects/commodity-tax',
       },
