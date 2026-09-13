@@ -294,11 +294,13 @@ function TimelineRow({
                   : 'flex-col sm:flex-row sm:items-baseline sm:justify-between sm:gap-3'
               )}
             >
-              {!group.hideOrgNameInHeader && (
-                <h3 className="truncate text-base font-bold tracking-tight text-text-primary sm:text-lg">
-                  {group.org}
-                </h3>
-              )}
+              <h3 className={cn(
+                group.hideOrgNameInHeader
+                  ? 'sr-only'
+                  : 'truncate text-base font-bold tracking-tight text-text-primary sm:text-lg'
+              )}>
+                {group.org}
+              </h3>
               <span className="font-mono text-xs text-text-tertiary">
                 {groupDateRange(group.nodes)}
               </span>
@@ -331,7 +333,7 @@ export default function SkillTimeline({ expanded = false, heading }: SkillTimeli
   const groups = groupByOrg(TIMELINE);
 
   return (
-    <Section id="journey" title={title}>
+    <Section id="journey" title={title} className="scroll-mt-24">
       <noscript>
         <style>{'.js-role-details-trigger{display:none!important}'}</style>
       </noscript>

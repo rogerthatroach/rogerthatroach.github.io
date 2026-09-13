@@ -19,7 +19,7 @@ export default function Hero() {
     <section
       id="hero"
       aria-label="Intro"
-      className="relative flex min-h-screen items-center justify-center overflow-hidden pb-16 pt-24 md:pb-12 md:pt-0"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden pb-16 pt-24 md:pt-28"
     >
       <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 bg-linear-to-b from-accent/5 via-transparent to-background" />
@@ -111,27 +111,14 @@ export default function Hero() {
           </span>
         </motion.p>
 
-        <p
+        <ul
           aria-label="Career summary"
-          className="font-mono text-xs tracking-wider text-text-tertiary lg:hidden"
+          className="flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-xs tracking-wider text-text-tertiary"
         >
-          {HERO_SUMMARY.join(' · ')}
-        </p>
-      </div>
-
-      <div className="absolute bottom-10 left-0 right-0 z-10 hidden lg:block">
-        <div className="mx-auto max-w-content px-6 md:px-16">
-          <ul
-            aria-label="Career summary"
-            className="flex items-center gap-6 font-mono text-xs tracking-wider text-text-tertiary"
-          >
-            {HERO_SUMMARY.map((item, i) => (
-              <li key={item} className={i > 0 ? 'border-l border-border-subtle pl-6' : undefined}>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
+          {HERO_SUMMARY.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
       </div>
     </section>
   );

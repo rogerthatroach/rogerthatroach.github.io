@@ -9,7 +9,7 @@ export const HERO = {
   name: 'Harmilap Singh Dhaliwal',
   title: 'AI & Data Science Lead — RBC',
   tagline: 'Hands-on production AI leadership, from industrial ML to regulated finance.',
-  bio: `Across ${YEARS_EXPERIENCE} years, I have built production ML and AI systems in power generation, cloud document intelligence, and regulated finance. At RBC, I conceived, architected, and built the ${DRAFTING_PLATFORM_NAME} end to end for project funding requests. It was the first true agentic AI platform approved for production at the bank and launched across the full CFO Group in all geographies. My work stays hands-on across architecture, implementation, evaluation, and production follow-through.`,
+  bio: `I have built production ML and AI systems in power generation, cloud document intelligence, and regulated finance. At RBC, I conceived, architected, and built the ${DRAFTING_PLATFORM_NAME} for project funding requests. It was the first true agentic AI platform approved for production at the bank and launched across the full CFO Group in all geographies.`,
   location: 'Toronto, ON',
   actions: {
     projects: 'Read case studies',

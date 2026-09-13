@@ -51,7 +51,7 @@ export default function Home() {
 
         <SkillTimeline expanded heading="The Journey" />
 
-        <section id="work" className="px-6 py-14 md:px-16">
+        <section id="work" className="scroll-mt-24 px-6 py-14 md:px-16">
           <div className="mx-auto max-w-content">
             <div className="mb-6 flex items-baseline justify-between gap-4">
               <h2 className="font-display text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">Projects</h2>

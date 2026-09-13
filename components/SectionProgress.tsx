@@ -10,7 +10,7 @@ export interface ProgressSection {
 
 /**
  * Fixed right-rail section progress dots. Active dot tracks the viewport
- * via IntersectionObserver; links jump to each section. Label appears on hover and
+ * at a viewport reading position; links jump to each section. Label appears on hover and
  * while the section is active. Desktop-only (hidden below lg).
  *
  * Keeps the central column uncluttered with a persistent, low-ink wayfinder.
@@ -23,37 +23,36 @@ export default function SectionProgress({
   const [activeId, setActiveId] = useState<string | null>(sections[0]?.id ?? null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let best: IntersectionObserverEntry | null = null;
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          if (!best || entry.intersectionRatio > best.intersectionRatio) {
-            best = entry;
-          }
-        }
-        if (best) {
-          setActiveId((best.target as HTMLElement).id);
-        }
-      },
-      {
-        rootMargin: '-40% 0px -40% 0px',
-        threshold: [0, 0.25, 0.5, 0.75, 1],
-      }
-    );
+    const targets = sections
+      .map((section) => document.getElementById(section.id))
+      .filter((element): element is HTMLElement => element !== null);
+    let frame: number | null = null;
 
-    const targets: HTMLElement[] = [];
-    for (const s of sections) {
-      const el = document.getElementById(s.id);
-      if (el) {
-        observer.observe(el);
-        targets.push(el);
+    const updateActive = () => {
+      frame = null;
+      const readingLine = window.innerHeight * 0.4;
+      let current = targets[0];
+      for (const target of targets) {
+        if (target.getBoundingClientRect().top <= readingLine) current = target;
+        else break;
       }
-    }
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+        current = targets[targets.length - 1];
+      }
+      setActiveId(current?.id ?? null);
+    };
+    const scheduleUpdate = () => {
+      if (frame === null) frame = window.requestAnimationFrame(updateActive);
+    };
+
+    updateActive();
+    window.addEventListener('scroll', scheduleUpdate, { passive: true });
+    window.addEventListener('resize', scheduleUpdate);
 
     return () => {
-      targets.forEach((el) => observer.unobserve(el));
-      observer.disconnect();
+      window.removeEventListener('scroll', scheduleUpdate);
+      window.removeEventListener('resize', scheduleUpdate);
+      if (frame !== null) window.cancelAnimationFrame(frame);
     };
   }, [sections]);
 

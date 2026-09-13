@@ -5,7 +5,7 @@ export default function MetricsRibbon() {
     <section
       id="through-line"
       aria-label="Through-line thesis and key metrics"
-      className="border-y border-border-subtle bg-surface/30"
+      className="scroll-mt-24 border-y border-border-subtle bg-surface/30"
     >
       <div className="mx-auto max-w-content px-6 md:px-16">
         <div className="mx-auto max-w-2xl pt-12 text-center sm:pt-14">
