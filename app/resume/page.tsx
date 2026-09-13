@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Download, Linkedin } from 'lucide-react';
+import { Download, ExternalLink, Linkedin } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import ResumeMetrics from '@/components/resume/ResumeMetrics';
@@ -15,6 +15,7 @@ import { YEARS_EXPERIENCE } from '@/data/canonical';
 import { SKILLS, SKILL_CATEGORIES } from '@/data/skills';
 import { AWARDS } from '@/data/awards';
 import { EDUCATION, CREDENTIALS } from '@/data/education';
+import { RESUME_PDF } from '@/data/resume';
 
 const META_TITLE = 'Resume';
 const META_DESCRIPTION =
@@ -69,12 +70,22 @@ export default function ResumePage() {
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <a
-                href="/resume.pdf"
-                download="Harmilap-Singh-Dhaliwal-Resume.pdf"
+                href={RESUME_PDF.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group inline-flex min-h-11 items-center gap-2 rounded-lg border border-accent/30 bg-accent-muted px-4 py-2 text-sm font-medium text-accent transition-all hover:border-accent hover:bg-accent hover:text-background print:hidden"
               >
+                <ExternalLink size={16} aria-hidden="true" />
+                {RESUME_PDF.viewLabel}
+                <span className="sr-only">{RESUME_PDF.viewHint}</span>
+              </a>
+              <a
+                href={RESUME_PDF.href}
+                download={RESUME_PDF.filename}
+                className="group inline-flex min-h-11 items-center gap-2 rounded-lg border border-border-subtle bg-surface/50 px-4 py-2 text-sm font-medium text-text-primary transition-colors hover:border-accent/40 hover:bg-surface-hover hover:text-accent print:hidden"
+              >
                 <Download size={16} aria-hidden="true" />
-                Download résumé PDF (2 pages)
+                {RESUME_PDF.downloadLabel}
               </a>
               <a
                 href={HERO.links.linkedin}
