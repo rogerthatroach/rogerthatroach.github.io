@@ -9,6 +9,18 @@ export interface Award {
 
 export const AWARDS: Award[] = [
   {
+    title: 'CFO Conference Award',
+    org: 'RBC',
+    year: '2026',
+    detail: 'Recognition for Global Functions GST allocations and Commodity Tax work.',
+  },
+  {
+    title: 'CFO Individual Quarterly Award',
+    org: 'RBC',
+    year: 'P4 2026',
+    detail: 'Individual recognition for Commodity Tax work.',
+  },
+  {
     title: 'CFO One RBC Team Award',
     org: 'RBC',
     year: '2025',
