@@ -1,0 +1,394 @@
+name: Restore a verified GitHub Pages deployment
+
+on:
+  workflow_run:
+    workflows: ['Deploy to GitHub Pages']
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Successful deployment run on main to restore'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  restore:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REQUESTED_SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+      FAILED_RUN_ID: ${{ github.event.workflow_run.id }}
+      TRIGGER_EVENT: ${{ github.event_name }}
+      DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      RESTORE_DIRECTORY: ${{ runner.temp }}/pages-restore
+      SITE_URL: https://rogerthatroach.github.io
+    steps:
+      - name: Select a verified deployment to restore
+        id: select
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != 'refs/heads/main' || "$DEFAULT_BRANCH" != 'main' ]]; then
+            echo 'Restores must run from the main default branch.' >&2
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import subprocess
+          import tarfile
+          from datetime import datetime
+          from pathlib import Path
+
+          repository = os.environ['GITHUB_REPOSITORY']
+          temporary = Path(os.environ['RUNNER_TEMP'])
+
+          def require(condition, message):
+              if not condition:
+                  raise SystemExit(message)
+
+          def output(values):
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+                  for name, value in values.items():
+                      stream.write(f'{name}={value}\n')
+
+          def skip(reason):
+              output({'should_restore': 'false'})
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as stream:
+                  stream.write(f'Automatic restore skipped: {reason}\n')
+              print(f'Automatic restore skipped: {reason}')
+
+          def api(endpoint):
+              response = subprocess.run(['gh', 'api', endpoint], check=True, capture_output=True, text=True)
+              return json.loads(response.stdout)
+
+          def trusted_run(run, workflow_id, path='.github/workflows/deploy.yml', events=('push', 'workflow_dispatch')):
+              return (
+                  run.get('workflow_id') == workflow_id
+                  and run.get('path', '').split('@', 1)[0] == path
+                  and run.get('head_branch') == 'main'
+                  and run.get('event') in events
+                  and run.get('repository', {}).get('full_name') == repository
+                  and run.get('head_repository', {}).get('full_name') == repository
+                  and re.fullmatch(r'[0-9a-f]{40}', run.get('head_sha', '')) is not None
+              )
+
+          def health_step_has(run_id, conclusion, job_name='deploy', step_name='Verify live portfolio'):
+              jobs = api(f'repos/{repository}/actions/runs/{run_id}/jobs?filter=latest&per_page=100')
+              return any(
+                  job.get('name') == job_name
+                  and job.get('conclusion') == conclusion
+                  and any(step.get('name') == step_name and step.get('conclusion') == conclusion for step in job.get('steps', []))
+                  for job in jobs.get('jobs', [])
+              )
+
+          def completed_time(run):
+              require(run.get('status') == 'completed', 'Recovery ordering requires a completed workflow attempt.')
+              value = run.get('updated_at')
+              require(isinstance(value, str) and value, 'Completed workflow attempt is missing its completion timestamp.')
+              try:
+                  timestamp = datetime.fromisoformat(value.replace('Z', '+00:00'))
+              except ValueError:
+                  raise SystemExit('Completed workflow attempt has an invalid completion timestamp.')
+              require(timestamp.tzinfo is not None, 'Workflow completion time must include its time zone.')
+              return timestamp
+
+          def verified_restore_after(failed):
+              cutoff = completed_time(failed)
+              workflow = api(f'repos/{repository}/actions/workflows/restore.yml')
+              page = 1
+              seen = set()
+              while True:
+                  response = api(f"repos/{repository}/actions/workflows/{workflow['id']}/runs?branch=main&status=success&per_page=100&page={page}")
+                  batch = response.get('workflow_runs', [])
+                  require(all(run.get('id') not in seen for run in batch), 'Repeated recovery results while checking for a newer restore.')
+                  seen.update(run.get('id') for run in batch)
+                  for run in batch:
+                      if not trusted_run(run, workflow['id'], '.github/workflows/restore.yml', ('workflow_dispatch', 'workflow_run')) or run.get('status') != 'completed' or run.get('conclusion') != 'success':
+                          continue
+                      completed = completed_time(run)
+                      if completed > cutoff and health_step_has(run['id'], 'success', 'restore', 'Verify the restored live portfolio'):
+                          return True
+                  if len(batch) < 100:
+                      return False
+                  page += 1
+
+          if os.environ['TRIGGER_EVENT'] == 'workflow_dispatch':
+              source_id = os.environ['REQUESTED_SOURCE_RUN_ID']
+              require(re.fullmatch(r'[1-9][0-9]*', source_id) is not None, 'source_run_id must contain only digits.')
+              output({'should_restore': 'true', 'source_run_id': source_id, 'downloaded': 'false'})
+          else:
+              failed_id = os.environ['FAILED_RUN_ID']
+              require(os.environ['TRIGGER_EVENT'] == 'workflow_run' and re.fullmatch(r'[1-9][0-9]*', failed_id) is not None, 'Invalid automatic recovery trigger.')
+              workflow = api(f'repos/{repository}/actions/workflows/deploy.yml')
+              failed = api(f'repos/{repository}/actions/runs/{failed_id}')
+              if not trusted_run(failed, workflow.get('id')) or failed.get('status') != 'completed' or failed.get('conclusion') != 'failure':
+                  skip('the triggering run is no longer an eligible failed main deployment.')
+              elif not health_step_has(failed_id, 'failure'):
+                  skip('the failure occurred before the live portfolio health check; no deployment rollback is needed.')
+              else:
+                  runs = []
+                  seen = set()
+                  page = 1
+                  while True:
+                      response = api(f"repos/{repository}/actions/workflows/{workflow['id']}/runs?branch=main&status=success&per_page=100&page={page}")
+                      batch = response.get('workflow_runs', [])
+                      require(all(item.get('id') not in seen for item in batch), 'Repeated workflow results while selecting a backup.')
+                      seen.update(item.get('id') for item in batch)
+                      runs.extend(item for item in batch if trusted_run(item, workflow['id']) and item.get('status') == 'completed' and item.get('conclusion') == 'success')
+                      if len(batch) < 100:
+                          break
+                      page += 1
+                  failed_at = completed_time(failed)
+                  if any(completed_time(run) > failed_at for run in runs):
+                      skip('a newer successful main deployment already exists.')
+                  elif verified_restore_after(failed):
+                      skip('a later verified recovery already restored the live site.')
+                  else:
+                      selected = None
+                      candidates = sorted((run for run in runs if completed_time(run) < failed_at), key=completed_time, reverse=True)
+                      for candidate in candidates:
+                          run_id = str(candidate['id'])
+                          if not health_step_has(run_id, 'success'):
+                              continue
+                          listing = api(f'repos/{repository}/actions/runs/{run_id}/artifacts?per_page=100')
+                          artifacts = [artifact for artifact in listing.get('artifacts', []) if artifact.get('name') == 'github-pages']
+                          if len(artifacts) != 1 or artifacts[0].get('expired') is not False or not 0 < artifacts[0].get('size_in_bytes', 0) <= 1024 ** 3:
+                              continue
+                          directory = temporary / 'pages-recovery-candidates' / run_id
+                          directory.mkdir(parents=True)
+                          archive = directory / 'artifact.tar'
+                          try:
+                              subprocess.run(['gh', 'run', 'download', run_id, '--repo', repository, '--name', 'github-pages', '--dir', str(directory)], check=True)
+                              require(archive.is_file() and not archive.is_symlink() and 0 < archive.stat().st_size <= 1024 ** 3, 'Invalid candidate archive.')
+                              with tarfile.open(archive, mode='r:') as saved:
+                                  manifest_entry = next((member for member in saved if str(Path(member.name)) == 'release.json'), None)
+                                  require(manifest_entry is not None and manifest_entry.isfile() and manifest_entry.size <= 16384, 'Candidate has no bounded release manifest.')
+                                  with saved.extractfile(manifest_entry) as stream:
+                                      manifest = json.loads(stream.read(16385))
+                              require(isinstance(manifest, dict) and type(manifest.get('schemaVersion')) is int and manifest['schemaVersion'] == 1, 'Candidate release schema does not match.')
+                              require(manifest.get('commitSha') == candidate['head_sha'] and manifest.get('runId') == run_id, 'Candidate release provenance does not match.')
+                              require(isinstance(manifest.get('resumeSha256'), str) and re.fullmatch(r'[0-9a-f]{64}', manifest['resumeSha256']) is not None, 'Candidate PDF hash is invalid.')
+                          except (SystemExit, ValueError, OSError, tarfile.TarError, subprocess.CalledProcessError):
+                              print(f'Skipped deployment run {run_id}: no valid release manifest.')
+                              continue
+                          destination = Path(os.environ['RESTORE_DIRECTORY'])
+                          require(not destination.exists(), 'Restore destination already exists.')
+                          directory.rename(destination)
+                          selected = run_id
+                          break
+                      require(selected is not None, 'No unexpired prior deployment with a successful health check and valid release manifest is available. Manual recovery is required.')
+                      output({'should_restore': 'true', 'source_run_id': selected, 'downloaded': 'true'})
+                      print(f'Selected verified deployment run {selected} for automatic restore.')
+          PY
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: steps.select.outputs.should_restore == 'true'
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        if: steps.select.outputs.should_restore == 'true'
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Validate the restore request and source deployment
+        if: steps.select.outputs.should_restore == 'true'
+        id: source
+        shell: bash
+        env:
+          SOURCE_RUN_ID: ${{ steps.select.outputs.source_run_id }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF" != 'refs/heads/main' || "$DEFAULT_BRANCH" != 'main' ]]; then
+            echo 'Restores must be dispatched from the main default branch.' >&2
+            exit 1
+          fi
+          if [[ ! "$SOURCE_RUN_ID" =~ ^[1-9][0-9]*$ ]]; then
+            echo 'source_run_id must contain only digits.' >&2
+            exit 1
+          fi
+          mkdir -p "$RESTORE_DIRECTORY"
+          gh api "repos/$GITHUB_REPOSITORY/pages" > "$RUNNER_TEMP/pages-settings.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/deploy.yml" > "$RUNNER_TEMP/pages-workflow.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID" > "$RUNNER_TEMP/pages-source-run.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/jobs?filter=latest&per_page=100" > "$RUNNER_TEMP/pages-source-jobs.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$SOURCE_RUN_ID/artifacts?per_page=100" > "$RUNNER_TEMP/pages-source-artifacts.json"
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          temporary = Path(os.environ['RUNNER_TEMP'])
+          settings = json.loads((temporary / 'pages-settings.json').read_text())
+          workflow = json.loads((temporary / 'pages-workflow.json').read_text())
+          source = json.loads((temporary / 'pages-source-run.json').read_text())
+          jobs = json.loads((temporary / 'pages-source-jobs.json').read_text())
+          artifacts = json.loads((temporary / 'pages-source-artifacts.json').read_text())
+          repository = os.environ['GITHUB_REPOSITORY']
+
+          def require(condition, message):
+              if not condition:
+                  raise SystemExit(message)
+
+          require(settings.get('build_type') == 'workflow', 'GitHub Pages must use the custom workflow source.')
+          require(source.get('id') == int(os.environ['SOURCE_RUN_ID']), 'Source run ID does not match.')
+          require(source.get('status') == 'completed' and source.get('conclusion') == 'success', 'Source deployment run must have completed successfully.')
+          require(source.get('workflow_id') == workflow.get('id'), 'Source run is not the portfolio deployment workflow.')
+          require(source.get('path', '').split('@', 1)[0] == '.github/workflows/deploy.yml', 'Source run must use deploy.yml, not a restore or another workflow.')
+          require(source.get('head_branch') == 'main', 'Source deployment must come from main.')
+          require(source.get('event') in ('push', 'workflow_dispatch'), 'Source event is not a trusted deployment event.')
+          require(source.get('repository', {}).get('full_name') == repository, 'Source repository does not match.')
+          require(source.get('head_repository', {}).get('full_name') == repository, 'Source commit must come from this repository.')
+          require(re.fullmatch(r'[0-9a-f]{40}', source.get('head_sha', '')) is not None, 'Source commit SHA is invalid.')
+          require(any(job.get('name') == 'deploy' and job.get('conclusion') == 'success' and any(step.get('name') == 'Verify live portfolio' and step.get('conclusion') == 'success' for step in job.get('steps', [])) for job in jobs.get('jobs', [])), 'Source deployment must have passed the live portfolio health check.')
+          matches = [item for item in artifacts.get('artifacts', []) if item.get('name') == 'github-pages']
+          require(len(matches) == 1, 'Source run must contain exactly one github-pages artifact.')
+          artifact = matches[0]
+          require(artifact.get('expired') is False, 'The selected backup has expired. Select an unexpired successful deployment.')
+          require(0 < artifact.get('size_in_bytes', 0) <= 1024 ** 3, 'Backup artifact size is invalid or exceeds 1 GiB.')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f"commit_sha={source['head_sha']}\n")
+          PY
+
+      - name: Download the saved static artifact
+        if: steps.select.outputs.should_restore == 'true' && steps.select.outputs.downloaded != 'true'
+        shell: bash
+        env:
+          SOURCE_RUN_ID: ${{ steps.select.outputs.source_run_id }}
+        run: |
+          set -euo pipefail
+          gh run download "$SOURCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name github-pages --dir "$RESTORE_DIRECTORY"
+
+      - name: Inspect the backup without extracting it
+        if: steps.select.outputs.should_restore == 'true'
+        id: backup
+        shell: bash
+        env:
+          EXPECTED_SHA: ${{ steps.source.outputs.commit_sha }}
+          SOURCE_RUN_ID: ${{ steps.select.outputs.source_run_id }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          import re
+          import tarfile
+          from pathlib import Path, PurePosixPath
+
+          directory = Path(os.environ['RESTORE_DIRECTORY'])
+          archive = directory / 'artifact.tar'
+
+          def require(condition, message):
+              if not condition:
+                  raise SystemExit(message)
+
+          files = [path for path in directory.rglob('*') if path.is_file() or path.is_symlink()]
+          require(files == [archive] and not archive.is_symlink(), 'Backup must contain only artifact.tar.')
+          require(0 < archive.stat().st_size <= 1024 ** 3, 'Static archive is empty or exceeds 1 GiB.')
+          members = {}
+          total_size = 0
+          with tarfile.open(archive, mode='r:') as saved:
+              for member in saved:
+                  path = PurePosixPath(member.name)
+                  require(not path.is_absolute() and '..' not in path.parts and '\\' not in member.name, 'Unsafe path in static backup.')
+                  name = str(path)
+                  require(member.isfile() or member.isdir(), 'Static backup may contain only regular files and directories.')
+                  require(name not in members, 'Duplicate path in static backup.')
+                  require('.git' not in path.parts and '.github' not in path.parts, 'Static backup contains repository metadata.')
+                  require(member.size >= 0, 'Invalid archive member size.')
+                  if member.isfile():
+                      total_size += member.size
+                      require(member.offset_data + member.size <= archive.stat().st_size, 'Truncated static backup.')
+                  require(total_size <= 1024 ** 3, 'Expanded static backup exceeds 1 GiB.')
+                  members[name] = member
+                  require(len(members) <= 100000, 'Static backup contains too many entries.')
+
+              required = ('index.html', 'resume.html', 'resume.pdf', '.nojekyll', 'release.json')
+              require(all(name in members and members[name].isfile() for name in required), 'Backup is missing the portfolio, resume, .nojekyll or release manifest.')
+              require(any(name.startswith('_next/static/') and member.isfile() and member.size > 0 for name, member in members.items()), 'Backup is not a built Next.js portfolio.')
+
+              def read_small(name, limit):
+                  require(members[name].size <= limit, f'{name} is unexpectedly large.')
+                  with saved.extractfile(members[name]) as stream:
+                      return stream.read(limit + 1)
+
+              home = read_small('index.html', 5 * 1024 ** 2)
+              require(b'<html' in home.lower() and b'/_next/static/' in home and b'Harmilap Singh Dhaliwal' in home, 'Backup homepage is not the expected portfolio.')
+              manifest = json.loads(read_small('release.json', 16384))
+              require(isinstance(manifest, dict), 'Release manifest must be a JSON object.')
+              require(set(manifest) == {'schemaVersion', 'commitSha', 'runId', 'resumeSha256'}, 'Unsupported release manifest fields.')
+              require(type(manifest['schemaVersion']) is int and manifest['schemaVersion'] == 1, 'Unsupported release manifest version.')
+              require(manifest['commitSha'] == os.environ['EXPECTED_SHA'], 'Backup commit does not match the successful source run.')
+              require(manifest['runId'] == os.environ['SOURCE_RUN_ID'], 'Backup run ID does not match the successful source run.')
+              require(isinstance(manifest['resumeSha256'], str) and re.fullmatch(r'[0-9a-f]{64}', manifest['resumeSha256']) is not None, 'Invalid resume hash in release manifest.')
+              require(members['resume.pdf'].size <= 20 * 1024 ** 2, 'Resume PDF is unexpectedly large.')
+              digest = hashlib.sha256()
+              with saved.extractfile(members['resume.pdf']) as stream:
+                  first = stream.read(1024 * 1024)
+                  require(first.startswith(b'%PDF-'), 'Backup resume is not a PDF.')
+                  digest.update(first)
+                  while chunk := stream.read(1024 * 1024):
+                      digest.update(chunk)
+              require(digest.hexdigest() == manifest['resumeSha256'], 'Backup resume does not match its release hash.')
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f"resume_sha256={manifest['resumeSha256']}\n")
+          print(f"Validated static backup from deployment run {os.environ['SOURCE_RUN_ID']}.")
+          PY
+
+      - name: Upload the unchanged backup for Pages
+        if: steps.select.outputs.should_restore == 'true'
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        with:
+          name: github-pages-restore
+          path: ${{ runner.temp }}/pages-restore/artifact.tar
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Restore GitHub Pages
+        if: steps.select.outputs.should_restore == 'true'
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: github-pages-restore
+
+      - name: Verify the restored live portfolio
+        if: steps.select.outputs.should_restore == 'true'
+        env:
+          EXPECTED_SHA: ${{ steps.source.outputs.commit_sha }}
+          EXPECTED_PDF_SHA: ${{ steps.backup.outputs.resume_sha256 }}
+        run: >-
+          node scripts/verify-live-site.mjs
+          --base-url "$SITE_URL"
+          --expected-sha "$EXPECTED_SHA"
+          --expected-pdf-sha "$EXPECTED_PDF_SHA"
+          --attempts 12
+          --retry-delay-ms 10000
+
+      - name: Record the verified restore
+        if: steps.select.outputs.should_restore == 'true'
+        env:
+          RESTORED_SHA: ${{ steps.source.outputs.commit_sha }}
+          SOURCE_RUN_ID: ${{ steps.select.outputs.source_run_id }}
+        run: |
+          printf 'Restored and verified deployment run %s (commit %s).\n' "$SOURCE_RUN_ID" "$RESTORED_SHA" >> "$GITHUB_STEP_SUMMARY"

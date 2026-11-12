@@ -1,24 +1,33 @@
 #!/bin/bash
 # Pre-push hook — full build before pushing to remote
-# Runs: npm run build (blocker)
+# Runs: Pages source check for main updates, then npm run build (blockers)
 # Escape hatch: SKIP_CHECKS=1 git push ...  (emergencies only)
 
 set -e
 
-if [ "$SKIP_CHECKS" = "1" ]; then
-  echo "⚠️  SKIP_CHECKS=1 — bypassing pre-push build"
-  exit 0
-fi
+pages_source_required=0
 
 # Warn loudly if pushing to main
 while read local_ref local_sha remote_ref remote_sha; do
   if [ "$remote_ref" = "refs/heads/main" ]; then
+    if [[ ! "$local_sha" =~ ^0+$ ]]; then
+      pages_source_required=1
+    fi
     echo "━━━ pushing to main — extra care ━━━"
     if [ "$local_ref" != "refs/heads/main" ] && [ "$local_ref" != "refs/heads/dev" ]; then
       echo "⚠ Pushing from unusual branch to main. Double-check."
     fi
   fi
 done
+
+if [ "$pages_source_required" = "1" ]; then
+  node scripts/check-pages-source.mjs
+fi
+
+if [ "$SKIP_CHECKS" = "1" ]; then
+  echo "⚠️  SKIP_CHECKS=1 — bypassing pre-push build"
+  exit 0
+fi
 
 echo "━━━ pre-push: full build ━━━"
 echo "→ npm run build"
