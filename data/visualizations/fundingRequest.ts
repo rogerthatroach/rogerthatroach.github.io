@@ -245,7 +245,7 @@ export const FUNDING_REQUEST_BUILDER_MILESTONES: FundingRequestMilestoneContent 
   eyebrow: 'Delivery arc',
   title: 'A one-page vision became a production platform in five distinct phases',
   thesis: 'Vision, exploration, production work, pilot use, and launch stay separate; ideation does not collapse into production authorship.',
-  caption: `The ${DRAFTING_PLATFORM_NAME} delivery arc: from a one-page product thesis to a full CFO Group launch across all geographies.`,
+  caption: `The ${DRAFTING_PLATFORM_NAME} delivery arc: from a one-page product thesis to an organization-wide launch.`,
   milestones: [
     {
       marker: 'Vision',
@@ -269,8 +269,8 @@ export const FUNDING_REQUEST_BUILDER_MILESTONES: FundingRequestMilestoneContent 
     },
     {
       marker: 'May 2026',
-      title: 'Launch across the CFO Group',
-      detail: 'The production path expands across all geographies.',
+      title: 'Launch across the organization',
+      detail: 'The production workflow launches across RBC.',
     },
   ],
   ownershipLabel: 'The through-line',

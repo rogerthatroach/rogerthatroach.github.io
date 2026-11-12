@@ -65,7 +65,7 @@ export const TIMELINE: TimelineNode[] = [
     org: 'Royal Bank of Canada',
     role: 'AI & Data Science Lead · CFO Group',
     description:
-      `Conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME} from March through its ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch while guiding the 2025 Amplify cohort and leading a focused two-week v1-to-v2 refactor of the ${FINANCIAL_BENCHMARKING_NAME}. Later drove the ${DRAFTING_PLATFORM_NAME} from concept to full CFO Group launch. Remain ${HANDS_ON_PCT} hands-on across architecture, implementation, evaluation, and production follow-through.`,
+      `Conceived, architected, and built the ${WORKFORCE_ANALYTICS_NAME} from March through its ${WORKFORCE_ANALYTICS_PRODUCTION_LAUNCH} launch while guiding the 2025 Amplify cohort and leading a focused two-week v1-to-v2 refactor of the ${FINANCIAL_BENCHMARKING_NAME}. Later drove the ${DRAFTING_PLATFORM_NAME} from concept to organization-wide launch. Remain ${HANDS_ON_PCT} hands-on across architecture, implementation, evaluation, and production follow-through.`,
     skills: ['LangGraph', 'MCP', 'Semantic retrieval', 'Text-to-SQL', 'Python', 'React'],
     milestone: `${FUNDING_REQUEST_DRAFTING_SCALE} launch`,
     accent: 'purple',
@@ -82,10 +82,10 @@ export const TIMELINE: TimelineNode[] = [
       {
         name: `${DRAFTING_PLATFORM_NAME}`,
         oneLiner:
-          'Drove a reviewed, single-agent drafting workflow from a one-page concept to production. It was the first true agentic AI platform approved for production at the bank: pilot in April 2026, then full CFO Group launch across all geographies in May.',
+          'Drove a reviewed, single-agent drafting workflow from a one-page concept to production. It was the first true agentic AI platform approved for production at the bank: pilot in April 2026, then organization-wide launch in May.',
         decisionRationale:
           'A single LangGraph orchestrator owns workflow state and review. Bounded MCP tool routines handle scoped work without being presented as additional agents; missing coverage returns to clarification or human review.',
-        metric: { value: 'April → May 2026', label: 'pilot to full CFO Group launch' },
+        metric: { value: 'April → May 2026', label: 'pilot to organization-wide launch' },
         caseStudyLink: '/projects/funding-request-drafting',
         blogLink: '/blog/funding-request-drafting-platform-building',
       },

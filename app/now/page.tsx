@@ -3,26 +3,12 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
+import { NOW } from '@/data/now';
 
-const UPDATED = 'August 2026';
-
-const BULLETS: { heading: string; body: string }[] = [
-  {
-    heading: 'Operating',
-    body: 'Supporting the AI/LLM drafting platform in production after its May 2026 full CFO Group launch: reviewing user feedback, investigating observed behavior, and following changes through evaluation and release.',
-  },
-  {
-    heading: 'Piloting',
-    body: 'A multi-agent successor is in pilot. The current work is centered on user testing and carrying pilot findings into the next reviewed iteration.',
-  },
-  {
-    heading: 'Improving',
-    body: 'Turning production feedback into clearer test cases, coverage checks, and follow-through without widening the reviewed application boundary.',
-  },
-];
+const { updated: UPDATED, bullets: BULLETS } = NOW;
 
 const META_TITLE = 'Now';
-const META_DESCRIPTION = `Current production-support, pilot, and evaluation work as of ${UPDATED}.`;
+const META_DESCRIPTION = NOW.metaDescription;
 const META_PATH = '/now';
 
 export const metadata: Metadata = {
@@ -67,7 +53,7 @@ export default function NowPage() {
             Now · updated {UPDATED}
           </p>
           <h1 className="mt-2 font-display text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
-            Current focus.
+            {NOW.heading}
           </h1>
 
           <ol className="mt-10 space-y-6">

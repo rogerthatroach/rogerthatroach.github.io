@@ -15,7 +15,7 @@ export const AWARDS_COUNT = AWARDS.length;
 /**
  * RBC production AI systems (3).
  *
- *   1. AI/LLM Drafting Platform — pilot launched April 2026; full CFO Group launch across all geographies May 2026
+ *   1. AI/LLM Drafting Platform — pilot launched April 2026; organization-wide launch May 2026
  *   2. AI/LLM Workforce Analytics Platform — built Mar–Nov 2025; production since Nov 2025
  *   3. Financial Peer Benchmarking Platform — v1 shipped, v2 is a concurrent 2-week refactor of v1 (one product, two revisions)
  *
@@ -146,8 +146,8 @@ export const WORKFORCE_ANALYTICS_COST_CENTRES = '~40,000';
 /** Rollup nodes in the 18-level business-segment hierarchy, above the leaf cost centres. */
 export const WORKFORCE_ANALYTICS_ROLLUPS = '~9,000';
 
-/** Drafting-platform pilot launched April 2026; full CFO Group launch across all geographies May 2026. */
-export const FUNDING_REQUEST_DRAFTING_SCALE = 'Full CFO Group';
+/** Drafting-platform pilot launched April 2026; organization-wide launch May 2026. */
+export const FUNDING_REQUEST_DRAFTING_SCALE = 'Organization-wide';
 
 // ═══════════════════════════════════════════════════════════════════
 // TEAM

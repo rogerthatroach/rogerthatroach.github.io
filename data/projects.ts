@@ -105,7 +105,7 @@ const PROJECTS_CHRONOLOGICAL: Project[] = [
   {
     id: 'funding-request-drafting',
     title: `${DRAFTING_PLATFORM_NAME}`,
-    subtitle: 'Reviewed Agentic Workflow — RBC CFO Group',
+    subtitle: 'Reviewed Agentic Workflow — RBC',
     role: 'Conceived, architected, and built end-to-end',
     stack: ['LangGraph', 'MCP', 'Semantic retrieval', 'Foundation-model API'],
     heroMetric: { value: FUNDING_REQUEST_DRAFTING_SCALE, label: 'May 2026 launch' },

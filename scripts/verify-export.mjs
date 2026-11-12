@@ -87,7 +87,7 @@ const requiredVisibleTextByRoute = new Map([
   ['/', ['Hands-on production AI leadership', '3 production AI systems']],
   ['/resume', ['AI & Data Science Lead — RBC', 'Three production AI systems at the bank', 'AI/LLM Drafting Platform', 'AI/LLM Workforce Analytics Platform', 'Mar → Nov 2025', 'Financial Peer Benchmarking Platform', 'Professional experience']],
   ['/about', ['I lead best when I stay close to the work', 'Four domains, four recurring questions']],
-  ['/now', ['Now · updated August 2026', 'Current focus']],
+  ['/now', ['Now · updated November 2026', 'Current focus']],
   ['/platform', ['Application boundaries', 'They do not map RBC’s internal infrastructure']],
   ['/projects', ['AI/LLM Drafting Platform', 'Combustion Tuning']],
   ['/projects/funding-request-drafting', ['Problem and context', 'One agent carries the draft from intake to review', 'A field group is a scope, not a specialist agent']],
@@ -96,7 +96,7 @@ const requiredVisibleTextByRoute = new Map([
   ['/projects/commodity-tax', ['Decision and trade-off', 'Outcome and operating state']],
   ['/projects/document-intelligence', ['Decision and trade-off', 'Outcome and operating state']],
   ['/projects/combustion-tuning', ['Decision and trade-off', 'Outcome and operating state']],
-  ['/blog/funding-request-drafting-platform-building', ['Building an AI/LLM Drafting Platform: From One-Page Plan to CFO Group Launch']],
+  ['/blog/funding-request-drafting-platform-building', ['Building an AI/LLM Drafting Platform: From One-Page Plan to Organization-Wide Launch']],
   ['/blog/enterprise-agentic-ai-architecture', ['AI/LLM Drafting: One Agent, Bounded Tools, Human Review']],
   ['/blog/agentic-ai', ['The numerical path is repeatable for fixed inputs, data, code, and configuration; model routing and prose remain probabilistic.']],
   ['/blog/text-to-sql', ["The model's score is a routing signal, not a correctness probability."]],
@@ -145,6 +145,10 @@ for (const path of nonErrorPages) {
 
   for (const [label, pattern] of renderedOutputGuards) {
     if (pattern.test(html)) fail(`${route}: contains ${label}`)
+  }
+
+  if (/full CFO Group launch|From One-Page Plan to CFO Group Launch/i.test(visibleText)) {
+    fail(`${route}: drafting launch scope must reflect the organization-wide release`)
   }
 
   for (const phrase of requiredVisibleTextByRoute.get(route) ?? []) {

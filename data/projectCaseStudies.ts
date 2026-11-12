@@ -204,7 +204,7 @@ export const CASE_STUDIES: CaseStudy[] = [
       mechanism:
         'The graph carries a session from intake through template guidance, field-group retrieval, bounded extraction, ownership-aware merge, and coverage analysis. Passing checks produces a reviewable draft; missing coverage returns the session to clarification or human review.',
       outcomeAndState:
-        `The ${DRAFTING_PLATFORM_NAME} became the first true agentic AI platform approved for production at the bank. Its pilot launched in April 2026, followed by a full CFO Group launch across all geographies in May 2026.`,
+        `The ${DRAFTING_PLATFORM_NAME} became the first true agentic AI platform approved for production at the bank. Its pilot launched in April 2026, followed by an organization-wide launch in May 2026.`,
       limits:
         'Tool routines propose bounded work inside the graph; they are not independent agents. The author remains responsible for reviewing, revising, and accepting the draft, and unavailable evidence cannot be treated as covered.',
     },

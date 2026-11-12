@@ -12,7 +12,7 @@ export const ABOUT = {
     },
     {
       lead: 'Build the path to production, not only the architecture.',
-      body: 'For the AI/LLM drafting platform, I carried the work from a one-page product vision through implementation, pilot, and full CFO Group launch. For the AI/LLM workforce analytics platform, I conceived, architected, and built the system while leading its cross-functional production delivery. Direct building and coordinated delivery are both part of the job.',
+      body: 'For the AI/LLM drafting platform, I carried the work from a one-page product vision through implementation, pilot, and organization-wide launch. For the AI/LLM workforce analytics platform, I conceived, architected, and built the system while leading its cross-functional production delivery. Direct building and coordinated delivery are both part of the job.',
     },
     {
       lead: 'Treat trust as an operating requirement.',

@@ -161,7 +161,7 @@ export const POSTS: BlogPost[] = [
       readingTime: '7 min read',
       abstract:
         `The ${DRAFTING_PLATFORM_NAME} uses one LangGraph orchestrator to guide drafting across retained sessions. Typed MCP tools handle bounded workflow actions; field-scoped retrieval supplies evidence to extraction tasks; ownership-aware merge and coverage checks surface collisions and gaps for author review. These controls preserve evidence and expose failure paths without removing the need for human judgment.`,
-      updated: '2026-08-09',
+      updated: '2026-11-12',
       status: 'published',
       projectId: 'funding-request-drafting',
       register: 'technical',
@@ -172,7 +172,7 @@ export const POSTS: BlogPost[] = [
       { id: 7, authors: 'Lewis, P. et al.', title: 'Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks', venue: 'NeurIPS', year: 2020 },
     ],
     furtherReading: [
-      { title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`, url: '/blog/funding-request-drafting-platform-building', description: 'From initial product thesis through pilot and full CFO Group launch.' },
+      { title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to Organization-Wide Launch`, url: '/blog/funding-request-drafting-platform-building', description: 'From initial product thesis through pilot and organization-wide launch.' },
       { title: 'AI/LLM Drafting: Four Decisions Behind a Reviewable Workflow', url: '/blog/enterprise-agentic-ai-framework', description: 'Chosen approaches, strongest alternatives, costs, and residual risks.' },
       { title: `${DRAFTING_PLATFORM_NAME} — Case Study`, url: '/projects/funding-request-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
       { title: 'LangGraph Documentation', url: 'https://langchain-ai.github.io/langgraph/', description: 'Graph-based workflow orchestration with state, conditional routing, and checkpoints.' },
@@ -199,21 +199,21 @@ export const POSTS: BlogPost[] = [
     references: [],
     furtherReading: [
       { title: 'AI/LLM Drafting: One Agent, Bounded Tools, Human Review', url: '/blog/enterprise-agentic-ai-architecture', description: 'Mechanism, evidence boundaries, failure paths, and residual risk.' },
-      { title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`, url: '/blog/funding-request-drafting-platform-building', description: 'The production journey from one-page plan through pilot and full CFO Group launch.' },
+      { title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to Organization-Wide Launch`, url: '/blog/funding-request-drafting-platform-building', description: 'The production journey from one-page plan through pilot and organization-wide launch.' },
       { title: `${DRAFTING_PLATFORM_NAME} — Case Study`, url: '/projects/funding-request-drafting', description: 'Problem, contribution, decision, operating state, and limits.' },
     ],
   },
   {
     meta: {
       slug: 'funding-request-drafting-platform-building',
-      title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to CFO Group Launch`,
+      title: `Building an ${DRAFTING_PLATFORM_NAME}: From One-Page Plan to Organization-Wide Launch`,
       subtitle: 'How bounded exploration, one accountable workflow, and explicit review points turned an initial product thesis into a production drafting platform.',
       date: '2026-04-17',
       tags: ['Leadership', 'Agentic AI', 'LangGraph', 'Product Development', 'Team Building'],
       readingTime: '5 min read',
       abstract:
-        `The ${DRAFTING_PLATFORM_NAME} began as a one-page plan, used the 2025 Amplify cohort for bounded problem exploration, entered pilot in April 2026, and launched across the full CFO Group in May. Amplify widened the option set; direct production ownership covered architecture, implementation, pilot, and launch.`,
-      updated: '2026-08-30',
+        `The ${DRAFTING_PLATFORM_NAME} began as a one-page plan, used the 2025 Amplify cohort for bounded problem exploration, entered pilot in April 2026, and launched organization-wide in May 2026. Amplify widened the option set; direct production ownership covered architecture, implementation, pilot, and launch.`,
+      updated: '2026-11-12',
       status: 'published',
       projectId: 'funding-request-drafting',
       register: 'builder',

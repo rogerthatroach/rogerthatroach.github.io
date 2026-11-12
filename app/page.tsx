@@ -18,7 +18,7 @@ const HOME_SECTIONS = [
 ];
 import { PROJECTS } from '@/data/projects';
 import { CASE_STUDIES } from '@/data/projectCaseStudies';
-import { YEARS_EXPERIENCE } from '@/data/canonical';
+import { HOME_PROJECTS_DESCRIPTION } from '@/data/hero';
 
 export default function Home() {
   const projectRows = PROJECTS.map((project) => {
@@ -64,8 +64,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="mb-6 max-w-2xl text-sm text-text-secondary">
-              Six systems across {YEARS_EXPERIENCE} years. From power plant combustion tuning to agentic AI
-              launched across RBC&rsquo;s full CFO Group.
+              {HOME_PROJECTS_DESCRIPTION}
             </p>
 
             <ProjectsHybridTable rows={projectRows} />

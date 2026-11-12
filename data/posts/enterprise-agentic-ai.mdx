@@ -17,7 +17,7 @@ Document-heavy enterprise workflows ask more of an AI system than a chatbot can 
 
 Retrieval-augmented generation can supply relevant source material <CitationRef id={7} />, but retrieval alone does not decide who owns the workflow, how retrieved evidence is scoped, what happens when sources disagree, or when a draft is ready for review. Those are orchestration and control questions.
 
-The AI/LLM Drafting Platform addresses them with one reviewed single-agent workflow. A LangGraph graph owns the session path; registered tool routines perform bounded work; field groups constrain which references and target fields travel together; merge and coverage checks surface collisions and omissions; and an author reviews the resulting project funding request draft. This is the production v1 architecture used inside RBC CFO Group, the first true agentic AI platform approved for production at the bank.
+The AI/LLM Drafting Platform addresses them with one reviewed single-agent workflow. A LangGraph graph owns the session path; registered tool routines perform bounded work; field groups constrain which references and target fields travel together; merge and coverage checks surface collisions and omissions; and an author reviews the resulting project funding request draft. This is the production v1 architecture deployed organization-wide at RBC, the first true agentic AI platform approved for production at the bank.
 
 The architecture makes responsibilities and failure paths explicit. It does not make model output deterministic, prove that every source is complete, or remove the need for human judgment.
 
@@ -93,6 +93,6 @@ Traceability has the same limit. A retained record can show what the registered 
 
 ## 8. Production scope and transferability
 
-The drafting platform entered pilot in April 2026 and launched across the full CFO Group in all geographies in May. This production architecture now operates at that scope. Deployment alone does not make it a universal architecture for regulated workflows or demonstrate a quantified improvement in drafting time.
+The drafting platform entered pilot in April 2026 and launched organization-wide in May 2026. This production architecture now operates at that scope. Deployment alone does not make it a universal architecture for regulated workflows or demonstrate a quantified improvement in drafting time.
 
 The reusable part is a set of questions: Who owns control? Which work is bounded as a tool routine? What state is required to resume? How is evidence scoped? Where do collisions surface? What stops progression when coverage is missing? Who reviews the result? Those questions transfer to other structured workflows. The answers, controls, and evidence still have to be designed and evaluated for each domain.
