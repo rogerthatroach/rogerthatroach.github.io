@@ -28,6 +28,16 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: npm
+      - name: Verify Pages publishing source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          build_type="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type')"
+          if [ "$build_type" != "workflow" ]; then
+            echo "::error::GitHub Pages must publish through GitHub Actions."
+            exit 1
+          fi
       - run: npm ci
       - run: npm run typecheck
       - run: npm audit --audit-level=high
@@ -51,6 +61,7 @@ jobs:
         with:
           path: out
           include-hidden-files: true
+          retention-days: 90
 
   deploy:
     needs: build
