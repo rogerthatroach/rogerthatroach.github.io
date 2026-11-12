@@ -36,7 +36,6 @@ jobs:
       FAILED_RUN_ID: ${{ github.event.workflow_run.id }}
       TRIGGER_EVENT: ${{ github.event_name }}
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-      RESTORE_DIRECTORY: ${{ runner.temp }}/pages-restore
       SITE_URL: https://rogerthatroach.github.io
     steps:
       - name: Select a verified deployment to restore
@@ -48,6 +47,8 @@ jobs:
             echo 'Restores must run from the main default branch.' >&2
             exit 1
           fi
+          export RESTORE_DIRECTORY="$RUNNER_TEMP/pages-restore"
+          printf 'RESTORE_DIRECTORY=%s\n' "$RESTORE_DIRECTORY" >> "$GITHUB_ENV"
           python3 - <<'PY'
           import json
           import os
